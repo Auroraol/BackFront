@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>定位</title>
+    <style>
+        div {
+            margin: 10px;
+            padding: 5px;
+            font-size: 12px;
+            line-height: 25px;
+        }
+        #first{
+            background-color: #d42020;
+            border: 1px solid #666;
+            /*相对定位  相对于原来的位置     上下左右*/
+            position: relative;
+
+            /*向上*/
+            top: -20px;
+            /*向下*/
+            bottom: -10px;
+            /*向右*/
+            left: 20px;
+            /*向左*/
+            right: 30px;
+
+        }
+
+        #second{
+            background-color: #5cc718;
+            border: 1px solid #7f0606;
+        }
+
+        #third{
+            background-color: #0093E9;
+            border: 1px solid #11cd96;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="father">
+    <div id="first">
+        第一个盒子
+    </div>
+    <div id="second" >
+        第二个盒子
+    </div>
+    <div id="third">
+        第三个盒子
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+server:
+  port: 8090
+# 初始化dispatcherServlet，默认-1未开启，0及以上为开启
+spring:
+  mvc:
+    servlet:
+      load-on-startup: 1

@@ -1,0 +1,18 @@
+/*类选择器*/
+.head1{
+    color: #d42020;
+    background: aquamarine;
+}
+.head2{
+    color: #5cc718;
+    background: #c1972c;
+}
+/*标签选择器*/
+p{
+    font-size: 10px;
+}
+
+/*id选择器*/
+#id1{
+    color:red;
+}

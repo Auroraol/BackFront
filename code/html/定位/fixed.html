@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>固定定位</title>
+
+    <style>
+      div:nth-of-type(1){
+          /*绝对定位*/
+        width: 100px;
+        height: 100px;
+        background-color: red;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+      }
+
+      /*相对定位*/
+      div:nth-of-type(2){
+          width: 50px;
+          height: 50px;
+          background-color: orange;
+          position: fixed;
+          right: 0;
+          bottom: 0;
+      }
+    </style>
+
+</head>
+<body>
+
+<div>div1</div>
+<div>div2</div>
+</body>
+</html>

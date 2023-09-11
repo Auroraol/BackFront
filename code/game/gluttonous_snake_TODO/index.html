@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>贪吃蛇</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="./js.js"></script>
+    <script type="text/javascript" src="javascript/js.js"></script>
+</head>
+<body>
+
+<div class="box">
+<div id="score">
+    <span>等分: 0</span>
+</div>
+<div>
+    <form action="#" method="get" id="form" name="form">
+        <p>难度:
+            <input type="radio" name="Hard" checked="checked">简单
+            <input type="radio" name="Hard">中等
+            <input type="radio" name="Hard">困难
+            <input type="radio" name="Hard">地狱
+        </p>
+        <p>
+            <input type="button" value="开始" class="start">
+            <input type="reset" value="重玩" class="reset">
+        </p>
+<!--        <p><span id="start">按“空格键”开始/暂停</span></p>-->
+    </form>
+
+</div>
+
+<div id="main">
+    <div id="home">
+<!--        <div style="background:url(./images/sna/snake0.png) no-repeat;"></div>-->
+<!--        <div style="background:url(./images/sna/snake1.png) no-repeat; left:20px;"></div>-->
+<!--        <div style="background:url(./images/sna/snake2.png) no-repeat; left:40px;"></div>-->
+<!--        <div style="background:url(./images/sna/snake3.png) no-repeat; left:60px;"></div>-->
+    </div>
+    <div class="wall left"></div>
+    <div class="wall right"></div>
+    <div class="wall top"></div>
+    <div class="wall bottom"></div>
+</div>
+</div>
+
+</body>
+</html>

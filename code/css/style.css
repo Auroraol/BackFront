@@ -1,0 +1,36 @@
+.title{
+    font-size: 18px;
+    font-weight: bold;
+    text-indent: 1em;
+    line-height: 30px;
+    /*颜色 图片 位置 平铺方式*/
+    background: red url("../html/resources/image/img_1.png") 286px 13px no-repeat;
+}
+
+#nav{
+    width: 300px;
+}
+
+ul li{
+    height: 30px;
+    list-style: none;
+    background-image: url("../html/resources/image/img_1.png");
+    background-repeat: no-repeat;
+    background-position: 241px 19px;
+}
+
+ul {
+    background: antiquewhite;
+}
+a{
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+}
+
+a:hover{
+    color: orange;
+    text-decoration: underline;
+}
+

@@ -1,0 +1,41 @@
+div{
+    margin: 10px;
+    padding: 5px;
+}
+
+#father{
+    border: 1px #0000 solid;
+    overflow: hidden;
+}
+
+.l1{
+    border: 1px #F00 dashed;
+    float: right;
+    display: inline-block;
+}
+
+.l2{
+    display: inline-block;
+    border: 1px solid deeppink;
+    /*float: left;*/
+}
+
+.l3{
+    display: inline-block;
+    border: 1px #F00 dashed;
+    /*float: right;*/
+}
+
+.l4{
+    border: 1px #F00 dashed;
+    font-size: 12px;
+    line-height: 23px;
+    display: inline-block;
+    /*float: right;*/
+}
+
+.clear{
+    clear : both;
+    margin: 0;
+    padding: 0;
+}

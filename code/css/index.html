@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--规范通过<style>可以编写css的代码
+    语法:
+    选择器{
+        声明1;
+        声明2;
+    }
+    -->
+    <link rel="stylesheet" href="syle.css">
+    <style>
+<!--后代选择器-->
+        body p{
+            background:red;
+        }
+
+    </style>
+</head>
+<body>
+
+<!--类选择器-->
+<!--
+    类选择器可以,多标签归类. 可以复用
+-->
+<h1 class="head1">第一</h1>
+<h1 class="head2">第一</h1>
+<p class="head1">第一</p>
+
+<!--标签选择器-->
+<p class="head1">dsfahdhs 啊的苏格兰和</p>
+
+<!--id选择器-->
+<!--id必须全局唯一
+     不遵循就近原则
+-->
+<h1 id="id1">第一</h1>
+<p>p1</p>
+<p>p2</p>
+<p>p3</p>
+<ul>
+    <li>
+        <p>p4</p>
+    </li>
+    <li>
+        <p>p5</p>
+    </li>
+    <li>
+        <p>p6</p>
+    </li>
+</ul>
+
+</body>
+</html>

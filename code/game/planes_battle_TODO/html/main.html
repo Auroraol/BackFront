@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>飞机大作战</title>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="index.css" />
+    <script type="text/javascript" src="../js/controled.js"></script>
+</head>
+<body>
+
+<div id="mysterydiv">
+    <div id="mysteryhomediv">
+        <p id="name">飞机大作战</p>
+        <button id="game">开始游戏</button>
+    </div>
+    <div id="gamediv">
+        <audio src="../audio/bgm.mp3" autoplay = "autoplay" loop = "loop" preload="auto"></audio>
+        <div id="scorediv">
+            <label>得分：</label>
+            <p id="initialscore">0</p>
+        </div>
+        <div id="pausediv">
+            <button>继续</button><br />
+            <button>结束游戏</button>
+        </div>
+        <div id="enddiv">
+            <p class="lastscore">飞机大作战</p>
+            <p id="mysteryplanscoretext">0</p>
+            <div><button onclick="tryagain()">再玩一次</button></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

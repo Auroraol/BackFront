@@ -1,0 +1,45 @@
+body{
+    margin: 0;
+    padding: 0;
+    /**/
+    display: flex;
+    /*可让子元素居中显示。*/
+    justify-content: center;
+    /*让子元素 竖着排列时  连着用*/
+    flex-direction: column;
+    align-items: center;
+    height: 396px;
+
+}
+.puzzle {
+    border-style: solid;
+    border-color: #416565;
+    border-width: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+.cell,.emptyCell {
+    width: 60px;
+    height: 60px;
+    margin: 10px;
+    text-align: center;
+    font-weight: bold;
+    font-size: xx-large;
+    padding: 10px;
+    border: 1px solid;
+}
+
+.cell:hover, .emptyCell:hover{
+    cursor:pointer;
+    background-color: cadetblue;
+}
+
+/*#butn1{*/
+/*    position: absolute;*/
+/*    bottom: -81px;*/
+/*}*/
+
+h2{
+    height: 1px;
+}

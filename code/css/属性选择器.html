@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>属性选择器</title>
+    <style>
+    /*存在id属性的元素*/
+    a[id]{
+        background : yellow;
+    }
+
+    </style>
+</head>
+<body>
+
+<p class="demo">
+    <a href="http://www.baidu.com"class="linksitem first"id="first">1</a><a href=""class="linksitem active" target="_blank" title="test">2</a><a href="images/123.html"class="links item">3</a>
+    <a href="../html/resources/image/1.png"class="links item">4</a>
+    <a href="images/123.jpg"class="links item">5</a>
+    <a href="abc"class="links item">6</a>
+    <a href="/a.pdf" class="links item">7</a>
+    <a href="/abc.pdf"class="links item">8</a>
+    <a href="abc.doc" class="linksitem">9</a>
+    <a href="abcd.doc" class="links item last">10</a>
+</p>
+
+</body>
+</html>

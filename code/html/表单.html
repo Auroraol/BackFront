@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>表单</title>
+</head>
+<body>
+
+<!--表单
+    action :表单提交的位置，可以是网站，也可以是一个请求处理地址
+    method : post,get提交方式
+        get方式提交：我们可以在url中看到我们提交的信息，不安全，高效
+        post：比较安全，传输大文件.
+-->
+<form action="#" method="get">
+    <!--placeholder 提示信息-->
+    <p>名字: <input type="text" name="username" placeholder="请输入用户名"></p>
+    <p>密码: <input type="password" name="password" id="password"></p>
+
+    <!--单选框-->
+    <p>性别：
+        <input type="radio" name="sex" value="male" checked/>男
+        <input type="radio" name="sex" value="falme">女
+    </p>
+
+    <!--多选框-->
+    </p>爱好：
+        <input type="checkbox" name="habby" value="shopping">购物
+        <input type="checkbox" name="habby"  value="game">游戏
+        <input type="checkbox" name="habby" value="study">学习
+        <input type="checkbox" name="habby" value="study">敲代码
+    </p>
+
+    <!--文件域-->
+    <p>上传文件:
+        <input type="file" name="files" id="files">
+    </p>
+
+<!--    隐藏域：<input type="hidden" name="hidden" value="aaaa"><br>-->
+    取色器：<input type="color" name="color" id="color"><br>
+<!--    生日：<input type="date" name="date" id="date"><br>-->
+    生日：<input type="datetime-local" name="birthday" id="birthday"><br/>
+
+    <!--pattern 写正则表达式 网上搜  https://www.jb51.net/tools/regexsc.htm -->
+    邮箱：<input type="email" name="email" id="email" pattern="/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/
+/^[a-z\d]+(\.[a-z\d]+)*@([\da-z](-[\da-z])?)+(\.{1,2}[a-z]+)+$/或\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"><br/>
+    年龄：<input type="number" name="age" id="age" min="1" max="150"><br>
+
+    <!--滑块-->
+    <p>音量:
+        <input type="range" name="video">
+    </p>
+
+    <!--搜索框--> <!--+ 增加鼠标可用性
+        点击文本会自动跳转到id的位置
+    -->
+    <p>
+        <label for="search">搜索:</label>
+        <input type="search" name="search" id="search">
+    </p>
+
+    <!--下拉框-->
+    <p>省份：
+        <select name="provinces" id="provinces">
+        <option value="">请选择</option>
+        <option value="1">北京</option>
+        <option value="2">上海</option>
+        <option value="3">西安</option>
+        </select>
+    </p>
+    <!--文本域-->
+    </p>自我描述:<br>
+        <textarea name="des" id="des" cols="30" rows="10" placeholder="文本内容"></textarea>
+    </p>
+
+    <!--按钮
+               input type= "button"普通按钮
+               input type= "image" 图像按钮
+               input type= "submit"提交按钮
+               input type="reset" 重置
+           <p>按钮:
+               <input type="button" name="btn1" value="Mtk K"><input type="image" src=". ./resources/ image/1.jpg"></p>
+           <p>
+           <input type="reset" value="清空表单"></p>
+       -->
+    <p>按钮:
+        <input type="submit" value="提交">
+        <input type="reset" value="清空表单">
+        <input type="image" src="./img/regbtn.jpg" alt="提交图片">
+    </p>
+
+</form>
+
+</body>
+</html>

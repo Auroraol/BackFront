@@ -1,0 +1,131 @@
+@charset "utf-8";
+/* CSS Document */
+
+*{
+	margin:0;
+	padding:0;
+	text-decoration: none;
+}
+
+#mysterydiv
+{
+	position:absolute;
+	left: 221px;
+	top: 3px;
+}
+
+
+#mysteryhomediv{
+	position:absolute;
+	left:0;
+	top:0;
+	width: 512px;
+	height: 672px;
+	background-image:url(../image/home.jpg);
+	border: 8px solid #FF3600;
+	border-radius: 10px;
+}
+#name{
+	margin-left:175px;
+	margin-top:200px;
+	font-size:30px;
+	font-family:Verdana, Geneva, sans-serif;
+}
+
+#mysteryhomediv button{
+	position:absolute;
+	top:500px;
+	left:139px;
+	width:150px;
+	height:30px;
+	border:1px solid black;
+	border-radius:30px;
+	background-color:#c4c9ca;
+}
+
+#game{
+	margin-left:30px;
+}
+
+button{
+	outline:none;
+}
+
+#gamediv{
+	width:360px;
+	height:600px;
+	background-image:url(../image/back.jpg);
+	display:none;
+	border: 10px solid #FF3600;
+	border-radius: 10px;
+}
+
+#scorediv{
+	font-size:16px;
+	font-weight:bold;
+	position:absolute;
+	top:10px;
+	left:10px;
+	/*不显示*/
+	display:none;
+}
+
+#gamediv img{
+	position:absolute;
+	z-index:1;
+}
+
+#pausediv{
+	position:absolute;
+	top:210px;
+	left:82px;
+	display:none;
+	z-index:2;
+}
+#pausediv button{
+	width:150px;
+	height:30px;
+	margin-bottom:20px;
+	border:1px solid black;
+	border-radius:30px;
+	background-color:#c4c9ca;
+}
+#enddiv{
+	position:absolute;
+	top:210px;
+	left:75px;
+	border:1px solid black;
+	border-radius:5px;
+	text-align:center;
+	background-color:#d7ddde;
+	display:none;
+	z-index:2;
+}
+.lastscore{
+	width:160px;
+	height:30px;
+	line-height:30px;
+	font-size:16px;
+	font-weight:bold;
+}
+#mysteryplanscoretext{
+	width:160px;
+	height:80px;
+	line-height:80px;
+	border-top:1px solid gray;
+	border-bottom:1px solid gray;
+	font-size:16px;
+	font-weight:bold;
+}
+#enddiv div{
+	width:160px;
+	height:50px;
+}
+#enddiv div button{
+	margin-top:10px;
+	width:90px;
+	height:30px;
+	border:1px solid gray;
+	border-radius:30px;
+}
+	

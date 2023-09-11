@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="javaweb-session-cookie:war" />
+    </artifacts-to-build>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b5d7c300-a15a-453a-acf2-ed260dd101a6" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../../../../code/basic_code/basic_grammar/src/demo/HuiWen.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/code.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/gluttonous_snake_TODO/css/style.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/gluttonous_snake_TODO/images/sna/background.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/gluttonous_snake_TODO/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/gluttonous_snake_TODO/javascript/js.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/simple_game/css/style.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/simple_game/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/simple_game/js/js.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/sudoku/css/style.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/sudoku/js/js.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/sudoku/main.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/sudoku_retro/css/style.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/sudoku_retro/js/Interface_Builder.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/game/sudoku_retro/main.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/html/X-NOTE/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/javascript/1.第一课.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/javascript/2.基本语法.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/javascript/3.字符串.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../code/javascript/Date日期对象.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/index.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/request/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/request/src/main/java/com/jindao/request/LoginServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/request/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/request/src/main/webapp/index.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/request/src/main/webapp/success.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/response/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/response/src/main/java/com/jindao/servlet/FileServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/response/src/main/java/com/jindao/servlet/ImageServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/response/src/main/java/com/jindao/servlet/RedirectServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/response/src/main/java/com/jindao/servlet/RequestTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/response/src/main/resources/1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/response/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/response/src/main/webapp/index.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/response/src/main/webapp/success.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/servlet-01/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/servlet-01/src/main/java/com/jindao/servlet/HelloWorld.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/servlet-01/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/servlet-01/src/main/webapp/index.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/servlet-02/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/servlet-02/src/main/java/com/jindao/servlet/GetServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/servlet-02/src/main/java/com/jindao/servlet/HelloServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/servlet-02/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/servlet-02/src/main/webapp/index.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/servlet-03/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/servlet-03/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../mavenweb01/servlet-03/src/main/webapp/index.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../多线程/code/lesson/lesson.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../注解和反射/code/untitled/src/TestAnnotation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../注解和反射/code/untitled/src/TestPerformance.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../注解和反射/code/untitled/untitled.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../网络编程/code/untitled/src/lesson01/TcpClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../网络编程/code/untitled/src/lesson01/TcpServer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../网络编程/code/untitled/untitled.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../../../java_note.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../code/basic_code/basic_grammar/src/com/jindao/Demo01.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../../code/basic_code/basic_grammar/src/com/jindao/Demo01.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../code/basic_code/basic_grammar/src/com/jindao/ForDemo01.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../../code/basic_code/basic_grammar/src/com/jindao/ForDemo01.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../code/basic_code/basic_grammar/src/com/jindao/Variable.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../../code/basic_code/basic_grammar/src/com/jindao/Variable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../code/html/媒体.html" beforeDir="false" afterPath="$PROJECT_DIR$/../../../../code/html/媒体.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../html.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../html.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/%B3(Q@C2[EP(RSPH3)4B$$1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/%}N@510G}RQH_YJVQ$NE9WT.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/3GT3Q%{J9LURANL_RDNCKHC.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/4O{BE94M8JJJ30YM%IM1Y7N.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/5DI6{NDFO65YX@K37P`_A]D.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/5Z4{@4K4S%B@V@95F4BP{95.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/6C6NZQ2K8J3E1AQT]O2_VJS.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/7D]DTW%JJKCPW2B}7AJXB0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/7D`MG0H3%FDNZ`NM{3[9{8.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/7O5H{0BFLZ%1N]RYT41J9GI.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/7[}({I8`)[W_UW}TU50$C32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/DS7Q8`V88671K%YOYN0EQY7.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/ESZFFH@%P9{I8N$GLN$]R.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/JS{R}D2ZO]{IQJ_I$_WWBYH.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/LK%R{2DNADGNXVW_$9R{3$V.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/L_ZSOCCS5]2AYD]A%YVCY5V.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/P76M6DWOZ5Y3R$S7ECSSZYJ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QG`T06XYKFQA{T_FYY5`GIQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220618095536.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220618100036.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220618102214-16555189622101.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220618102214.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220618102235.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220618103116.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220618103239.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220618105028.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220618110415-16555216513602.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220618110415-16555217100823.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220618110415.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220618110836.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220619085001.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220619093124.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220619093747.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220619093750-16556026953651.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220619093750.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220619094332.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220619100710.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220619101108.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220619103628.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220619105502.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620084350.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620085512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620085634.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620091357-16556890302612.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620091357.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620091546.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620091718.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620091855.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620093134.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620093407.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620093703.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620094243.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620094331.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620094433-16556895329573.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620094433-16556895434984.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620094433.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620094552.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620094833.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620095025.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620095114.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620095429.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620100352.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/QQ图片20220620100631.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/SB7}9A2ZG9S%[7MPVB@SA%6.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/THHTU`JB$ZAE2@5UNDCFQ.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/W_PZX`V86AQBHFSK3X9JT}0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/ZI}8S42W%924JH${Y7[Z2[F.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/ZV58([Z6R(AH])5EL@EH99C.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/[OT$_C0``97XL$31DKCQAO.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615092413691.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615092719547.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615092903118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615094501808.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615094538891.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615094606854.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615095235290.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615095330221.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615100009692.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615100130953.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615101818865.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615103528029.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615103621637.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615105014512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615105430302.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615110226079.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615112240049.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220615113644997.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618080918483.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618080929207.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618081033572.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618081114645.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618081139777.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618082132166.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618082951963.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618083058214.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618083421117.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618083636991.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618084818276.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618085558828.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618090840872.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618092001474.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618093053755.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618093631237.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618094455162.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618101753948.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220618110259411.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619090714050.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619090846781.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619090937803.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619092232782.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619092916448.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619094315068.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619094504210.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619100653537.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619104209632.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619104723563.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619104815539.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619104857503.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220619105408006.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220620084528131.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220620093055043.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/image-20220620100439669.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.assets/{LCGMF1(QC]PKQVTFC)DM_X.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../java.md" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../../../.." />
+  </component>
+  <component name="LogFilters">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="FILTER_DEBUG" value="true" />
+    <option name="CUSTOM_FILTER" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="$PROJECT_DIR$/../../../../../../../../../Program Files/Java/tools/apache-maven-3.9.1" />
+        <option name="userSettingsFile" value="C:\Program Files\Java\tools\apache-maven-3.9.1\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="MavenRunner">
+    <option name="jreName" value="1.8" />
+    <option name="vmOptions" value="-Darchetype=Internal -Dfile.encoding=GBK" />
+  </component>
+  <component name="ProjectId" id="2NMVNzoImxsE5WZq3cX2Kd1jRmX" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.sourceCode.Java"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="Tomcat 9.0.73" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.73" ALTERNATIVE_JRE_ENABLED="false" nameIsGenerated="true">
+      <option name="UPDATING_POLICY" value="restart-server" />
+      <deployment>
+        <artifact name="javaweb-session-cookie:war">
+          <settings>
+            <option name="CONTEXT_PATH" value="/r" />
+          </settings>
+        </artifact>
+      </deployment>
+      <server-settings>
+        <option name="BASE_DIRECTORY_NAME" value="8b595862-3610-41eb-a4b0-b7f8d4900243" />
+      </server-settings>
+      <predefined_log_file enabled="true" id="Tomcat" />
+      <predefined_log_file enabled="true" id="Tomcat Catalina" />
+      <predefined_log_file id="Tomcat Manager" />
+      <predefined_log_file id="Tomcat Host Manager" />
+      <predefined_log_file id="Tomcat Localhost Access" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="50039" />
+      </RunnerSettings>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Profile">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method v="2">
+        <option name="Make" enabled="true" />
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="javaweb-session-cookie:war" />
+        </option>
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b5d7c300-a15a-453a-acf2-ed260dd101a6" name="Changes" comment="" />
+      <created>1679473903784</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1679473903784</updated>
+      <workItem from="1679473905223" duration="12951000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

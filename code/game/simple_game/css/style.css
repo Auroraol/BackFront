@@ -1,0 +1,29 @@
+body{
+    /*设置成居中显示*/
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    content: "";
+    display: block;
+    clear: both;
+    /*background-color: #8BC6EC;*/
+    /*background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);*/
+
+}
+#d1{
+    height: 503px;
+    width: 510px;
+    border: black solid 1.5px;
+    margin: 0 auto;
+    padding: 0;
+    /*text-align: center;*/
+}
+
+#d1>div{
+    height: 250px;
+    width: 100px;
+    margin: 0;
+    padding: 0;
+    float: left;
+    border: black solid 1px;
+}

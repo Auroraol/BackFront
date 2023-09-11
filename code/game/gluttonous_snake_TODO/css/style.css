@@ -1,0 +1,123 @@
+body{
+    /*body总有一个默认的外边距  margin: 0; 下面是规范*/
+    padding: 0;
+    text-decoration: none;
+    margin: 0;
+}
+
+#box{
+    background-color: #ccc;
+    font-weight: bold;
+    content: '';
+    display: block;
+    clear: both;
+}
+
+#score{
+    width: 83px;
+    height: 2px;
+    line-height: 58px;
+    font-style:italic;
+    font-family: '微软雅黑';
+    padding-left: 5px;
+}
+
+#form{
+    float: right;
+}
+/*层次选择器*/
+#form input{
+    vertical-align: middle;
+    /*设置有边距*/
+    margin-right: 5px;
+}
+
+#main{
+    width: 540px;
+    height: 500px;
+    /*居中*/
+    margin: 0 auto;
+    position: relative;
+    *background: #71a000
+
+}
+
+#main div{
+    width: 20px;
+    height: 20px;
+    position: absolute;
+}
+
+#main #home{
+    width: 500px;
+    height: 460px;
+    left: 20px;
+    top: 20px;
+    position: relative;
+    border: 1px solid black;
+    background: url(../images/sna/background.jpg) no-repeat;
+
+}
+
+#main #home div{
+    position: absolute;
+}
+
+#main div.wall{
+    width: 540px;
+    height: 20px;
+    background: url("./images/div.jpg") repeat-x;
+    position: absolute;
+}
+
+#main div.top{
+    left:0px;
+    top:0px;
+}
+
+#main div.bottom{
+    left:0px;
+    top:480px;
+}
+
+#main div.left{
+    width: 20px;
+    height: 500px;
+    background: url(./images/div.jpg) repeat-y;
+    left:0px;
+    top:0px;
+}
+
+#main div.right{
+    width: 20px;
+    height: 500px;
+    background: url(./images/div.jpg) repeat-y;
+    left:520px;
+    top:0px;
+}
+
+.l{
+    -moz-transform:rotate(0deg);
+    -o-transform:rotate(0deg);
+    -webkit-transform:rotate(0deg);
+    transform:rotate(0deg);
+    /* IE8+ - must be on one line, unfortunately */
+    -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=1, M12=0, M21=0, M22=1, SizingMethod='auto expand')";
+    /* IE6 and 7 */
+    filter: progid:DXImageTransform.Microsoft.Matrix( M11=1, M12=0, M21=0, M22=1, SizingMethod='auto expand');
+}
+.t{
+    -moz-transform: rotate(90deg); -o-transform: rotate(90deg); -webkit-transform: rotate(90deg); transform: rotate(90deg);
+    /* IE8+ - must be on one line, unfortunately */ -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=-1.8369701987210297e-16, M12=-1, M21=1, M22=-1.8369701987210297e-16, SizingMethod='auto expand')"; /* IE6 and 7 */ filter: progid:DXImageTransform.Microsoft.Matrix( M11=-1.8369701987210297e-16, M12=-1, M21=1, M22=-1.8369701987210297e-16, SizingMethod='auto expand');
+
+}
+.r{
+    -moz-transform: rotate(180deg); -o-transform: rotate(180deg); -webkit-transform: rotate(180deg); transform: rotate(180deg);
+    /* IE8+ - must be on one line, unfortunately */ -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=-1, M12=1.2246467991473532e-16, M21=-1.2246467991473532e-16, M22=-1, SizingMethod='auto expand')"; /* IE6 and 7 */ filter: progid:DXImageTransform.Microsoft.Matrix( M11=-1, M12=1.2246467991473532e-16, M21=-1.2246467991473532e-16, M22=-1, SizingMethod='auto expand');
+
+}
+.b{
+    -moz-transform: rotate(270deg); -o-transform: rotate(270deg); -webkit-transform: rotate(270deg); transform: rotate(270deg);
+    /* IE8+ - must be on one line, unfortunately */ -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=6.123233995736766e-17, M12=1, M21=-1, M22=6.123233995736766e-17, SizingMethod='auto expand')"; /* IE6 and 7 */ filter: progid:DXImageTransform.Microsoft.Matrix( M11=6.123233995736766e-17, M12=1, M21=-1, M22=6.123233995736766e-17, SizingMethod='auto expand');
+
+}

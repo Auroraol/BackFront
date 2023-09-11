@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>sudoku</title>
+    <script type="text/javascript">
+        if(location.hostname.toLowerCase().indexOf('dhtmlgoodies') >=0) {
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-2042963-3']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+        }
+    </script>
+</head>
+<body>
+<div class="sudoku" id="sudoku">
+    <div class="sudokuSection" id="sudokuSection0">
+        <div class="sudokuSquare" id="square_0_0"><span></span><span></span></div><div class="sudokuSquare" id="square_0_1"><span></span><span></span></div><div class="sudokuSquare" id="square_0_2"><span></span><span></span></div><div class="sudokuSquare" id="square_1_0"><span></span><span></span></div><div class="sudokuSquare" id="square_1_1"><span></span><span></span></div><div class="sudokuSquare" id="square_1_2"><span></span><span></span></div><div class="sudokuSquare" id="square_2_0"><span></span><span></span></div><div class="sudokuSquare" id="square_2_1"><span></span><span></span></div><div class="sudokuSquare" id="square_2_2"><span></span><span></span></div> </div>
+    <div class="sudokuSection" id="sudokuSection1">
+        <div class="sudokuSquare" id="square_0_3"><span></span><span></span></div><div class="sudokuSquare" id="square_0_4"><span></span><span></span></div><div class="sudokuSquare" id="square_0_5"><span></span><span></span></div><div class="sudokuSquare" id="square_1_3"><span></span><span></span></div><div class="sudokuSquare" id="square_1_4"><span></span><span></span></div><div class="sudokuSquare" id="square_1_5"><span></span><span></span></div><div class="sudokuSquare" id="square_2_3"><span></span><span></span></div><div class="sudokuSquare" id="square_2_4"><span></span><span></span></div><div class="sudokuSquare" id="square_2_5"><span></span><span></span></div> </div>
+    <div class="sudokuSection" id="sudokuSection2">
+        <div class="sudokuSquare" id="square_0_6"><span></span><span></span></div><div class="sudokuSquare" id="square_0_7"><span></span><span></span></div><div class="sudokuSquare" id="square_0_8"><span></span><span></span></div><div class="sudokuSquare" id="square_1_6"><span></span><span></span></div><div class="sudokuSquare" id="square_1_7"><span></span><span></span></div><div class="sudokuSquare" id="square_1_8"><span></span><span></span></div><div class="sudokuSquare" id="square_2_6"><span></span><span></span></div><div class="sudokuSquare" id="square_2_7"><span></span><span></span></div><div class="sudokuSquare" id="square_2_8"><span></span><span></span></div> </div>
+    <div class="sudokuSection" id="sudokuSection3">
+        <div class="sudokuSquare" id="square_3_0"><span></span><span></span></div><div class="sudokuSquare" id="square_3_1"><span></span><span></span></div><div class="sudokuSquare" id="square_3_2"><span></span><span></span></div><div class="sudokuSquare" id="square_4_0"><span></span><span></span></div><div class="sudokuSquare" id="square_4_1"><span></span><span></span></div><div class="sudokuSquare" id="square_4_2"><span></span><span></span></div><div class="sudokuSquare" id="square_5_0"><span></span><span></span></div><div class="sudokuSquare" id="square_5_1"><span></span><span></span></div><div class="sudokuSquare" id="square_5_2"><span></span><span></span></div> </div>
+    <div class="sudokuSection" id="sudokuSection4">
+        <div class="sudokuSquare" id="square_3_3"><span></span><span></span></div><div class="sudokuSquare" id="square_3_4"><span></span><span></span></div><div class="sudokuSquare" id="square_3_5"><span></span><span></span></div><div class="sudokuSquare" id="square_4_3"><span></span><span></span></div><div class="sudokuSquare" id="square_4_4"><span></span><span></span></div><div class="sudokuSquare" id="square_4_5"><span></span><span></span></div><div class="sudokuSquare" id="square_5_3"><span></span><span></span></div><div class="sudokuSquare" id="square_5_4"><span></span><span></span></div><div class="sudokuSquare" id="square_5_5"><span></span><span></span></div> </div>
+    <div class="sudokuSection" id="sudokuSection5">
+        <div class="sudokuSquare" id="square_3_6"><span></span><span></span></div><div class="sudokuSquare" id="square_3_7"><span></span><span></span></div><div class="sudokuSquare" id="square_3_8"><span></span><span></span></div><div class="sudokuSquare" id="square_4_6"><span></span><span></span></div><div class="sudokuSquare" id="square_4_7"><span></span><span></span></div><div class="sudokuSquare" id="square_4_8"><span></span><span></span></div><div class="sudokuSquare" id="square_5_6"><span></span><span></span></div><div class="sudokuSquare" id="square_5_7"><span></span><span></span></div><div class="sudokuSquare" id="square_5_8"><span></span><span></span></div> </div>
+    <div class="sudokuSection" id="sudokuSection6">
+        <div class="sudokuSquare" id="square_6_0"><span></span><span></span></div><div class="sudokuSquare" id="square_6_1"><span></span><span></span></div><div class="sudokuSquare" id="square_6_2"><span></span><span></span></div><div class="sudokuSquare" id="square_7_0"><span></span><span></span></div><div class="sudokuSquare" id="square_7_1"><span></span><span></span></div><div class="sudokuSquare" id="square_7_2"><span></span><span></span></div><div class="sudokuSquare" id="square_8_0"><span></span><span></span></div><div class="sudokuSquare" id="square_8_1"><span></span><span></span></div><div class="sudokuSquare" id="square_8_2"><span></span><span></span></div> </div>
+    <div class="sudokuSection" id="sudokuSection7">
+        <div class="sudokuSquare" id="square_6_3"><span></span><span></span></div><div class="sudokuSquare" id="square_6_4"><span></span><span></span></div><div class="sudokuSquare" id="square_6_5"><span></span><span></span></div><div class="sudokuSquare" id="square_7_3"><span></span><span></span></div><div class="sudokuSquare" id="square_7_4"><span></span><span></span></div><div class="sudokuSquare" id="square_7_5"><span></span><span></span></div><div class="sudokuSquare" id="square_8_3"><span></span><span></span></div><div class="sudokuSquare" id="square_8_4"><span></span><span></span></div><div class="sudokuSquare" id="square_8_5"><span></span><span></span></div> </div>
+    <div class="sudokuSection" id="sudokuSection8">
+        <div class="sudokuSquare" id="square_6_6"><span></span><span></span></div><div class="sudokuSquare" id="square_6_7"><span></span><span></span></div><div class="sudokuSquare" id="square_6_8"><span></span><span></span></div><div class="sudokuSquare" id="square_7_6"><span></span><span></span></div><div class="sudokuSquare" id="square_7_7"><span></span><span></span></div><div class="sudokuSquare" id="square_7_8"><span></span><span></span></div><div class="sudokuSquare" id="square_8_6"><span></span><span></span></div><div class="sudokuSquare" id="square_8_7"><span></span><span></span></div><div class="sudokuSquare" id="square_8_8"><span></span><span></span></div> </div>
+
+</div>
+<div id="gameOptions">
+    <h1>Sudoku</h1>
+
+    <ul>
+        <li><a href="#" onclick="revealAll();return false">Reveal numbers</a></li>
+        <li><a href="#" onclick="initSudoku();return false">New game</a></li>
+        <!-- <li><a href="#" onclick="helpMe();return false">Help me!</a></li> -->
+        <li><a href="#" onclick="showHint();return false">Show hint</a></li>
+    </ul>
+    <ul>
+        <li><a href="#" onclick="switchLevel(1,this);return false" style="font-weight:bold">Beginner</a></li>
+        <li><a href="#" onclick="switchLevel(2,this);return false">Moderate</a></li>
+        <li><a href="#" onclick="switchLevel(3,this);return false">Hard</a></li>
+        <li><a href="#" onclick="switchLevel(4,this);return false">Expert</a></li>
+    </ul>
+    <ul class="gameRules">
+        <li><b>Goal of the game</b></li>
+        <li>1. No duplicates of the numbers 1-9 horizontally.</li>
+        <li>2. No duplicates of the numbers 1-9 vertically</li>
+        <li>3. No duplicates of the numbers 1-9 in the 3x3 cell groups</li>
+    </ul>
+    <ul>
+        <li><i>Click on a cell and use your keyboard to type in the numbers</i></li>
+    </ul>
+</div>
+<div id="hintDiv"><div id="hintDivInner"></div></div>
+<div id="debug" style="position:absolute;left:30px;top:600px"></div>
+</body>
+</html>
