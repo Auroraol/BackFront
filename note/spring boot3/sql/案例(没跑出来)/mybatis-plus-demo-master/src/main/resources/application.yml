@@ -1,0 +1,39 @@
+#????
+server:
+  port: 8080
+
+#spring:
+#  #?????
+#  datasource:
+#    #??????????
+#    driver-class-name: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/mybatis_plus?characterEncoding=utf-8&useSSL=false
+#    username: root
+#    password: 123456
+
+#MyBatis-Plus????
+mybatis-plus:
+  configuration:
+    #??
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  type-enums-package: cn.edu.guet.enums
+
+spring:
+  # ???????
+  datasource:
+    dynamic:
+      # ??????????????,?????master
+      primary: master
+      # ???????,??false.true?????????????,false???????
+      strict: false
+      datasource:
+        master:
+          url: jdbc:mysql://localhost:3306/mybatis_plus?characterEncoding=utf-8&useSSL=false
+          driver-class-name: com.mysql.jdbc.Driver
+          username: root
+          password: 123456
+        slave_1:
+          url: jdbc:mysql://localhost:3306/mybatis_plus-1?characterEncoding=utf-8&useSSL=false
+          driver-class-name: com.mysql.jdbc.Driver
+          username: root
+          password: 123456

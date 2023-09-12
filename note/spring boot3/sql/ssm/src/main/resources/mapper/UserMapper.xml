@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ssm.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.ssm.entity.User">
+            <result property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="sex" column="sex" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,sex
+    </sql>
+    <insert id="insertAll">
+        insert into user
+            (id, name, sex)
+        values (#{id,jdbcType=NUMERIC}, #{name,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR})
+
+    </insert>
+</mapper>

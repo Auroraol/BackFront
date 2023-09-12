@@ -1,6 +1,4 @@
-
-
-# 项目结构
+项目结构
 
 ![image-20230709103935383](spring boot3.assets/image-20230709103935383.png)
 
@@ -246,15 +244,44 @@ public class HelloController {
 
 总结： 导入场景启动器、触发 `spring-boot-autoconfigure`这个包的自动配置生效、容器中就会具有相关场景的功能
 
+## 5. 显示网址
+
+```java
+@Slf4j
+@SpringBootApplication
+public class DemoApplication {
+
+	public static void main(String[] args) throws UnknownHostException {
+
+		ConfigurableApplicationContext application = SpringApplication.run(DemoApplication.class, args);
+		Environment env = application.getEnvironment();
+		String ip = InetAddress.getLocalHost().getHostAddress();
+		String port = env.getProperty("server.port");
+		String path = env.getProperty("server.servlet.context-path");
+		if (StringUtils.isEmpty(path)) {
+			path = "";
+		}
+		log.info("\n----------------------------------------------------------\n\t" +
+				"Application  is running! Access URLs:\n\t" +
+				"Local访问网址: \t\thttp://localhost:" + port + path + "\n\t" +
+				"External访问网址: \thttp://" + ip + ":" + port + path + "\n\t" +
+				"----------------------------------------------------------");
+		String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+		log.info("当前项目进程号：" + jvmName.split("@")[0]);
+	}
+}
+
+```
+
 
 
 # 注解
 
 | 注解                   | 备注                                                         |
 | ---------------------- | ------------------------------------------------------------ |
-| @SpringBootApplication | 入口                                                         |
-| @Controller            | 1.Controller +RequestMapping+GetMapping、<br/>2.引人freemarker<<br/>#   配置thymeleaf场景<br/>#   spring.thymeleaf<br/>spring.thymeleaf.prefix=classpath:templates/  <br/>spring.thymeleaf.suffix=.html<br/>#开发期间关闭，上线以后开启<br/>spring.thymeleaf.cache=falsebr/><br/>4、在application.properties中配置freemarker相关的信息<br/>5、返回的是页面 |
-| @RestController        | 1. 返回的是输出结果，如json ，是提供前端获取数据、提交数据<br/>2. 结合 @RequestMapping、@GetMapping、@PostMapping...... |
+| @SpringBootApplication | 入口函数                                                     |
+| @Controller            | 1.Controller +RequestMapping+GetMapping、<br/>2.引人freemarker<<br/>#   配置thymeleaf场景<br/>#   spring.thymeleaf<br/>spring.thymeleaf.prefix=classpath:templates/  <br/>spring.thymeleaf.suffix=.html<br/>#开发期间关闭，上线以后开启<br/>spring.thymeleaf.cache=falsebr/><br/>4、在application.properties中配置freemarker相关的信息<br/>5、返回的是页面<br/>6.  ==接收前端数据== |
+| @RestController        | 1. 返回的是输出结果,返回对象，如json ，是==提供前端获取数据==、提交数据<br/>2. 结合 @RequestMapping、@GetMapping、@PostMapping...... |
 | @RequestMapping        | 放在类上面                                                   |
 | @RequestParam          | 动态参数(RequestParam  带?)                                  |
 | @PathVariable          | 动态参数 (PathVariable 不带?)                                |
@@ -270,15 +297,187 @@ public class HelloController {
 
 | 注解                 | 备注                                                         |
 | -------------------- | ------------------------------------------------------------ |
-| @Service             | bean注册, 一般加在service目录里面的类上                      |
-| @Component           | bean注册                                                     |
-| @Autowired           | //@Resource =@Autowired+@Qualifie<br>//如果接口实现只有一个，那么用@Autowired就可以了，也不需要指定名字.<br/>//如果接口有多个实现,那么用@Resource，并指定name<br/>//或者使用@Autowired+@Qualifier+Qualifier的value值. |
+| @Service             | bean注册, ==一般加在service目录里面的类上==                  |
+| @Component           | bean注册, 和 Service 没有啥区别,  Component是比较通用的东西  |
+| @Autowired           | //@Resource =@Autowired+@Qualifie<br> //自动加载类, 理解就是不用new<br/>//如果接口实现只有一个，那么用@Autowired就可以了，也不需要指定名字.<br/>//如果接口有多个实现,那么用@Resource，并指定name<br/>//或者使用@Autowired+@Qualifier+Qualifier的value值. |
 | @Configuration+@Bean | bean注册(人为)                                               |
 | @Values              | 从配置文件中取参数                                           |
 
 其他注解:  controller --->servicer-->DAo(Mapper)【底层框架】SSM框架----->mapper. . .. . @select、@insertJPA ---
 
 ==详情见demo代码==
+
+**@Controller:**
+
+```java
+@Slf4j
+@Controller
+public class ParamController {
+
+
+	/**
+	 * 动态参数(RequestParam  带?) + 带数据返回页面(方法2)
+	 */
+	@GetMapping("/param")
+	public String hello(@RequestParam(value = "age",   defaultValue = "0") int age,         //required 表示可以不传值
+						@RequestParam(value = "name", required = false, defaultValue = "") String name,  //访问: http://localhost:8090/data2?age=参数?name=参数
+						Model model){
+
+		//把需要给页面共享的数据放到model中
+		String text = "<span style='color:red'>"+name+"</span>";
+		model.addAttribute("msg",text);
+		model.addAttribute("age",18);
+
+		return "view";
+	}
+
+	/**
+	 * 动态参数 (PathVariable 不带?)   ps:看路径匹配章节
+	 */
+	@GetMapping("/a*/b?/{p1:[a-f]+}/**")
+	public String hello(HttpServletRequest request, @PathVariable("p1") String path
+			, Model model) {
+
+		model.addAttribute("msg",path);
+		return "view";
+	}
+
+	/**
+	 * 在@Controller中希望返回json格式
+	 * @return
+	 */
+	@GetMapping("/ReBody")
+	@ResponseBody
+	public User getUser(){
+		User user = new User(1000, "张四", "男" , 12);
+		//log. info("使用@GetMapping + @ResponseBody");
+		return user;
+	}
+}
+
+```
+
+**@RestController:**
+
+```java
+@Slf4j
+@RestController   // 返回对象
+@RequestMapping("/action")
+public class UserActionController {
+
+
+	/*
+	* @Autowired   //自动加载类
+	* private UserService userService;  //报错UserService接口里有多个实现类
+	*/
+	@Autowired
+	@Qualifier("adminServiceImpl")    //首字母小写
+	private UserService userService;
+
+	/* @Resource   和 Autowired 没有啥区别,  @Resource可以指定UserServiceImpl类
+	* @Resource(name = "AdminServiceImpl")
+	* private UserService userService;  // ok
+	*/
+	@Resource(name = "UserServiceImpl")
+	private UserService userService1;  // ok
+
+
+	@GetMapping("/show")
+	public User show(){
+		return userService.show();
+	}
+
+	@GetMapping("/{id}")
+	public User get(@PathVariable("id") int id){
+		return userService.get(id);
+	}
+
+
+	/*
+	 * 新增数据
+	 * 假设前端发送数据  前端发过来的数据用RequestBody修饰
+	 */
+	@PostMapping
+	public User addUser(@RequestBody User user){
+		return user;
+	}
+
+
+	@Value("${robot.name}")
+	private String naem;    // name ={robot.name}
+
+
+
+}
+
+```
+
+**@Configuration+@Bean  :**  
+
+```java
+package com.example.demo.confiq;
+
+import com.example.demo.service.UserService;
+import com.example.demo.service.impl.AdminServiceImpl;
+import com.example.demo.service.impl.UserServiceImpl;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+//@EnableWebMvc //禁用boot的默认配置
+@Configuration //这是一个配置类,给容器中放一个 WebMvcConfigurer 组件，就能自定义底层
+public class MyConfig  /*implements WebMvcConfigurer*/ {
+	@Bean
+	public WebMvcConfigurer webMvcConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override //配置静态资源
+			public void addResourceHandlers(ResourceHandlerRegistry registry) {
+				registry.addResourceHandler("/static/**")
+						.addResourceLocations("classpath:/a/", "classpath:/b/")
+						.setCacheControl(CacheControl.maxAge(1180, TimeUnit.SECONDS));
+			}
+
+			@Override //配置拦截器
+			public void addInterceptors(InterceptorRegistry registry) {
+
+			}
+		};
+	}
+
+
+	/*
+	* 人为加注解
+	* */
+	@Bean("adminServiceImpl")
+	public UserService AdminServiceImpl(){
+		return  new AdminServiceImpl();
+	}
+
+	@Bean
+	public UserService UserServiceImpl (){
+		return  new UserServiceImpl();
+	}
+}
+
+
+```
+
+
+
+
+
+
+
+
+
+
 
 ## 01-组件注册
 
@@ -3149,7 +3348,9 @@ mybatis.configuration.map-underscore-to-camel-case=true
 
 ## 使用
 
-+ ```properties
++ 配置文件
+
+  ```properties
   # 1、先配置数据源信息
   spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
   spring.datasource.type=com.zaxxer.hikari.HikariDataSource
@@ -3164,9 +3365,9 @@ mybatis.configuration.map-underscore-to-camel-case=true
   mybatis.configuration.map-underscore-to-camel-case=true
   ```
 
-  
++ **入口函数**
 
-+ ```java
+  ```java
   package com.atguigu.boot3.ssm;
   
   import com.atguigu.boot3.starter.robot.annotation.EnableRobot;
@@ -3180,7 +3381,7 @@ mybatis.configuration.map-underscore-to-camel-case=true
    * 3、MyBatis自动关联绑定。
    */
   @EnableRobot
-  @MapperScan(basePackages = "com.atguigu.boot3.ssm.mapper")   //
+  @MapperScan(basePackages = "com.atguigu.boot3.ssm.mapper")   //添加扫描
   @SpringBootApplication
   public class Boot305SsmApplication {
   
@@ -3191,9 +3392,9 @@ mybatis.configuration.map-underscore-to-camel-case=true
   }
   ```
 
-- **编写Bean**
+- **编写entity**
 
-  放在entity里：就是数据库表的实体对象。
+  <font  color = red>entity包：数据库表的实体对象</font>
 
   ```java
   package com.atguigu.boot3.ssm.entity;
@@ -3211,97 +3412,194 @@ mybatis.configuration.map-underscore-to-camel-case=true
   }
   ```
 
-- 编写Mapper
+- **编写Mapper**
 
-- 使用`mybatisx`插件，快速生成MapperXML
+  + 方法一:  使用MapperXML
 
-  ![image-20230708173420239](spring boot3.assets/image-20230708173420239.png)
+    使用`mybatisx`插件，快速生成MapperXML
 
-  ```java
-  package com.atguigu.boot3.ssm.mapper;
-  
-  import com.atguigu.boot3.ssm.bean.TUser;
-  import org.apache.ibatis.annotations.Param;
-  
-  @Mapper
-  public interface UserMapper {
-  
-      /**
-       * 1、每个方法都在Mapper文件中有一个sql标签对应。
-       * 2、所有参数都应该用@Param进行签名，以后使用指定的名字在SQL中取值
-       */
-      TUser getUserById(@Param("id") Long id);
-  }
-  ```
+    ![image-20230708173420239](spring boot3.assets/image-20230708173420239.png)
 
-  ```xml
-  <?xml version="1.0" encoding="UTF-8" ?>
-  <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-  <mapper namespace="com.atguigu.boot3.ssm.mapper.UserMapper">
-      <!--    接口的全类名和namespace的值是一一对应的
-              select id,login_name loginName,nick_name nickName,passwd from t_user where id=#{id}
-      -->
-  
-      <select id="getUserById" resultType="com.atguigu.boot3.ssm.bean.TUser">
-          select *
-          from t_user
-          where id = #{id}
-      </select>
-  </mapper>
-  ```
+    ```java
+    package com.atguigu.boot3.ssm.mapper;
+    
+    import com.atguigu.boot3.ssm.bean.TUser;
+    import org.apache.ibatis.annotations.Param;
+    
+    @Mapper
+    public interface UserMapper {
+    
+        /**
+         * 1、每个方法都在Mapper文件中有一个sql标签对应。
+         * 2、所有参数都应该用@Param进行签名，以后使用指定的名字在SQL中取值
+         */
+        TUser getUserById(@Param("id") Long id);
+    }
+    ```
 
-  **或者**
+    ```xml
+    <?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+    <mapper namespace="com.atguigu.boot3.ssm.mapper.UserMapper">
+        <!--    接口的全类名和namespace的值是一一对应的
+                select id,login_name loginName,nick_name nickName,passwd from t_user where id=#{id}
+        -->
+    
+        <select id="getUserById" resultType="com.atguigu.boot3.ssm.bean.TUser">
+            select *
+            from t_user
+            where id = #{id}
+        </select>
+    </mapper>
+    ```
 
-  ```java
-  package com.qingge.springboot.mapper;
-  import com.qingge.springboot.entity.User;
-  import org.apache.ibatis.annotations.Mapper;
-  import org.apache.ibatis.annotations.Select;
-  import java.util.List;
-  
-  @Mapper
-  public interface UserMapper{
-      @Select("SELECT fron sys_user")  //
-      List<User>findALl();
-      
-      int insert();
-  }
-  ```
+  + 方法二:  使用注解
+
+    ```java
+    package com.qingge.springboot.mapper;
+    import com.qingge.springboot.entity.User;
+    import org.apache.ibatis.annotations.Mapper;
+    import org.apache.ibatis.annotations.Select;
+    import java.util.List;
+    
+    @Mapper
+    public interface UserMapper{
+        @Select("SELECT fron sys_user")  //
+        List<User>findALl();
+        
+        int insert();
+    }
+    ```
 
 - 测试代码
 
+  ```java
+  package com.atguigu.boot3.ssm.controller;
+  
+  import com.atguigu.boot3.ssm.bean.TUser;
+  import com.atguigu.boot3.ssm.mapper.UserMapper;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.web.bind.annotation.GetMapping;
+  import org.springframework.web.bind.annotation.PathVariable;
+  import org.springframework.web.bind.annotation.RestController;
+  
+  
+  @RestController
+  public class UserController {
+  
+      @Autowired
+      UserMapper userMapper; //
+  
+  
+      /**
+       * 返回User的json数据
+       * @param id
+       * @return
+       */
+      @GetMapping("/user/{id}")
+      public TUser getUser(@PathVariable("id") Long id){  //前端的动态值传给id
+          TUser user = userMapper.getUserById(id);
+          return user;
+      }
+  }
+  ```
+
+## IDEA中使用自带的数据库
+
+> 首先打开IDEA页面
+> <img src="spring boot3.assets/image-20230911234743463.png" alt="image-20230911234743463" style="zoom: 80%;" />
+
+> 添加MySQL数据库
+>
+> <img src="spring boot3.assets/image-20230911234811564.png" alt="image-20230911234811564" style="zoom: 80%;" />
+
+> 配置
+> ![image-20230911234829000](spring boot3.assets/image-20230911234829000.png)
+
+> 选择自己用的数据库
+>
+> ![image-20230911234909372](spring boot3.assets/image-20230911234909372.png)
+
+> 查看数据库中的表结构
+> ![image-20230911234924676](spring boot3.assets/image-20230911234924676.png)
+
+> 查看表的SQL语句
+>
+> ![image-20230911234939139](spring boot3.assets/image-20230911234939139.png)
+
+> 新建查询，执行SQL语句
+> ![image-20230911233447754](spring boot3.assets/image-20230911233447754.png)
+
+### MyBatisX 插件
+
+![image-20230911233548515](spring boot3.assets/image-20230911233548515.png)
+
+设置项目基本路径、包路径、[编码格式](https://so.csdn.net/so/search?q=编码格式&spm=1001.2101.3001.7020)，实体类包名称、实体类名![image-20230911234703690](spring boot3.assets/image-20230911234703690.png)
+
+配置生成mapper文件，service文件的位置
+
+![image-20230912170343770](spring boot3.assets/image-20230912170343770.png)
+
+ptions选项作用大致如下：
+
+- comment：可能和生成java doc comments有关，没有效果。
+- toString/hashCode/equals：是否生成相应的方法，建议勾选(和Lombok选择一个)。
+- Lombok：勾选后实体类自动添加Lombok的@Data注解，建议勾选（要先安装Lombok插件）
+- Actual Column：勾选后，生成的实体类属性名和表中字段名大小写会保持一致。例如，表中有字段Name，勾选该选项后生成的属性名也为Name，未勾选则为name，建议根据实际需要勾选。
+- Actual Column Annotation：是否对所有属性名都加上注解标明对应字段，例如@TableName，建议勾选。
+- JSR310:Data API：是否使用新标准的时间日期API，包括 Instant、Clock、LocalDateTime、DateTimeFormatter、ZonedDateTime 以及替换 Calendar 的 Chronology 等类。建议勾选（新标准的时间日期API比老版本友好多了，强烈建议使用新版时间日期API）
+
+### 快速生成
+
+不需要写返回值，只需要写方法名就能够快速生成CRUD
+![在这里插入图片描述](spring boot3.assets/45623756db034e079a06a8c2c824dac0.png)
+
+输入insertSelective之后立即点击“**Alt+Enter**”即可mapper文件中自动生成sql
+
+![image-20230911234021608](spring boot3.assets/image-20230911234021608.png)
+
+![image-20230911234044862](spring boot3.assets/image-20230911234044862.png)
+
+### 代码
+
+**IService的使用：**
+
+IService的使用需要另外两个接口的配合：`baseMapper`和`ServiceImpl`
+
+第一步：实现basemapper接口
+
 ```java
-package com.atguigu.boot3.ssm.controller;
-
-import com.atguigu.boot3.ssm.bean.TUser;
-import com.atguigu.boot3.ssm.mapper.UserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-
-
-@RestController
-public class UserController {
-
-    @Autowired
-    UserMapper userMapper; //
-
-
-    /**
-     * 返回User的json数据
-     * @param id
-     * @return
-     */
-    @GetMapping("/user/{id}")
-    public TUser getUser(@PathVariable("id") Long id){  //前端的动态值传给id
-        TUser user = userMapper.getUserById(id);
-        return user;
-    }
+public interface AdminMapper extends BaseMapper<Admin> {
 }
 ```
 
+第二步：编写service类
 
+```java
+public interface AdminService extends IService<Admin> {
+}
+```
+
+第三步：编写serviceImpl，ServiceImpl里面是各种的方法实现，好奇的可以点进源码看下，两个泛型需要注意的，第一个是继承basemapper的(AdminMapper)，第二个是实体类(Admin)。
+
+```java
+public class AdminServiceImpl extends ServiceImpl<AdminMapper,Admin> 
+    						  implements AdminService {}
+
+public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {...}
+```
+
+第四步：愉快的使用啦，可以参考[IService接口解释](https://gitee.com/baomidou/mybatis-plus/blob/3.0/mybatis-plus-extension/src/main/java/com/baomidou/mybatisplus/extension/service/IService.java)或者[Mybatis-plus官网](https://mp.baomidou.com/guide/crud-interface.html#service-crud-接口)的方法解释来调用。
+
+```java
+	@Autowired
+    AdminService adminService;
+
+	void test11(){
+		// adminService中有很多方法
+        Admin admin = adminService.getById(13);
+    }
+```
 
 ## 自动配置原理
 

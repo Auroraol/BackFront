@@ -42,7 +42,7 @@ public class MyConfig  /*implements WebMvcConfigurer*/ {
 
 
 	/*
-	* 认为加注解
+	* 人为加注解
 	* */
 	@Bean("adminServiceImpl")
 	public UserService AdminServiceImpl(){
