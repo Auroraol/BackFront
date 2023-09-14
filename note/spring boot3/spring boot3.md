@@ -3551,6 +3551,44 @@ ptions选项作用大致如下：
 
 ### 快速生成
 
+```xml
+        <!--        mybatisplus+数据库相关开始-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-core</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!--        mybatisplus+数据库相关结束-->
+```
+
+配置
+
+```properties
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.type=com.zaxxer.hikari.HikariDataSource
+spring.datasource.url=jdbc:mysql://localhost:3306/mybatis
+spring.datasource.username=root
+spring.datasource.password=741106
+
+
+mybatis.mapper-locations=classpath:/mapper/*.xml
+
+mybatis.configuration.map-underscore-to-camel-case=true
+
+# web??
+server.port=9000
+```
+
+
+
 不需要写返回值，只需要写方法名就能够快速生成CRUD
 ![在这里插入图片描述](spring boot3.assets/45623756db034e079a06a8c2c824dac0.png)
 
@@ -3703,3 +3741,56 @@ Druid官网：https://github.com/alibaba/druid
 
 
 
+
+
+# 单元测试
+
+## 使用@AutoWired遇到空指针
+
+[Spring boot test测试中@Autowired不起作用_未名who的博客-CSDN博客](https://blog.csdn.net/qq_2300688967/article/details/80054766)
+
+[Spring 单元测试时使用@AutoWired为空 解决方法_在test中使用autowired空指针异常_梦彧-Z的博客-CSDN博客](https://blog.csdn.net/weixin_45852395/article/details/121427862)
+
+1，问题：如下所示：
+
+```java
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+ 
+public class MoveSysUserTest {
+    @Autowired
+    private MoveSysUser moveSysUser;
+ 
+    @Test
+    public void testMoveSysUser() {
+        boolean res = moveSysUser.moveSysUser();
+        System.out.println(res);
+    }
+}
+```
+
+此时运行，会提示moveSysUser为空，报空指针异常
+
+2，解决方法
+
+方法1: 添加注解(或者继承一个添加了以上注解的类)：
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+```
+
+```properties
+	<!--如果只缺@RunWith这一项，只用导入junit.4.12这一个包就可以了-->
+	<dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>compile</scope>
+    </dependency>
+```
+
+方法2:   <font color = red>在spring测试中不要使用静态变量或者main方法！！</font>

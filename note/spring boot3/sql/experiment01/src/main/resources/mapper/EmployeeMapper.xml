@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.experiment01.mapper.EmployeeMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.experiment01.entity.Employee">
+            <result property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="age" column="age" jdbcType="SMALLINT"/>
+            <result property="position" column="position" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,age,
+        position
+    </sql>
+    <insert id="insertSelective">
+        insert into employee
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null">name,</if>
+            <if test="age != null">age,</if>
+            <if test="position != null">position,</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id,jdbcType=INTEGER},</if>
+            <if test="name != null">#{name,jdbcType=VARCHAR},</if>
+            <if test="age != null">#{age,jdbcType=SMALLINT},</if>
+            <if test="position != null">#{position,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <delete id="deleteById">
+        delete
+        from employee
+        where id = #{id,jdbcType=NUMERIC}
+    </delete>
+    <update id="updateSelective">
+        update employee
+        <set>
+            <if test="id != null">id=#{id,jdbcType=NUMERIC},</if>
+            <if test="name != null">name=#{name,jdbcType=VARCHAR},</if>
+            <if test="age != null">age=#{age,jdbcType=NUMERIC},</if>
+            <if test="position != null">position=#{position,jdbcType=VARCHAR},</if>
+        </set>
+        where
+    </update>
+    <update id="updateIdAndNameAndAgeAndPositionById">
+        update employee
+        set id       = #{id,jdbcType=NUMERIC},
+            name     = #{name,jdbcType=VARCHAR},
+            age      = #{age,jdbcType=NUMERIC},
+            position = #{position,jdbcType=VARCHAR}
+        where id = #{oldId,jdbcType=NUMERIC}
+    </update>
+    <select id="selectById" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from employee
+        where
+        id = #{id,jdbcType=NUMERIC}
+    </select>
+</mapper>
