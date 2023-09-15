@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- 引入jQuery -->
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script>
+        var data = { id: 5, name: "张三" };
+
+        // 入口函数
+        $(function(){
+           // 在html加载完成后执行的代码
+
+            // 案例1   
+            //    //方法1
+            //    $("p").click(function(){
+            //        alert($(this).text());
+            //    });
+            //方法2
+            $("p").on("click", function(event){
+            // 这里的this指向触发点击事件的p元素(Element)
+                alert($(this).text());
+            });
+
+
+            // 案例2
+            // 为`<body>`中的所有`id=n5`元素绑定事件：
+            // 为n5绑定mouseenter mouseleave两个事件，并为其传入附加数据data
+            // 附加数据可以是任意类型
+            $("body").on("mouseenter mouseleave", "#n5", data, function(event){
+                var $me = $(this);
+                var options = event.data; // 这就是传入的附加数据
+                if(event.type == "mouseenter"){
+                    $me.html( "你好，" + options.name + "!");		
+                }else if(event.type == "mouseleave" ){
+                    $me.html( "再见!");		
+                }			
+            });
+
+
+            //案例3
+            // 为div中的所有p元素绑定click事件处理程序
+            // 只有n2、n3可以触发该事件
+            $("div").on("click", "p", function(event){
+                alert( $(this).text() );
+            });
+            // 后添加的n6也可以触发上述click事件，因为它也是div中的p元素
+            $("#n1").append('<p id="n6">我是创建在div中的元素,绑定的click事件对此元素也生效!</p>');
+
+
+            //案例4
+            // on()函数的第一个参数eventsMap是一个对象，可以"属性-值"的方式指定多个"事件类型-处理函数"
+            var events = {
+                "mouseenter": function(event){
+                    //event.data == 传进来的参数
+                    $(this).html( "你好，" + event.data.name + "!");		
+                },
+                "mouseleave": function(event){
+                    $(this).html( "再见!");
+                }		
+            };
+            //为n5绑定mouseenter mouseleave两个事件，并为其传入附加数据data
+            $("body").on(events, ".n6", data);
+
+        });
+    </script>
+    
+</head>
+<body>
+    <div id="n1">
+        <p id="n2"><span>CodePlayer</span></p>
+        <p id="n3"><span>jquery事件处理</span></p>
+        <em id="n4">https://</em>
+    </div>
+    <p id="n5">Google</p>
+    <p class="n6">案例4</p>
+</body>
+</html>
+

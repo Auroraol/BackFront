@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <ul id="test_ul">
+        <li class="js">JavaScript</li>
+        <li name="python">Python</li>
+    </ul>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>键盘事件</title>
+    <script>
+        /*输出输入的字符*/
+        function myKeyDown(id) {
+            console.log(document.getElementById(id).value);
+        }
+
+        /*按键结束，字体转换为大写*/
+        function myKeyUp(id) {
+            var text = document.getElementById(id).value;
+            document.getElementById(id).value = text.toUpperCase();
+        }
+
+
+    </script>
+</head>
+<body>
+    <input id="name" type="text" onkeydown="myKeyDown(this.id)" onkeyup="myKeyUp(this.id)"> 
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鼠标事件</title>
+    <script>
+        //JS
+        function myClick() {  
+               console.log("你单击了按钮！");  
+           }  
+        function myDBClick() {  
+            console.log("你双击了按钮！");  
+        }  
+        function myMouseDown() {  
+            console.log("鼠标按下了！");  
+        }  
+        function myMouseUp() {  
+            console.log("鼠标抬起了！");  
+        }  
+        function myMouseOver() {  
+            console.log("鼠标悬浮！");  
+        }  
+        function myMouseOut() {  
+            console.log("鼠标离开！")  
+        }  
+        function myMouseMove() {  
+            console.log("鼠标移动！")  
+        }  
+        function myMouseEnter() {  
+            console.log("鼠标进入！")  
+        }  
+        function myMouseLeave() {  
+            console.log("鼠标离开！")  
+        }   
+    </script>
+</head>
+<body>
+    //html
+    <button onclick="myClick()">鼠标单击</button> 
+    <button ondblclick="myDBClick()">鼠标双击</button> 
+    <button onmousedown="myMouseDown()" onmouseup="myMouseUp()">鼠标按下和抬起</button> 
+    <button onmouseover="myMouseOver()" onmouseout="myMouseOut()">鼠标悬浮和离开</button> 
+    <button onmousemove="myMouseMove()">鼠标移动</button> 
+    <button onmouseenter="myMouseEnter()" onmouseleave="myMouseLeave()">鼠标进入和离开</button>
+
+</body>
+</html>
+
