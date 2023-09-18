@@ -756,6 +756,8 @@ p{
 
 ![image-20220628155857774](html.assets/image-20220628155857774.png)
 
+
+
 ![image-20220717220318864](html.assets/image-20220717220318864.png)
 
 ## 结构伪类选择器
@@ -1876,7 +1878,7 @@ h1{
 
 
 
-![image-20220701152418371](html.assets/image-20220701152418371.png)
+<img src="html.assets/image-20220701152418371.png" alt="image-20220701152418371" style="zoom:33%;" />
 
 
 

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>  
+        #content{
+            width: 380;
+            padding: 0px;
+            margin: 0px;
+            overflow: hidden;
+            font-size: 12px;
+            line-height: 25px;
+            border: 1px solid yellow;
+        }
+        ul,li{
+            padding: 0px;
+            margin: 0px;
+            list-style: none;
+        }
+        /*父级元素相对定位*/
+        #content ul{
+            position: relative;
+        }
+        .tipText,.tipBg{
+            position: absolute;
+            width: 380px;
+            height: 25px;
+            top:216px
+        }
+        .tipText{
+            color: white;
+            z-index: 999;
+        }
+        .tipBg{
+            background: orange;
+            opacity: 0.5;/*背景透明度*/
+            filter: alpha(opacity=50);
+        }
+    </style>
+</head>
+<body>
+<div id="content">
+    <ul>
+        <li><img src="images/bg.jpg" alt=""></li>
+        <li class="tipText">学习微服务，找狂神</li>
+        <li class="tipBg"></li>
+        <li>时间：2099-01=01</li>
+        <li>地点：月球一号基地</li>
+    </ul>
+</div>
+</body>
+</html>
