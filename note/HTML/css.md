@@ -515,6 +515,12 @@ img,span{vetical-align:middle}
 color: rgba(0, 255, 255, 0.9);
 ```
 
+**背景颜色:**
+
+```css
+background-color:aqua;
+```
+
 ## 3.4、鼠标样式
 
 **cursor** : 网页浏览时用户鼠标指针的样式或图形形状。

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.experiment01.mapper.TbIdcardMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.experiment01.entity.TbIdcard">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="code" column="CODE" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,CODE
+    </sql>
+    <select id="findAllById" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_idcard
+        where
+        id = #{id,jdbcType=NUMERIC}
+    </select>
+    <select id="findCodeById" resultMap="BaseResultMap">
+        select CODE
+        from tb_idcard
+        where id = #{id,jdbcType=NUMERIC}
+    </select>
+</mapper>

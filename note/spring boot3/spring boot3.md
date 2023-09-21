@@ -3504,7 +3504,7 @@ mybatis.configuration.map-underscore-to-camel-case=true
   }
   ```
 
-## IDEA中使用自带的数据库
+## IDEA中使用自带的数据库(重要)
 
 > 首先打开IDEA页面
 > <img src="spring boot3.assets/image-20230911234743463.png" alt="image-20230911234743463" style="zoom: 80%;" />
@@ -3608,6 +3608,7 @@ IService的使用需要另外两个接口的配合：`baseMapper`和`ServiceImpl
 
 ```java
 public interface AdminMapper extends BaseMapper<Admin> {
+     ClassDetail getById(Serializable id);
 }
 ```
 
@@ -3615,6 +3616,7 @@ public interface AdminMapper extends BaseMapper<Admin> {
 
 ```java
 public interface AdminService extends IService<Admin> {
+    ClassDetail getById(Serializable id);
 }
 ```
 
@@ -3622,7 +3624,15 @@ public interface AdminService extends IService<Admin> {
 
 ```java
 public class AdminServiceImpl extends ServiceImpl<AdminMapper,Admin> 
-    						  implements AdminService {}
+    						  implements AdminService {
+    @Autowired
+    ClassDetailMapper classDetailMapper;
+
+    @Override
+    public ClassDetail getById(Serializable id) {
+        return classDetailMapper.getDetailById(id);
+    }
+}
 
 public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {...}
 ```
@@ -3637,6 +3647,762 @@ public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {...
 		// adminService中有很多方法
         Admin admin = adminService.getById(13);
     }
+```
+
+### mybatis中parameterType别名图
+
+![image-20230921195943952](spring boot3.assets/image-20230921195943952.png)
+
+### 单表查询
+
+#### 条件构造器方式
+
+![img](spring boot3.assets/868422e97ac64147951736389c4eeabf.png)
+
+```java
+一、查询需求
+
+1、名字中包含雨并且年龄小于40
+
+       name like '%雨%' and age<40
+
+2、名字中包含雨年并且龄大于等于20且小于等于40并且email不为空
+
+   name like '%雨%' and age between 20 and 40 and email is not null
+
+3、名字为王姓或者年龄大于等于25，按照年龄降序排列，年龄相同按照id升序排列
+
+   name like '王%' or age>=25 order by age desc,id asc
+
+4、创建日期为2019年2月14日并且直属上级为名字为王姓
+
+      date_format(create_time,'%Y-%m-%d')='2019-02-14' and manager_id in (select id from user where name like '王%')
+
+5、名字为王姓并且（年龄小于40或邮箱不为空）
+
+    name like '王%' and (age<40 or email is not null)
+
+6、名字为王姓或者（年龄小于40并且年龄大于20并且邮箱不为空）
+
+    name like '王%' or (age<40 and age>20 and email is not null)
+
+7、（年龄小于40或邮箱不为空）并且名字为王姓
+
+    (age<40 or email is not null) and name like '王%'
+
+8、年龄为30、31、34、35
+
+    age in (30、31、34、35) 
+
+9、只返回满足条件的其中一条语句即可
+
+limit 1
+
+二、select中字段不全部出现的查询
+
+10、名字中包含雨并且年龄小于40(需求1加强版)
+
+第一种情况：select id,name
+
+                  from user
+
+                  where name like '%雨%' and age<40
+
+第二种情况：select id,name,age,email
+
+                  from user
+
+                  where name like '%雨%' and age<40
+
+三、统计查询：
+
+11、按照直属上级分组，查询每组的平均年龄、最大年龄、最小年龄。
+
+并且只取年龄总和小于500的组。
+
+select avg(age) avg_age,min(age) min_age,max(age) max_age
+
+from user
+
+group by manager_id
+
+having sum(age) <500
+
+```
+
+
+
+```java
+
+/**
+     * 1、名字中包含雨并且年龄小于40
+     *     name like '%雨%' and age<40
+     */
+    @Test
+    public void selectByWrapper() {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("name", "雨").lt("age", 40);
+
+        List<User> userList = userMapper.selectList(queryWrapper);
+        userList.forEach(System.out::println);
+    }
+    /**
+     * 2、名字中包含雨年并且龄大于等于20且小于等于40并且email不为空
+     *    name like '%雨%' and age between 20 and 40 and email is not null
+     */
+    @Test
+    public void selectByWrapper2() {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("name", "雨").between("age" ,20 ,40).isNotNull("email");
+
+        List<User> userList = userMapper.selectList(queryWrapper);
+        userList.forEach(System.out::println);
+    }
+
+    /**
+     * 3、名字为王姓或者年龄大于等于25，按照年龄降序排列，年龄相同按照id升序排列
+     *    name like '王%' or age>=25 order by age desc,id asc
+     */
+    @Test
+    public void selectByWrapper3() {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.likeRight("name", "王").or().gt("age", 25).orderByDesc("age").orderByAsc("id");
+
+        List<User> userList = userMapper.selectList(queryWrapper);
+        userList.forEach(System.out::println);
+    }
+```
+
+4、创建日期为2019年2月14日并且直属上级为名字为王姓
+
+> date_format(create_time,‘%Y-%m-%d’)=‘2019-02-14’ and manager_id in (select id from user where name like ‘王%’)
+
+```java
+apply(sql,prams)
+inSql("字段",sql子查询)
+
+
+
+QueryWrapper<User> queryWrapper = new QueryWrapper<User>();
+queryWrapper.apply("date_format(create_time,'%Y-%m-%d') = {0}","2019-02-14").inSql("manager_id","select id from user where name like '王%' ");
+List<User> userList = userMapper.selectList(queryWrapper);
+userList.forEach(System.out::println);
+
+// 此处写法存在sql注入问题，不建议使用
+userQuery.apply("date_format(create_time,'%Y-%m-%d')='2019-02-14' or true or true").inSql("manager_id","select id from user where name like '王%'");
+
+queryWrapper.apply("phone","888888").inSql("username","select username from user where id = 3");
+
+date_format(日期，'格式')：将日期按照格式进行插入或者返回。例如：date_format(now(),'%Y-%m-%d')。
+动态条件构造器：apply。范围条件构造器：insql。
+注意：如果{0}替换为实际值，可能会造成sql注入。
+```
+
+
+
+```java
+public class SelectTest {
+    @Autowired
+    UserMapper userMapper;
+
+    @Test
+    public void selectById() {
+        User user = userMapper.selectById(1087982257332887553L);
+        System.out.println(user);
+    }
+
+    @Test
+    public void selectBatchIds() {
+        List<Long> ids = Arrays.asList(
+            1087982257332887553L,
+            1094590409767661570L,
+            1094592041087729666L
+        );
+        List<User> list = userMapper.selectBatchIds(ids);
+        list.forEach(System.out::println);
+    }
+
+    @Test
+    public void selectByMap() {
+        Map<String, Object> map = new HashMap<>();
+        //map的key指代的是mysql表中的列名，并非java实体的属性名
+        map.put("name", "张雨琪");
+        map.put("manager_id", 1088248166370832385L);
+        List<User> list = userMapper.selectByMap(map);
+        list.forEach(System.out::println);
+    }
+
+    @Test
+    public void selectList_all() {
+        List<User> list = userMapper.selectList(null);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 名字中包含雨，并且年龄小于40
+     * SELECT * FROM `user`
+     * WHERE `name` LIKE '%雨%' AND `age`< 40
+     */
+    @Test
+    public void selectList_like_lt() {
+//        QueryWrapper<User> query = Wrappers.<User>query();
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.like("name", "雨").lt("age", 40);
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 名字中包含雨，并且年龄大于等于20且小于等于40，并且email不为空
+     * SELECT * FROM `user`
+     * WHERE `name` LIKE '%雨%' AND `age` <= 40 AND `age` >= 20 AND `email` IS NOT NULL
+     */
+    @Test
+    public void selectList_between_isNotNull() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.like("name", "雨").between("age", 20, 40).isNotNull("email");
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 姓赵或者年龄大于等于25，按照年龄降序排列，年龄相同则按照id升序排列
+     * SELECT * FROM `user`
+     * WHERE `name` LIKE '赵%' OR `age` >= 25 ORDER BY `age` DESC , `id` ASC;
+     */
+    @Test
+    public void selectList_or_orderByDesc_orderByAsc() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.likeRight("name", "赵").or().ge("age", 20)
+            .orderByDesc("age").orderByAsc("id");
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 创建日期为2019年2月14日，且直属上级姓王
+     * SELECT * FROM `user`
+     * WHERE DATE_FORMAT(create_time,'%Y-%m-%d')='2019-02-14'
+     * AND manager_id IN (SELECT id FROM `user` WHERE `name` LIKE '王%')
+     */
+    @Test
+    public void selectList_apply_inSql() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.apply("DATE_FORMAT(create_time,'%Y-%m-%d')={0}", "2019-02-14")
+            .inSql("manager_id", "SELECT id FROM `user` WHERE `name` LIKE '王%'");
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 姓王且（年龄小于40或邮箱不为空）
+     * SELECT * FROM `user`
+     * WHERE `name` LIKE '王%' AND (`age`< 40 OR `email` IS NOT NULL)
+     */
+    @Test
+    public void selectList_and_lambda() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.likeRight("name", "王")
+            .and(q -> q.lt("age", 40).or().isNotNull("email"));
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 姓王且或者（年龄小于40且年龄大于20且邮箱不为空）
+     * SELECT * FROM `user`
+     * WHERE `name` LIKE '王%' OR (`age`< 40 AND `age` > 20  AND `email` IS NOT NULL)
+     */
+    @Test
+    public void selectList_or_lambda() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.likeRight("name", "王")
+            .or(q -> q.lt("age", 40).gt("age", 20).isNotNull("email"));
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * （年龄小于40或邮箱不为空）且姓王
+     * SELECT * FROM `user`
+     * WHERE (`age`< 40 OR `email` IS NOT NULL) AND `name` LIKE '王%'
+     */
+    @Test
+    public void selectList_nested() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.nested(q -> q.lt("age", 40).or().isNotNull("email"))
+            .likeRight("name", "王");
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 年龄为30,31,34,35
+     * SELECT * FROM `user` WHERE `age` IN (30,31,34,35);
+     */
+    @Test
+    public void selectList_in() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.in("age", Arrays.asList(30, 31, 34, 35));
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 返回只满足条件的一条（只调用最后一次，有sql注入的风险）
+     * SELECT * FROM `user` WHERE `age` IN (30,31,34,35) LIMIT 1;
+     */
+    @Test
+    public void selectList_last() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.in("age", Arrays.asList(30, 31, 34, 35)).last("limit 1");
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 只查询指定字段
+     * SELECT `name`,`age` FROM `user` WHERE `age` IN (30,31,34,35) LIMIT 1;
+     */
+    @Test
+    public void selectList_select_include() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.select("name", "age").in("age", Arrays.asList(30, 31, 34, 35)).last("limit 1");
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 排除指定字段
+     */
+    @Test
+    public void selectList_select_exclude() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.in("age", Arrays.asList(30, 31, 34, 35)).last("limit 1")
+            .select(
+                User.class,
+                info -> !info.getColumn().equals("create_time") && !info.getColumn().equals("manager_id")
+            );
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 条件判断
+     */
+    @Test
+    public void selectList_condition() {
+        String name = "刘";
+        String email = "";
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.like(StringUtils.isNotEmpty(name), "name", name)
+            .like(StringUtils.isNotEmpty(email), "email", email);
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 实体类作为条件构造器
+     * 默认是等值查询，可以在实体类属性中设置自定义条件
+     */
+    @Test
+    public void selectList_entity() {
+        User whereUser = new User();
+        whereUser.setName("刘");//name like "刘"
+        whereUser.setAge(32);//age<30
+        QueryWrapper<User> query = new QueryWrapper<>(whereUser);
+        query.eq("manager_id", "1088248166370832385");
+
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * allEq
+     */
+    @Test
+    public void selectList_allEq() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "刘明强");
+        params.put("age", 31);
+        params.put("email", null);
+//        query.allEq(params,false);//第二个参数表示如果列值为null是否按IS NULL查询，false则忽略null列的查询
+        query.allEq((k, v) -> !k.equals("name"), params, false);//第一个参数是过滤器
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * selectMaps的应用场景1：当表中的列特别多，但实际只需要几个列时，这时返回一个实体类有些不必要
+     */
+    @Test
+    public void selectMaps() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.like("name", "雨").lt("age", 40).select("name", "age");
+        List<Map<String, Object>> maps = userMapper.selectMaps(query);
+        maps.forEach(System.out::println);
+    }
+
+    /**
+     * selectMaps的应用场景2：查询统计结果
+     * 按照直属上级分组，查询每组的平均年龄、最大年龄、最小年龄，并且只取年龄总和小于100的组
+     * SELECT AVG(age) avg_age,MIN(age) min_age,MAX(age) max_age
+     * FROM `user`
+     * GROUP BY `manager_id`
+     * HAVING SUM(age)<100;
+     */
+    @Test
+    public void selectMaps2() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.select("AVG(age) avg_age", "MIN(age) min_age", "MAX(age) max_age")
+            .groupBy("manager_id")
+            .having("SUM(age)<{0}", 100);
+        List<Map<String, Object>> maps = userMapper.selectMaps(query);
+        maps.forEach(System.out::println);
+    }
+
+
+    /**
+     * selectObjs只返回第一列，其它列被遗弃
+     * 应用场景：只需返回一列的时候
+     */
+    @Test
+    public void selectObjs() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.like("name", "雨").lt("age", 40).select("name", "age");
+        List<Object> list = userMapper.selectObjs(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 返回总记录数
+     */
+    @Test
+    public void selectCount() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.like("name", "雨").lt("age", 40);
+        Integer count = userMapper.selectCount(query);
+        System.out.println("总记录数：" + count);
+    }
+
+    /**
+     * selectOne：只能查询一条记录，查询到多条会报错
+     */
+    @Test
+    public void selectOne() {
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.like("name", "刘红雨").lt("age", 40);
+        User user = userMapper.selectOne(query);
+        System.out.println(user);
+    }
+
+    /**
+     * lambda条件构造器
+     */
+    @Test
+    public void lambdaQueryWrapper1() {
+//        LambdaQueryWrapper<User> lambdaQ = new QueryWrapper<User>().lambda();
+//        LambdaQueryWrapper<User> lambdaQ = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<User> lambdaQ = Wrappers.<User>lambdaQuery();
+
+        lambdaQ.like(User::getName, "雨").lt(User::getAge, 40);
+        List<User> list = userMapper.selectList(lambdaQ);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * lambda条件构造器:防误写（例如列名"name"可能被误写）
+     */
+    @Test
+    public void lambdaQueryWrapper2() {
+        LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
+        query.likeRight(User::getName, "王")
+            .and(q -> q.lt(User::getAge, 40).or().isNotNull(User::getEmail));
+        List<User> list = userMapper.selectList(query);
+        list.forEach(System.out::println);
+    }
+
+    /**
+     * 链式lambda条件构造器：更优雅的书写方式
+     */
+    @Test
+    public void lambdaQueryChainWrapper() {
+        List<User> list = new LambdaQueryChainWrapper<User>(userMapper)
+            .likeRight(User::getName, "王")
+            .and(
+                q -> q
+                    .lt(User::getAge, 40)
+                    .or()
+                    .isNotNull(User::getEmail)
+            )
+            .list();
+        list.forEach(System.out::println);
+    }
+
+}
+```
+
+ 比如我们想查age等于23并且school_id等于300的
+
+> sql语句为：select * FROM student where age='23' or school_id='300'
+
+ 最直接的方法： 
+
+> List<Student> students = studentMapper
+>
+> .selectList(Wrappers.lambdaQuery(Student.class)
+>
+> .eq(Student::getAge, "23")
+>
+> .or()
+>
+> .eq(Student::getSchoolId,300));
+
+ 也可以用下面的方法
+
+>  用mybatis-plus则为：
+>
+> ```
+> List<Student> students = studentMapper.selectList(Wrappers.lambdaQuery(Student.class)
+> .eq(Student::getAge, "23")
+> .or(s -> s.eq(Student::getSchoolId, 300)));
+> ```
+
+**比如我们想查 age等于25或者姓张的同学**
+
+> sql语句：select * FROM student where age='25' or `name` LIKE '张%'
+
+用mybatis-plus最直接的方法
+
+> ```
+> List<Student> students = studentMapper
+> .selectList(Wrappers.lambdaQuery(Student.class)
+> .eq(Student::getAge, "25")
+> .or()
+> .likeRight(Student::getName, "张"));
+> ```
+
+ 也可以用以下方法
+
+> ```
+> List<Student> students = studentMapper
+> .selectList(Wrappers.lambdaQuery(Student.class)
+> .eq(Student::getAge, "25")
+> .or(s->s.likeRight(Student::getName,"张")));
+> ```
+
+#### 使用注解方式
+
+mapper中使用注解的方式:
+
+```java
+@Select("SELECT * FROM users WHERE id = #{id}")
+User getUserById(Long id);
+@Insert("INSERT INTO users (name, age) VALUES (#{name}, #{age})")
+void addUser(User user);
+@Update("UPDATE users SET name = #{name}, age = #{age} WHERE id = #fid}")
+void updateUser(User user);
+@Delete("DELETE FROM users WHERE id = #{id}")
+void deleteUser(Long id);
+```
+
+#### 使用xml方式
+
+比较简单一般由插件直接生成
+
+### 多表查询
+
+代码见[代码experiment02](C:\Users\16658\Documents\GitHub\java_note\note\spring boot3\sql\experiment02)
+
+MP提供了大量单表查询的方法，但是没有多表的操作，所以涉及到多表的查询时，需要我们自己实现
+
+**单表查询插件自动生成映射类型**
+
+```xml
+    <resultMap id="BaseResultMap" type="com.example.experiment01.entity.TbProduct">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="NAME" jdbcType="VARCHAR"/>
+            <result property="price" column="price" jdbcType="DOUBLE"/>
+    </resultMap>
+```
+
+#### 理解一对一, 多对一和一对多
+
+```java
+//人类
+public class Person implements Serializable{
+private Integer id;
+private String name;
+private String sex;
+private Integer age;
+
+private Card card;   //人和身份证是一对一的关系
+}
+// 对这个数据实体操作时---->使用association
+```
+
+```java
+package com.glj.pojo;
+ 
+import java.io.Serializable;
+ 
+//学生类
+public class Student implements Serializable {
+private Integer id;
+private String name;
+private String sex;
+private Integer age;
+       
+private Clazz clazz;   //学生与班级是多对一的关系
+}
+// 对这个数据实体操作时---->使用association
+```
+
+```java
+package com.glj.pojo;
+ 
+import java.io.Serializable;
+import java.util.List;
+ 
+// 班级类
+public class Clazz implements Serializable{
+private Integer id;
+private String code;
+private String name;
+      
+private List<Student> students;  //班级与学生是一对多的关系
+}
+// 对这个数据实体操作时---->使用collection
+```
+
+#### 使用Xml方式
+
+**多表查询:**
+
+[association]()关联 用于一对一或多对一查询
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.experiment01.mapper.TbPersonMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.experiment01.entity.TbPerson">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="age" column="age" jdbcType="INTEGER"/>
+            <result property="sex" column="sex" jdbcType="VARCHAR"/>
+            <result property="cardId" column="card_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,age,
+        sex,card_id
+    </sql>
+
+    <!-- 嵌套查询：通过执行另外一条SQL映射语句来返回预期的特殊类型 -->
+    <select id="findPersonById" parameterType="Integer" resultMap="IdCardWithPersonResult">
+        SELECT * from tb_person where id=#{id}
+    </select>
+    <resultMap type="com.example.experiment01.entity.TbPerson" id="IdCardWithPersonResult">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="age" column="age"/>
+        <result property="sex" column="sex"/>
+        <!-- 一对一：association使用select属性引入另外一条SQL语句 -->
+        <association property="cardId" column="card_id" javaType="com.example.experiment01.entity.TbIdcard"
+                     select="com.example.experiment01.mapper.IdCardMapper.findAllById"/>
+    </resultMap>
+
+    <!-- 嵌套结果：使用嵌套结果映射来处理重复的联合结果的子集 -->
+    <select id="findPersonById2" parameterType="Integer"
+            resultMap="IdCardWithPersonResult2">
+        SELECT p.*,idcard.code
+        from tb_person p,tb_idcard idcard
+        where p.card_id=idcard.id
+          and p.id= #{id}
+    </select>
+    <resultMap type="com.example.experiment01.entity.TbPerson" id="IdCardWithPersonResult2">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="age" column="age"/>
+        <result property="sex" column="sex"/>
+        <association property="cardId" javaType="com.example.experiment01.entity.TbIdcard">
+            <id property="id" column="card_id"/>
+            <result property="code" column="code"/>
+        </association>
+    </resultMap>
+
+
+</mapper>
+
+```
+
+[collection](https://so.csdn.net/so/search?q=collection&spm=1001.2101.3001.7020) 意为集合 用于一对多查询
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxx.xxx.mapper.xxxxMapper">
+    <!-- 
+		id
+		number
+		productList
+    -->
+    <!-- 多对多嵌套查询：通过执行另外一条SQL映射语句来返回预期的特殊类型 -->
+    <select id="函数名" parameterType="参数类型" resultMap="结果集名1">
+        <!-- sql语句 -->
+        select * from tb_orders WHERE id=#{id}
+    </select>
+    <resultMap type="com.xxx.xxx.entity.实体类" id="结果集名1">
+        <!--property是实体类属性, colum是sql语句查出的字段
+			colum能当做参数给property
+		-->
+        <id property="id" column="id"/>
+        <result property="number" column="number"/>
+         <!-- collection 多表关联映射  ofType表示属性集合中元素的类型--> 
+        <collection property="productList" column="id" ofType="com.xxx.xxx.entity.关联的实体类"
+                   <!--select调用其他mapper的函数(这里出现报错)--> 
+                    select="com.itheima.mapper.ProductMapper.findProductById">
+        </collection>
+    </resultMap>
+
+    <!-- 多对多嵌套结果查询：查询某订单及其关联的商品详情 -->
+    <select id="函数名" parameterType="参数类型" resultMap="结果集名2">
+        select o.*,p.id as pid,p.name,p.price
+        from tb_orders o,tb_product p,tb_ordersitem  oi
+        WHERE oi.orders_id=o.id
+          and oi.product_id=p.id
+          and o.id=#{id}
+    </select>
+    
+    <!-- 自定义手动映射类型 -->
+    <resultMap type="com.example.experiment01.entity.TbOrders" id="结果集名2">
+        <id property="id" column="id"/>
+        <result property="number" column="number"/>
+        <!-- collection 多表关联映射 --> 
+        <collection property="productList" ofType="com.xxx.xxx.entity.关联的实体类">
+            <!--property是实体类属性, colum是sql语句查出的字段-->
+            <id property="id" column="pid"/>
+            <result property="name" column="name"/>
+            <result property="price" column="price"/>
+        </collection>
+    </resultMap>
+</mapper>
+```
+
+ps:  当结果就是实体类并且没有联表使用resultMap="实体类"可以不用写resultMap了
+
+```xml
+    <select id="findProductById" parameterType="Integer" 		              resultType="com.example.experiment01.entity.TbProduct"> 
+        SELECT * from tb_product where id IN(
+            SELECT product_id FROM tb_ordersitem  WHERE orders_id = #{id}
+        )
+    </select>
 ```
 
 ## 自动配置原理

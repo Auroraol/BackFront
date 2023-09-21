@@ -2465,6 +2465,9 @@ mouse : <span id="mouseMove"></span>
         })
     });
 </script>
+
+//或者
+window.onload = function () {  }
 ```
 
 ##  jQuery 样式操作

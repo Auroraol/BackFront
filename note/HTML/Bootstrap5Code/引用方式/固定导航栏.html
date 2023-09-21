@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+      <!-- bootstrap.min.css -->
+      <link rel="stylesheet" href="/css/bootstrap.min.css">
+      <!--bootstrap font icon -->
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* 不会影响固定导航栏的位置 */
+        body {
+            padding-top: 70px;
+        }
+    </style>
+    </head>
+<body>
+    <div class="container">
+        <!-- 固定导航栏 顶部 -->
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                  <a class="nav-link" href="#">Active</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link disabled" href="#">Disabled</a>
+                </li>
+            </ul>
+        </nav>
+        <!-- 固定导航栏 底部 -->
+        </nav>
+            <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-bottom">
+            <div class="container-fluid">
+            <a href="#" class="navbar-brand">固定在底部</a>
+            </div>
+        </nav>
+    
+        <!-- 导航栏 -->
+        <ul class="nav nav-tabs mt-5">
+            <li class="nav-item">
+                <a href="#" class="nav-link active">
+                    <i class="bi bi-house-door-fill"></i> 首页
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="bi bi-book-fill"></i>学习
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="bi bi-tv"></i>前端
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link disabled">
+                    <i class="bi bi-x-circle"></i>禁用
+                </a>
+            </li>
+        </ul>
+
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        <p>
+            What was the motivation behind this project when we already have Electron and NW.js? How does this project differ from these platforms, how does it achieve something that is not possible/harder with Electron or NW.js?
+            One of the motivations of this project is to demonstrate how browsers that are installed locally can be used with Node out of the box.
+            Node v8 and Chrome v8 engines are decoupled in Carlo, providing a maintainable model with the ability to independently update underlying components. Carlo gives the user control over bundling and is more about productivity than branding.
+            Q: Can a Node app using Carlo be packaged as a Desktop app?
+            The pkg project can be used to package a Node app as a Desktop app. Carlo does not provide branding configurability such as application icons or customizable menus, instead, Carlo focuses on productivity and Web/Node interoperability. Check out the systeminfo example and call pkg package.json to see how it works.
+            
+            Q: What happens if the user does not have Chrome installed?
+            Carlo prints an error message when Chrome can not be located.
+            
+            Q: What is the minimum Chrome version that Carlo supports?
+            Chrome Stable channel, versions 70.* are supported.
+        </p>
+
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script> 
+</body>
+</html>

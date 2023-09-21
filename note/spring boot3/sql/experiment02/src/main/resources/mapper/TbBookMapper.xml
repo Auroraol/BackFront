@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.experiment01.mapper.TbBookMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.experiment01.entity.TbBook">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="bookname" column="bookName" jdbcType="VARCHAR"/>
+            <result property="price" column="price" jdbcType="DOUBLE"/>
+            <result property="author" column="author" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,bookName,price,
+        author
+    </sql>
+    <select id="findAllById" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_book
+        where
+        id = #{id,jdbcType=NUMERIC}
+    </select>
+    <update id="updateBooknameAndPriceById">
+        update tb_book
+        set bookName = #{bookname,jdbcType=VARCHAR},
+            price    = #{price,jdbcType=DECIMAL}
+        where id = #{id,jdbcType=NUMERIC}
+    </update>
+</mapper>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+     <!--bootstrap font icon -->
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+     <style>
+        body {
+            padding-top: 50px;
+        }
+     </style>
+</head>
+<body>
+<!-- 头部 -->
+<header>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <div class="container">
+            <a href="#" class="navbar-brand">Loge</a>
+            <!-- 折叠 -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                    <a class="nav-link" href="#">首页</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="#">企业服务</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="#">产品服务</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="#">关于我们</a>
+                    </li>
+                </ul>
+            </div>
+            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+                <input type="search" class="form-control form-control-dark text-bg-dark" placeholder="Search..." aria-label="Search">
+            </form>
+            <div class="text-end">
+                <button type="button" class="btn btn-outline-light me-2">搜索</button>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- 第二部分 -->
+<section>
+    <div class="container">
+        <div class="card bg-light my-3 p-2">
+            <div class="row card-body">
+                <div class="col-md-6">
+                    <h2>The Fastest Way to Space</h2>
+                    <p> Make your way to space in our rocket, elevator or transporter.</p>
+                    <button type="button" class="btn btn-success">Take the Tour</button>
+                    <button type="button" class="btn btn-primary">Book Tickets Now</button>
+                </div>
+                <div class="col-md-6  d-none  d-lg-block">
+                    <img src="/images/img-header.jpg" alt="">
+                </div>
+        </div>
+
+        <div class="row text-xl-center">
+            <!-- 当屏幕宽度小于576时元素使用col-sm-xx 的布局 // 第一个独占占一行其他两个并排 -->
+            <div class="col-md-4 col-sm-10">
+                <i class="bi bi-airplane-engines"></i>
+                <h3>Book Today!</h3>
+                <p>Even if you're traveling tomorrow, you can still
+                    get tickets today. We have a number of
+                    conveniently located ports around the globe
+                    to service everyone.</p>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <i class="bi bi-balloon-heart"></i>
+                <h3>Go Anywhere</h3>
+                <p>If you need to get to space today, why not try
+                    out a transporter? Despite the claims, there
+                    are have been no deaths in the last 6 weeks!</p>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <i class="bi bi-bug"></i>
+                <h3>RocketBus®</h3>
+                <p> For cheapest fares, catch the next RocketBus®
+                    to the stars. Cheaper on your wallet, and
+                    easiest way to make friends.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 底部 -->
+<footer class="bg-light fixed-bottom">
+    <div class="container">
+        <div class="row">
+            <!-- 超小的时候 用col-6布局 其他时候用col-sm-3 布局-->
+            <div class="col-sm-3 col-6">
+                <h5>常见问题1</h5>
+                <ul class="list-unstyled">
+                    <li class="list-group-item">HTML</li>
+                    <li class="list-group-item">CSS</li>
+                    <li class="list-group-item">Bootstrap</li>
+                  </ul>
+            </div>
+            <div class="col-sm-3 col-6">
+                <h5>常见问题2</h5>
+                <ul class="list-unstyled">
+                    <li class="list-group-item">HTML</li>
+                    <li class="list-group-item">CSS</li>
+                    <li class="list-group-item">Bootstrap</li>
+                  </ul>
+            </div>
+            <div class="col-sm-3 col-6">
+                <h5>常见问题3</h5>
+                <ul class="list-unstyled">
+                    <li class="list-group-item">HTML</li>
+                    <li class="list-group-item">CSS</li>
+                    <li class="list-group-item">Bootstrap</li>
+                  </ul>
+            </div>
+            <div class="col-sm-3 col-6">
+                <h5>常见问题4</h5>
+                <ul class="list-unstyled">
+                    <li class="list-group-item">HTML</li>
+                    <li class="list-group-item">CSS</li>
+                    <li class="list-group-item">Bootstrap</li>
+                  </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+    <script src="/js/bootstrap.bundle.min.js"></script> 
+</body>
+</html>

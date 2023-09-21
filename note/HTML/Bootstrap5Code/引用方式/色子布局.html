@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- bootstrap.min.css -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        .box {
+            width: 100px;
+            height: 100px;
+        }
+
+        .box span {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-3">
+        <div class="d-flex">
+            <!--数子1-->
+            <div class="box border border-dark rounded-4 mx-3 shadow d-flex justify-content-center align-items-center">
+                <span class="bg-dark rounded-circle"></span>
+            </div>
+            
+            <!-- 数子2 -->
+            <div class="box border border-dark rounded-4 mx-3 shadow d-flex flex-column justify-content-around align-items-center">
+                <span class="bg-dark rounded-circle"></span>
+                <span class="bg-dark rounded-circle"></span>
+            </div> 
+
+            <!-- 数子3  p-2设置内边距 d-flex使用flex布局 justify-content-between两端对齐-->
+            <div class="box border border-dark rounded-4 mx-3 p-2 shadow d-flex justify-content-between">
+                <span class="bg-dark rounded-circle"></span>
+                <span class="bg-dark rounded-circle align-self-center"></span>
+                <span class="bg-dark rounded-circle align-self-end"></span>
+            </div>
+            
+            <!-- 数子4 -->
+            <div class="box border border-dark rounded-4 mx-3 shadow d-flex ">
+                <div class="box rounded-4 mx-3 d-flex flex-column justify-content-around align-items-center">
+                    <span class="bg-dark rounded-circle"></span>
+                    <span class="bg-dark rounded-circle"></span>
+                </div> 
+                <div class="box rounded-4 mx-3 d-flex flex-column justify-content-around align-items-center">
+                    <span class="bg-dark rounded-circle"></span>
+                    <span class="bg-dark rounded-circle"></span>
+                </div> 
+            </div> 
+        </div>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script> 
+</body>
+</html>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.experiment01.mapper.TStudentMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.experiment01.entity.TStudent">
+            <id property="sid" column="sid" jdbcType="INTEGER"/>
+            <result property="sname" column="sname" jdbcType="VARCHAR"/>
+            <result property="sage" column="sage" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        sid,sname,sage
+    </sql>
+</mapper>

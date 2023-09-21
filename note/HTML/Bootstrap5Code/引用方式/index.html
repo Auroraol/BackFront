@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- bootstrap.min.css -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+    <!-- <div class="row">
+        <div class="col-md-9" style="background-color: red;">
+            <div class="row">
+                <div class="col-md-6">1</div>
+                <div class="col-md-6">2</div>
+            </div>
+            <div class="row">
+                <div class="col-md-3" style="background-color: aqua;">3</div>
+                <div class="col-md-6" style="background-color: black;">4</div>
+            </div>
+        </div>
+    </div> -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4" style="background-color:aqua;">.col-md-4</div>
+            <!--偏移4格-->
+            <div class="col-md-4 offset-md-4" style="background-color:aqua;">.col-md-4 .offset-md-4</div>  
+        </div>
+        <div class="row">
+            <div class="col-md-3 offset-md-3">.col-md-3 .offset-md-3</div>
+            <div class="col-md-3 offset-md-3">.col-md-3 .offset-md-3</div>
+        </div>.
+        <div class="row">
+            <div class="col-md-6 offset-md-3" style="background-color:red;">.col-md-6 .offset-md-3</div>
+        </div>
+    </div>
+
+    <div class="row">   
+        <div class="col-md-9 order-2">
+            <h5>这是最新的文章列表</h5>
+            <ul>
+                <li>文章标题一 作者 日期</li>
+                <li>文章标题二 作者-日期</li>
+                <li>文章标题二 作者 日期</li>
+            </ul>
+        </div>
+        <div class="col-md-3 order-1">
+            <h5>导航栏</h5>
+            <ul>
+                <li>首页</li>
+                <li>视频直播</li>
+                <li>视频回放</li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">1</div>
+        <div class="col-md-4 order-first">order-first2</div>
+        <div class="col-md-4 order-last">order-last3</div>
+        <div class="col-md-4 order-1">order-1(4)</div>
+        <div class="col-md-4 order-2">order-2(5)</div>
+        <div class="col-md-4">6</div>
+        <div class="col-md-4">7</div>
+        <div class="col-md-4">8</div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-1 text-truncate">
+            这是一个很长很长很长非常长的段落
+        </div>
+    </div>
+        
+    <p class="fs-1">这是一个段落fs-1</p>
+    <p class="fs-2">这是一个段落fs-2</p>
+    <p class="fs-3">这是一个段落fs-3</p>
+    <p class="fs-4">这是一个段落fs-4</p>
+    <p class="fs-5">这是一个段落fs-5</p>
+    <p class="fs-6">这是一个段落fs-6</p>
+
+    <p class="1h-1">这是一个很长很长很长的段落</p>
+    <p class="lh-sm">这是一个很长很长很长的段落1.25</p>
+    <p class="lh-base">这是一个很长很长很长的段落</p>
+    <p class="1h-lg">这是一个很长很长很长的段落2rem</p>
+
+    <ol class="list-group list-group-numbered">
+        <li class="list-group-item">第一项</li>
+        <li class="list-group-item">第二项</li>
+        <li class="list-group-item">第三项</li>
+        <li class="list-group-item">第四项</li>
+    </ol>
+
+
+    <ul class="list-group">
+        <li class="list-group-item">
+        <small class="bg-primary badge">12</small>
+        第一项
+        </li>
+        <li class="list-group-item">第二项</li>
+        <li class="list-group-item">第三项</li>
+        <li class="list-group-item">第四项</li>
+    </ul>
+
+    <div class="list-group">
+        <a href="#" class="list-group-item active">
+            <h4 class="list-group-heading">网站服务</h4>
+        </a>
+        <a href="#" class="list-group-item">
+            <h4 class="list-group-heading">标题—</h4>
+            <p class="list-group-item-text">这里面是内容-</p>
+        </a>
+        <a href="#" class="list-group-item">
+            <h4 class="list-group-heading active">标题二</h4>
+            <p class="list-group-item-text">这里面是内容二</p>
+        </a>
+    </div>
+    <table class="table">
+        <thead>
+          <tr>
+            <th>Firstname</th>
+            <th>Lastname</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>John</td>
+            <td>Doe</td>
+            <td>john@example.com</td>
+          </tr>
+          <tr>
+            <td>Mary</td>
+            <td>Moe</td>
+            <td>mary@example.com</td>
+          </tr>
+          <tr>
+            <td>July</td>
+            <td>Dooley</td>
+            <td>july@example.com</td>
+          </tr>
+        </tbody>
+    </table>
+
+    <div class="progress">
+        <div class="progress-bar bg-success" style="width:40%">
+          Free Space
+        </div>
+        <div class="progress-bar bg-warning" style="width:10%">
+          Warning
+        </div>
+        <div class="progress-bar bg-danger" style="width:20%">
+          Danger
+        </div>
+      </div>
+
+    <p class="text-sm-center">文本将在屏幕宽度等于或大于 576px视口及以上居中对齐。</p>
+    <p class="text-md-center">文本将在屏幕宽度等于或大于768px视口及以上居中对齐</p>
+    <p class="text-1g-center">文本将在屏幕宽度等于或大于992px视口及以上居中对齐。</p>
+    <p class="text-x1-center">文本将在屏幕宽度等于或大于1200px视口及以上居中对齐。</p>
+
+    <div class="float-sm-end">小屏幕向右浮动</div><br>
+    <div class="float-md-end">中等屏幕向右浮动</div><br>
+    <div class="float-lg-end">大屏幕向右浮动</div><br>
+    <div class="float-xl-end">超大屏幕向右浮动</div><br>
+    <div class="float-xxl-end">特大屏幕向右浮动</div><br>
+    <div class="float-none">没有浮动</div>
+
+    <span class="border"></span></div> 
+    <span class="border border-0"></span>         
+    <span class="border border-top-0"></span>    
+    <span class="border border-right-0"></span>   
+    <span class="border border-bottom-0"></span>   
+    <span class="border border-left-0"></span>    
+    <br>
+
+    <span class="border-top"></span>  
+    <span class="border-end"></span>     
+    <span class="border-bottom"></span>  
+    <span class="border-start"></span>   
+
+    <div class="progress" style="height: 30px">
+        <div class="progress-bar progress-bar-striped" style="width: 60%">60%</div>
+    </div>
+    <br>
+    <div class="progress" style="height: 30px">
+        <div class="progress-bar progress-bar-striped bg-warning" style="width: 60%">60%</div>
+    </div>
+    <br>
+    <div class="progress" style="height: 30px">
+        <div class="progress-bar progress-bar-striped bg-danger" style="width: 60%">60%</div>
+    </div>
+
+    <div class="p-4 mb-4 border border-danger shadow">这是一个盒子</div>
+
+    <div class="box w-25 bg-info mb-3">这个盒子</div>
+    <div class="box2 w-25 bg-danger">另一个盒子</div>
+
+    <!--fiex-wrap-reverse 换行，第一行在下方 -->
+    <div class="d-flex bg-primary flex-wrap mt-3">
+        <div class="bg-danger" style="width: 200px">弹性盒子1</div>
+        <div class="bg-warning" style="width: 200px">弹性盒子2</div>
+        <div class="bg-info" style="width: 200px">弹性盒子3</div>
+        <div class="bg-danger" style="width: 200px">弹性盒子4</div>
+        <div class="bg-warning" style="width: 200px">弹性盒子5</div>
+        <div class="bg-info" style="width: 200px">弹性盒子6</div>
+        <div class="bg-danger" style="width: 200px">弹性盒子7</div>
+        <div class="bg-warning" style="width: 200px">弹性盒子8</div>
+        <div class="bg-info" style="width: 200px">弹性盒子9</div>
+    </div>
+
+    <!-- 默认值是：stretch 如果项目未设置高度，将占满整 个窗口的高度 -->
+    <div class="d-flex bg-primary" style="height: 300px; width: 500px;">
+        <div class="bg-danger">弹性盒子1</div>
+        <div class="bg-warning">弹性盒子2</div>
+        <div class="bg-info">弹性盒子3</div>
+    </div>
+
+    <div class="d-flex bg-primary mt-3 align-items-end justify-content-center" style="height: 300px; width: 500px;">
+        <div class="bg-danger">弹性盒子1</div>
+        <div class="bg-warning">弹性盒子2</div>
+        <div class="bg-info">弹性盒子3</div>
+    </div>
+
+    <div class="d-flex bg-primary flex-wrap align-content-center" style="width: 600px; height: 500px;">
+        <div class="bg-danger" style="width: 200px">弹性盒子1</div>
+        <div class="bg-warning" style="width: 200px">弹性盒子2</div>
+        <div class="bg-info" style="width: 200px">弹性盒子3</div>
+        <div class="bg-danger" style="width: 200px">弹性盒子4</div>
+        <div class="bg-warning" style="width: 200px">弹性盒子5</div>
+        <div class="bg-info" style="width: 200px">弹性盒子6</div>
+        <div class="bg-danger" style="width: 200px">弹性盒子7</div>
+        <div class="bg-warning" style="width: 200px">弹性盒子8</div>
+        <div class="bg-info" style="width: 200px">弹性盒子9</div>
+    </div>
+
+    <div class="d-sm-flex bg-primary" style="width: 400px; height: 400px;">
+        <div class="bg-danger align-self-end">弹性盒子1</div>
+        <div class="bg-warning align-self-center">弹性盒子2</div>
+        <div class="bg-info">弹性盒子3</div>
+    </div>
+
+    <!-- 创建最多 12 列的响应式行 -->
+    <!-- <div class="container">
+        <div class="row">
+            <div class="col-md-1">1</div>
+            <div class="col-md-1">2</div>
+            <div class="col-md-1">3</div>
+            <div class="col-md-1">4</div>
+            <div class="col-md-1">5</div>
+            <div class="col-md-1">6</div>
+            <div class="col-md-1">7</div>
+            <div class="col-md-1">8</div>
+            <div class="col-md-1">9</div>
+            <div class="col-md-1">10</div>
+            <div class="col-md-1">11</div>
+            <div class="col-md-1">12</div>
+        </div>
+    </div> -->
+    <!-- <div class="container-fluid">
+        <h1>这个容器container-fluid</h1>
+    </div> -->
+    <!-- <div class="container-sm">.container-sm</div> 
+    <div class="container-md">.container-md</div>
+    <div class="container-1g">.container-1g</div>
+    <div class="container-x1">.container-xl</div>
+    <div class="container-xxl">.container-xxl</div>-->
+    <script src="/js/bootstrap.bundle.min.js"></script> 
+</div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.experiment01.mapper.TbPersonMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.experiment01.entity.TbPerson">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="age" column="age" jdbcType="INTEGER"/>
+            <result property="sex" column="sex" jdbcType="VARCHAR"/>
+            <result property="cardId" column="card_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,age,
+        sex,card_id
+    </sql>
+
+    <!-- 嵌套查询：通过执行另外一条SQL映射语句来返回预期的特殊类型 -->
+    <select id="findPersonById" parameterType="Integer" resultMap="IdCardWithPersonResult">
+        SELECT * from tb_person where id=#{id}
+    </select>
+    <resultMap type="com.example.experiment01.entity.TbPerson" id="IdCardWithPersonResult">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="age" column="age"/>
+        <result property="sex" column="sex"/>
+        <!-- 一对一：association使用select属性引入另外一条SQL语句 -->
+        <association property="cardId" column="card_id" javaType="com.example.experiment01.entity.TbIdcard"
+                     select="com.example.experiment01.mapper.IdCardMapper.findAllById"/>
+    </resultMap>
+
+    <!-- 嵌套结果：使用嵌套结果映射来处理重复的联合结果的子集 -->
+    <select id="findPersonById2" parameterType="Integer"
+            resultMap="IdCardWithPersonResult2">
+        SELECT p.*,idcard.code
+        from tb_person p,tb_idcard idcard
+        where p.card_id=idcard.id
+          and p.id= #{id}
+    </select>
+    <resultMap type="com.example.experiment01.entity.TbPerson" id="IdCardWithPersonResult2">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="age" column="age"/>
+        <result property="sex" column="sex"/>
+        <association property="cardId" javaType="com.example.experiment01.entity.TbIdcard">
+            <id property="id" column="card_id"/>
+            <result property="code" column="code"/>
+        </association>
+    </resultMap>
+
+
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.experiment01.mapper.UsersMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.experiment01.entity.Users">
+            <id property="uid" column="uid" jdbcType="INTEGER"/>
+            <result property="uname" column="uname" jdbcType="VARCHAR"/>
+            <result property="uage" column="uage" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        uid,uname,uage
+    </sql>
+    <!-- 一对多：查看某一用户及其关联的订单信息
+         注意：当关联查询出的列名相同，则需要使用别名区分 -->
+    <select id="findUserWithOrders" parameterType="Integer"
+            resultMap="UserWithOrdersResult">
+        SELECT u.*,o.id as orders_id,o.number
+        from tb_user u,tb_orders o
+        WHERE u.id=o.user_id
+          and u.id=#{id}
+    </select>
+    <resultMap type="com.example.experiment01.entity.Users" id="UserWithOrdersResult">
+        <id property="uid" column="id"/>
+        <result property="uname" column="username"/>
+        <result property="uage" column="uage"/>
+        <!-- 一对多关联映射：collection
+           ofType表示属性集合中元素的类型，List<Orders>属性即Orders类 -->
+        <collection property="ordersList" ofType="com.example.experiment01.entity.TbOrders">
+            <id property="id" column="orders_id"/>
+            <result property="number" column="number"/>
+        </collection>
+    </resultMap>
+
+</mapper>
