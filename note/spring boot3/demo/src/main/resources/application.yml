@@ -1,5 +1,5 @@
 server:
-  port: 8090
+  port: 8080
 # 初始化dispatcherServlet，默认-1未开启，0及以上为开启
 spring:
   mvc:

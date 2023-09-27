@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service;
 
 
 @Slf4j
-@Service  //自动注册bean  // 不加它就用bean认为加
+@Service
+//@Service  //自动注册bean  // 不加它就用bean认为加
 // @Component   和 Service 没有啥区别,  Component是比较通用的东西
 public class AdminServiceImpl implements UserService {
 	@Override

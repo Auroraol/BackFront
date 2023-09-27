@@ -99,6 +99,4 @@ public class UserActionController {
 	@Value("${robot.name}")
 	private String naem;    // name ={robot.name}
 
-
-
 }

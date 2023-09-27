@@ -2287,6 +2287,8 @@ InputStream in = PropertiesUtil.class.getClassLoader().getResourceAsStream("xx.p
 
 # html和后端进行数据交互
 
+注意: 这里的后端并没有分离
+
 ## 三种向后端提供数据的方法
 
 ### 一、表单提交
@@ -2955,3 +2957,139 @@ a、假如请求在A页面/webname/index.html页面，最终的请求路径是�
 ![image-20230716204557799](JavaWeb.assets/image-20230716204557799.png)
 
 ![image-20230716204632320](JavaWeb.assets/image-20230716204632320.png)
+
+
+
+# 前端后端交互请求的几种方式
+
+
+
+以下是常见的请求方式及其使用例子：
+
+常见的请求方式有以下几种:
+
+\1. GET：获取资源，[请求参数](https://so.csdn.net/so/search?q=请求参数&spm=1001.2101.3001.7020)在URL中传递，一般用于数据查询操作。
+\2. POST：提交数据，请求参数在请求体中传递，一般用于数据新增和修改操作。
+\3. PUT：更新数据，请求参数在请求体中传递，一般用于数据更新操作。
+\4. DELETE：删除数据，请求参数在URL中传递，一般用于数据删除操作。
+
+一、[GET请求](https://so.csdn.net/so/search?q=GET请求&spm=1001.2101.3001.7020)
+
+1.前端使用例子：
+
+```
+axios.get('/api/getUserInfo?id=123')
+ .then(response => {
+  console.log(response.data);
+ })
+ .catch(error => {
+  console.log(error);
+ });
+```
+
+2.后端使用例子：
+
+```
+@RequestMapping(value = "/getUserInfo", method = RequestMethod.GET)
+@ResponseBody
+public User getUserInfo(@RequestParam("id") String id) {
+  User user = userService.getUserById(id);
+  return user;
+}
+```
+
+二、POST请求
+
+1.前端使用例子：
+
+```
+axios.post('/api/login', {
+  username: 'admin',
+  password: '123456'
+ })
+ .then(response => {
+  console.log(response.data);
+ })
+ .catch(error => {
+  console.log(error);
+ });
+```
+
+2.后端使用例子：
+
+```
+@RequestMapping(value = "/login", method = RequestMethod.POST)
+@ResponseBody
+public Map<String, Object> login(@RequestBody Map<String, Object> params) {
+  String username = (String) params.get("username");
+  String password = (String) params.get("password");
+  // 验证用户名和密码
+  // ...
+  Map<String, Object> result = new HashMap<>();
+  result.put("code", 200);
+  result.put("msg", "登录成功");
+  return result;
+}
+```
+
+三、PUT请求
+
+1.前端使用例子：
+
+```
+axios.put('/api/updateUserInfo', {
+  id: 123,
+  name: '张三',
+  age: 18
+ })
+ .then(response => {
+  console.log(response.data);
+ })
+ .catch(error => {
+  console.log(error);
+ });
+```
+
+2.后端使用例子：
+
+```
+@RequestMapping(value = "/updateUserInfo", method = RequestMethod.PUT)
+@ResponseBody
+public Map<String, Object> updateUserInfo(@RequestBody User user) {
+  // 更新用户信息
+  Map<String, Object> result = new HashMap<>();
+  result.put("code", 200);
+  result.put("msg", "更新成功");
+  return result;
+}
+```
+
+四、DELETE请求
+
+1.前端使用例子：
+
+```
+axios.delete('/api/deleteUser?id=123')
+ .then(response => {
+  console.log(response.data);
+ })
+ .catch(error => {
+  console.log(error);
+ });
+```
+
+2.后端使用例子：
+
+```
+@RequestMapping(value = "/deleteUser", method = RequestMethod.DELETE)
+@ResponseBody
+public Map<String, Object> deleteUser(@RequestParam("id") String id) {
+  // 删除用户信息
+  // ...
+  Map<String, Object> result = new HashMap<>();
+  result.put("code", 200);
+  result.put("msg", "删除成功");
+  return result;
+}
+```
+

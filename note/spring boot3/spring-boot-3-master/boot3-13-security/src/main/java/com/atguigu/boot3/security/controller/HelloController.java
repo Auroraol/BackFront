@@ -19,7 +19,7 @@ public class HelloController {
 
 
 
-    @PreAuthorize("hasAuthority('world_exec')")
+    @PreAuthorize("hasAuthority('world_exec')")   // 满足world_exec权限
     @GetMapping("/world")
     public String world(){
         return "Hello World!!!";

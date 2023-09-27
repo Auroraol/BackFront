@@ -49,6 +49,7 @@ public class AppSecurityConfiguration {
 
     @Bean //查询用户详情；
     UserDetailsService userDetailsService(PasswordEncoder passwordEncoder){
+        // 实际开发的从数据库拿
         UserDetails zhangsan = User.withUsername("zhangsan")
                 .password(passwordEncoder.encode("123456")) //使用密码加密器加密密码进行存储
                 .roles("admin", "hr")
@@ -64,7 +65,7 @@ public class AppSecurityConfiguration {
         UserDetails wangwu = User.withUsername("wangwu")
                 .password(passwordEncoder.encode("123456"))
                 .roles("admin")
-                .authorities("file_write","world_exec")
+                .authorities("file_write","world_exec")  //权限标识
                 .build();
 
         //默认内存中保存所有用户信息
