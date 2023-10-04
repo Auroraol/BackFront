@@ -2,7 +2,7 @@
 
 ![image-20230709103935383](spring boot3.assets/image-20230709103935383.png)
 
-**注意:  可能会写一个mapper包  里面写数据库操作的接口, 然后在生成Mapper接口的xml文件写sql语句**
+**注意:  可能会写一个mapper包  里面写数据库操作的接口, 然后在生成Mapper接口的xml文件写sql语句**和dao包一样
 
 ![image-20230926223348288](spring boot3.assets/image-20230926223348288.png)
 
@@ -1425,8 +1425,10 @@ public class UserActionController {
 | 注解                 | 备注                                                         |
 | -------------------- | ------------------------------------------------------------ |
 | @Service             | bean注册, ==一般加在service目录里面的类上==                  |
+| @Controller          | 控制层组件, controller目录里面的类上                         |
+| @Repository          | 数据层组件, dao目录里面的类上                                |
 | @Component           | bean注册, 和 Service 没有啥区别,  Component是比较通用的东西  |
-| @Autowired           | //@Resource =@Autowired+@Qualifie<br> //自动加载类, 理解就是不用new<br/>//如果接口实现只有一个，那么用@Autowired就可以了，也不需要指定名字.<br/>//如果接口有多个实现,那么用@Resource，并指定name<br/>//或者使用@Autowired+@Qualifier+Qualifier的value值. |
+| @Autowired           | //@Resource =@Autowired+@Qualifie<br>//自动加载类, 理解就是不用new<br/>//如果接口实现只有一个，那么用@Autowired就可以了，也不需要指定名字.<br/>//如果接口有多个实现,那么用@Resource，并指定name<br/>//或者使用@Autowired+@Qualifier+Qualifier的value值. |
 | @Configuration+@Bean | bean注册(人为) —> 用于配置类                                 |
 | @Values              | 从配置文件中取参数                                           |
 
@@ -5831,80 +5833,11 @@ public class BootWebAdminApplicationTest {
 
 #### 条件构造器方式
 
-![img](spring boot3.assets/868422e97ac64147951736389c4eeabf.png)
+![image-20231002145521470](spring boot3.assets/image-20231002145521470.png)
 
-```java
-一、查询需求
+![image-20231002145432486](spring boot3.assets/image-20231002145432486.png)
 
-1、名字中包含雨并且年龄小于40
-
-       name like '%雨%' and age<40
-
-2、名字中包含雨年并且龄大于等于20且小于等于40并且email不为空
-
-   name like '%雨%' and age between 20 and 40 and email is not null
-
-3、名字为王姓或者年龄大于等于25，按照年龄降序排列，年龄相同按照id升序排列
-
-   name like '王%' or age>=25 order by age desc,id asc
-
-4、创建日期为2019年2月14日并且直属上级为名字为王姓
-
-      date_format(create_time,'%Y-%m-%d')='2019-02-14' and manager_id in (select id from user where name like '王%')
-
-5、名字为王姓并且（年龄小于40或邮箱不为空）
-
-    name like '王%' and (age<40 or email is not null)
-
-6、名字为王姓或者（年龄小于40并且年龄大于20并且邮箱不为空）
-
-    name like '王%' or (age<40 and age>20 and email is not null)
-
-7、（年龄小于40或邮箱不为空）并且名字为王姓
-
-    (age<40 or email is not null) and name like '王%'
-
-8、年龄为30、31、34、35
-
-    age in (30、31、34、35) 
-
-9、只返回满足条件的其中一条语句即可
-
-limit 1
-
-二、select中字段不全部出现的查询
-
-10、名字中包含雨并且年龄小于40(需求1加强版)
-
-第一种情况：select id,name
-
-                  from user
-
-                  where name like '%雨%' and age<40
-
-第二种情况：select id,name,age,email
-
-                  from user
-
-                  where name like '%雨%' and age<40
-
-三、统计查询：
-
-11、按照直属上级分组，查询每组的平均年龄、最大年龄、最小年龄。
-
-并且只取年龄总和小于500的组。
-
-select avg(age) avg_age,min(age) min_age,max(age) max_age
-
-from user
-
-group by manager_id
-
-having sum(age) <500
-
-```
-
-
+例子
 
 ```java
 
@@ -6365,6 +6298,87 @@ public class SelectTest {
 > .eq(Student::getAge, "25")
 > .or(s->s.likeRight(Student::getName,"张")));
 > ```
+
+
+
+#### **使用条件构造器进行查询**
+
+1. Java的传统写法
+
+```java
+public AjaxResult selectStudentByNumber(@RequestBody Student student) {
+    // 1. 定义条件构造器
+    // 要使用哪个表进行查询，那么<>内就填写哪个类
+    QueryWrapper<Student> qw = new QueryWrapper();
+    // 2. 构造条件构造器
+    // 第一个变量是书库据表中的字段，第二个变量是sql语句查询中要查找的值
+    qw.eq("stu_number", student.getStuNumber());
+    
+    // 3. 查询
+    // 在result内，就进行完了查询
+    List<Student> result = studentService.list(qw);
+    // 4. 返回
+    return AjaxResult.success(result);
+}
+```
+
+1. [lambda表达式](https://so.csdn.net/so/search?q=lambda表达式&spm=1001.2101.3001.7020)方式(推荐)
+
+```java
+public AjaxResult selectStudentByNumber(@RequestBody Student student) {
+    // 1.定义条件构造器
+    LambdaQueryWrapper<Student> lqw = new LambdaQueryWrapper<Student>().eq(Student::getStuNumber,stuNumber);
+     // 2. 查询
+    List<Student> result = studentService.list(lqw);
+    return AjaxResult.success(result);
+}
+```
+
+##### 用法：
+
+##### allEq：全部等于
+
+```plaintext
+// params : key为数据库字段名,value为字段值
+allEq(Map<R, V> params)
+```
+
+> 举例：
+> allEq({id:1,name:"某某",age:null})--->id = 1 and name = '某某' and age is null
+
+代码演示：
+
+```java
+/**
+ * SQL:SELECT * FROM student WHERE (stu_name = ? AND id = ?)
+ */
+public AjaxResult selectStudent(@RequestBody Student student) {
+        QueryWrapper qw = new QueryWrapper();
+        Map map = new HashMap<>();
+        map.put("id","2");
+        map.put("stu_name","某某");
+        qw.allEq(map);
+        List<User> list = studentService.list(qw);
+        return AjaxResult.success(list);
+}
+```
+
+
+
+##### eq：等于 =
+
+```java
+eq(R column, Object val)
+```
+
+> 举例：
+> eq("name", "某某")--->name = '某某'
+
+[MyBatis-Plus——条件构造器_mybatis-plus条件构造器-CSDN博客](https://blog.csdn.net/Yangyeon_/article/details/129452576)
+
+
+
+
 
 #### 使用注解方式
 
@@ -6900,7 +6914,7 @@ public class MoveSysUserTest {
 2. Jwt+redis
 3. redis  + UUID
 
-# Spring-Boot-操作-Redis
+# Spring-Boot-操作-Redis内存数据库
 
 在 Redis 出现之前，缓存框架各种各样，有了 Redis ，缓存方案基本上都统一了
 
@@ -7154,7 +7168,7 @@ select 8
 
 
 
-# 反序列化(非跨平台)
+# 反序列化(json)
 
 \[fastjson2 介绍及使用_西凉的悲伤的博客-CSDN博客](https://blog.csdn.net/qq_33697094/article/details/128114939)
 
@@ -9935,6 +9949,1761 @@ LoadProperties测试获取的功能描述：原生获取配置文件的值
 - 读取流的时候指定好编码，保证和文件的编码一致，否则会导致乱码
 
 
+
+
+
+# Nginx高性能服务
+
+## 一、引言
+
+### 1.1 代理问题
+
+客户端到底要将请求发送给哪台服务器。
+
+| 发送给服务器1还是服务器2                                     |
+| ------------------------------------------------------------ |
+| ![image.png](spring boot3.assets/1646185298458-8bfc884b-abca-473e-bcec-ea1f4a802f78.png) |
+
+### 1.2 负载均衡问题
+
+如果所有客户端的请求都发送给了服务器1，那么服务器2将没有任何意义
+
+| 负载均衡问题                                                 |
+| ------------------------------------------------------------ |
+| 服务器1访问数据库客户端服务器2![image.png](spring boot3.assets/1646185332482-13171c40-c632-4005-97b7-70d50edf2147.png) |
+
+### 1.3 资源优化
+
+客户端发送的请求可能是申请动态资源的，也有申请静态资源，但是都是去Tomcat中获取的
+
+| 静态资源访问                                                 |
+| ------------------------------------------------------------ |
+| 客户端数据库服务器1本地静态资源![image.png](spring boot3.assets/1646185343154-aab9cb15-8b23-45f3-9273-b97bc442941c.png) |
+
+### 1.4 Nginx处理
+
+| 在搭建集群后，使用Nginx                                      |
+| ------------------------------------------------------------ |
+| ![image.png](spring boot3.assets/1646185354953-4e9aecee-5fe6-41b3-91f5-2722120838a9.png) |
+
+## 二、Nginx概述
+
+Nginx是由俄罗斯人研发的，应对Rambler的网站，并且2004年发布的第一个版本。
+
+Nginx (engine x) 是一个高性能的HTTP和反向代理web服务器，同时也提供了IMAP/POP3/SMTP服务。Nginx是由伊戈尔·赛索耶夫为俄罗斯访问量第二的Rambler.ru站点（俄文：Рамблер）开发的，第一个公开版本0.1.0发布于2004年10月4日。2011年6月1日，nginx 1.0.4发布。
+
+其特点是占有内存少，并发能力强，事实上nginx的并发能力在同类型的网页服务器中表现较好，中国大陆使用nginx网站用户有：百度、京东、新浪、网易、腾讯、淘宝等。在全球活跃的网站中有12.18%的使用比率，大约为2220万个网站。
+
+Nginx 是一个安装非常的简单、配置文件非常简洁（还能够支持perl语法）、Bug非常少的服务。Nginx 启动特别容易，并且几乎可以做到7*24不间断运行，即使运行数个月也不需要重新启动。你还能够不间断服务的情况下进行软件版本的升级。
+
+Nginx代码完全用C语言从头写成。官方数据测试表明能够支持高达 50,000 个并发连接数的响应。
+
+### 2.1 Nginx的特点
+
++ 稳定性极强。 7*24小时不间断运行。
++ Nginx提供了非常丰富的配置实例。
++ 占用内存小，并发能力强。
+
+| Nginx引入前后,客户端请求处理流程的对比                       |
+| ------------------------------------------------------------ |
+| ![image-20231002175402614](spring boot3.assets/image-20231002175402614.png) |
+
+### 2.2 Nginx作用
+
+> Http代理，反向代理：作为web服务器最常用的功能之一，尤其是反向代理。
+
+**正向代理:  代理客户端**
+![img](spring boot3.assets/kuangstudy46bdad36-d3e0-43b0-a223-43360b7e8fc7.png)
+**反向代理:  代理服务端**
+![img](spring boot3.assets/kuangstudy62a15097-6e2a-4dbe-bcf5-f0d7cab81089.png)
+
+> Nginx提供的负载均衡策略有2种：内置策略和扩展策略。内置策略为轮询，加权轮询，Ip hash。扩展策略，就天马行空，只有你想不到的没有他做不到的。
+
+轮询
+![img](spring boot3.assets/kuangstudy4d33dfac-1949-4b2d-abb8-fe0b6e65b8dc.png)
+加权轮询
+![img](spring boot3.assets/kuangstudyb1e3e440-4159-4259-a174-528b56cb04b2.png)
+iphash对客户端请求的ip进行hash操作，然后根据hash结果将同一个客户端ip的请求分发给同一台服务器进行处理，可以解决session不共享的问题。
+![img](spring boot3.assets/kuangstudy64acb9a3-cd1a-4c0e-a1fa-9b220046a95a.png)
+
+> 动静分离，在我们的软件开发中，有些请求是需要后台处理的，有些请求是不需要经过后台处理的（如：css、html、jpg、js等等文件），这些不需要经过后台处理的文件称为静态文件。让动态网站里的动态网页根据一定规则把不变的资源和经常变的资源区分开来，动静资源做好了拆分以后，我们就可以根据静态资源的特点将其做缓存操作。提高资源响应的速度。
+
+![img](spring boot3.assets/kuangstudyedb1bbd6-e530-4aba-8fde-68658a10e73f.png)
+
+目前，通过使用Nginx大大提高了我们网站的响应速度，优化了用户体验，让网站的健壮性更上一层楼！软件层面一般常用Nginx来做反向代理服务器，它的性能非常好，用来做负载均衡。
+
+## 三、Nginx的安装
+
+### windows下安装
+
+**1、下载nginx**
+
+http://nginx.org/en/download.html 下载稳定版本。
+以nginx/Windows-1.16.1为例，直接下载 nginx-1.16.1.zip。
+下载后解压，解压后如下：
+
+![img](spring boot3.assets/kuangstudyb5a1d538-352c-4aa6-88f7-23d18f0588ab.png)
+
+**2、启动nginx**
+
+有很多种方法启动nginx
+
+(1)直接双击nginx.exe，双击后一个黑色的弹窗一闪而过
+
+(2)打开cmd命令窗口，切换到nginx解压目录下，输入命令 `nginx.exe` ，回车即可
+
+**3、检查nginx是否启动成功**
+
+直接在浏览器地址栏输入网址 [http://localhost:80](http://localhost/) 回车，出现以下页面说明启动成功！
+
+![img](spring boot3.assets/kuangstudya21688c8-159e-4caa-8e65-3dc056b6b78e.png)
+
+**4、配置监听**
+
+nginx的配置文件是conf目录下的nginx.conf，默认配置的nginx监听的端口为80，如果80端口被占用可以修改为未被占用的端口即可。
+
+![img](spring boot3.assets/kuangstudyf23105c4-b0b2-4e22-a1bf-b8098f40c144.png)
+
+当我们修改了nginx的配置文件nginx.conf 时，不需要关闭nginx后重新启动nginx，只需要执行命令 `nginx -s reload` 即可让改动生效
+
+**5、关闭nginx**
+
+如果使用cmd命令窗口启动nginx， 关闭cmd窗口是不能结束nginx进程的，可使用两种方法关闭nginx
+
+(1)输入nginx命令 `nginx -s stop`(快速停止nginx) 或 `nginx -s quit`(完整有序的停止nginx)
+
+(2)使用taskkill `taskkill /f /t /im nginx.exe`
+
+```
+taskkill是用来终止进程的，/f是强制终止 ./t终止指定的进程和任何由此启动的子进程。/im示指定的进程名称 .
+```
+
+### linux下安装
+
+**1、安装gcc**
+
+安装 nginx 需要先将官网下载的源码进行编译，编译依赖 gcc 环境，如果没有 gcc 环境，则需要安装：
+
+```
+yum install gcc-c++
+```
+
+**2、PCRE pcre-devel 安装**
+
+PCRE(Perl Compatible Regular Expressions) 是一个Perl库，包括 perl 兼容的正则表达式库。nginx 的 http 模块使用 pcre 来解析正则表达式，所以需要在 linux 上安装 pcre 库，pcre-devel 是使用 pcre 开发的一个二次开发库。nginx也需要此库。命令：
+
+```
+yum install -y pcre pcre-devel
+```
+
+**3、zlib 安装**
+
+zlib 库提供了很多种压缩和解压缩的方式， nginx 使用 zlib 对 http 包的内容进行 gzip ，所以需要在 Centos 上安装 zlib 库。
+
+```
+yum install -y zlib zlib-devel
+```
+
+**4、OpenSSL 安装**
+OpenSSL 是一个强大的安全套接字层密码库，囊括主要的密码算法、常用的密钥和证书封装管理功能及 SSL 协议，并提供丰富的应用程序供测试或其它目的使用。
+nginx 不仅支持 http 协议，还支持 https（即在ssl协议上传输http），所以需要在 Centos 安装 OpenSSL 库。
+
+```
+yum install -y openssl openssl-devel
+```
+
+  **一次性安装，执行如下命令**
+
+```
+yum install gcc openssl openssl-devel pcre pcre-devel zlib zlib-devel -y
+```
+
+**5、下载安装包**
+
+手动下载.tar.gz安装包，地址：https://nginx.org/en/download.html
+
+![img](spring boot3.assets/kuangstudyf51b946d-fda4-4675-b913-2084e028a5c0.png)
+
+下载完毕上传到服务器上 /root
+
+**6、解压**
+
+```
+tar -zxvf nginx-1.18.0.tar.gzcd nginx-1.18.0
+```
+
+![img](spring boot3.assets/kuangstudyd8290598-ede7-4b4b-875b-2f447a9c001f.png)
+
+**7、配置**
+
+使用默认配置，在nginx根目录下执行
+
+```
+./configuremakemake install
+```
+
+查找安装路径： `whereis nginx`
+
+![img](spring boot3.assets/kuangstudyf80f8dc2-d5df-4bc2-933d-6ce11f388f6e.png)
+
+```
+
+```
+
+
+
+```
+upstream lb{
+    server 127.0.0.1:8080 weight=1;
+    server 127.0.0.1:8081 weight=1;
+}
+location / {
+    proxy_pass http://lb;
+```
+
+}
+
+#  Docker虚拟化容器技术
+
++ Docker概述
++ Docker安装
++ Docker命令
++ 镜像命令
++ 容器命令
++ 操作命令
++ Docker镜像!
++ 容器数据卷！
++ DockerFile
++ Docker网络原理
++ IDEA 整合Docker
++ Docker Compose
++ Docker Swarm
+
+CI\CD Jenkins
+
+##  一、引言 
+
+### 1.1 环境不一致
+
+我本地运行没问题啊：由于环境不一致，导致相同的程序，运行结果却不一致。
+
+```
+一款产品：开发--上线 两套环境！应用环境，应用配置！
+开发-运维。问题:   我在我的电脑上可以运行!版本更新,导致服务不可用!对于运维来说,考验就十分大?
+环境配置是十分的麻烦,每一个机器都要部署环境(集群Redis、 ES、Hadoop.....) !费时费力。
+发布一个项目(jar+ (Redis MySQL jdk ES）)， 项目能不能都带上环境安装打包！
+之前在服务器配置一个应用的环境 Redis MySQL jdk ES Hadoop ,配置超麻烦了，不能够跨平台。
+```
+
+### 1.2 隔离性
+
+哪个哥们又写死循环了，怎么这么卡：在多用户的操作系统下，会因为其他用户的操作失误影响到你自己编些的程序。
+
+ ### 1.3 弹性伸缩 
+
+淘宝在双11的时候，用户量暴增：需要很多很多的运维人员去增加部署的服务器，运维成本过高的问题。
+
+##  二、Docker介绍 
+
+### 2.1 Docker的由来
+
+| Docker的作者已经离开了维护Docker的团队                       |
+| ------------------------------------------------------------ |
+| ![image.png](spring boot3.assets/1646184354442-27cdc328-368a-4049-97f6-fc5c692df8e3.png) |
+
+###  2.2 Docker的思想
+
++ 集装箱：会将所有需要的内容放到不同的集装箱中，谁需要这些环境就直接拿到这个集装箱就可以了。 
++ 标准化： 
+  + 运输的标准化：Docker有一个码头，所有上传的集装箱都放在了这个码头上，当谁需要某一个环境，就直接指派大海疼去搬运这个集装箱就可以了。
+  + 命令的标准化：Docker提供了一些列的命令，帮助我们去获取集装箱等等操作。
+  + 提供了REST的API：衍生出了很多的图形化界面，Rancher。
+
++ 隔离性：Docker在运行集装箱内的内容时，会在Linux的内核中，单独的开辟一片空间，这片空间不会影响到其他程序。 
++ 中央仓库|注册中心：超级码头，上面放的就是集装箱 
++ 镜像：就是集装箱 
++  容器：运行起来的镜像 
+
+### 2.3 Docker的作用
+
+**应用更快速的交付和部署**
+
+```
+传统:一堆帮助文档,安装程序
+Docker :打包镜像发布测试,一键运行
+```
+
+**更便捷的升级和扩缩容**
+
+```
+使用了Docker之后，我们部署应用就和搭积木一样！
+项目打包为一个镜像,扩展服务器A!服务器B
+```
+
+**更简单的系统运维**
+
+```
+在容器化之后，我们的开发，测试环境都是高度一致的。
+```
+
+**更高效的计算资源利用**
+
+```
+Docker是内核级别的虚拟化,可以再一个物理机上可以运行很多的容器实例!服务器的性能可以被压榨到极致。
+```
+
+##  三、Docker的安装
+
+![image-20231002190403275](spring boot3.assets/image-20231002190403275.png)
+
+**镜像（image）:**
+
+docker镜像就好比是一个模板,可以通过这个模板来创建容器服务, tomcat镜像===> run==> tomcat01容器(提供服务器) ,
+通过这个镜像可以创建多个容器(最终服务运行或者项目运行就是在容器中的)。
+
+**容器(container) :**
+
+Docker利用容器技术,独立运行一个或者一个组应用，通过镜像来创建的。
+启动，停止，删除，基本命令！目前就可以把这个容器理解为就是一个简易的linux系統
+
+**仓库(repository):**
+
+仓库就是存放镜像的地方！仓库分为公有仓库和私有仓库！
+Docker Hub（默认是国外的）
+阿里云…..都有容器服务器(配置镜像加速!)
+
+### 3.1 云服务器安装Docker
+
+**下载Docker依赖的环境**
+
+```shell
+yum -y install yum-utils device-mapper-persistent-data lvm2
+```
+
+**指定Docker镜像源**
+
+```shell
+yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+```
+
+**安装Docker**
+
+```shell
+yum makacache fast
+yum -y install docker-ce
+```
+
+**启动Docker并测试**
+
+```shell
+# 启动Docker服务
+systemctl start docker
+# 设置开机自动启动
+systemctl enable docker
+# 测试
+docker ps
+```
+
+![image-20231002194321227](spring boot3.assets/image-20231002194321227.png)
+
+**测试一下Docker**
+
+```shell
+docker run hello-world
+```
+
+![image.png](spring boot3.assets/1647311103937-730e3834-b4a4-42d4-8aaa-8913cd937a32.png)
+
+![image-20231002195531945](spring boot3.assets/image-20231002195531945.png)
+
+### 3.2 安装 Docker Compose
+
++ Docker Compose是一个工具，用于定义和运行多容器应用程序的工具；
++ Docker Compose通过yml文件定义多容器的docker应用；
++ Docker Compose通过一条命令根据yml文件的定义去创建或管理多容器；
++ <img src="spring boot3.assets/image-20231002224038346.png" alt="image-20231002224038346" style="zoom: 67%;" />
+
+#### 基本安装
+
+[Docker Compose介绍和安装](https://blog.csdn.net/juanxiaseng0838/article/details/127553225)
+
+Docker Compose安装的最新的版本Docker Compose version v2.12.2，对于Mac和Windows安装好Docker以后，就已经安装好Docker Compose，不需要手动安装，这里的安装方式是基于Linux的Cnetos的，可以参考[官方网站](https://docs.docker.com/compose/install/)去安装。
+
+```shell
+[root@localhost ~]# sudo yum install docker-compose-plugin
+已加载插件：fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: mirror.lzu.edu.cn
+ * extras: ftp.ksu.edu.tw
+ * updates: mirror.lzu.edu.cn
+正在解决依赖关系
+--> 正在检查事务
+---> 软件包 docker-compose-plugin.x86_64.0.2.12.2-3.el7 将被 安装
+--> 解决依赖关系完成
+```
+
+![image-20231002194648410](spring boot3.assets/image-20231002194648410.png)
+
+查看安装情况
+
+```shell
+[root@localhost ~]# docker compose version
+Docker Compose version v2.12.2
+```
+
+#### Docker Compose基本命令
+
+Docker Compose命令基本上和Docker相差不多，主要就是对Docker Compose生命周期控制、日志格式等相关命令，可以通过docker-compose --help进行帮助。
+
+```shell
+[root@localhost ~]# docker compose --help
+ 
+Usage:  docker compose [OPTIONS] COMMAND
+ 
+Docker Compose
+ 
+Options:
+      --ansi string                Control when to print ANSI control characters ("never"|"always"|"auto") (default "auto")
+      --compatibility              Run compose in backward compatibility mode
+      --env-file string            Specify an alternate environment file.
+  -f, --file stringArray           Compose configuration files
+      --profile stringArray        Specify a profile to enable
+      --project-directory string   Specify an alternate working directory
+                                   (default: the path of the, first specified, Compose file)
+  -p, --project-name string        Project name
+ 
+Commands:
+  build       Build or rebuild services
+  convert     Converts the compose file to platform's canonical format
+  cp          Copy files/folders between a service container and the local filesystem
+  create      Creates containers for a service.
+  down        Stop and remove containers, networks
+  events      Receive real time events from containers.
+  exec        Execute a command in a running container.
+  images      List images used by the created containers
+  kill        Force stop service containers.
+  logs        View output from containers
+  ls          List running compose projects
+  pause       Pause services
+  port        Print the public port for a port binding.
+  ps          List containers
+  pull        Pull service images
+  push        Push service images
+  restart     Restart service containers
+  rm          Removes stopped service containers
+  run         Run a one-off command on a service.
+  start       Start services
+  stop        Stop services
+  top         Display the running processes
+  unpause     Unpause services
+  up          Create and start containers
+  version     Show the Docker Compose version information
+ 
+Run 'docker compose COMMAND --help' for more information on a command.
+```
+
+例子
+
+```shell
+#构建建启动nignx容器
+docker-compose up -d nginx
+#进入nginx容器中
+docker-compose exec nginx bash
+#将会停止UP命令启动的容器，并删除容器
+docker-compose down   
+#显示所有容器
+docker-compose ps 
+#重新启动nginx容器
+docker-compose restart nginx 
+#构建镜像
+docker-compose build nginx  
+#不带缓存的构建
+docker-compose build --no-cache nginx 
+#查看nginx的日志
+docker-compose logs  nginx 
+#查看nginx的实时日志
+docker-compose logs -f nginx
+#验证（docker-compose.yml）文件配置，
+#当配置正确时，不输出任何内容，当文件配置错误，输出错误信息
+docker-compose config  -q
+#以json的形式输出nginx的docker日志
+docker-compose events --json nginx
+#暂停nignx容器
+docker-compose pause nginx
+#恢复ningx容器
+docker-compose unpause nginx
+#删除容器
+docker-compose rm nginx  
+#停止nignx容器
+docker-compose stop nginx   
+#启动nignx容器
+docker-compose start nginx
+```
+
+#### Docker-Compose模板文件
+
+**image**
+image是指定服务的镜像名称或镜像ID
+
+```vbnet
+services: 
+    web: 
+        image: hello-world 
+```
+
+**build**
+利用Dockerfile自动构建镜像，然后使用镜像启动服务容器。
+
+```cobol
+build:
+  context: ../
+  dockerfile: path/of/Dockerfile 
+```
+
+**command**
+使用command可以覆盖容器启动后默认执行的命令。
+
+```bash
+command: bundle exec thin -p 3000
+```
+
+**container_name**
+指定自定义容器名称
+
+```vbnet
+container_name: app
+```
+
+**depends_on**
+表示服务之间的依赖关系。
+
+```cobol
+version: "3"
+services:
+  web:
+    build: .
+    depends_on:
+      - redis
+  redis:
+    image: redis
+ 
+#docker compose up:按依赖顺序启动服务,redis在web之前启动。
+#docker-compose stop:按依赖顺序停止服务,web在redis之前停止。
+```
+
+**pid**
+将PID模式设置为主机PID模式，跟主机系统共享进程命名空间。
+
+```vbnet
+pid: "host"
+```
+
+**ports**
+映射端口
+
+```cobol
+ports:
+ - "8000"
+ - "49022:22"
+ - "127.0.0.1:8001:8001"
+```
+
+**extra_hosts**
+添加主机名映射。使用与docker客户端–add-host类似
+
+```cobol
+extra_hosts:
+ - "somehost:162.242.195.82"
+ - "otherhost:50.31.209.229"
+```
+
+**volumes**
+目录映射，可以直接使用 [主机:容器]格式，或者使用[主机:容器:ro]格式，后者对于容器来说，数据卷是只读的，可以有效保护宿主机的文件系统。
+
+```cobol
+volumes:
+  # 只指定一个路径，Docker会自动在创建一个目录。
+  - /var/lib/mysql
+  # 主机使用绝对路径和容器目录映射
+  - /opt/data:/var/lib/mysql
+  # 以Compose配置文件的目录为中心的相对路径和容器目录映射
+  - ./cache:/tmp/cache
+  # 使用用户的相对路径（~/ 表示的目录是 /home/<用户目录>/ 或者 /root/）。
+  - ~/configs:/etc/configs/:ro
+```
+
+**dns**
+自定义DNS服务器。
+
+```cobol
+dns：8.8.8.8
+dns：
+    - 8.8.8.8    
+    - 9.9.9.9
+```
+
+**dns_search**
+配置DNS搜索域。
+
+```cobol
+dns_search：example.com
+dns_search：
+    - domain1.example.com
+    - domain2.example.com
+```
+
+**entrypoint**
+设置入口命令
+
+```cobol
+entrypoint: /code/entrypoint.sh
+entrypoint: ["php", "-d", "memory_limit=-1", "vendor/bin/phpunit"]
+entrypoint: java -jar penngo_test.jar
+```
+
+**env_file**
+从文件添加环境变量
+
+```cobol
+env_file: .env
+env_file:
+  - ./common.env
+  - ./apps/web.env
+  - /opt/runtime_opts.env
+```
+
+**environment**
+添加环境变量。
+
+```cobol
+environment:
+  RACK_ENV: development
+  SHOW: 'true'
+  SESSION_SECRET:
+ 
+environment:
+  - RACK_ENV=development
+  - SHOW=true
+  - SESSION_SECRET
+```
+
+**external_links**
+链接到docker-compose.yml外部的容器
+
+```cobol
+external_links:
+  - redis_1
+  - project_db_1:mysql
+  - project_db_1:postgresql
+```
+
+**cap_add**
+增加指定容器的内核能力（capacity）。
+
+```cobol
+cap_add:
+    - ALL
+```
+
+**cap_drop**
+去掉指定容器的内核能力（capacity）。
+
+```vbnet
+cap_drop:
+    - NET_ADMIN
+```
+
+**cgroup_parent**
+创建了一个cgroup组名称为cgroups_1:
+
+```vbnet
+cgroup_parent: cgroups_1
+```
+
+**devices**
+指定设备映射关系
+
+```vbnet
+devices:
+    - "/dev/ttyUSB1:/dev/ttyUSB0" 
+```
+
+**expose**
+暴露端口，但不映射到宿主机，只允许能被连接的服务访问。
+
+```cobol
+expose:
+    - "3000"
+    - "8000" 
+```
+
+**labels**
+为容器添加Docker元数据（metadata）信息。
+
+```vbnet
+labels:
+- "com.example.description=Accounting webapp"
+- "com.example.department=Finance"
+- "com.example.label-with-empty-value"
+```
+
+**links**
+链接到其它服务中的容器
+
+```markdown
+links:
+    - db
+    - db:database
+    - redis
+```
+
+**log_driver**
+指定日志驱动类型。目前支持三种日志驱动类型：
+
+```vbnet
+log_driver: "json-file"
+log_driver: "syslog"
+log_driver: "none" 
+```
+
+**log_opt**
+日志驱动的相关参数。
+
+**net**
+设置网络模式。
+
+```vbnet
+net: "bridge"
+net: "none"
+net: "host"
+```
+
+
+
+
+
+
+
+```shell
+mkdir prod
+cd prod/
+vim prometheus.yml
+vim docker-compose.yml
+```
+
+
+
+
+
+
+
+```yml
+version: "3"
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql_slaver11
+    restart: always
+    privileged: true
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      TZ: Asia/Shanghai
+    volumes:
+      - /wuming/mysql/slaver11/data:/var/lib/mysql
+      - /wuming/mysql/slaver11/log:/var/log/mysql
+      - /wuming/mysql/slaver11/conf/my.cnf:/etc/mysql/my.cnf
+  mycat:
+    image: manondidi/mycat:latest
+    container_name: mycat
+    restart: always
+    ports:
+      - 8066:8066
+    volumes:
+      - /wuming/mycat/conf:/usr/local/mycat/conf
+      - /wuming/mycat/logs:/usr/local/mycat/logs
+  redis:
+    image: redis:latest
+    container_name: redis_master
+  
+```
+
+
+
+```shell
+docker compose -f docker-compose.yml up -d
+```
+
+
+
+#### Docker Compose实战
+
+[Docker Compose  (cnblogs.com)](https://www.cnblogs.com/wtzbk/p/15125977.html)
+
+我们构建一个如下的应用，通过Nginx转发给后端的两个Java应用;
+
+<img src="spring boot3.assets/1627207873318-2e20675a-e606-4ff1-b7cd-b4fb346a743b.png" alt="img" style="zoom: 40%;" />
+
+1. 新建Spring Boot应用，增加一个HelloController，编写一个hello方法，返回请求的端口和IP；
+
+```java
+/**
+ * hello
+ *
+ * @author wangtongzhou
+ * @since 2021-07-25 09:43
+ */
+@RestController
+public class HelloController {
+
+    @GetMapping("/hello")
+    public String hello(HttpServletRequest req) throws UnknownHostException {
+        return "hello";
+    }
+
+}
+```
+
+1. 指定Spring Boot的启动入口;
+
+```xml
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 指定该Main Class为全局的唯一入口 -->
+                    <mainClass>cn.wheel.getway.WheelGetWay</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <!--可以把依赖的包都打包到生成的Jar包中-->
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+```
+
+1. 打包Spring Boot应用；
+
+```go
+mvn package
+```
+
+1. 上传文件到Linux服务器/usr/local/docker-compose-demo的目录；
+2. 在/usr/local/docker-compose-demo的目录编辑Dockerfile；
+
+```dockerfile
+#指定基础镜像
+FROM java:8
+LABEL name="docker-compose-demo" version="1.0" author="wtz"
+COPY ./getway-1.0-SNAPSHOT.jar ./docker-compose-demo.jar
+#启动参数
+CMD ["java","-jar","docker-compose-demo.jar"]
+```
+
+1. 编辑docker-compose.yml文件；
+
+```yaml
+version: '3.0'
+
+networks:
+  docker-compose-demo-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.1
+
+
+services:
+  docker-compose-demo01:
+    build:
+      #构建的地址
+      context: /usr/local/docker-compose-demo
+      dockerfile: Dockerfile
+    image: docker-compose-demo
+    container_name: docker-compose-demo01
+    #选择网络
+    networks:
+      - docker-compose-demo-net
+    #选择端口
+    ports:
+      - 8081:8080/tcp
+    restart: always
+
+  docker-compose-demo02:
+    build:
+      #构建的地址
+      context: /usr/local/docker-compose-demo
+      dockerfile: Dockerfile
+    image: docker-compose-demo
+    container_name: docker-compose-demo02
+    #选择网络
+    networks:
+      - docker-compose-demo-net
+    #选择端口
+    ports:
+      - 8082:8080/tcp
+    restart: always
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-demo
+    networks:
+      - docker-compose-demo-net
+    ports:
+      - 80:80/tcp
+    restart: always
+    volumes:
+      - /usr/local/docker-compose-demo/nginx.conf:/etc/nginx/nginx.conf:rw
+
+
+volumes:
+  docker-compose-demo-volume: {}
+```
+
+1. 编写nginx.conf，实现负载均衡到每个应用，这里通过容器名称访问，因此不需要管每个容器的ip是多少，这个也是自定义网络的好处；
+
+```bash
+user nginx;
+worker_processes  1;
+events {
+    worker_connections  1024;
+}
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    sendfile        on;
+    keepalive_timeout  65;
+
+server {
+    listen 80;
+    location / {
+     proxy_pass http://docker-compose-demo;
+     proxy_set_header  Host $host;
+	     proxy_set_header  X-real-ip $remote_addr;
+	     proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+upstream docker-compose-demo{
+   server docker-compose-demo01:8080;
+   server docker-compose-demo02:8080;
+}
+include /etc/nginx/conf.d/*.conf;
+
+
+server {
+    listen 80;
+    location / {
+     proxy_pass http://docker-compose-demo;
+     proxy_set_header  Host $host;
+	     proxy_set_header  X-real-ip $remote_addr;
+	     proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+upstream docker-compose-demo{
+   server docker-compose-demo01:8080;
+   server docker-compose-demo02:8080;
+}
+include /etc/nginx/conf.d/*.conf;
+}
+```
+
+1. 查看/usr/local/docker-compose-demo目录，有以下确保有以下四个文件；
+
+![image.png](spring boot3.assets/1627196848329-0c34fa5b-93c2-42d8-aa3d-8e0940a070d1.png)image.png
+
+1. 检查docker-compose.yml的语法是否正确，如果不发生报错，说明语法没有发生错误;
+
+```lua
+docker-compose config
+```
+
+1. 启动docker-compose.yml定义的服务；
+
+```x86asm
+docker-compose up
+```
+
+![image.png](spring boot3.assets/1627204068667-c269e04b-5176-4aaa-bf7b-ee6db6e597d2.png)image.png
+
+1. 验证服务是否正确；
+
+```csharp
+#查看宿主机ip
+ip add
+
+#访问对应的服务
+curl http://172.21.122.231/hello
+```
+
+![img](spring boot3.assets/1627204247825-43503cbc-884d-4e02-ab78-3ba1b661628e.png)img
+
+![image.png](spring boot3.assets/1627204194847-e2a16c6d-f04b-489d-b3dd-6c1ae0a83ffe.png)image.png
+
+
+
+
+
+## todo
+
+```
+
+```
+
+![image-20231002195035739](spring boot3.assets/image-20231002195035739.png)
+
+## 四、Docker的中央仓库【重点】
+
++ Docker官方的中央仓库：这个仓库是镜像最全的，但是下载速度较慢。 https://hub.docker.com/ 
+
++ 国内的镜像网站：网易蜂巢，daoCloud等，下载速度快，但是镜像相对不全。 
+
+  + https://c.163yun.com/hub#/home 
+
+  + http://hub.daocloud.io/   （推荐使用） 
+
++ 在公司内部会采用私服的方式拉取镜像，需要添加配置，如下…… 
+
+```shell
+# 需要创建/etc/docker/daemon.json，并添加如下内容
+{
+	"registry-mirrors": ["https://registry.docker-cn.com"],
+	"insecure-registries": ["ip:port"]   
+}
+# 重启两个服务
+systemctl daemon-reload
+systemctl restart docker
+```
+
+### 直接配置阿里云镜像加速
+
+![image-20231002200251218](spring boot3.assets/image-20231002200251218.png)
+
+**使用**
+
+![image-20231002200422844](spring boot3.assets/image-20231002200422844.png)
+
+##  五、常用命令
+
+<img src="spring boot3.assets/image-20231002221406584.png" alt="image-20231002221406584" style="zoom: 67%;" />
+
+### 5.1 镜像命令
+
+#### 拉取镜像
+
+```shell
+sudo docker pull 镜像名
+sudo docker pull 镜像名:Tag
+```
+
+<img src="spring boot3.assets/image-20231002210442940.png" alt="image-20231002210442940" style="zoom: 80%;" />
+
+#### 查看本地全部镜像
+
+```shell
+sudo docker images
+```
+
+![image-20230308154454634](spring boot3.assets/bd8687b93dbd03751961b1e43c44c5b2.png)
+
++ REPOSITORY：表示镜像的仓库源
+
++ TAG：镜像的标签
+
++ IMAGE ID：镜像ID
+
++ CREATED：镜像创建时间
+
++ SIZE：镜像大小
+
+注意：如果镜像后面不加TAG，默认使用latest的镜像
+
+#### 删除本地镜像
+
+```shell
+docker image rmi -f 镜像名/镜像ID     # 删除1个镜像
+docker image rmi -f 镜像名 镜像名         #删除多个镜像
+```
+
+![image-20230308170230613](spring boot3.assets/37043aee7c6768894b2d0c44a4304c06.png)
+
+#### 镜像的导入导出（重点）
+
+ **保存镜像**
+
+将我们的镜像 保存为tar 压缩文件 这样方便镜像转移和保存 ,然后 可以在任何一台安装了docker的服务器上 加载这个镜像
+
+```shell
+docker save 镜像名/镜像ID -o 镜像保存在哪个位置与名字
+```
+
+  **加载镜像**
+
+任何装 docker 的地方加载镜像保存文件,使其恢复为一个镜像
+
+```shell
+docker load -i 镜像保存文件位置
+```
+
+**修改镜像名称和版本**
+
+```
+docker tag 镜像id 新镜像名称:版本
+```
+
+-----
+
+总结
+
+```shell
+# 将本地的镜像导出
+docker save -o 导出的路径 镜像id
+# 加载本地的镜像文件
+docker load -i 镜像文件
+# 修改镜像名称和版本
+docker tag 镜像id 新镜像名称:版本
+```
+
+如果因为网络原因可以通过硬盘的方式传输镜像，虽然不规范，但是有效，但是这种方式导出的镜像名称和版本都是null，需要手动修改
+
+#### commit 更新镜像
+
+```shell
+docker commit 提交容器成为一个新的副本
+
+#命令和git原理类似
+docker commit -m="提交的描述信息" -a="作者" 容器id 目标镜像名:[TAG]
+```
+
+**实战测试**
+
+**更新镜像之前，需要使用镜像来创建一个容器。**
+
+```shell
+:~$ docker run -t -i ubuntu:15.10 /bin/bash
+root@e218edb10161:/#
+```
+
+在完成操作之后，输入 exit 命令来退出这个容器。通过命令 docker commit 来提交容器副本。
+
+```shell
+:~$ docker commit -m="has update" -a="jeflee2324" e218edb10161 jeflee2324/ubuntu:v2
+```
+
+各个参数说明：
+
++ -m: 提交的描述信息
++ -a: 指定镜像作者
++ e218edb10161：容器 ID
++ jeflee2324/ubuntu:v2:  指定要创建的目标镜像名
+
+**例子**
+
+```shell
+#1、启动一个默认的tomcat
+#2、发现这个默认的tomcat是没有webapps应用,镜像的原因,官方的镜像默认webapps下面是没有文件的!
+#3、我自己拷贝进去了基本的文件
+# 4、将我们操作过的容器通过commit提交为一个镜像
+```
+
+![image-20231003222735725](spring boot3.assets/image-20231003222735725.png)
+
+#### 搜索镜像
+
+```shell
+sudo docker search 镜像名称
+```
+
+比如搜索Hadoop的镜像信息 docker search hadoop
+
+![image-20230308154908968](spring boot3.assets/f1922e38afa8e23443440683f11abc94.png)
+
++ NAME:镜像名称
++ DESCRIPTION:镜像说明
++ STARS:点赞数量
++ OFFICIAL:是否是官方的
++ AUTOMATED：是否自动构建的
+
+### 5.2 容器操作
+
+> 有了镜像才可以创建容器
+
+#### 运行容器
+
+运行容器需要制定具体镜像，如果镜像不存在，会直接下载
+
+```shell
+# 简单操作
+docker run 镜像的标识|镜像名称[:tag]
+
+# 常用的参数
+docker run -d -p 宿主机端口:容器端口 --name 容器名称 镜像的标识|镜像名称[:tag]
+# -d：代表后台运行容器
+# -p 宿主机端口:容器端口：为了映射当前Linux的端口和容器的端口
+# --name 容器名称：指定容器的名称
+
+docker run -d -p 8081:8080 --name tomcat b8
+```
+
+```shell
+docker run -it -d --name 要取的别名 -p 宿主机端口:容器端口 -v 宿主机文件存储位置:容器内文件位置 镜像名:Tag /bin/bash 
+
+-it 表示 与容器进行交互式启动
+-d 表示可后台运行容器 （守护式运行）  
+--name 给要运行的容器 起的名字  
+/bin/bash  交互路径
+-p 将容器的端口映射到宿主机上，通过宿主机访问内部端口
+-v 将容器内的指定文件夹挂载到宿主机对应位置
+```
+
+#### 退出容器
+
+```shell
+exit            # 直接容器停止并退出
+Ctrl + p + q    # 容器不停止退出
+```
+
+#### 查看正在运行的容器
+
+查看全部正在运行的容器信息
+
+```shell
+docker ps [-qa]
+# -a：查看全部的容器，包括没有运行
+# -q：只查看容器的标识
+```
+
+![img](spring boot3.assets/a954baa77e0097150b1c74514921e11f.png)
+
+#### 查看容器中进程信息 ps
+
+```shell
+docker top 容器id
+```
+
+![image-20231002220025497](spring boot3.assets/image-20231002220025497.png)
+
+#### 查看容器日志
+
+查看容器日志，以查看容器运行的信息
+
+```shell
+docker logs -f -t --tail  容器id
+
+-tf              # 显示日志
+-tf --tail number # 显示日志条数
+[root@kuangshen /]# docker logs -tf --tail 10 dce7b86171bf
+```
+
+
+
+#### 查看镜像的元数据
+
+```shell
+docker inspect 容器id
+```
+
+![image-20231002220308497](spring boot3.assets/image-20231002220308497.png)
+
+#### 进入容器内容部（重中重）
+
+```shell
+docker exec -it 容器id bash  #或者docker exec -it 容器ID sh
+#退出容器：exit
+```
+
+#### 进入正在运行中的容器
+
+```cobol
+sudo docker attach 容器ID/容器名
+```
+
+#### 主机内容和容器内容相互拷贝(没用)
+
+> 此拷贝是一个手动过程，未来使用 -v 卷的技术，可以实现自动
+
+将宿主机的文件复制到容器内部的指定目录
+
+```shell
+docker cp 文件名称 容器id:容器内部路径
+```
+
+![image-20231002221107526](spring boot3.assets/image-20231002221107526.png)
+
+#### 重启&启动&停止&删除容器
+
+容器的启动，停止，删除等操作，后续经常会使用到
+
+```shell
+# 重新启动容器
+docker restart 容器id        # 启动停止运行的容器
+docker start 容器id          # 停止指定的容器（删除容器前，需要先停止容器）
+```
+
+停止
+
+```shell
+docker stop 容器名/容器ID     # 停止全部容器
+docker stop $(docker ps -qa) # 删除指定容器
+```
+
+删除
+
+```shell
+#删除一个容器
+docker rm -f 容器名/容器ID
+#删除多个容器 空格隔开要删除的容器名或容器ID
+docker rm -f 容器名/容器ID 容器名/容器ID 容器名/容器ID
+#删除全部容器
+docker rm -f $(docker ps -aq)
+```
+
+#### 导入和导出容器
+
+##### 导出容器
+
+```shell
+docker export 容器ID > 文件名
+```
+
+如：docker export 97 > ubuntu.tar.gz
+
+<img src="spring boot3.assets/image-20231002213745064.png" alt="image-20231002213745064" style="zoom:80%;" />
+
+##### 导入容器
+
+```shell
+cat 文件名 | docker import - 镜像用户/镜像名:镜像版本号（镜像用户和版本号可以不写）
+cat test.tar.gz | docker import - ubuntu2
+```
+
+<img src="spring boot3.assets/image-20231002213731425.png" alt="image-20231002213731425" style="zoom:80%;" />
+
+ 
+
+## 六、Docker应用 
+
+ [docker常用软件安装](https://blog.csdn.net/qq_43430759/article/details/126345572)
+
+### 一 tomcat
+
+#### 1.1 查找镜像
+
+```bash
+# 最新版的tomcat里面webapps改了名字，如果使用的话注意进入容器修改名称。这里我们使用tomcat8，不需要做修改。
+docker search tomcat8-jdk8
+```
+
+![image-20231002232400893](spring boot3.assets/image-20231002232400893.png)
+
+#### 1.2 拉取镜像到本地
+
+```bash
+docker pull billygoo/tomcat8-jdk8
+```
+
+![image-20231002232352140](spring boot3.assets/image-20231002232352140.png)
+
+#### 1.3 创建容器实例
+
+```bash
+docker run -d -p 8080:8080 --name mystery_tomcat8 billygoo/tomcat8-jdk8
+```
+
+#### 1.4 使用
+
+```bash
+# 浏览器访问
+ip地址：8080
+```
+
+![image-20231002232337485](spring boot3.assets/image-20231002232337485.png)
+
+### 二 nginx
+
+#### 2.1 查找镜像
+
+```bash
+docker search nginx
+```
+
+![image-20231002232326184](spring boot3.assets/image-20231002232326184.png)
+
+#### 2.2 拉取镜像到本地
+
+```bash
+# 这里就默认安装latest版本
+docker pull nginx
+```
+
+![image-20231002232317239](spring boot3.assets/image-20231002232317239.png)
+
+#### 2.3 创建容器实例
+
+```bash
+# 1 创建之前先准备数据卷文件夹
+mkdir -p /mydata/nginx/conf
+mkdir -p /mydata/nginx/log
+mkdir -p /mydata/nginx/html
+```
+
+\
+
+![image-20231002235421110](spring boot3.assets/image-20231002235421110.png)
+
+```shell
+# 2 第一次创建nginx容器
+docker run -d -p 3389:80 --name nginx nginx:latest
+# 3 复制配置文件到主机上
+docker cp nginx:/etc/nginx/nginx.conf /mydata/nginx/conf/nginx.conf
+# 将容器conf.d文件夹下内容复制到宿主机
+docker cp nginx:/etc/nginx/conf.d /mydata/nginx/conf/conf.d
+# 将容器中的html文件夹复制到宿主机
+docker cp nginx:/usr/share/nginx/html /mydata/nginx/
+# 复制完之后删除容器，过河拆桥
+docker rm -f nginx
+# 4 第二次创建nginx容器
+docker run -d -p 3389:80 --name mystery_nginx -v /mydata/nginx/conf/nginx.conf:/etc/nginx/nginx.conf -v /mydata/nginx/conf/conf.d:/etc/nginx/conf.d -v /mydata/nginx/log:/var/log/nginx -v /mydata/nginx/html:/usr/share/nginx/html nginx:latest
+```
+
+#### 2.4 使用
+
+外网测试
+
+```
+浏览器直接输入ip即可（80端口可以省略）
+```
+
+![image-20231002232302011](spring boot3.assets/image-20231002235504999.png)
+
+内网测试
+
+```
+[root@lfj home]# curl localhost:3389
+```
+
+![image-20231003214648419](spring boot3.assets/image-20231003214648419.png)
+
+### 三 mysql5.7
+
+#### 3.1 查找镜像
+
+```bash
+docker search mysql:5.7
+```
+
+![image-20231003232219063](spring boot3.assets/image-20231003232219063.png)
+
+#### 3.2 拉取镜像到本地
+
+```bash
+docker pull mysql:5.7
+```
+
+#### 3.3 创建容器实例
+
+```bash
+# 参数说明：-d 后台守护进程创建容器、-p 端口映射、--privileged 赋予容器内root用户真正的root权限、-v 文件挂载 -e 设置mysql参数，这里设置root密码、--name 设置创建的容器实例名称
+docker run -d -p 3306:3306 --privileged=true -v /mydata/mysql/log:/var/log/mysql -v /mydata/mysql/data:/var/lib/mysql -v /mydata/mysql/conf:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=root  --name mystery_mysql mysql:5.7
+```
+
+#### 3.4 使用
+
+##### 3.4.1 修改配置文件
+
+```bash
+vim /mydata/mysql/conf/my.cnf
+```
+
+```bash
+# 添加如下内容
+[client]
+default_character_set=utf8
+[mysqld]
+collation_server = utf8_general_ci
+character_set_server = utf8
+123456
+```
+
+##### 3.4.2 查看字符集是否修改成功
+
+<img src="spring boot3.assets/image-20231003232416137.png" alt="image-20231003232416137"  />
+
+##### 3.4.3 操作数据库
+
+![image-20231003232433654](spring boot3.assets/image-20231003232433654.png)
+远程操作，这里使用datagrip
+
+![image-20231003232451777](temp.assets/image-20231003232451777.png)
+
+### 附：防火墙开放端口方法
+
+如果是阿里云或华为云之类的ESC服务器，还需要去控制台配置安全组规则。
+
+```bash
+firewall-cmd --zone=public --add-port=15672/tcp --permanent
+firewall-cmd --reload
+```
+
+### 端口暴露
+
+![image-20231002231435742](spring boot3.assets/image-20231002231435742.png)
+
+## 七、数据卷【`重点`】
+
+ 数据卷：将宿主机的一个目录映射到容器的一个目录中。可以在宿主机中操作目录中的内容，那么容器内部映射的文件，也会跟着一起改变。**容器的持久化和数据共享同步操作！**
+
+#### 7.1 创建数据卷
+
+创建数据卷之后，默认会存放在一个目录下 **/var/lib/docker/volumes/数据卷名称/_data**
+
+```shell
+如何确定是具名挂载还是匿名挂载，还是指定路径挂载！
+-v 容器内路径  # 匿名挂载
+-v 卷名：容器内路径 # 具名挂载
+/宿主机路径::容器内路径 # 指定路径挂载
+```
+
+```shell
+docker volume create 数据卷名称
+```
+
+#### 7.2 查看数据卷详情
+
+查看数据卷的详细信息，可以查询到存放路径，创建时间等等
+
+```shell
+docker volume inspect 数据卷名称
+```
+
+#### 7.3 查看全部数据卷
+
+查看全部数据卷信息
+
+```shell
+docker volume ls
+```
+
+![img](spring boot3.assets/1647324763299-d644aedc-1c8f-4148-9659-f99a38e9d3a0-1696260400703156.png)
+
+#### 7.4 删除数据卷
+
+```shell
+docker volume rm 数据卷名称
+```
+
+#### 7.5 容器映射数据卷[重点]
+
+映射有两种方式：
+
+- 通过数据卷名称映射，如果数据卷不存在。Docker会帮你自动创建，会将容器内部自带的文件，存储在默认的存放路径中。
+- 通过路径映射数据卷，直接指定一个路径作为数据卷的存放位置。但是这个路径下是空的。
+
+```shell
+# 通过数据卷名称映射docker run -v 数据卷名称:容器内部的路径 镜像id
+# 通过路径映射数据卷docker run -v 路径:容器内部的路径 镜像id   
+
+docker run -d -p 8081:8080 --name tomcat -v[volume] /opt/tocmat:/usr/local/tomcat/webapps/ROOT b8
+```
+
+#### 7.6 通过Dockerfile挂载(推荐)
+
+**编写dockerfile**
+
+```shell
+ vim dockerfile
+```
+
+![image-20231003230529074](spring boot3.assets/image-20231003230529074.png)
+
+**将其制作为镜像**
+
+```shell
+docker build -f dockerfile路径 -t 镜像名称[:tag] .
+```
+
+![image-20231003230126680](spring boot3.assets/image-20231003230126680.png)
+
+**启动容器**
+
+![image-20231003230305737](spring boot3.assets/image-20231003230305737.png)
+
+#### 7.7 数据卷容器
+
+==容器之间配置信息的传递,数据卷容器的生命周期一直持续到没有容器使用为止。但是一旦持久化到了本地，这个时候，本地的数据是不会删除的==
+
+![image-20231003230910597](spring boot3.assets/image-20231003230910597.png)
+
+
+
+<img src="spring boot3.assets/image-20231003231411163.png" alt="image-20231003231411163"  />
+
+<img src="spring boot3.assets/image-20231003231555770.png" alt="image-20231003231555770"  />
+
+例子
+
+![image-20231003231909315](spring boot3.assets/image-20231003231909315.png)
+
+
+
+
+
+
+
+## 八 TODO
+
+
+
+## 九、Dockerfile自定义镜像【`重点`】
+
+可以从中央仓库下载一个镜像，也可以自己手动去制作一个镜像，需要通过Dockerfile去指定自定义镜像的信息
+
+### 9.1 Docker镜像加载原理
+
+**docker的镜像实际上由一层一层的文件系统组成,这种层级的文件系统UnionFS**
+
+![image-20231003215610508](spring boot3.assets/image-20231003215610508.png)
+
+平时安装进虚拟机的CentOS都是好几个G，Docker才200M
+
+![image-20231003215701434](spring boot3.assets/image-20231003215701434.png)
+
+对于一个精简的OS, rootfs可以很小,只需要包含最基本的命令,工具和程序库就可以了,因为底层直接用主机的kernel 自己只需要提供rootfs就可以了。由此可见对于不同的linux发行版, bootfs基本是一致的, rootfs会有差别,因此不同的发行版可以公用bootfs.  **虚拟机是分钟级别，容器是秒级！**
+
+### 9.2 分层理解
+
+![image-20231003220412051](spring boot3.assets/image-20231003220412051.png)
+
+所有的Docker镜像都起始于一个基础镜像层,当进行修改或增加新的内容时,就会在当前镜像层之上,创建新的镜像层。假如基于Ubuntu Linux 16.04创建一个新的镜像,这就是新镜像的第一层;如果在该镜像中添加Python包,就会在基础镜像层之上创建第二个镜像层;如果继续添加一个安全补丁,就会创建第三个镜像层。
+该镜像当前已经包含3个镜像层,如下图所示
+
+<img src="spring boot3.assets/image-20231003220514796.png" alt="image-20231003220514796" style="zoom:67%;" />
+
+特点
+
++ Docker镜像都是只读的,当容器启动时,一个新的可写层被加载到镜像的顶部
+  + <img src="spring boot3.assets/image-20231003221145247.png" alt="image-20231003221145247" style="zoom:80%;" />
+
++ 这一层就是我们通常说的容器层，容器之下的都叫镜像层！
+  + ![image-20231003221412282](spring boot3.assets/image-20231003221412282.png)
+
+
+
+#### 9.4 Dockerfile(properties)
+
+创建自定义镜像就需要创建一个Dockerfile，如下为Dockerfile的语言
+
+```shell
+from: 指定当前自定义镜像依赖的环境 tocmat
+copy: 将相对路径下的内容复制到自定义镜像中 /opt/springboot.jar
+workdir: 声明镜像的默认工作目录 /opt/resource
+run: 执行的命令，可以编写多个
+cmd: 需要执行的命令（在workdir下执行的，cmd可以写多个，只以最后一个为准） java -jar
+
+# 举个例子，制作SSM容器镜像，而且ssm.war要放在Dockerfile的同级目录下
+from daocloud.io/library/tomcat:8.5.15-jre8
+copy ssm.war /usr/local/tomcat/webapps
+```
+
+#### 9.5 通过Dockerfile制作镜像
+
+编写完Dockerfile后需要通过命令将其制作为镜像，并且要在Dockerfile的当前目录下，之后即可在镜像中查看到指定的镜像信息，注意最后的 .
+
+```shell
+docker build -t 镜像名称[:tag] .
+```
+
+
+
+![image-20231004140609440](spring boot3.assets/image-20231004140609440.png)
+
+
+
+
+
+# 架构模块
+
+**ElasticSearch分布式搜索框架**
+
+**ElasticSearch分布式搜索框架**
+
+**SpringSession分布式会话框架**
+
+
+
+# Maven 和 Gradle
+
+## Maven
+
+### Maven 的两个经典作用
+
+#### 一.   依赖管理 也就是管理jar包
+
+Maven 的一个核心特性就是依赖管理。
+
+当涉及到多模块的项目（包含成百个模块或者子项目），管理依赖就变成一项困难的任务。这时用Maven 可以对处理这种情形的高度控制。
+
+在传统的 WEB 项目中，我们必须将工程所依赖的 jar 包复制到工程中，导致了工程的变得很大。比如
+
+idea常见普通Maven项目目录：
+                   <img src="spring boot3.assets/20201204225021484.png#pic_center" alt="Alt" style="zoom: 80%;" />
+
+**maven工程中不直接将 jar包导入到工程中，而是通过在 pom.xml** **文件中添加所需jar包的坐标**。
+
+到仓库中找到 jar 包不会影响程序性能：
+maven 中也有索引的概念，通过建立索引，可以大大提高加载 jar 包的速度，使得我们认为 jar 包基本跟放在本地的工程文件中再读取出来的速度是一样的。**Maven中仓库分为三类：**
+
+​                                  ![](https://th.bing.com/th/id/R.e0c7d085e393ba437bf61aadde678c47?rik=cSX4nWv0RmzLTg&riu=http%3a%2f%2fcdn.imodou.com.cn%2fwp-content%2fuploads%2f2021%2f04%2fimage-1617589018144.png&ehk=b1UJfJY%2bH8tSnPJ9vnUkKXGbZgvNV8WKJZiGEMvV8%2fs%3d&risl=&pid=ImgRaw&r=0)         
+
+
+
++ **本地仓库：**存放在本地服务器中，当运行项目的时候，maven会自动根据配置文件查找本地仓库，再从本地仓库中调用jar包使用。
+
++ **远程仓库**
+  当本地仓库中没有项目所需要的jar包时，那么maven会继续查找远程仓库，一般远程仓库指的是公司搭建的私有服务器，也叫私服；
+  当jar包在私服中查找到之后，maven会将jar包下载到本地仓库中，下次使用的时候就不用再去找远程仓库。
+  **中央仓库：**
+  当远程仓库获取不到jar包时，就需要到中央仓库去查找，并下载在远程仓库中，本地仓库再从远程仓库中下载回来使用。
+
+#### 二. 一键构建
+
+**Maven 规范化构建流程如下：**
+
+​           ![在这里插入图片描述](spring boot3.assets/2020120423190572.png#pic_center)
+
+### Maven坐标
+
+Maven通过坐标对jar包进行唯一标识。坐标通过3个元素进行定义，groupId、artifactId、version。
+
+1. groupId：组织标识，一般为域名倒置。
+2. artifactId：项目名或模块名，是当前项目中的唯一标识。
+3. version：当前项目版本。
+
+## Gradle
+
+如果你经常使用Maven，可能会发现Maven有一些地方用的让人不太舒服：
+
++ Maven的配置文件是XML格式的，假如你的项目依赖的包比较多，那么XML文件就会变得非常非常长；
+
++ XML文件不太灵活，假如你需要在构建过程中添加一些自定义逻辑，搞起来非常麻烦；
+
++ Maven非常的稳定，但是相对的就是对新版java支持不足，哪怕就是为了编译java11，也需要更新内置的Maven插件；
+
+如果你对Maven的这些缺点也有所感触，尝试gradle构建工具，这是一个全新的java构建工具，解决了Maven的一些痛点。
+
+[Gradle使用教程 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/440595132)
+
+[gradle使用教程，一篇就够 - 简书 (jianshu.com)]()
 
 
 
