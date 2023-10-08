@@ -4,17 +4,9 @@
 
 #### 1.1 原生web开发中存在哪些问题？
 
-
-
- 
-
 -  传统Web开发存在硬编码所造成的过度程序耦合（例如：Service中作为属性Dao对象）。 
 -  部分Java EE API较为复杂，使用效率低（例如：JDBC开发步骤）。 
 -  侵入性强，移植性差（例如：DAO实现的更换，从Connection到SqlSession）。 
-
- 
-
-
 
 ### 二、Spring框架
 
@@ -22,25 +14,13 @@
 
 #### 2.1 概念
 
-
-
- 
-
 -  Spring是一个项目管理框架，同时也是一套Java EE解决方案。 
 -  Spring是众多优秀设计模式的组合（工厂、单例、代理、适配器、包装器、观察者、模板、策略）。 
 -  Spring并未替代现有框架产品，而是将众多框架进行有机整合，简化企业级开发，俗称"胶水框架"。 
 
- 
-
-
-
 #### 2.2 访问与下载
 
-
-
 官方网站：https://spring.io/
-
- 
 
 下载地址：http://repo.spring.io/release/org/springframework/spring/
 
@@ -50,9 +30,7 @@
 
 ------
 
-Spring架构由诸多模块组成，可分类为
-
- 
+Spring架构由诸多模块组成，可分类为\
 
 - 核心技术：依赖注入，事件，资源，i18n，验证，数据绑定，类型转换，SpEL，AOP。
 - 测试：模拟对象，TestContext框架，Spring MVC测试，WebTestClient。
@@ -60,8 +38,6 @@ Spring架构由诸多模块组成，可分类为
 - Spring MVC和 Spring WebFlux Web框架。
 - 集成：远程处理，JMS，JCA，JMX，电子邮件，任务，调度，缓存。
 - 语言：Kotlin，Groovy，动态语言。
-
- 
 
 | Spring架构组成                                               |
 | ------------------------------------------------------------ |
@@ -91,22 +67,16 @@ Spring架构由诸多模块组成，可分类为
 | org.springframework | spring-websocket         | WebSocket 和 SockJS 实现，包括对 STOMP 的支持  |
 | org.springframework | spring-jcl               | Jakarta Commons Logging 日志系统               |
 
-
-
 ### 四、自定义工厂
 
 ------
 
 #### 4.1 配置文件
 
-
-
 ```plain
 userDAO=com.qf.dao.UserDAOImpl
 userService=com.qf.service.UserServiceImpl
 ```
-
-
 
 作业：1、编写一个spring容器
 
@@ -119,8 +89,6 @@ userService=com.qf.service.UserServiceImpl
 ​    5、什么是ioc，并且举例
 
 #### 4.2 工厂类
-
-
 
 ```java
 /**
@@ -165,7 +133,7 @@ public class MyFactory {
 
 #### 5.2 选择Maven目录
 
-| 选择Maven项目                                                |
+| 选择创建常规的Maven项目                                      |
 | ------------------------------------------------------------ |
 | ![img](03-Spring教程.assets/1645081877591-91e1a73b-ce6d-4925-bbec-fc677f68edc7.png) |
 
@@ -184,8 +152,6 @@ public class MyFactory {
 ------
 
 #### 6.1 pom.xml中引入Spring常用依赖
-
-
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -216,11 +182,7 @@ public class MyFactory {
 
 #### 6.2 创建Spring配置文件
 
-
-
-命名无限制，约定俗成命名有：spring-context.xml、applicationContext.xml、beans.xml
-
-
+resources下创建配置文件,  命名无限制，约定俗成命名有：spring-context.xml、applicationContext.xml、beans.xml
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -239,8 +201,6 @@ public class MyFactory {
 
 定义目标Bean类型
 
-
-
 ```java
 public class MyClass{
     public void show(){
@@ -249,22 +209,14 @@ public class MyClass{
 }
 ```
 
-
-
 spring-context.xml中的< beans >内部配置bean标签
-
-
 
 ```xml
 <!-- 配置实例（id:“唯一标识”  class="需要被创建的目标对象全限定名"） -->
 <bean id="mc" class="com.qf.spring.part1.factory.MyClass" />
 ```
 
-
-
 调用Spring工厂API（ApplicationContext接口）
-
-
 
 ```java
 public class TestFactory{
@@ -316,7 +268,7 @@ Spring框架包含多个模块，每个模块各司其职，可结合需求引�
 - xmlns:xsi：XMLSchema-instance 标签遵循Schema标签标准。
 - xsi:schemaLocation：xsd文件位置，用以描述标签语义、属性、取值范围等。
 
- 
+
 
 
 
@@ -2214,4 +2166,10 @@ log4j.appender.E.Threshold = INFO
 log4j.appender.E.layout = org.apache.log4j.PatternLayout
 log4j.appender.E.layout.ConversionPattern = %-d{yyyy-MM-dd HH:mm:ss}  - [ %p ]  %l %c %t - %m %n
 ```
+
+
+
+
+
+
 

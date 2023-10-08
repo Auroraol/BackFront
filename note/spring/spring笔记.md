@@ -20,7 +20,11 @@ DI：依赖注入（Dependency Injection）：依赖其他容器（比如spring�
 
 IOC：控制反转（Inversion of Control）：它是一种控制权的转移。即组件与组件之间的依赖由主动变为被动。也就是说：应用程序本身不再负责组件的创建、维护等，而是将控制权移交出去。从这一点来说，几乎所有的框架都是IOC框架。
 
-IOC只是将组件控制权移交出去，但并没有说明组件如何获取。而DI明确说明：组件依赖Spring容器获取。 所以可以这样说：DI是IOC思想的一种具体实现。
+IOC只是将组件控制权移交出去，但并没有说明组件如何获取。而DI明确说明：组件依赖Spring容器获取。 所以可以这样说：**DI是IOC思想的一种具体实现。**
+
+ ApplicationContext是Spring IoC容器实现的代表，**它负责实例化，配置和组装Bean**。容器通过读取配置元数据获取有关实例化、配置和组装哪些对象的说明 。配置元数据可以使用XML、Java注解或Java代码来呈现。它允许你处理应用程序的对象与其他对象之间的互相依赖关系。
+
+<font color=red>**在 Java 中一个普通的实例化的对象也被称之为 Bean 对象，在框架这一块我们遇到的对象就是以 Bean 对象称呼**</font>
 
 # 2. DI（依赖注入）
 
@@ -28,52 +32,32 @@ IOC只是将组件控制权移交出去，但并没有说明组件如何获取�
 
 Spring实现依赖注入有三种方式：注解方式（官方推荐方式）、xml配置文件方式、javaConfig方式。
 
-## 2.1.xml方式
+## 2.1 添加Spring依赖
+
+pom.xm文件添加依赖
+
+```xml
+    <dependencies>
+        <!--Spring框架的核心容器-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.2.3.RELEASE</version>
+        </dependency>
+        <!--Spring提供了Bean的定义和管理的核心功能-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>5.2.3.RELEASE</version>
+        </dependency>
+    </dependencies>
+```
+
+## 2.2 xml方式
 
 下面使用 Spring 来重构dao层组件与service层组件。 也就是说：由Spring创建dao层组件和service层组件，并使用Spring将dao层组件注入给service层组件。
 
-例子
-
-### 2.1.1.添加Spring依赖
-
-```xml
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.neusoft</groupId>
-  <artifactId>springtest</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <build>
-    <plugins>
-      <!-- 设置jdk版本 -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <encoding>utf-8</encoding>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  <properties>
-    <!-- spring 版本号 -->
-    <spring.version>5.2.8.RELEASE</spring.version>
-  </properties>
-  <dependencies>
-    <!-- 此依赖会关联引用Spring中的所有基础jar包 -->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-  </dependencies>
-</project>
-```
-
-### 2.1.2.创建dao接口与实现类
+### 2.2.1 创建dao接口与实现类
 
 **UserDao.java**
 
@@ -99,7 +83,7 @@ public class UserDaoImpl implements UserDao{
 }
 ```
 
-### 2.1.3.创建service接口与实现类
+### 2.2.2 创建service接口与实现类
 
 **UserService.java**
 
@@ -133,7 +117,7 @@ public class UserServiceImpl implements UserService{
 }
 ```
 
-### 2.1.4.创建Spring配置文件
+### 2.2.3 创建Spring配置文件
 
 在类路径下创建spring.xml配置文件：
 
@@ -166,7 +150,7 @@ public class UserServiceImpl implements UserService{
 4. property标签，是给bean的属性注入其它对象。name属性，就是对象属性名； ref属性，就是给属性注入的对象。（如果想要注入基本数据类型，那么使用value属性）
 5. 给bean的属性注入其它对象，默认使用 get/set 方法注入。也可以使用其它方式注入：构造方法注入、P命名空间注入等。
 
-### 2.1.5. 测试
+### 2.2.4  测试
 
 ```java
 package com.neusoft;
@@ -186,7 +170,7 @@ public class MySpringTest {
 }
 ```
 
-## 2.3.注解方式
+## 2.3.注解方式(推荐)
 
 注解（Annotation），也叫元数据。它是一种代码级别的说明，是jdk1.5之后引入的一个特性。
 
@@ -383,15 +367,82 @@ javaConfig，是在 Spring 3.0 开始从一个独立的项目并入到 Spring �
 
 标注了@Configuration和标注了@Component的类一样是一个Bean，可以被Spring的 context:component-scan 标签扫描到。类中的每个标注了@Bean的方法都相当于提供了一个Bean的定义信息。
 
+### 2.4.1 配置类
+
 ```java
-package com.neusoft;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import com.neusoft.dao.UserDao;
-import com.neusoft.dao.impl.UserDaoImpl;
-import com.neusoft.service.UserService;
-import com.neusoft.service.impl.UserServiceImpl;
+@Configuration    // 就相当于创建了一个xml 文件 <beans></beans> //表示里面的Bean彼此有依赖关系
+@ComponentScan("cn.tulingxueyuan")   //<context:component-scan base-package="cn.tulingxueyuan" >
+@PropertySource("classpath:db.properties")
+public class MainConfiration  {
+
+
+    @Value("${mysql.username}")
+    private String name;
+    @Value("${mysql.password}")
+    private String password;
+    @Value("${mysql.url}")
+    private String url;
+    @Value("${mysql.driverClassName}")
+    private String driverName;
+
+
+    // <bean class="com.alibaba.druid.pool.DruidDataSource" id="dataSource"></bean>
+    // 可以干预Bean实例化过程！
+    @Bean()
+    public DruidDataSource dataSource(){
+        DruidDataSource dataSource=new DruidDataSource();
+        dataSource.setName(name);
+        dataSource.setPassword(password);
+        dataSource.setUrl(url);
+        dataSource.setDriverClassName(driverName);
+        return dataSource;
+
+    }
+
+    //接受生命周期回调
+    //init-method="initByConfig" destroy-method="destroyByConfig"
+    @Bean(initMethod = "initByConfig",destroyMethod = "destroyByConfig")
+    public User userconf(){
+
+        return  new User();
+    }
+    
+    //自定义Bean的名字
+    @Bean(name = "myThing")
+    //多个别名：@Bean(name = { "dataSource", "subsystemA-dataSource", "subsystemB-dataSource" })
+    public Thing thing() {
+        return new Thing();
+    }
+    
+    //指定 Bean 的作用域
+    @Bean
+    @Scope("prototype")
+    public Encryptor encryptor() {
+        // ...
+    }
+    
+}
+
+//@Import 注解允许从另一个配置类加载@Bean定义
+@Configuration
+@Import(ConfigA.class)
+public class ConfigB {
+
+    @Bean
+    public B b() {
+        return new B();
+    }
+}
+
+@Configuration
+public class ConfigA {
+
+    @Bean
+    public A a() {
+        return new A();
+    }
+}
+
 @Configuration
 public class AppConfig {
     @Bean
@@ -409,25 +460,20 @@ public class AppConfig {
 }
 ```
 
-### 2.4.2.测试
+### 2.4.2 测试
 
 ```java
-ApplicationContext context = new  ClassPathXmlApplicationContext("spring.xml");
-UserService service = (UserService)context.getBean("userService");
-User user = service.getUser();
-System.out.println(user);
-
-/*
-AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-context.register(AppConfig.class);
-context.refresh();
-UserService service = (UserService)context.getBean("userService");
-User user = service.getUser();
-System.out.println(user);
-*/
+@Test
+public void test01(){
+    ApplicationContext ioc=new AnnotationConfigApplicationContext(MainConfiration.class);
+    UserController bean = ioc.getBean(UserController.class);
+    bean.getUser();
+}
 ```
 
-# 3.AOP（面向切面）
+
+
+# 3. AOP（面向切面）
 
 ## 3.1 概要
 
@@ -668,4 +714,332 @@ public static void main(String[] args) {
 2. service层不能再实现接口。
 
 
+
+# 4.  创建 Spring 项目
+
+##  一、Spring 的概念
+
+**Spring : 包含众多工具方法的 IoC 容器。**
+
+**Spring 的核心 ：IoC （控制反转）， DI (依赖注入)。**
+
+**loC （Inversion of Control）**翻译成中文就是 “控制反转” 的意思，**控制反转一种编程设计思想**，将程序的控制流程从传统的主动调用方式转变为被动接收方式（一个类的内部不再实例另一个类，而是告诉程序这个类需要那个类作为参数采用运行），从而实现对象和对象之间的解耦和依赖管理。
+
+**DI （Dependency Injection 的缩写——“依赖注入”）**“[依赖注入](https://so.csdn.net/so/search?q=依赖注入&spm=1001.2101.3001.7020)” **指的就是由 IoC 容器在运行期间（程序运行期间），动态地将某种依赖关系注入到对象之中。**传统的做法是由程序主动去找他所依赖的对象然后进行实例化，而DI则是由容器主动地将依赖关系注入到对象中。这样做的好处是对象之间解耦。
+既然 Spring 是一个 loC 容器，那么它就具备两个最基本的功能：
+
+- 将对象存储到容器（Spring）中
+- 从容器（Spring）中将对象取出来
+
+**在 Java 中一个普通的实例化的对象也被称之为 Bean 对象，在框架这一块我们遇到的对象就是以 Bean 对象称呼。**
+
+## 二、创建 Spring 项目
+
+我们在了解 Spring 是啥之后，接下来结合 IDEA (集成开发环境) 演示如何创建一个 Spring 项目。
+
+### 2.1 创建一个 普通的 Maven 项目（无需使用模板）
+
+![image-20231008153854352](spring笔记.assets/image-20231008153854352.png)
+
+![image-20231008153913347](spring笔记.assets/image-20231008153913347.png)
+
+------
+
+### 2.2 添加 Spring 框架支持
+
+> Spring 是一个开源的 Java 框架，由 Rod Johnson 在 2002 年创建。Spring 提供了许多简化 Java 开发的功能，因此它在 Java 开发社区中得到了广泛的应用和认可。Spring 是第三方的资源（框架）是由大佬对已有的功能进行封装拓展，使得程序猿更容易地编写功能，并不属于 JDK 官方 , 所以我们要想使用 Spring 就需要下载第三方依赖。
+
+**只需要在项目中地 pom.xml 文档中添加 Spring 框架地支持, xml 配置如**
+
+```XML
+<dependencies>
+        <!-- Spring常用依赖 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.2.3.RELEASE</version>
+        </dependency>
+        <!--提供了Bean的定义和管理的核心功能-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>5.2.3.RELEASE</version>
+        </dependency>
+</dependencies>
+```
+
+------
+
+### 2.3 添加一个启动类
+
+最后在创建好的项目 Java 文件夹下创建一个启动类，包含 main 方法即可：
+
+```java
+public class App {
+    public static void main(String[] args) {
+ 
+    }
+}
+```
+
+------
+
+## 三、将对象存储到 Spring
+
+要想存储 Bean 对象（类实例化后的对象）需要有 2 步操作：
+
+- 创建一个 bean 对象 —— 需要一个类
+- 将 bean 对象 注册到 Spring 中 【使用 Spring 配置文件进行注册】
+
+### 3.1 创建 Bean 对象
+
+所谓 Bean 对象就是 Java 中的一个普通的对象。
+
+```java
+public class Dog {
+    // 狗的属性
+    private String name;
+    private int age;
+    private String sex;
+    private String color;
+ 
+ 
+    // 狗的行为
+    public void cry() {
+        System.out.println(this.name + "汪汪~");
+    }
+ 
+    /**
+     * 小狗的做我介绍
+     * @return
+     */
+    @Override
+    public String toString() {
+        return "Dog{" +
+                "我叫做：'" + name + '\'' +
+                ", 我今年：" + age +
+                "岁, 我的性别是：" + sex +
+                ", 我是'" + color + '\'' + "的" +
+                '}';
+    }
+ 
+    public String getName() {
+        return name;
+    }
+ 
+    public void setName(String name) {
+        this.name = name;
+    }
+ 
+    public int getAge() {
+        return age;
+    }
+ 
+    public void setAge(int age) {
+        this.age = age;
+    }
+ 
+    public String getSex() {
+        return sex;
+    }
+ 
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+ 
+    public String getColor() {
+        return color;
+    }
+ 
+    public void setColor(String color) {
+        this.color = color;
+    }
+}
+```
+
+ 常规的做法
+
+```java
+public class App {
+    public static void main(String[] args) {
+        Dog dog = new Dog();
+        dog.setName("哈巴狗");
+        dog.setAge(3);
+        dog.setSex("公");
+        dog.setColor("白色");
+        dog.cry();
+        System.out.println(dog.toString());
+    }
+}
+```
+
+<img src="spring笔记.assets/image-20231008154418014.png" alt="image-20231008154418014" style="zoom:67%;" />
+
+------
+
+### 3.3 将 Bean 对象注册到 Spring
+
+这里介绍一种古老的注册方法——【使用 Spring 配置文件进行注册】
+
+在创建好的项目中添加 Spring 的配置文件 **spring-test.xml** , 将该文件放到 **resources 的根目录**下：
+
+<img src="spring笔记.assets/image-20231008154500616.png" alt="image-20231008154500616" style="zoom: 67%;" />
+
+这个配置文件 **spring-test.xml** 文件名**可以任意的名称但是必须保证文件后缀为（ .xml ）**，这里的文件名在后续的取 Bean 对象中会使用到。
+
+该文件为 Spring 的配置文件，格式也是固定的
+
+```XML
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+</beans>
+```
+
+接下来，实现如何将 我们自定义的对象（Dog）注册到 Spring 中就可以了，具体的操作在 <beans> 标签中添加的。
+
+```XML
+<beans xmlns="http://www.springframework.org/schema/beans"
+    <bean id="dog" class="Dog"></bean>
+</beans>
+```
+
+![image-20231008154539200](spring笔记.assets/image-20231008154539200.png)
+
+如果需要将多个 bean 对象注册到 Spring 中，重复以上操作即可。**注意：需要给每个 bean 对象取别名（标识）。**
+
+
+
+------
+
+## 四、从 Spring 获取并使用 Bean 对象
+
+### 4.1 创建 Spring 上下文对象
+
+Spring的上下文是指Spring容器中存储Bean对象的**数据结构**，也可以理解为Spring容器中的环境。
+
+**目前 Spring 上下文对象可以使用 ApplicationContext 接口来获取：**
+
+> Spring框架中的ApplicationContext是一个[IoC容器](https://so.csdn.net/so/search?q=IoC容器&spm=1001.2101.3001.7020)，负责管理应用程序中的Bean对象，它是一个配置文件，提供了Bean对象所需的配置信息，同时也是Bean对象的容器。通过ApplicationContext，开发人员可以将Bean对象存储在容器中，并在其他组件中使用这些Bean对象。
+
+```java
+//1. 获取 Spring 上下文对象，创建的时候需要配置 Spring 的配置文件
+ApplicationContext context = new ClassPathXmlApplicationContext("spring-test.xml");
+```
+
+![img](spring笔记.assets/70062d9795604d54a1722503a69e7148.png)
+
+------
+
+### 4.2 获取指定的 Bean 对象
+
+上一步我们获取了 Spring 的上下文对象，context 这个对象就是用来管理 Bean 对象的，如果我们需要获取某个具体的 Bean 对象，需要在上下文对象的基础上调用 **getBean() 方法**
+
+**getBean()方法是从Spring容器中获取Bean实例的核心方法。**
+
+**当前给大家介绍的功能是读取Bean 对象：**
+
+**通过Bean ID或Bean名称从 Spring 容器中获取指定的Bean定义，如果没有找到，则抛出异常。**
+
+```java
+//1. 获取 Spring 上下文对象，创建的时候需要配置 Spring 的配置文件
+ApplicationContext context = new ClassPathXmlApplicationContext("spring-test.xml");
+        
+//2. 从 Spring 上下文中取出某个 bean 对象
+Dog dog = (Dog)context.getBean("dog");// dog是我们给 Dog 类的实例取得的标志（名字）
+```
+
+**注意事项：**
+
+![image-20231008155457615](spring笔记.assets/image-20231008155457615.png)
+
+**否则会抛出：NoSuchBeanDefinitionException 异常**
+
+![image-20231008155510454](spring笔记.assets/image-20231008155510454.png)
+
+------
+
+#### 4.2.1 getBean() 方法的使用
+
+getBean() 方法有很多种重载的方法，我们也可以使用其他的方法来获取 Bean 对象。
+
+**1. 根据 bean 对象的 id （标志）来获取 【上文已经讲过】**
+
+```java
+// dog是我们给 Dog 类的实例取得的标志（名字）
+
+Dog dog = (Dog)context.getBean("dog");
+```
+
+使用 bean对象的 id 来获取，Spring 上下文对象—— context 的返回值是 Object, 所以需要进行强制类型转换。 
+
+**2. 根据类型来获取 Bean** 
+
+```java
+Dog dog = context.getBean(Dog.class);
+```
+
+因为我们直接使用 bean 对象的类型来获取，所以我们无需手动强制类型转换，在获取的时候会自动强转。
+
+**3. 根据** **bean 对象的 id （标志）+ 类型 获取 bean**
+
+```java
+ Dog dog = context.getBean("dog",Dog.class);
+```
+
+**第一种方法的第二种方法的区别在于：**
+
+当一个类被重复的注册到 spring-test.xml 的配置文件中时，只能使用根据 ID (名称) 来获取。
+
+![img](spring笔记.assets/680425537b8c432daef58bd4ac097fe9.png)
+
+此时 Spring 容器中存储了 两个 Dog 类的实例（bean 对象）。
+
+**我们使用类型来获取 bean 对象并使用时的表现：**
+
+![img](spring笔记.assets/b591525c9761446888490653f0b93785.png)
+
+所以我们当同类型的对象被注册到 Spring 中多次时就会导致程序报错，此时我们应当使用 bean 对象的 ID (名称) 来获取。但是这种方式的缺陷在于 我们需要手动的进行强制类型转换（返回类型是 Object）
+
+所以我们推荐的写法是使用第三种方法 ：**根据** **bean 对象的 id （标志）+ 类型 获取 bean 对象。**
+
+------
+
+**4.3 使用 Bean 对象**
+
+上文也说到其实 Bean 对像就是普通的实例化的对象，Bean 对象只是一个名字罢了。所以Bean 对象的使用跟我们传统对象的使用并无差异：
+
+```java
+public class App {
+    public static void main(String[] args) {
+        //1. 获取 Spring 上下文对象，创建的时候需要配置 Spring 的配置文件
+        ApplicationContext context =
+                new ClassPathXmlApplicationContext("spring-test.xml");
+ 
+        //2. 使用类型从 Spring 容器中获取 bean 对象
+        Dog dog = context.getBean("dog",Dog.class);
+ 
+        //3. bean 对象的使用
+        dog.setName("哈巴狗");
+        dog.setAge(3);
+        dog.setSex("公");
+        dog.setColor("白色");
+        dog.cry();
+        System.out.println(dog.toString());  
+    }
+}
+```
+
+![image-20231008160134335](spring笔记.assets/image-20231008160134335.png)
+
+
+
+
+
+
+
+# 单元测试
+
+[Spring如何使用注解方案测试_springtest注解_tanxinji的博客-CSDN博客](https://blog.csdn.net/wasane/article/details/125404012)
 

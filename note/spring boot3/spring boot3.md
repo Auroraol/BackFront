@@ -1508,6 +1508,7 @@ public class HelloController {
 | @Autowired           | //@Resource =@Autowired+@Qualifie<br> //自动加载类, 理解就是不用new<br/>//如果接口实现只有一个，那么用@Autowired就可以了，也不需要指定名字.<br/>//如果接口有多个实现,那么用@Resource，并指定name<br/>//或者使用@Autowired+@Qualifier+Qualifier的value值. |
 | @Configuration+@Bean | bean注册(人为) —> 用于配置类                                 |
 | @Values              | 从配置文件中取参数                                           |
+| @Repository          | 用于将 DAO 层 (spring应用)                                   |
 
 ### 2.1  @Autowired
 
