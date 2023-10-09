@@ -1503,12 +1503,15 @@ public class HelloController {
 
 | 注解                 | 备注                                                         |
 | -------------------- | ------------------------------------------------------------ |
-| @Service             | bean注册, ==一般加在service目录里面的类上==                  |
-| @Component           | bean注册, 和 Service 没有啥区别,  Component是比较通用的东西  |
-| @Autowired           | //@Resource =@Autowired+@Qualifie<br> //自动加载类, 理解就是不用new<br/>//如果接口实现只有一个，那么用@Autowired就可以了，也不需要指定名字.<br/>//如果接口有多个实现,那么用@Resource，并指定name<br/>//或者使用@Autowired+@Qualifier+Qualifier的value值. |
+| @Service("?")        | bean注册, ==一般加在service目录里面的类上==                  |
+| @Component("?")      | bean注册,  和 Service 没有啥区别,  Component是比较通用的东西 |
+| @Autowired           | ①自动加载类(个人理解就是不用new)      ②或者使用@Autowired+@Qualifier![image-20231008233349225](spring boot3.assets/image-20231008233349225.png) |
+| @Resource(name="?")  | ①如果该接口有多个实现,    用@Resource，并指定name <br>②@AutoWired只适合spring框架，而@Resource扩展性更好 |
 | @Configuration+@Bean | bean注册(人为) —> 用于配置类                                 |
 | @Values              | 从配置文件中取参数                                           |
-| @Repository          | 用于将 DAO 层 (spring应用)                                   |
+| @Repository("?")     | 用于将 DAO 层 (spring应用)                                   |
+
+注: "?"可选
 
 ### 2.1  @Autowired
 
@@ -1553,25 +1556,75 @@ public class UserController {
 
 ### 2.4  @Scope
 
-声明 Spring Bean 的作用域，使用方法:
+设置注解的作用域
+
+| 参数      | 说明                                                         |
+| --------- | ------------------------------------------------------------ |
+| singleton | 单实例的(`单例`)(默认)   ----全局有且仅有一个实例            |
+| prototype | 多实例的(`多例`)                ---- 每次获取Bean的时候会有一个新的实例 |
+| reqeust   | 同一次请求 ----request：每一次HTTP请求都会产生一个新的bean，同时该bean仅在当前`HTTP request`内有效 |
+| session   | 同一个会话级别 ---- session：每一次HTTP请求都会产生一个新的bean，同时该bean仅在当前`HTTP session`内有效 |
+
+**例子1**
+
+在UserServiceImpl中添加@Scope注解：
 
 ```java
-@Bean
-@Scope("singleton")
-public Person personSingleton() {
-    return new Person();
+@Service("userService")
+@Scope("prototype")
+public class UserServiceImpl implements UserService{ }
+```
+
+在测试类中测试多例：
+
+```java
+ApplicationContext context = new  ClassPathXmlApplicationContext("spring.xml");
+UserService service1 = (UserService)context.getBean("userService");
+UserService service2 = (UserService)context.getBean("userService");
+System.out.println(service1==service2);      //false
+```
+
+**例子2**
+
+```cpp
+public class Person {
+    private String name;
+    private Integer age;
+
+    public Person() {
+    }
+
+    public Person(String name, Integer age) {
+        this.name = name;
+        this.age = age;
+    }
 }
 ```
 
-四种常见的 Spring Bean 的作用域：
+```java
+@Configuration
+public class ProtoTypeConfig {
 
-●singleton : 唯一 bean 实例，Spring 中的 bean 默认都是单例的；
+    @Scope("singleton")
+    @Bean
+    public Person person() {
+        return new Person("李四", 55);
+    }
+```
 
-●prototype : 每次请求都会创建一个新的 bean 实例；
+测试代码
 
-●request : 每一次 HTTP 请求都会产生一个新的 bean，该 bean 仅在当前 HTTP request 内有效；
-
-●session : 每一次 HTTP 请求都会产生一个新的 bean，该 bean 仅在当前 HTTP session 内有效。
+```java
+@Test
+public void test4() {
+    ApplicationContext ctx = new AnnotationConfigApplicationContext(ProtoTypeConfig.class);
+    Person person1 = ctx.getBean(Person.class);
+    Person person2 = ctx.getBean(Person.class);
+    System.out.println("person1 HashCode  " + person1.hashCode());
+    System.out.println("person2 HashCode  " + person2.hashCode());
+    System.out.println(person1 == person2);  // true
+}
+```
 
 ### 2.5  @Configuration
 

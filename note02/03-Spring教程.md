@@ -1,24 +1,24 @@
-### 一、引言
+一、引言
 
 ------
 
-#### 1.1 原生web开发中存在哪些问题？
+## 1.1 原生web开发中存在哪些问题？
 
 -  传统Web开发存在硬编码所造成的过度程序耦合（例如：Service中作为属性Dao对象）。 
 -  部分Java EE API较为复杂，使用效率低（例如：JDBC开发步骤）。 
 -  侵入性强，移植性差（例如：DAO实现的更换，从Connection到SqlSession）。 
 
-### 二、Spring框架
+# 二、Spring框架
 
 ------
 
-#### 2.1 概念
+## 2.1 概念
 
 -  Spring是一个项目管理框架，同时也是一套Java EE解决方案。 
 -  Spring是众多优秀设计模式的组合（工厂、单例、代理、适配器、包装器、观察者、模板、策略）。 
 -  Spring并未替代现有框架产品，而是将众多框架进行有机整合，简化企业级开发，俗称"胶水框架"。 
 
-#### 2.2 访问与下载
+## 2.2 访问与下载
 
 官方网站：https://spring.io/
 
@@ -26,7 +26,7 @@
 
 
 
-### 三、Spring架构组成
+# 三、Spring架构组成
 
 ------
 
@@ -67,11 +67,11 @@ Spring架构由诸多模块组成，可分类为\
 | org.springframework | spring-websocket         | WebSocket 和 SockJS 实现，包括对 STOMP 的支持  |
 | org.springframework | spring-jcl               | Jakarta Commons Logging 日志系统               |
 
-### 四、自定义工厂
+# 四、自定义工厂
 
 ------
 
-#### 4.1 配置文件
+## 4.1 配置文件
 
 ```plain
 userDAO=com.qf.dao.UserDAOImpl
@@ -88,7 +88,7 @@ userService=com.qf.service.UserServiceImpl
 
 ​    5、什么是ioc，并且举例
 
-#### 4.2 工厂类
+## 4.2 工厂类
 
 ```java
 /**
@@ -119,11 +119,11 @@ public class MyFactory {
 
 
 
-### 五、构建Maven项目
+# 五、构建Maven项目
 
 ------
 
-#### 5.1 新建项目
+## 5.1 新建项目
 
 | 使用IDEA打开已创建的文件夹目录                               |
 | ------------------------------------------------------------ |
@@ -131,7 +131,7 @@ public class MyFactory {
 
 
 
-#### 5.2 选择Maven目录
+## 5.2 选择Maven目录
 
 | 选择创建常规的Maven项目                                      |
 | ------------------------------------------------------------ |
@@ -139,7 +139,7 @@ public class MyFactory {
 
 
 
-#### 5.3 GAV坐标
+## 5.3 GAV坐标
 
 | GAV坐标                                                      |
 | ------------------------------------------------------------ |
@@ -147,11 +147,11 @@ public class MyFactory {
 
 
 
-### 六、Spring环境搭建
+# 六、Spring环境搭建
 
 ------
 
-#### 6.1 pom.xml中引入Spring常用依赖
+## 6.1 pom.xml中引入Spring常用依赖
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -180,7 +180,7 @@ public class MyFactory {
 
 
 
-#### 6.2 创建Spring配置文件
+## 6.2 创建Spring配置文件
 
 resources下创建配置文件,  命名无限制，约定俗成命名有：spring-context.xml、applicationContext.xml、beans.xml
 
@@ -195,7 +195,7 @@ resources下创建配置文件,  命名无限制，约定俗成命名有：sprin
 
 
 
-### 七、Spring工厂编码
+# 七、Spring工厂编码
 
 ------
 
@@ -236,7 +236,7 @@ public class TestFactory{
 
 
 
-### 八、依赖与配置文件详解
+# 八、依赖与配置文件详解
 
 ------
 
@@ -244,7 +244,7 @@ Spring框架包含多个模块，每个模块各司其职，可结合需求引�
 
 
 
-#### 8.1 Spring依赖关系
+##8.1 Spring依赖关系
 
 | Spring常用功能的Jar包依赖关系                                |
 | ------------------------------------------------------------ |
@@ -256,7 +256,7 @@ Spring框架包含多个模块，每个模块各司其职，可结合需求引�
 
 
 
-#### 8.2 schema
+## 8.2 schema
 
 
 
@@ -272,7 +272,7 @@ Spring框架包含多个模块，每个模块各司其职，可结合需求引�
 
 
 
-### 九、IoC（Inversion of Control ）控制反转【`重点`】
+# 九、IoC（Inversion of Control ）控制反转【`重点`】
 
 ------
 
@@ -288,7 +288,7 @@ Spring框架包含多个模块，每个模块各司其职，可结合需求引�
 
 
 
-#### 9.1 项目中强耦合问题
+## 9.1 项目中强耦合问题
 
 
 
@@ -312,7 +312,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-#### 9.2 解决方案
+## 9.2 解决方案
 
 
 
@@ -352,11 +352,11 @@ public class UserServiceImpl implements UserService {
 
 
 
-### 十、DI（Dependency Injection）依赖注入【`重点`】
+# 十、DI（Dependency Injection）依赖注入【`重点`】
 
 ------
 
-#### 10.1 概念
+## 10.1 概念
 
 
 
@@ -364,7 +364,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-#### 10.2 Set注入
+## 10.2 Set注入
 
 
 
@@ -372,7 +372,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-##### 10.2.1 定义目标Bean类型
+### 10.2.1 定义目标Bean类型
 
 
 
@@ -394,7 +394,7 @@ public class User {
 
 
 
-##### 10.2.2 基本类型 + 字符串类型 + 日期类型
+### 10.2.2 基本类型 + 字符串类型 + 日期类型
 
 
 
@@ -411,7 +411,7 @@ public class User {
 
 
 
-##### 10.2.3 容器类型
+### 10.2.3 容器类型
 
 
 
@@ -466,7 +466,7 @@ public class User {
 
 
 
-##### 10.2.4 自建类型
+### 10.2.4 自建类型
 
 
 
@@ -497,7 +497,7 @@ public class User {
 
 
 
-#### 10.3 构造注入【了解】
+## 10.3 构造注入【了解】
 
 
 
@@ -505,7 +505,7 @@ public class User {
 
 
 
-##### 10.3.1 定义目标Bean类型
+### 10.3.1 定义目标Bean类型
 
 
 
@@ -528,7 +528,7 @@ public class Student {
 
 
 
-##### 10.3.2 注入
+### 10.3.2 注入
 
 
 
@@ -544,7 +544,7 @@ public class Student {
 
 
 
-#### 10.4 自动注入【重点】
+## 10.4 自动注入【重点】
 
 
 
@@ -681,11 +681,11 @@ public class UserServiceImpl implements UserService {
 
 
 
-### 十一、Bean细节
+# 十一、Bean细节
 
 ------
 
-#### 11.1 控·制简单对象的单例、多例模式（new）
+## 11.1 控·制简单对象的单例、多例模式（new）
 
 
 
@@ -719,7 +719,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-#### 11.2 FactoryBean创建复杂对象【重点】
+## 11.2 FactoryBean创建复杂对象【重点】
 
 
 
@@ -731,7 +731,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-##### 11.2.1 实现FactoryBean接口
+### 11.2.1 实现FactoryBean接口
 
 | 接口方法描述                                                 |
 | ------------------------------------------------------------ |
@@ -745,7 +745,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-##### 11.2.2 配置spring-context.xml
+### 11.2.2 配置spring-context.xml
 
 | 配置与获取方式                                               |
 | ------------------------------------------------------------ |
@@ -753,7 +753,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-##### 11.2.3 特例
+### 11.2.3 特例
 
 | 获取FactoryBean接口的实现类对象，而非getObject()所生产的对象。 |
 | ------------------------------------------------------------ |
@@ -761,11 +761,11 @@ public class UserServiceImpl implements UserService {
 
 
 
-### 十二、Spring工厂特性
+# 十二、Spring工厂特性
 
 ------
 
-#### 12.1 饿汉式创建优势
+## 12.1 饿汉式创建优势
 
 
 
@@ -777,7 +777,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-#### 12.2 生命周期方法
+## 12.2 生命周期方法
 
 
 
@@ -792,7 +792,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-#### 12.3 生命周期注解
+## 12.3 生命周期注解
 
 
 
@@ -817,7 +817,7 @@ public void destroy(){
 
 
 
-#### 12.4 生命周期阶段（面试重点）
+## 12.4 生命周期阶段（面试重点）
 
 
 
@@ -843,7 +843,7 @@ public void destroy(){
 
 ------
 
-#### 13.1 概念
+## 13.1 概念
 
 
 
@@ -855,7 +855,7 @@ public void destroy(){
 
 
 
-#### 13.2 静态代理设计模式
+## 13.2 静态代理设计模式
 
 
 
@@ -881,7 +881,7 @@ public void destroy(){
 
 
 
-#### 13.3 动态代理设计模式 (jdk cglab)
+## 13.3 动态代理设计模式 (jdk cglab)
 
 
 
@@ -889,7 +889,7 @@ public void destroy(){
 
 
 
-##### 13.3.1 JDK动态代理实现（基于接口）
+### 13.3.1 JDK动态代理实现（基于接口）
 
 
 
@@ -913,7 +913,7 @@ public void destroy(){
 
 
 
-##### 13.3.2 CGlib动态代理实现（基于继承）
+### 13.3.2 CGlib动态代理实现（基于继承）
 
 
 
@@ -936,11 +936,11 @@ proxy,createOrder();
 
 
 
-### 十四、面向切面编程【`重点`】
+# 十四、面向切面编程【`重点`】
 
 ------
 
-#### 14.1 概念
+## 14.1 概念
 
 
 
@@ -948,7 +948,7 @@ AOP（Aspect Oriented Programming），即面向切面编程，利用一种称�
 
 
 
-#### 14.2 AOP开发术语
+## 14.2 AOP开发术语
 
 
 
@@ -967,7 +967,7 @@ AOP（Aspect Oriented Programming），即面向切面编程，利用一种称�
 
 
 
-#### 14.3 作用
+## 14.3 作用
 
 
 
@@ -975,7 +975,7 @@ Spring的AOP编程即是通过动态代理类为原始类的方法添加辅助�
 
 
 
-#### 14.4 环境搭建
+## 14.4 环境搭建
 
 
 
@@ -1023,7 +1023,7 @@ http://www.springframework.org/schema/aop/spring-aop.xsd
 
 
 
-#### 14.5 开发流程
+## 14.5 开发流程
 
 
 
@@ -1111,7 +1111,7 @@ public class MyAdvice implements MethodBeforeAdvice { //实现前置通知接口
 
 
 
-#### 14.6 AOP小结
+## 14.6 AOP小结
 
 
 
@@ -1126,7 +1126,7 @@ public class MyAdvice implements MethodBeforeAdvice { //实现前置通知接口
 
 
 
-#### 14.7 通知类【可选】
+## 14.7 通知类【可选】
 
 
 
@@ -1209,7 +1209,7 @@ public class AopThrowsAdvice implements ThrowsAdvice {
     </aop:config>
 ```
 
-#### 14.8 通配切入点
+## 14.8 通配切入点
 
 
 
@@ -1242,7 +1242,7 @@ public   void  add(参数)-- 修饰符  返回值 方法名 参数
 
 
 
-#### 14.9 JDK和CGLIB选择
+## 14.9 JDK和CGLIB选择
 
 
 
@@ -1265,7 +1265,7 @@ class DefaultAopProxyFactory{
 
 
 
-#### 14.10 后处理器
+## 14.10 后处理器
 
 
 
@@ -1283,7 +1283,7 @@ class DefaultAopProxyFactory{
 
 
 
-##### 14.10.1 后处理器定义
+### 14.10.1 后处理器定义
 
 
 
@@ -1322,7 +1322,7 @@ public class MyBeanPostProcessor implements BeanPostProcessor{
 
 
 
-##### 14.10.2 配置后处理器
+### 14.10.2 配置后处理器
 
 
 
@@ -1333,7 +1333,7 @@ public class MyBeanPostProcessor implements BeanPostProcessor{
 
 
 
-##### 14.10.3 bean生命周期
+### 14.10.3 bean生命周期
 
 
 
@@ -1341,7 +1341,7 @@ public class MyBeanPostProcessor implements BeanPostProcessor{
 
 
 
-##### 14.10.4 动态代理源码(了解)
+### 14.10.4 动态代理源码(了解)
 
 
 
@@ -1366,11 +1366,11 @@ AbstractAutoProxyCreator#postProcessAfterInitialization(Object bean, String bean
 
 
 
-### 十五、Spring + MyBatis【`重点`】
+# 十五、Spring + MyBatis【`重点`】
 
 ------
 
-#### 15.1 配置数据源
+#15.1 配置数据源
 
 
 
@@ -1378,7 +1378,7 @@ AbstractAutoProxyCreator#postProcessAfterInitialization(Object bean, String bean
 
 
 
-##### 15.1.1 引入jdbc.properties配置文件
+### 15.1.1 引入jdbc.properties配置文件
 
 
 
@@ -1392,7 +1392,7 @@ jdbc.password=123456
 
 
 
-##### 15.1.2 整合Spring配置文件和properties配置文件
+### 15.1.2 整合Spring配置文件和properties配置文件
 
 
 
@@ -1433,7 +1433,7 @@ jdbc.password=123456
 
 
 
-##### 15.1.3 Druid连接池可选参数
+### 15.1.3 Druid连接池可选参数
 
 
 
@@ -1463,7 +1463,7 @@ jdbc.password=123456
 
 
 
-##### 15.1.4 Druid监控中心
+### 15.1.4 Druid监控中心
 
 
 
@@ -1481,7 +1481,7 @@ jdbc.password=123456
 
 
 
-##### 15.1.5 测试监控中心
+### 15.1.5 测试监控中心
 
 
 
@@ -1493,7 +1493,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-#### 15.2 整合MyBatis
+## 15.2 整合MyBatis
 
 
 
@@ -1501,7 +1501,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-##### 15.2.1 导入依赖
+### 15.2.1 导入依赖
 
 
 
@@ -1583,7 +1583,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-##### 15.2.2 配置SqlSessionFactory
+### 15.2.2 配置SqlSessionFactory
 
 
 
@@ -1607,7 +1607,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-##### 15.2.3 配置MapperScannerConfigurer
+### 15.2.3 配置MapperScannerConfigurer
 
 
 
@@ -1638,7 +1638,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-##### 15.2.4 配置Service
+### 15.2.4 配置Service
 
 
 
@@ -1651,11 +1651,11 @@ http://localhost:83/spring/druid/api.html
 
 
 
-### 十六、事务【`重点`】一切相关关系操作，串联成一个，要么都成功 要都失败
+# 十六、事务【`重点`】一切相关关系操作，串联成一个，要么都成功 要都失败
 
 ------
 
-#### 16.1 配置DataSourceTransactionManager
+## 16.1 配置DataSourceTransactionManager
 
 
 
@@ -1676,7 +1676,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-\####16.2 配置事务通知
+\##16.2 配置事务通知
 
 
 
@@ -1705,15 +1705,15 @@ http://localhost:83/spring/druid/api.html
 
 
 
-#### 16.3 事务属性
+## 16.3 事务属性
 
 
 
-##### 16.3.1 隔离级别
+### 16.3.1 隔离级别
 
 
 
-###### 16.3.1.1 概念
+## 16.3.1.1 概念
 
 
 
@@ -1733,7 +1733,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-###### 16.3.1.2 特性
+## 16.3.1.2 特性
 
 
 
@@ -1746,7 +1746,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-###### 16.3.1.3 并发问题
+## 16.3.1.3 并发问题
 
 
 
@@ -1760,7 +1760,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-##### 16.3.2 传播行为
+### 16.3.2 传播行为
 
 
 
@@ -1779,7 +1779,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-##### 16.3.3 读写性
+### 16.3.3 读写性
 
 
 
@@ -1796,7 +1796,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-##### 16.3.4 事务超时
+### 16.3.4 事务超时
 
 
 
@@ -1815,7 +1815,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-##### 16.3.5 事务回滚
+### 16.3.5 事务回滚
 
 
 
@@ -1833,7 +1833,7 @@ http://localhost:83/spring/druid/api.html
 
 
 
-#### 16.4 编织
+## 16.4 编织
 
 
 
@@ -1851,11 +1851,11 @@ http://localhost:83/spring/druid/api.html
 
 
 
-### 十七、注解开发
+# 十七、注解开发
 
 ------
 
-#### 17.1 声明bean
+## 17.1 声明bean
 
 
 
@@ -1888,7 +1888,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-#### 17.2 注入(DI)
+## 17.2 注入(DI)
 
 
 
@@ -1945,7 +1945,7 @@ public class XX{
 
 
 
-#### 17.3 事务控制
+## 17.3 事务控制
 
 
 
@@ -1978,7 +1978,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-#### 17.4 注解所需配置
+## 17.4 注解所需配置
 
 
 
@@ -1993,11 +1993,11 @@ public class UserServiceImpl implements UserService {
 
 
 
-#### 17.5 AOP开发
+## 17.5 AOP开发
 
 
 
-##### 17.5.1 注解使用
+### 17.5.1 注解使用
 
 
 
@@ -2047,7 +2047,7 @@ public class MyAspect {
 
 
 
-##### 17.5.2 配置
+### 17.5.2 配置
 
 
 
@@ -2058,11 +2058,11 @@ public class MyAspect {
 
 
 
-### 十八、集成JUnit
+# 十八、集成JUnit
 
 ------
 
-#### 18.1 导入依赖
+## 18.1 导入依赖
 
 
 
@@ -2081,7 +2081,7 @@ public class MyAspect {
 
 
 
-#### 18.2 编码
+## 18.2 编码
 
 
 
@@ -2127,16 +2127,16 @@ public class SpringTest{//当前测试类也会被纳入工厂中，所以其中
 2、编写log4j.properties配置文件
 
 ```properties
-### 设置日志输入级别（debug< info< WARN< error ）###
+#设置日志输入级别（debug< info< WARN< error ）#
 log4j.rootLogger = debug,stdout,D,E,I
-### 输出信息到控制抬 ###
+#输出信息到控制抬 #
 log4j.appender.stdout = org.apache.log4j.ConsoleAppender #这是告诉我日志往哪里输出
 log4j.appender.stdout.Target = System.out
 log4j.appender.stdout.layout = org.apache.log4j.PatternLayout
 log4j.appender.stdout.layout.ConversionPattern = [%-5p] %d{yyyy-MM-dd HH:mm:ss,SSS} method:%l%n%m%n
 
 
-### 输出DEBUG 级别以上的日志到=E://logs/error.log ###
+#输出DEBUG 级别以上的日志到=E://logs/error.log #
 log4j.appender.D = org.apache.log4j.DailyRollingFileAppender
 log4j.appender.D.File = E://logs/debug.log
 log4j.appender.D.Append = true
@@ -2146,7 +2146,7 @@ log4j.appender.D.layout = org.apache.log4j.PatternLayout
 log4j.appender.D.layout.ConversionPattern = %-d{yyyy-MM-dd HH:mm:ss}  - [ %p ]  %l %c %t - %m %n 
 
 
-### 输出ERROR 级别以上的日志到=E://logs/error.log ###
+#输出ERROR 级别以上的日志到=E://logs/error.log #
 log4j.appender.E = org.apache.log4j.DailyRollingFileAppender
 log4j.appender.E.File =E://logs/error.log
 log4j.appender.E.Append = true
@@ -2157,7 +2157,7 @@ log4j.appender.E.layout.ConversionPattern = %-d{yyyy-MM-dd HH:mm:ss}  - [ %p ]  
 
 
 
-### 输出ERROR 级别以上的日志到=E://logs/error.log ###
+#输出ERROR 级别以上的日志到=E://logs/error.log #
 log4j.appender.E = org.apache.log4j.DailyRollingFileAppender
 log4j.appender.E.File =E://logs/info.log
 log4j.appender.E.Append = true

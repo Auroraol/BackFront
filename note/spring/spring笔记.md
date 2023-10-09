@@ -1,4 +1,20 @@
-# 简要
+# 一、引言
+
+## 1.1 原生web开发中存在哪些问题？
+
+-  传统Web开发存在硬编码所造成的过度程序耦合（例如：Service中作为属性Dao对象）。 
+-  部分Java EE API较为复杂，使用效率低（例如：JDBC开发步骤）。 
+-  侵入性强，移植性差（例如：DAO实现的更换，从Connection到SqlSession）。 
+
+# 二、spring介绍
+
+## 2.1 访问与下载
+
+官方网站：https://spring.io/
+
+下载地址：http://repo.spring.io/release/org/springframework/spring/
+
+## 2.2 Spring架构组成
 
 Spring 总共大约有 20 个模块，由 1300 多个不同的文件构成。而这些组件被分别整合在6 个模块中：
 
@@ -12,9 +28,62 @@ Spring 总共大约有 20 个模块，由 1300 多个不同的文件构成。而
 **Spring两大核心 : **
 
 + DI：依赖注入（Dependency Injection）
-+  AOP：面向对象面编程（Aspect Oriented Programming）
++ AOP：面向对象面编程（Aspect Oriented Programming）
 
-# 1. IOC与DI
+**依赖:**
+
+| **GroupId**         | **ArtifactId**           | **说明**                                       |
+| ------------------- | ------------------------ | ---------------------------------------------- |
+| org.springframework | spring-beans             | Beans 支持，包含 Groovy                        |
+| org.springframework | spring-aop               | 基于代理的AOP支持                              |
+| org.springframework | spring-aspects           | 基于AspectJ 的切面                             |
+| org.springframework | spring-context           | 应用上下文运行时，包括调度和远程抽象           |
+| org.springframework | spring-context-support   | 支持将常见的第三方类库集成到 Spring 应用上下文 |
+| org.springframework | spring-core              | 其他模块所依赖的核心模块                       |
+| org.springframework | spring-expression        | Spring 表达式语言，SpEL                        |
+| org.springframework | spring-instrument        | JVM 引导的仪表（监测器）代理                   |
+| org.springframework | spring-instrument-tomcat | Tomcat 的仪表（监测器）代理                    |
+| org.springframework | spring-jdbc              | 支持包括数据源设置和 JDBC 访问支持             |
+| org.springframework | spring-jms               | 支持包括发送/接收JMS消息的助手类               |
+| org.springframework | spring-messaging         | 对消息架构和协议的支持                         |
+| org.springframework | spring-orm               | 对象/关系映射，包括对 JPA 和 Hibernate 的支持  |
+| org.springframework | spring-oxm               | 对象/XML 映射（Object/XML Mapping，OXM）       |
+| org.springframework | spring-test              | 单元测试和集成测试支持组件                     |
+| org.springframework | spring-tx                | 事务基础组件，包括对 DAO 的支持及 JCA 的集成   |
+| org.springframework | spring-web               | web支持包，包括客户端及web远程调用             |
+| org.springframework | spring-webmvc            | REST web 服务及 web 应用的 MVC 实现            |
+| org.springframework | spring-webmvc-portlet    | 用于 Portlet 环境的MVC实现                     |
+| org.springframework | spring-websocket         | WebSocket 和 SockJS 实现，包括对 STOMP 的支持  |
+| org.springframework | spring-jcl               | Jakarta Commons Logging 日志系统               |
+
+# 三、构建Maven项目
+
+## 3.1 创建一个 普通的 Maven 项目（无需使用模板）
+
+![image-20231008153854352](spring笔记.assets/image-20231008153854352.png)
+
+![image-20231008153913347](spring笔记.assets/image-20231008153913347.png)
+
+## 3.2 Spring依赖
+
+```xml
+    <dependencies>
+        <!--Spring框架的核心容器-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.2.3.RELEASE</version>
+        </dependency>
+    </dependencies>
+```
+
+| Spring常用功能的Jar包依赖关系                                |
+| ------------------------------------------------------------ |
+| ![image-20231009084103565](spring笔记.assets/image-20231009084103565.png) |
+
+注意：**Jar包彼此存在依赖，只需引入最外层Jar即可由Maven自动将相关依赖Jar引入到项目中。**
+
+# 四、 IOC与DI
 
 DI：依赖注入（Dependency Injection）：依赖其他容器（比如spring）来创建和维护所需要的组件，并将其注入到应用程序中。
 
@@ -26,38 +95,95 @@ IOC只是将组件控制权移交出去，但并没有说明组件如何获取�
 
 <font color=red>**在 Java 中一个普通的实例化的对象也被称之为 Bean 对象，在框架这一块我们遇到的对象就是以 Bean 对象称呼**</font>
 
-# 2. DI（依赖注入）
+
+
+# 五、IOC（Inversion of Control ）控制反转
+
+## 5.1 项目中强耦合问题
+
+```java
+public class UserDAOImpl implements UserDAO{....}
+```
+
+```java
+public class UserServiceImpl implements UserService {
+    // !!!强耦合了UserDAOImpl!!!,使得UserServiceImpl变得不稳健!!
+    private UserDAO userDAO= new UserDAOImpl();
+    @Override
+    public User queryUser() {
+        return userDAO.queryUser();
+    }
+    ....
+}
+```
+
+## 5.2 解决方案
+
+```java
+// 不引用任何一个具体的组件(实现类)，在需要其他组件的位置预留存取值入口(set/get)
+public class UserServiceImpl implements UserService {
+    // !!!不再耦合任何DAO实现!!!,消除不稳健因素!!
+    private UserDAO userDAO；
+    // 为userDAO定义set/get,允许userDAO属性接收spring赋值
+    //Getters And Setters
+    @Override
+    public User queryUser() {
+        return userDAO.queryUser();
+    }
+    ....
+}
+```
+
+```xml
+<bean id="userDAO" class="com.qf.spring.part1.injection.UserDaoImpl"></bean>
+<!-- UserServiceImpl组件 -->
+<bean id="userService" class="com.qf.spring.part1.injection.UserServiceImpl">
+    <!-- 由spring为userDAO属性赋值，值为id="userDAO"的bean -->
+    <property name="userDAO" ref="userDAO"/>  //ref 制定的是对象
+</bean>
+```
+
+此时，如果需要更换其他UserDAO实现类，则UserServiceImpl不用任何改动！ 则此时的UserServiceImpl组件变得更加稳健！
+
+# 六、DI（依赖注入）
 
 依赖注入（Dependency Injection）是一种设计模式，也是Spring框架的核心概念之一。其作用是去除组件之间的依赖关系，实现解耦合。 也就是说：所谓依赖注入，是指工程中需要的组件无须自己创建，而是依赖于外部环境注入。
 
 Spring实现依赖注入有三种方式：注解方式（官方推荐方式）、xml配置文件方式、javaConfig方式。
 
-## 2.1 添加Spring依赖
+## 6.1 添加Spring依赖
 
 pom.xm文件添加依赖
 
 ```xml
     <dependencies>
-        <!--Spring框架的核心容器-->
+        <!--Spring框架-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>5.2.3.RELEASE</version>
         </dependency>
-        <!--Spring提供了Bean的定义和管理的核心功能-->
+        <!-- 单元测试 -->
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
+            <artifactId>spring-test</artifactId>
             <version>5.2.3.RELEASE</version>
+        </dependency>
+        <!-- 单元测试 -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 ```
 
-## 2.2 xml方式
+## 6.2 xml方式
 
 下面使用 Spring 来重构dao层组件与service层组件。 也就是说：由Spring创建dao层组件和service层组件，并使用Spring将dao层组件注入给service层组件。
 
-### 2.2.1 创建dao接口与实现类
+### 6.2.1 创建dao接口与实现类
 
 **UserDao.java**
 
@@ -83,7 +209,7 @@ public class UserDaoImpl implements UserDao{
 }
 ```
 
-### 2.2.2 创建service接口与实现类
+### 6.2.2 创建service接口与实现类
 
 **UserService.java**
 
@@ -117,7 +243,7 @@ public class UserServiceImpl implements UserService{
 }
 ```
 
-### 2.2.3 创建Spring配置文件
+### 6.2.3 创建Spring配置文件
 
 在类路径下创建spring.xml配置文件：
 
@@ -150,7 +276,7 @@ public class UserServiceImpl implements UserService{
 4. property标签，是给bean的属性注入其它对象。name属性，就是对象属性名； ref属性，就是给属性注入的对象。（如果想要注入基本数据类型，那么使用value属性）
 5. 给bean的属性注入其它对象，默认使用 get/set 方法注入。也可以使用其它方式注入：构造方法注入、P命名空间注入等。
 
-### 2.2.4  测试
+### 6.2.4  测试
 
 ```java
 package com.neusoft;
@@ -170,7 +296,319 @@ public class MySpringTest {
 }
 ```
 
-## 2.3.注解方式(推荐)
+### 6.2.5 Set注入
+
+创建对象时，Spring工厂会通过Set方法为对象的属性赋值。
+
+#### 6.2.5.1 定义目标Bean类型
+
+```java
+public class User {
+    private Integer id;
+    private String password;
+    private String sex;
+    private Integer age;
+    private Date bornDate;
+    private String[] hobbys;
+    private Set<String> phones;
+    private List<String> names;
+    private Map<String,String> countries;
+    private Properties files;
+    //Getters And Setters
+}
+```
+
+#### 6.2.5.2 属性赋值
+
+##### 6.2.5.2.1 基本类型
+
+```xml
+<bean id="u1" class="com.lfj.dao.User">
+    <!--base field-->
+    <property name="id" value="1001" />
+    <property name="password" value="123456" />
+    <property name="sex" value="male" />
+    <property name="age" value="20" />
+    <property name="bornDate" value="1990/1/1" />
+    <!--注意格式"/"-->
+</bean>
+```
+
+##### 6.2.5.2.2 容器类型
+
+```xml
+<bean id="u1" class="com.lfj.dao.User">	
+	<!--Array-->
+    <property name="hobbys">
+        <array>
+            <value>Run</value>
+            <value>Swim</value>
+            <value>Climb</value>
+        </array>
+    </property>
+
+    <!--Set-->
+    <property name="phones">
+        <set>
+            <value>13777777777</value>
+            <value>13888888888</value>
+            <value>13999999999</value>
+        </set>
+    </property>
+
+    <!--List-->
+    <property name="names">
+        <list>
+            <value>tom</value>
+            <value>jack</value>
+            <value>marry</value>
+        </list>
+    </property>
+
+    <!--Map-->
+    <property name="countries">
+        <map>
+            <entry key="CN" value="China" />
+            <entry key="US" value="America" />
+            <entry key="KR" value="Korea" />
+        </map>
+    </property>
+    
+    <!--Properties-->
+    <property name="files">
+        <props>
+            <prop key="first">One</prop>
+            <prop key="second">Two</prop>
+            <prop key="third">Three</prop>
+        </props>
+    </property>
+</bean>
+```
+
+##### 6.2.5.2.3 自定义类型
+
+例子1
+
+```xml
+<!--次要bean，被作为属性-->
+<bean id="addr" class="com.lfj.dao.Address">
+    <property name="position" value="北京市海淀区" />
+    <property name="zipCode" value="100001" />
+</bean>
+
+<!--主要bean，操作的主体-->
+<bean id="u2" class="com.lfj.dao.User">
+    <property name="address" ref="addr" /><!--address属性引用addr对象-->
+</bean>
+```
+
+例子2
+
+```xml
+<!--次要bean，被作为属性-->
+<bean id="userDao" class="com.lfj.dao.impl.UserDaoImpl" />
+
+<!--主要bean，操作的主体-->
+<bean id="userService" class="com.lfj.service.UserServiceImpl">
+    <property name="ud" ref="userDao" /><!--ud属性引用userDao对象-->
+</bean>
+```
+
+##### 6.2.5.2.4  自动注入
+
+不用在配置中 指定为哪个属性赋值，及赋什么值.
+
+由spring自动根据某个 "原则" ，在工厂中查找一个bean，为属性注入属性值
+
+原则：
+
+1. 根据类型注入
+2. 根据属性名注入
+
+```java
+public class UserServiceImpl implements UserService {
+    private UserDAO userDAO；
+    //Getters And Setters
+    ....
+}
+```
+
+```xml
+<bean id="userDao" class="com.qf.spring.part1.injection.UserDaoImpl" />
+<!-- 为UserServiceImpl中的属性基于类型自动注入值 -->
+<bean id="userService" class="com.qf.spring.part1.injection.UserServiceImpl" autowire="byType"></bean>
+```
+
+```xml
+<bean id="userDao" class="com.qf.spring.part1.injection.UserDaoImpl" />
+<!-- 为UserServiceImpl中的属性基于类型自动注入值 -->
+<bean id="userService" class="com.qf.spring.part1.injection.UserServiceImpl" autowire="byName"></bean>
+```
+
+综合代码
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="mySpring" class="com.qf.MySpring" autowire="byType" >
+<!--        <property name="mySpringDao" ref="mySpringDao"></property>-->
+
+    </bean>
+    <bean id="mySpringDao" class="com.qf.MySpringDao">
+    </bean>
+
+    <!--采用的set注入依赖-->
+    <bean id="user" class="com.qf.entity.User">
+        <property name="id" value="1"/>
+        <property name="password" value="123456"/>
+        <property name="sex" value="女"/>
+        <property name="age" value="30"/>
+        <property name="bornDate" value="2021/10/18 16:39:40"/>
+        <property name="hobbys">
+            <array>
+                <value>洗脚</value>
+                <value>按摩</value>
+                <value>洗澡</value>
+            </array>
+        </property>
+        <property name="phones">
+            <set>
+                <value>1234567</value>
+                <value>87654321</value>
+                <value>023-444444</value>
+            </set>
+        </property>
+
+        <property name="names">
+            <list>
+                <value>张三</value>
+                <value>李四</value>
+                <value>王麻子</value>
+            </list>
+        </property>
+
+        <property name="countries">
+            <map>
+                <entry key="zh" value="中国"></entry>
+                <entry key="us" value="美国"></entry>
+                <entry key="jp" value="日本"></entry>
+            </map>
+        </property>
+
+        <property name="files">
+            <props>
+                <prop key="java">spring</prop>
+                <prop key="php">phpadmin</prop>
+            </props>
+        </property>
+
+        <property name="mySpringDao" ref="mySpringDao"></property>
+
+    </bean>
+
+    <!--采用的构造器注入依赖-->
+    <bean id="sud" class="com.qf.entity.Student">
+        <constructor-arg name="id" value="12"/>
+        <constructor-arg name="age" value="20"/>
+        <constructor-arg name="name" value="苍老师"/>
+        <constructor-arg name="sex" value="女"></constructor-arg>
+    </bean>
+</beans>
+```
+
+### 6.2.6 Spring 获取并使用 Bean 对象
+
+#### 6.2.6.1 创建 Spring 上下文对象
+
+Spring的上下文是指Spring容器中存储Bean对象的**数据结构**，也可以理解为Spring容器中的环境。
+
+**目前 Spring 上下文对象可以使用 ApplicationContext 接口来获取：**
+
+> Spring框架中的ApplicationContext是一个[IoC容器](https://so.csdn.net/so/search?q=IoC容器&spm=1001.2101.3001.7020)，负责管理应用程序中的Bean对象，它是一个配置文件，提供了Bean对象所需的配置信息，同时也是Bean对象的容器。通过ApplicationContext，开发人员可以将Bean对象存储在容器中，并在其他组件中使用这些Bean对象。
+
+```java
+//1. 获取 Spring 上下文对象，创建的时候需要配置 Spring 的配置文件
+ApplicationContext context = new ClassPathXmlApplicationContext("spring-test.xml");
+```
+
+![image-20231009084633955](spring笔记.assets/image-20231009084633955.png)
+
+------
+
+#### 6.2.6.2 获取指定的 Bean 对象
+
+**getBean() 方法的使用**
+
+getBean() 方法有很多种重载的方法，我们也可以使用其他的方法来获取 Bean 对象。
+
+**方法1. 根据 bean 对象的 id （标志）来获取 **
+
+```java
+//1. 获取 Spring 上下文对象，创建的时候需要配置 Spring 的配置文件
+ApplicationContext context = new ClassPathXmlApplicationContext("spring-test.xml");
+
+//2. 从 Spring 上下文中取出某个 bean 对象
+Dog dog = (Dog)context.getBean("dog"); // dog是我们给 Dog 类的实例取得的标志（名字）
+```
+
+使用 bean对象的 id 来获取，Spring 上下文对象—— context 的返回值是 Object, 所以需要进行强制类型转换。 
+
+**注意事项：**
+
+![image-20231008155457615](spring笔记.assets/image-20231008155457615.png)
+
+**否则会抛出：NoSuchBeanDefinitionException 异常**
+
+![image-20231008155510454](spring笔记.assets/image-20231008155510454.png)
+
+**方法2. 根据类型来获取 Bean** 
+
+```java
+Dog dog = context.getBean(Dog.class);
+```
+
+因为我们直接使用 bean 对象的类型来获取，所以我们无需手动强制类型转换，在获取的时候会自动强转。
+
+**方法3. 根据** **bean 对象的 id （标志）+ 类型 获取 bean**   <font color=red>(推荐)</font>
+
+```java
+ Dog dog = context.getBean("dog", Dog.class);
+```
+
+------
+
+**4.3 使用 Bean 对象**
+
+==其实 Bean 对像就是普通的实例化的对象，Bean 对象只是一个名字。==所以Bean 对象的使用跟我们传统对象的使用并无差异：
+
+```java
+public class App {
+    public static void main(String[] args) {
+        //1. 获取 Spring 上下文对象，创建的时候需要配置 Spring 的配置文件
+        ApplicationContext context =
+                new ClassPathXmlApplicationContext("spring-test.xml");
+ 
+        //2. 使用类型从 Spring 容器中获取 bean 对象
+        Dog dog = context.getBean("dog",Dog.class);
+ 
+        //3. bean 对象的使用
+        dog.setName("哈巴狗");
+        dog.setAge(3);
+        dog.setSex("公");
+        dog.setColor("白色");
+        dog.cry();
+        System.out.println(dog.toString());  
+    }
+}
+```
+
+```
+animal.Dog{我叫做:'哈巴狗'，我今年:3岁，我的性别是:公，我是'白色'的}
+```
+
+## 6.3.注解方式(推荐)
 
 注解（Annotation），也叫元数据。它是一种代码级别的说明，是jdk1.5之后引入的一个特性。
 
@@ -188,176 +626,255 @@ public int saveBusiness(String businessName) {}
 
 注解基本语法：@注解名称(属性=属性值)
 
-### 2.3.1.修改dao实现类
+<img src="spring笔记.assets/image-20231008215728474.png" alt="image-20231008215728474" style="zoom: 80%;" />
+
+### 6.3.1 修改dao实现类
 
 ```java
-package com.neusoft.dao.impl;
-import org.springframework.stereotype.Component;
-import com.neusoft.dao.UserDao;
-import com.neusoft.po.User;
+package com.lfj.dao;
 
-@Repository
-public class UserDaoImpl implements UserDao{
-    @Override
-    public User getUser() {
-        return new User(1,"test","111");
-    }
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-08 17:14
+ */
+
+public interface PersonDao {
+	void getPerson();
 }
 ```
 
-@Component：创建此类的对象，并放入到Spring容器中。 @Component("xxxx")：创建此类的对象，取一个对象名，并放入到Spring容器中。
+```java
+package com.lfj.dao.impl;
 
-### 2.3.2.修改Service实现类
+import com.lfj.dao.PersonDao;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Repository;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-08 22:00
+ */
+
+@Repository()
+@Scope(value = "prototype")
+public class PersonDaoImpl implements PersonDao {
+	public void getPerson() {
+		System.out.println("PersonDao:getPerson");
+	}
+}
+```
+
+### 6.3.2 修改Service实现类
 
 ```java
-package com.neusoft.service.impl;
+package com.lfj.service;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-08 17:08
+ */
+
+public interface PersonService {
+	void getPerson();
+}
+
+```
+
+```java
+package com.lfj.service.impl;
+
+import com.lfj.dao.PersonDao;
+import com.lfj.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import com.neusoft.dao.UserDao;
-import com.neusoft.po.User;
-import com.neusoft.service.UserService;
+import org.springframework.stereotype.Service;
 
-@Service("userService")
-public class UserServiceImpl implements UserService{
-    @Autowired
-    private UserDao userDao;
-    @Override
-    public User getUser() {
-        return userDao.getUser();
-    }
-    //注意：UserDao属性自动注入，所以就可以不用get/set方法了
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-08 22:10
+ */
+
+@Service("PersonServiceImpl")
+//或者 @Component("PersonServiceImpl")
+public class PersonServiceImpl implements PersonService {
+
+	@Autowired
+	private PersonDao personDao;
+
+	public void getPerson() {
+		System.out.println("PersonServiceImpl......");
+		personDao.getPerson();
+	}
 }
 ```
 
-@Autowired：默认按照类型在Spring容器寻找对象，并注入到属性中。 所以此时要注意：UserDao接口的实现类只能有一个。
+```java
+package com.lfj.service.impl;
 
-### 2.3.3.修改Spring配置文件
+import com.lfj.dao.PersonDao;
+import com.lfj.service.PersonService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-08 21:14
+ */
+
+//Service报错
+@Service("PersonServiceExt")
+//或者 @Component("PersonServiceExt")
+public class PersonServiceExt implements PersonService {
+
+	@Autowired
+	private PersonDao personDao;
+
+	public void getPerson() {
+		System.out.println("PersonServiceExt......");
+		personDao.getPerson();
+	}
+}
+```
+
+### 6.3.3 controller类
+
+```java
+package com.lfj.controller;
+
+import com.lfj.dao.PersonDao;
+import com.lfj.service.PersonService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+import javax.annotation.Resource;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-08 17:07
+ */
+public class PersonController {
+
+	@Qualifier("personService")  //指定使用哪个类，来为以下的属性进行注入(父类 xxx = new 子类)
+	@Autowired
+	private PersonService personService;
+
+	//@AutoWired只适合spring框架，而@Resource扩展性更好
+	@Qualifier("PersonServiceExt")
+	@Resource
+	private PersonService personServiceExt2;
+
+	public PersonController() {
+		System.out.println("创建对象");
+	}
+
+	public void getPerson() {
+		personService.getPerson();
+	}
+
+	public void getPerson2() {
+		personServiceExt2.getPerson();
+	}
+
+	/**
+	 * 当方法上有@AutoWired注解时：
+	 * 1、此方法在bean创建的时候会自动调用
+	 * 2、这个方法的每一个参数都会自动注入值
+	 *
+	 * @param personDao
+	 */
+	@Autowired
+	public void test(PersonDao personDao) {
+		System.out.println("此方法被调用:" + personDao);
+	}
+
+	/**
+	 * @param personService
+	 * @Qualifier注解也可以作用在属性上，用来被当作id去匹配容器中的对象，如果没有此注解，那么直接按照类型进行匹配
+	 */
+	@Autowired
+	public void test2(@Qualifier("personServiceExt") PersonService personService) {
+		System.out.println("此方法被调用：" + personService);
+	}
+}
+
+```
+
+### 6.3.4 修改Spring配置文件
+
+resources下创建配置文件,  命名无限制，约定俗成命名有：spring-context.xml、applicationContext.xml、beans.xml
+
+applicationContext.xml
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<beans
-  xmlns="http://www.springframework.org/schema/beans"
-  xmlns:context="http://www.springframework.org/schema/context"
-  xmlns:aop="http://www.springframework.org/schema/aop"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans 
-  http://www.springframework.org/schema/beans/spring-beans.xsd
-  http://www.springframework.org/schema/context 
-  http://www.springframework.org/schema/context/spring-context.xsd
-  http://www.springframework.org/schema/aop 
-  http://www.springframework.org/schema/aop/spring-aop-4.1.xsd">
-  <!--开启注解扫描，设置需要扫描的包  -->
-  <context:component-scan base-package="com.neusoft"/>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--添加-->
+    <context:component-scan base-package="com.lfj"></context:component-scan>
+    <!--指定只扫描哪些组件，默认情况下是全部扫描的-->
+    <!--<context:include-filter type="assignable" expression="com.lfj.service.PersonService"/>-->
 </beans>
 ```
 
 context:component-scan标签中的base-package属性，设置需要扫描的包。 会到指定包（包括指定包下的所有子包）中扫描类、方法、属性上面是否有注解。（如有多个，可使用逗号分隔）
 
-### 2.3.4.测试
+### 6.3.5 测试类
 
 ```java
-package com.neusoft;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import com.neusoft.po.User;
-import com.neusoft.service.UserService;
-public class MySpringTest {
-    public static void main(String[] args) {
-        //读取Spring配置文件,获取Spring容器
-        ApplicationContext context = new  ClassPathXmlApplicationContext("spring.xml");
-        //通过Spring容器的getBean方法获得对象
-        UserService service = (UserService)context.getBean("userService");
-        User user = service.getUser();
-        System.out.println(user);
-    }
+package com.lfj;
+
+import com.lfj.service.PersonService;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-08 21:29
+ */
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:applicationContext.xml")
+public class testSpring {
+
+	@Qualifier("PersonServiceExt")
+	@Autowired
+	PersonService personService1;
+
+	@Qualifier("PersonServiceImpl")
+	@Autowired
+	PersonService personService2;
+
+	@Test
+	public void test1() {
+		personService1.getPerson();
+	}
+
+	@Test
+	public void test2() {
+		personService2.getPerson();
+	}
 }
 ```
 
-除了@Component这个泛指组件的注解外，Spring还提供了与@Component功能相同的三个语义化注解。
+```
+PersonServiceExt......
+PersonDao:getPerson
 
-1. @Service 业务层组件
-2. @Controller 控制层组件
-3. @Repository 数据层组件
-
-修改上面代码，使用@Repository 和 @Service 替换 dao 与 service 组件上的注解。
-
-
-
-
-
-@Scope() 注解：
-
-设置注解的作用域
-
-| 参数      | 说明                                                         |
-| --------- | ------------------------------------------------------------ |
-| singleton | 单实例的(`单例`)(默认)   ----全局有且仅有一个实例            |
-| prototype | 多实例的(`多例`)                ---- 每次获取Bean的时候会有一个新的实例 |
-| reqeust   | 同一次请求 ----request：每一次HTTP请求都会产生一个新的bean，同时该bean仅在当前`HTTP request`内有效 |
-| session   | 同一个会话级别 ---- session：每一次HTTP请求都会产生一个新的bean，同时该bean仅在当前`HTTP session`内有效 |
-
-**例子1**
-
-在UserServiceImpl中添加@Scope注解：
-
-```java
-@Service("userService")
-@Scope("prototype")
-public class UserServiceImpl implements UserService{ }
+PersonServiceImpl......
+PersonDao:getPerson
 ```
 
-在测试类中测试多例：
+具体代码见:   [注解方式代码.zip](code\注解方式代码.zip) 
 
-```java
-ApplicationContext context = new  ClassPathXmlApplicationContext("spring.xml");
-UserService service1 = (UserService)context.getBean("userService");
-UserService service2 = (UserService)context.getBean("userService");
-System.out.println(service1==service2);      //false
-```
-
-**例子2**
-
-```cpp
-public class Person {
-    private String name;
-    private Integer age;
-
-    public Person() {
-    }
-
-    public Person(String name, Integer age) {
-        this.name = name;
-        this.age = age;
-    }
-}
-```
-
-```java
-@Configuration
-public class ProtoTypeConfig {
-
-    @Scope("singleton")
-    @Bean
-    public Person person() {
-        return new Person("李四", 55);
-    }
-```
-
-测试代码
-
-```java
-@Test
-public void test4() {
-    ApplicationContext ctx = new AnnotationConfigApplicationContext(ProtoTypeConfig.class);
-    Person person1 = ctx.getBean(Person.class);
-    Person person2 = ctx.getBean(Person.class);
-    System.out.println("person1 HashCode  " + person1.hashCode());
-    System.out.println("person2 HashCode  " + person2.hashCode());
-    System.out.println(person1 == person2);  // true
-}
-```
-
-## 2.4.javaConfig方式
+## 6.4.javaConfig方式
 
 ==@Configuration+@Bean  bean注册(人为) —> 用于配置类==
 
@@ -367,7 +884,7 @@ javaConfig，是在 Spring 3.0 开始从一个独立的项目并入到 Spring �
 
 标注了@Configuration和标注了@Component的类一样是一个Bean，可以被Spring的 context:component-scan 标签扫描到。类中的每个标注了@Bean的方法都相当于提供了一个Bean的定义信息。
 
-### 2.4.1 配置类
+### 6.4.1 配置类
 
 ```java
 @Configuration    // 就相当于创建了一个xml 文件 <beans></beans> //表示里面的Bean彼此有依赖关系
@@ -460,7 +977,7 @@ public class AppConfig {
 }
 ```
 
-### 2.4.2 测试
+### 6.4.2 测试
 
 ```java
 @Test
@@ -471,9 +988,182 @@ public void test01(){
 }
 ```
 
+# 十、Bean细节
+
+## 10.1 控制简单对象的单例、多例模式（new）
+
+配置< bean scope="singleton | prototype" />
+
+```xml
+<!--
+	singleton（默认）：每次调用工厂，得到的都是同一个对象。
+	prototype：每次调用工厂，都会创建新的对象。
+-->
+<bean id="mc" class="com.qf.zcg.spring.day1.t1.basic.MyClass" scope="singleton" /> 
+```
+
+- 注意：需要根据场景决定对象的单例、多例模式。
+- 可以共用：Service、DAO、SqlSessionFactory（或者是所有的工厂）。
+- 不可共用：Connection、SqlSession、ShoppingCart。
+
+优缺点：
+
+单例模式：对象的创建，只需要创建一次，节约我们内存空间，速度飞快，线程不安全。（volidate） （即时加载）
+
+多例模式：线程安全，每次使用对象的时候才创建，速度慢，内存消耗大（延迟加载）
+
+## 10.2 FactoryBean创建复杂对象【重点】
+
+作用：让Spring可以创建复杂对象、或者无法直接通过反射创建的对象。
+
+| FactoryBean解决复杂对象创建                                  |
+| ------------------------------------------------------------ |
+| ![image-20231009094906696](spring笔记.assets/image-20231009094906696.png) |
+
+### 10.2.1 实现FactoryBean接口
+
+| 接口方法描述                                                 |
+| ------------------------------------------------------------ |
+| ![image-20231009094931539](spring笔记.assets/image-20231009094931539.png) |
+
+- 注意：isSingleton方法的返回值，需根据所创建对象的特点决定返回true/false。
+- 例如：Connection 不应该被多个用户共享，返回false。
+- 例如：SqlSessionFactory 重量级资源，不该过多创建，返回true。
+
+### 10.2.2 配置spring-context.xml
+
+| 配置与获取方式                                               |
+| ------------------------------------------------------------ |
+| ![image-20231009095048262](spring笔记.assets/image-20231009095048262.png) |
+
+### 10.2.3 特例
+
+| 获取FactoryBean接口的实现类对象，而非getObject()所生产的对象。 |
+| :----------------------------------------------------------- |
+| ![image-20231009095103768](spring笔记.assets/image-20231009095103768.png) |
+
+# 十一
+
+# 十二、Spring工厂特性
+
+------
+
+## 12.1 饿汉式创建优势
+
+工厂创建之后，会将Spring配置文件中的所有对象都创建完成（饿汉式）。
+
+提高程序运行效率。避免多次IO，减少对象创建时间。（概念接近连接池，一次性创建好，使用时直接获取）
+
+## 12.2 生命周期方法
+
+-  自定义初始化方法：添加“init-method”属性，Spring则会在创建对象之后，调用此方法。 
+-  自定义销毁方法：添加“destroy-method”属性，Spring则会在销毁对象之前，调用此方法。 
+-  销毁：工厂的close()方法被调用之后，Spring会毁掉所有已创建的单例对象。 
+-  分类：Singleton对象由Spring容器销毁、Prototype对象由JVM销毁。 
+
+## 12.3 生命周期注解
+
+初始化注解、销毁注解
+
+```java
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+@PostConstruct //初始化 
+public void init(){
+    System.out.println("init method executed");
+}
+
+@PreDestroy //销毁
+public void destroy(){
+    System.out.println("destroy method executed");
+}
+```
+
+## 12.4 生命周期阶段（面试重点）
+
+**单例bean：**singleton
+
+随工厂启动创建 ==》  构造方法  ==》 set方法(注入值)  ==》 init(初始化)  ==》 构建完成 ==》随工厂关闭销毁
+
+**多例bean：**prototype
+
+被使用时创建 ==》  构造方法  ==》 set方法(注入值)  ==》 init(初始化)  ==》 构建完成 ==》JVM垃圾回收销毁
+
+作业:升级我们 单车app 和 东郊app 把mybatis拉入spring管理 只能用 factorybean
 
 
-# 3. AOP（面向切面）
+
+# 十三、代理设计模式
+
+------
+
+## 13.1 概念
+
+将核心功能与辅助功能（事务、日志、性能监控代码）分离，达到核心业务功能更纯粹、辅助业务功能可复用。
+
+| 功能分离                                                     |
+| ------------------------------------------------------------ |
+| ![image-20231009101512887](spring笔记.assets/image-20231009101512887.png) |
+
+## 13.2 静态代理设计模式
+
+通过代理类的对象，为原始类的对象（目标类的对象）添加辅助功能，更容易更换代理实现类、利于维护。
+
+| 静态代理                                                     |
+| ------------------------------------------------------------ |
+| ![image-20231009101532017](spring笔记.assets/image-20231009101532017.png) |
+
+- 代理类 = 实现原始类相同接口 + 添加辅助功能 + 调用原始类的业务方法。
+- 静态代理的问题 
+
+- - 代理类数量过多，不利于项目的管理。
+  - 多个代理类的辅助功能代码冗余，修改时，维护性差。
+
+## 13.3 动态代理设计模式 (jdk cglab)
+
+动态创建代理类的对象，为原始类的对象添加辅助功能。
+
+### 13.3.1 JDK动态代理实现（基于接口）
+
+```java
+ final Car car = new CarFactory();// 目标
+        //匿名内部类
+        //额外功能
+        InvocationHandler  invocationHandler = new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                System.out.println("送车模");
+                Object invoke = method.invoke(car, args);//用反射执行类里面方法，方法的参数
+                System.out.println("送保养");
+                return invoke;
+            }
+        };
+
+        Car obj = (Car)Proxy.newProxyInstance(DynamicProxy.class.getClassLoader(), new Class[]{Car.class}, invocationHandler);
+        System.out.println(obj.car());
+```
+
+### 13.3.2 CGlib动态代理实现（基于继承）
+
+```java
+final OrderService os = new OrderServiceImpl();
+Enhancer cnh = new Enhancer();//1.创建字节码曾强对象
+enh.setSuperclass(os.getClass());//2.设置父类（等价于实现原始类接口）
+enh.setCallback(new InvocationHandler(){//3.设置回调函数（额外功能代码）
+    @Override
+    public Object invoke(Object proxy , Method method, Object[] args) throws Throwable{
+        System.out.println("start...");
+        Object ret = method.invoke(os,args);
+        System.out.println("end...");
+        return ret;
+    }
+});
+OrderService proxy = (OrderService)enh.create();//4.创建动态代理类
+proxy,createOrder();
+```
+
+# 十四、AOP（面向切面）
 
 ## 3.1 概要
 
@@ -715,7 +1405,616 @@ public static void main(String[] args) {
 
 
 
-# 4.  创建 Spring 项目
+# 十五、Spring + MyBatis
+
+------
+
+## 15.1 配置数据源
+
+将数据源配置到项目中
+
+### 15.1.1 引入jdbc.properties配置文件
+
+```properties
+#jdbc.properties
+jdbc.driverClass=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://localhost:3306/mydb?useUnicode=true&characterEncoding=UTF-8
+jdbc.username=root
+jdbc.password=123456
+```
+
+### 15.1.2 整合Spring配置文件和properties配置文件
+
+```xml
+<!--spring-context.xml-->
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       ">
+
+    <!--配置文件参数化（参数占位符）-->
+	<context:property-placeholder location="classpath:jdbc.properties" />
+    
+    <!--与PooledDataSource集成（二选一）-->
+    <bean id="dataSource" class="org.apache.ibatis.datasource.pooled.PooledDataSource">
+        <property name="driver" value="${driverClass}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+    </bean>
+
+    <!--与DruidDataSource集成（二选一）-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <!--基本配置-->
+        <property name="driverClassName" value="${jdbc.driverClass}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+</bean>
+```
+
+### 15.1.3 Druid连接池可选参数
+
+```xml
+<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+    <!--基本配置-->
+    <property name="driverClassName" value="${jdbc.driverClass}"/>
+    <property name="url" value="${jdbc.url}"/>
+    <property name="username" value="${jdbc.username}"/>
+    <property name="password" value="${jdbc.password}"/>
+
+    <!-- 配置初始化大小、最小、最大 -->
+    <property name="initialSize" value="${jdbc.init}"/>
+    <property name="minIdle" value="${jdbc.minIdle}"/>
+    <property name="maxActive" value="${jdbc.maxActive}"/>
+
+    <!-- 配置获取连接等待超时的时间 -->
+    <property name="maxWait" value="60000"/>
+
+    <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+    <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+
+    <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+    <property name="minEvictableIdleTimeMillis" value="300000"/>
+</bean>
+```
+
+### 15.1.4 Druid监控中心
+
+```xml
+<!--web.xml-->
+<servlet>
+    <servlet-name>DruidStatView</servlet-name>
+    <servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>DruidStatView</servlet-name>
+    <url-pattern>/druid/*</url-pattern>
+</servlet-mapping>
+```
+
+### 15.1.5 测试监控中心
+
+配置tomcat，并访问protocol://ip:port/project/druid/index.html
+
+http://localhost:83/spring/druid/api.html
+
+## 15.2 整合MyBatis
+
+将 SqlSessionFactory、DAO、Service 配置到项目中
+
+### 15.2.1 导入依赖
+
+```xml
+  <dependencies>
+    <!-- Spring常用依赖 -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>5.1.6.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-aspects</artifactId>
+      <version>5.1.6.RELEASE</version>
+    </dependency>
+
+    <!-- spring-jdbc -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>5.1.6.RELEASE</version>
+    </dependency>
+
+    <!-- spring+mybatis集成依赖 -->
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis-spring</artifactId>
+      <version>1.3.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!--MyBatis核心依赖-->
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
+      <version>3.4.6</version>
+    </dependency>
+
+    <!--MySql驱动依赖-->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.47</version>
+    </dependency>
+
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.24</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.2.75</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>druid</artifactId>
+      <version>1.1.16</version>
+    </dependency>
+  </dependencies>
+```
+
+### 15.2.2 配置SqlSessionFactory
+
+```xml
+<!-- 工厂bean：生成SqlSessionFactory -->
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <!-- 注入连接池 -->
+    <property name="dataSource" ref="dataSource"></property>
+    <!-- 注入dao-mapper文件信息 ,如果映射文件和dao接口 同包且同名，则此配置可省略-->
+    <property name="mapperLocations">
+        <list>
+            <value>classpath:com/qf/spring/dao/*.xml</value>
+        </list>
+    </property>
+    <!-- 为 dao-mapper文件中的实体 定义缺省包路径 
+		如：<select id="queryAll" resultType="User"> 中 User类可以不定义包
+    -->
+    <property name="typeAliasesPackage" value="com.qf.entity"></property>
+</bean>
+```
+
+### 15.2.3 配置MapperScannerConfigurer
+
+管理DAO实现类的创建，并创建DAO对象，存入工厂管理
+
+-  扫描所有DAO接口,去构建DAO实现 
+-  将DAO实现存入工厂管理 
+-  DAO实现对象在工厂中的id是：“首字母小写的-接口的类名”，
+   例如：UserDAO==>userDAO , OrderDAO==>orderDAO 
+
+```xml
+<!-- mapperScannerConfigurer -->
+<bean id="mapperScannerConfigurer9" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+   	<!-- dao接口所在的包  如果有多个包，可以用逗号或分号分隔 
+  		<property name="basePackage" value="com.a.dao,com.b.dao"></property>
+   	-->
+    <property name="basePackage" value="com.qf.spring.dao"></property>
+    <!-- 如果工厂中只有一个SqlSessionFactory的bean，此配置可省略 -->
+    <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+</bean>
+```
+
+### 15.2.4 配置Service
+
+```xml
+<bean id="userService" class="com.qf.spring.service.UserServiceImpl">
+    <!-- 注意ref中的值是对应DAO接口的首字母小写的接口名 -->
+	<property name="userDAO" ref="userDAO"></property>
+</bean>
+```
+
+# 十六、事务
+
+>  一切相关关系操作，串联成一个，要么都成功 要都失败
+
+## 16.1 配置
+
+DataSourceTransactionManager
+
+事务管理器，其中持有DataSource，可以控制事务功能（commit,rollback等）。
+
+```xml
+<!-- 1. 引入一个事务管理器，其中依赖DataSource,借以获得连接，进而控制事务逻辑 -->
+<bean id="tx" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"></property>
+</bean>
+```
+
+注意：DataSourceTransactionManager 和 SqlSessionFactoryBean 要注入同一个DataSource的Bean，否则事务控制失败!!!
+
+## 16.2 配置事务通知
+
+基于事务管理器，进一步定制，生成一个额外功能：Advice。
+
+此Advice可以切入任何需要事务的方法，通过事务管理器为方法控制事务。
+
+```xml
+<tx:advice id="txManager" transaction-manager="tx">
+	<tx:attributes>
+        <!--<tx:method name="insertUser" rollback-for="Exception" isolation="DEFAULT"    
+              	propagation="REQUIRED" read-only="false"/>-->
+        <!-- 以User结尾的方法，切入此方法时，采用对应事务实行-->
+        <tx:method name="*User" rollback-for="Exception"/>
+        <!-- 以query开头的方法，切入此方法时，采用对应事务实行 -->
+        <tx:method name="query*" propagation="SUPPORTS"/>
+        <!-- 剩余所有方法 -->
+        <tx:method name="*"/>
+    </tx:attributes>
+</tx:advice>
+```
+
+## 16.3 事务属性
+
+### 16.3.1 隔离级别
+
+## 16.3.1.1 概念
+
+`isolation`  隔离级别
+
+| 名称            | 描述                                                         |
+| --------------- | ------------------------------------------------------------ |
+| default         | (默认值）（采用数据库的默认的设置) （建议）  交给jdbc        |
+| read-uncommited | 读未提交  （会发生脏读 ） （查询）                           |
+| read-commited   | 读提交 （Oracle数据库默认的隔离级别）（不可重复读）（update） |
+| repeatable-read | 可重复读	（MySQL数据库默认的隔离级别）（删除或者增加） 幻读 （delete 和 insert） |
+| serialized-read | 序列化读                                                     |
+
+隔离级别由低到高为：read-uncommited < read-commited < repeatable-read < serialized-read
+
+## 16.3.1.2 特性
+
+-  安全性：级别越高，多事务并发时，越安全。因为共享的数据越来越少，事务间彼此干扰减少。 
+-  并发性：级别越高，多事务并发时，并发越差。因为共享的数据越来越少，事务间阻塞情况增多。 
+
+## 16.3.1.3 并发问题
+
+事务并发时的安全问题
+
+| 问题       | 描述                                                         |
+| ---------- | ------------------------------------------------------------ |
+| 脏读       | 一个事务读取到另一个事务还未提交的数据。大于等于 read-commited 可防止 |
+| 不可重复读 | 一个事务内多次读取一行数据的相同内容，其结果不一致。大于等于 repeatable-read 可防止 |
+| 幻读       | 一个事务内多次读取一张表中的相同内容，其结果不一致。serialized-read 可防止 |
+
+### 16.3.2 传播行为
+
+`propagation`传播行为
+
+当涉及到事务嵌套（Service调用Service）时，可以设置：
+
+-  SUPPORTS = 不存在外部事务，则不开启新事务；存在外部事务，则合并到外部事务中。（适合查询） 
+-  REQUIRED = 不存在外部事务，则开启新事务；存在外部事务，则合并到外部事务中。 (默认值)（适合增删改） 
+
+### 16.3.3 读写性
+
+`readonly` 读写性
+
+-  true：只读，可提高查询效率。(适合查询) 
+-  false：可读可写。 (默认值)（适合增删改） 
+
+### 16.3.4 事务超时
+
+`timeout`事务超时时间
+
+当前事务所需操作的数据被其他事务占用，则等待。
+
+- 100：自定义等待时间100（秒）。
+- -1：由数据库指定等待时间，默认值。（建议）
+
+### 16.3.5 事务回滚
+
+`rollback-for`  回滚属性
+
+-  如果事务中抛出 RuntimeException,则自动回滚 
+-  如果事务中抛出 CheckException(非运行时异常 Exception)，不会自动回滚，而是默认提交事务 
+-  处理方案 : 将CheckException转换成RuntimException上抛，或 设置 rollback-for="Exception" 
+
+## 16.4 编织
+
+将事务管理的Advice 切入需要事务的业务方法中
+
+```xml
+<aop:config>
+	<aop:pointcut expression="execution(* com.qf.spring.service.UserServiceImpl.*(..))" id="pc"/>
+    <!-- 组织切面 -->
+    <aop:advisor advice-ref="txManager" pointcut-ref="pc"/>
+</aop:config>
+```
+
+# 十七、注解开发
+
+------
+
+## 17.1 声明bean
+
+用于替换自建类型组件的 <bean...>标签；可以更快速的声明bean
+
+-  [@Service ]()  业务类专用 
+   [@Repository ]()  dao实现类专用 
+   [@Controller ]()  web层专用  
+-  [@Component ]()  通用  
+-  [@Scope ]()  用户控制bean的创建模式  
+
+```java
+// @Service说明 此类是一个业务类，需要将此类纳入工厂  等价替换掉 <bean class="xxx.UserServiceImpl">
+// @Service默认beanId == 首字母小写的类名"userServiceImpl"
+// @Service("userService") 自定义beanId为"userService"
+@Service //声明bean，且id="userServiceImpl"
+@Scope("singleton") //声明创建模式，默认为单例模式 ；@Scope("prototype")即可设置为多例模式
+public class UserServiceImpl implements UserService {
+ 	...   
+}
+```
+
+## 17.2 注入(DI)
+
+用于完成bean中属性值的注入
+
+- [@Autowired ]()  基于类型自动注入 
+- [@Resource ]()   基于名称自动注入 
+- @Qualifier("userDAO") 限定要自动注入的bean的id，一般和@Autowired联用
+- [@Value ]() 注入简单类型数据 (jdk8种+String) 
+
+```java
+@Service
+public class UserServiceImpl implements UserService {
+    
+    @Autowired //注入类型为UserDAO的bean
+    @Qualifier("userDAO2") //如果有多个类型为UserDAO的bean，可以用此注解从中挑选一个
+    private UserDAO userDAO;
+}
+```
+
+
+
+```java
+@Service
+public class UserServiceImpl implements UserService {
+    
+	@Resource("userDAO3") //注入id=“userDAO3”的bean
+    private UserDAO userDAO;
+    /*
+    @Resource //注入id=“userDAO”的bean
+    private UserDAO userDAO;
+    */
+}
+```
+
+
+
+```java
+public class XX{
+    @Value("100") //注入数字
+    private Integer id;
+    @Value("shine") //注入String
+	private String name;
+}
+```
+
+## 17.3 事务控制
+
+用于控制事务切入
+
+-  [@Transactional ]()  
+-  工厂配置中的 <tx:advice.... 和 <aop:config... 可以省略 !! 
+
+```java
+//类中的每个方法都切入事务(有自己的事务控制的方法除外)
+@Transactional(isolation=Isolation.READ_COMMITTED,propagation=Propagation.REQUIRED,readOnly=false,rollbackFor=Exception.class,timeout = -1)
+public class UserServiceImpl implements UserService {
+	...
+    //该方法自己的事务控制，仅对此方法有效
+	@Transactional(propagation=Propagation.SUPPORTS)
+	public List<User> queryAll() {
+		return userDao.queryAll();
+	}
+	public void save(User user){
+		userDao.save(user);
+	}
+}
+```
+
+## 17.4 注解所需配置
+
+```xml
+<!-- 告知spring，哪些包中 有被注解的类、方法、属性 -->
+<!-- <context:component-scan base-package="com.qf.a,com.xx.b"></context:component-scan> -->
+<context:component-scan base-package="com.qf"></context:component-scan>
+	
+<!-- 告知spring，@Transactional在定制事务时，基于txManager=DataSourceTransactionManager -->
+<tx:annotation-driven transaction-manager="txManager"/>
+```
+
+## 17.5 AOP开发
+
+### 17.5.1 注解使用
+
+```java
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.stereotype.Component;
+
+@Aspect // 声明此类是一个切面类：会包含切入点(pointcut)和通知(advice)
+@Component //声明组件，进入工厂
+public class MyAspect {
+    // 定义切入点
+    @Pointcut("execution(* com.qf.spring.service.UserServiceImpl.*(..))")
+    public void pc(){}
+    
+    @Before("pc()") // 前置通知
+    public void mybefore(JoinPoint a) {
+        System.out.println("target:"+a.getTarget());
+        System.out.println("args:"+a.getArgs());
+        System.out.println("method's name:"+a.getSignature().getName());
+        System.out.println("before~~~~");
+    }
+
+    @AfterReturning(value="pc()",returning="ret") // 后置通知
+    public void myAfterReturning(JoinPoint a,Object ret){
+        System.out.println("after~~~~:"+ret);
+    }
+    
+    @Around("pc()") // 环绕通知
+    public Object myInterceptor(ProceedingJoinPoint p) throws Throwable {
+        System.out.println("interceptor1~~~~");
+        Object ret = p.proceed();
+        System.out.println("interceptor2~~~~");
+        return ret;
+    }
+    
+    @AfterThrowing(value="pc()",throwing="ex") // 异常通知
+    public void myThrows(JoinPoint jp,Exception ex){
+        System.out.println("throws");
+        System.out.println("===="+ex.getMessage());
+    }
+}
+```
+
+### 17.5.2 配置
+
+```xml
+<!-- 添加如下配置,启用aop注解 -->
+<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+```
+
+# 十八、集成JUnit
+
+------
+
+## 18.1 导入依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-test</artifactId>
+    <version>4.3.6.RELEASE</version>
+</dependency>
+<dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.12</version>
+</dependency>
+```
+
+## 18.2 编码
+
+可以免去工厂的创建过程；
+
+ 可以直接将要测试的组件注入到测试类。
+
+```java
+@RunWith(SpringJUnit4ClassRunner.class) //由SpringJUnit4ClassRunner启动测试
+@ContextConfiguration("classpath:applicationContext.xml") //spring的配置文件位置
+public class SpringTest{//当前测试类也会被纳入工厂中，所以其中属性可以注入
+
+    @Autowired // 注入要测试的组件
+    @Qualifier("userDAO")
+    private UserDAO userDAO;
+
+    @Test
+    public void test(){
+        // 测试使用userDAO
+        userDAO.queryUser();
+        ....
+    }
+}
+```
+
+十九、log4j配置
+
+1、导入我们依赖包
+
+```xml
+<!-- https://mvnrepository.com/artifact/log4j/log4j -->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
+    </dependency>
+```
+
+2、编写log4j.properties配置文件
+
+```properties
+#设置日志输入级别（debug< info< WARN< error ）#
+log4j.rootLogger = debug,stdout,D,E,I
+#输出信息到控制抬 #
+log4j.appender.stdout = org.apache.log4j.ConsoleAppender #这是告诉我日志往哪里输出
+log4j.appender.stdout.Target = System.out
+log4j.appender.stdout.layout = org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern = [%-5p] %d{yyyy-MM-dd HH:mm:ss,SSS} method:%l%n%m%n
+
+
+#输出DEBUG 级别以上的日志到=E://logs/error.log #
+log4j.appender.D = org.apache.log4j.DailyRollingFileAppender
+log4j.appender.D.File = E://logs/debug.log
+log4j.appender.D.Append = true
+log4j.appender.D.Encoding=UTF8
+log4j.appender.D.Threshold = DEBUG
+log4j.appender.D.layout = org.apache.log4j.PatternLayout
+log4j.appender.D.layout.ConversionPattern = %-d{yyyy-MM-dd HH:mm:ss}  - [ %p ]  %l %c %t - %m %n 
+
+
+#输出ERROR 级别以上的日志到=E://logs/error.log #
+log4j.appender.E = org.apache.log4j.DailyRollingFileAppender
+log4j.appender.E.File =E://logs/error.log
+log4j.appender.E.Append = true
+log4j.appender.E.Encoding=UTF8
+log4j.appender.E.Threshold = ERROR
+log4j.appender.E.layout = org.apache.log4j.PatternLayout
+log4j.appender.E.layout.ConversionPattern = %-d{yyyy-MM-dd HH:mm:ss}  - [ %p ]  %l %c %t - %m %n
+
+
+
+#输出ERROR 级别以上的日志到=E://logs/error.log #
+log4j.appender.E = org.apache.log4j.DailyRollingFileAppender
+log4j.appender.E.File =E://logs/info.log
+log4j.appender.E.Append = true
+log4j.appender.E.Encoding=UTF8
+log4j.appender.E.Threshold = INFO
+log4j.appender.E.layout = org.apache.log4j.PatternLayout
+log4j.appender.E.layout.ConversionPattern = %-d{yyyy-MM-dd HH:mm:ss}  - [ %p ]  %l %c %t - %m %n
+```
+
+# 十九、  创建 Spring 项目
 
 ##  一、Spring 的概念
 
@@ -1039,7 +2338,50 @@ public class App {
 
 
 
-# 单元测试
+# 二十、spring单元测试
 
-[Spring如何使用注解方案测试_springtest注解_tanxinji的博客-CSDN博客](https://blog.csdn.net/wasane/article/details/125404012)
+**依赖**
 
+```xml
+    <dependencies>
+        <!--Spring框架的核心容器-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.2.3.RELEASE</version>
+        </dependency>
+        <!--Spring提供了Bean的定义和管理的核心功能-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>5.2.3.RELEASE</version>
+        </dependency>
+
+        <!-- 单元测试 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>5.2.3.RELEASE</version>
+        </dependency>
+        <!-- 单元测试 -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+```
+
+**测试类**	
+
+```java
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:applicationContext.xml")
+public class testSpring {
+
+	//.....
+}
+```
+
+==其他和springboot单元测试一样==
