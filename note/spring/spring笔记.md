@@ -1405,17 +1405,9 @@ public static void main(String[] args) {
 
 ## 14.1 概念
 
-
-
 AOP（Aspect Oriented Programming），即面向切面编程，利用一种称为"横切"的技术，剖开封装的对象内部，并将那些影响了多个类的公共行为封装到一个可重用模块，并将其命名为"Aspect"，即切面。所谓"切面"，简单说就是那些与业务无关，却为业务模块所共同调用的逻辑或责任封装起来，便于减少系统的重复代码，降低模块之间的耦合度，并有利于未来的可操作性和可维护性。
 
-
-
 ## 14.2 AOP开发术语
-
-
-
- 
 
 -  连接点(Joinpoint)：连接点是程序类中客观存在的方法，可被Spring拦截并切入内容。 （需要解决问题的方法）
 -  切入点(Pointcut)：被Spring切入连接点。(我们需要切入规则定义) 
@@ -1426,25 +1418,13 @@ AOP（Aspect Oriented Programming），即面向切面编程，利用一种称�
 -  代理(Proxy)：被AOP织入通知后，产生的结果类。（动态生产的代理类） 
 -  切面(Aspect)：由切点和通知组成，将横切逻辑织入切面所指定的连接点中。 
 
- 
-
-
-
 ## 14.3 作用
-
-
 
 Spring的AOP编程即是通过动态代理类为原始类的方法添加辅助功能。
 
-
-
 ## 14.4 环境搭建
 
-
-
 引入AOP相关依赖
-
-
 
 ```xml
 <dependency>
@@ -1454,11 +1434,7 @@ Spring的AOP编程即是通过动态代理类为原始类的方法添加辅助�
 </dependency>
 ```
 
-
-
 spring-context.xml引入AOP命名空间
-
-
 
 ```plain
 xmlns:aop="http://www.springframework.org/schema/aop"
@@ -1466,8 +1442,6 @@ xmlns:aop="http://www.springframework.org/schema/aop"
 http://www.springframework.org/schema/aop
 http://www.springframework.org/schema/aop/spring-aop.xsd
 ```
-
-
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1484,15 +1458,9 @@ http://www.springframework.org/schema/aop/spring-aop.xsd
 </beans>
 ```
 
-
-
 ## 14.5 开发流程
 
-
-
 定义原始类
-
-
 
 ```java
 package com.qf.aaron.aop.basic;
@@ -1501,8 +1469,6 @@ public interface UserService {
     public void save();
 }
 ```
-
-
 
 ```java
 package com.qf.aaron.aop.basic;
@@ -1514,11 +1480,7 @@ public class UserServiceImpl implements UserService {
 }
 ```
 
-
-
 定义通知类（添加额外功能）
-
-
 
 ```java
 package com.qf.aaron.aop.basic;
@@ -1532,11 +1494,7 @@ public class MyAdvice implements MethodBeforeAdvice { //实现前置通知接口
 }
 ```
 
-
-
 定义bean标签
-
-
 
 ```xml
 <!--原始对象-->
@@ -1546,15 +1504,9 @@ public class MyAdvice implements MethodBeforeAdvice { //实现前置通知接口
 <bean id="myAdvice" class="com.qf.aaron.aop.basic.MyAdvice" />
 ```
 
-
-
 定义切入点（PointCut）
 
- 
-
 形成切面（Aspect）
-
-
 
 ```xml
 <aop:config>
@@ -1563,8 +1515,6 @@ public class MyAdvice implements MethodBeforeAdvice { //实现前置通知接口
 </aop:config>
 ```
 
-
-
 ```xml
 <aop:config>
     <!--组装切面 -->
@@ -1572,30 +1522,16 @@ public class MyAdvice implements MethodBeforeAdvice { //实现前置通知接口
 </aop:config>
 ```
 
-
-
 ## 14.6 AOP小结
-
-
-
- 
 
 -  通过AOP提供的编码流程，更便利的定制切面，更方便的定制了动态代理。 
 -  进而彻底解决了辅助功能冗余的问题； 
 -  业务类中职责单一性得到更好保障； 
 -  辅助功能也有很好的复用性。 
 
- 
-
-
-
 ## 14.7 通知类【可选】
 
-
-
 定义通知类，达到通知效果
-
-
 
 ```java
 前置通知：MethodBeforeAdvice
@@ -1628,10 +1564,6 @@ AfterReturningAdvice  没有出现异常的时候正常打印通知，如果出�
 ThrowsAdvice 只有发生异常的时候才生效，正常代码通知失效。
 
 如果我们实现 ThrowsAdvice 里面，必须写连名字都一样afterThrowing方法
-
-
-
-
 
 ```java
 public class AopProxyAfter implements AfterReturningAdvice {
@@ -1674,17 +1606,11 @@ public class AopThrowsAdvice implements ThrowsAdvice {
 
 ## 14.8 通配切入点
 
-
-
 根据表达式通配切入点  作业1
 
 execution(* save())
 
-
-
 public   void  add(参数)-- 修饰符  返回值 方法名 参数
-
-
 
 ```xml
 <!--匹配参数-->
@@ -1703,20 +1629,10 @@ public   void  add(参数)-- 修饰符  返回值 方法名 参数
 <aop:pointcut id="myPointCut" expression="execution(* com.qf.aaron.aop..*.*(..))" />
 ```
 
-
-
 ## 14.9 JDK和CGLIB选择
-
-
-
- 
 
 -  spring底层，包含了jdk代理和cglib代理两种动态代理生成机制 
 -  基本规则是：目标业务类如果有接口则用JDK代理，没有接口则用CGLib代理 
-
- 
-
-
 
 ```java
 class DefaultAopProxyFactory{
@@ -1726,29 +1642,17 @@ class DefaultAopProxyFactory{
 }
 ```
 
-
-
 ## 14.10 后处理器
-
-
-
- 
 
 -  spring中定义了很多后处理器； 
 -  每个bean在创建完成之前 ，都会有一个后处理过程，即再加工，对bean做出相关改变和调整； 
 -  spring-AOP中，就有一个专门的后处理器，负责通过原始业务组件(Service),再加工得到一个代理组件。 
 
- 
-
 | 常用后处理器                                                 |
 | ------------------------------------------------------------ |
-| ![img](03-Spring教程.assets/1645082568104-8fd23625-3e48-4445-b045-9750968ff203.png) |
-
-
+| ![image-20231009105832314](spring笔记.assets/image-20231009105832314.png) |
 
 ### 14.10.1 后处理器定义
-
-
 
 ```java
 /**
@@ -1782,8 +1686,6 @@ public class MyBeanPostProcessor implements BeanPostProcessor{
     }
 }
 ```
-
-
 
 ### 14.10.2 配置后处理器
 
