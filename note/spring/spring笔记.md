@@ -1403,7 +1403,411 @@ public static void main(String[] args) {
 1. dao层不能再实现接口。
 2. service层不能再实现接口。
 
+## 14.1 概念
 
+
+
+AOP（Aspect Oriented Programming），即面向切面编程，利用一种称为"横切"的技术，剖开封装的对象内部，并将那些影响了多个类的公共行为封装到一个可重用模块，并将其命名为"Aspect"，即切面。所谓"切面"，简单说就是那些与业务无关，却为业务模块所共同调用的逻辑或责任封装起来，便于减少系统的重复代码，降低模块之间的耦合度，并有利于未来的可操作性和可维护性。
+
+
+
+## 14.2 AOP开发术语
+
+
+
+ 
+
+-  连接点(Joinpoint)：连接点是程序类中客观存在的方法，可被Spring拦截并切入内容。 （需要解决问题的方法）
+-  切入点(Pointcut)：被Spring切入连接点。(我们需要切入规则定义) 
+-  通知、增强(Advice)：可以为切入点添加额外功能，分为：前置通知、后置通知、异常通知、环绕通知等。（新增或者删除、修改功能） 
+-  目标对象(Target)：代理的目标对象 （需要处理的类）
+-  引介(Introduction)：一种特殊的增强，可在运行期为类动态添加Field和Method。（自己封装的方法） 
+-  织入(Weaving)：把通知应用到具体的类，进而创建新的代理类的过程。（编写 我们的额外功能方法过程） 
+-  代理(Proxy)：被AOP织入通知后，产生的结果类。（动态生产的代理类） 
+-  切面(Aspect)：由切点和通知组成，将横切逻辑织入切面所指定的连接点中。 
+
+ 
+
+
+
+## 14.3 作用
+
+
+
+Spring的AOP编程即是通过动态代理类为原始类的方法添加辅助功能。
+
+
+
+## 14.4 环境搭建
+
+
+
+引入AOP相关依赖
+
+
+
+```xml
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-aspects</artifactId>
+    <version>5.1.6.RELEASE</version>
+</dependency>
+```
+
+
+
+spring-context.xml引入AOP命名空间
+
+
+
+```plain
+xmlns:aop="http://www.springframework.org/schema/aop"
+
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd
+```
+
+
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       ">
+</beans>
+```
+
+
+
+## 14.5 开发流程
+
+
+
+定义原始类
+
+
+
+```java
+package com.qf.aaron.aop.basic;
+
+public interface UserService {
+    public void save();
+}
+```
+
+
+
+```java
+package com.qf.aaron.aop.basic;
+
+public class UserServiceImpl implements UserService {
+    public void save() {
+        System.out.println("save method executed...");
+    }
+}
+```
+
+
+
+定义通知类（添加额外功能）
+
+
+
+```java
+package com.qf.aaron.aop.basic;
+import org.springframework.aop.MethodBeforeAdvice;
+import java.lang.reflect.Method;
+
+public class MyAdvice implements MethodBeforeAdvice { //实现前置通知接口
+    public void before(Method method, Object[] args, Object target) throws Throwable {
+        System.out.println("before advice executed...");
+    }
+}
+```
+
+
+
+定义bean标签
+
+
+
+```xml
+<!--原始对象-->
+<bean id="us" class="com.qf.aaron.aop.basic.UserServiceImpl" />
+
+<!--辅助对象-->
+<bean id="myAdvice" class="com.qf.aaron.aop.basic.MyAdvice" />
+```
+
+
+
+定义切入点（PointCut）
+
+ 
+
+形成切面（Aspect）
+
+
+
+```xml
+<aop:config>
+    <!--切点-->
+    <aop:pointcut id="myPointCut" expression="execution(* save())" />
+</aop:config>
+```
+
+
+
+```xml
+<aop:config>
+    <!--组装切面 -->
+    <aop:advisor advice-ref="myAdvice" pointcut-ref="myPointCut" />
+</aop:config>
+```
+
+
+
+## 14.6 AOP小结
+
+
+
+ 
+
+-  通过AOP提供的编码流程，更便利的定制切面，更方便的定制了动态代理。 
+-  进而彻底解决了辅助功能冗余的问题； 
+-  业务类中职责单一性得到更好保障； 
+-  辅助功能也有很好的复用性。 
+
+ 
+
+
+
+## 14.7 通知类【可选】
+
+
+
+定义通知类，达到通知效果
+
+
+
+```java
+前置通知：MethodBeforeAdvice
+
+后置通知：AfterAdvice
+
+后置通知：AfterReturningAdvice //有异常不执行，方法会因异常而结束，无返回值
+
+异常通知：ThrowsAdvice  异常通知需要我的自己编写一个方法
+    //异常通知
+    public void afterThrowing(Method method, Object[] args, Object target, Exception ex) {
+        System.out.println("异常消息");
+    }
+
+环绕通知：MethodInterceptor
+    
+    @Override
+    public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+        System.out.println("加入前列消息");
+        methodInvocation.getMethod().invoke(new UserService(),null);
+        System.out.println("加入后列消息");
+        return null;
+    }
+```
+
+注：AfterAdvice  其下有两个子接口：AfterReturningAdvice 和 ThrowsAdvice
+
+AfterReturningAdvice  没有出现异常的时候正常打印通知，如果出现异常，通知失效。
+
+ThrowsAdvice 只有发生异常的时候才生效，正常代码通知失效。
+
+如果我们实现 ThrowsAdvice 里面，必须写连名字都一样afterThrowing方法
+
+
+
+
+
+```java
+public class AopProxyAfter implements AfterReturningAdvice {
+    private Logger logger = Logger.getLogger(AopProxy.class);
+    @Override
+    public void afterReturning(Object o, Method method, Object[] objects, Object o1) throws Throwable {
+        logger.debug("this is after advice");
+    }
+}
+
+//注：异常通知没有方法，需要我们自己编写一个方法
+public class AopThrowsAdvice implements ThrowsAdvice {
+    private Logger logger = Logger.getLogger(AopProxy.class);
+    //异常通知
+    public void afterThrowing(Method method, Object[] args, Object target, Exception ex) {
+        logger.debug("this is exception advice");
+    }
+}
+<!--目标对象-->
+<bean id="userService" class="com.qf.service.UserService" />
+
+<bean id="userDao" class="com.qf.dao.UserDao" />
+<!--辅助对象-->
+<bean id="aopProxy" class="com.qf.config.AopProxy" />
+
+<bean id="aopProxyAfter" class="com.qf.config.AopProxyAfter" />
+
+<bean id="aopThrowsAdvice" class="com.qf.config.AopThrowsAdvice" />
+
+<aop:config>
+  <!--id=随便取名，保持唯一就可以，expression-方法exuction  配置就是规则 -->
+  <aop:pointcut id="myPointCut" expression="execution(* save())" />
+  
+  <!--组装我的切面，切点和额外功能  就成为我的 切面-->
+  <aop:advisor advice-ref="aopThrowsAdvice" pointcut-ref="myPointCut" />
+  
+  <aop:advisor advice-ref="aopProxyAfter" pointcut-ref="myPointCut" />
+    </aop:config>
+```
+
+## 14.8 通配切入点
+
+
+
+根据表达式通配切入点  作业1
+
+execution(* save())
+
+
+
+public   void  add(参数)-- 修饰符  返回值 方法名 参数
+
+
+
+```xml
+<!--匹配参数-->
+<aop:pointcut id="myPointCut" expression="execution(* *(com.qf.aaron.aop.basic.User))" />
+<!--匹配方法名（无参）-->
+<aop:pointcut id="myPointCut" expression="execution(* save())" />
+<!--匹配方法名（任意参数）-->
+<aop:pointcut id="myPointCut" expression="execution(* save(..))" />
+<!--匹配返回值类型-->
+<aop:pointcut id="myPointCut" expression="execution(com.qf.aaron.aop.basic.User *(..))" />
+<!--匹配类名-->
+<aop:pointcut id="myPointCut" expression="execution(* com.qf.aaron.aop.basic.UserServiceImpl.*(..))" />
+<!--匹配包名-->
+<aop:pointcut id="myPointCut" expression="execution(* com.qf.aaron.aop.basic.*.*(..))" />
+<!--匹配包名、以及子包名-->
+<aop:pointcut id="myPointCut" expression="execution(* com.qf.aaron.aop..*.*(..))" />
+```
+
+
+
+## 14.9 JDK和CGLIB选择
+
+
+
+ 
+
+-  spring底层，包含了jdk代理和cglib代理两种动态代理生成机制 
+-  基本规则是：目标业务类如果有接口则用JDK代理，没有接口则用CGLib代理 
+
+ 
+
+
+
+```java
+class DefaultAopProxyFactory{
+    // 该方法中明确定义了 JDK代理和CGLib代理的选取规则
+    // 基本规则是：目标业务类如果有接口则用JDK代理，没有接口则用CGLib代理
+    public AopProxy createAopProxy(){...}
+}
+```
+
+
+
+## 14.10 后处理器
+
+
+
+ 
+
+-  spring中定义了很多后处理器； 
+-  每个bean在创建完成之前 ，都会有一个后处理过程，即再加工，对bean做出相关改变和调整； 
+-  spring-AOP中，就有一个专门的后处理器，负责通过原始业务组件(Service),再加工得到一个代理组件。 
+
+ 
+
+| 常用后处理器                                                 |
+| ------------------------------------------------------------ |
+| ![img](03-Spring教程.assets/1645082568104-8fd23625-3e48-4445-b045-9750968ff203.png) |
+
+
+
+### 14.10.1 后处理器定义
+
+
+
+```java
+/**
+ * 定义bean后处理器
+ * 作用：在bean的创建之后，进行再加工
+ */
+public class MyBeanPostProcessor implements BeanPostProcessor{
+
+    /**
+     * 在bean的init方法之前执行
+     * @param bean  原始的bean对象
+     * @param beanName
+     * @return
+     * @throws BeansException
+     */
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("后处理器 在init之前执行~~~"+bean.getClass());
+        return bean;
+    }
+	/**
+     * 在bean的init方法之后执行
+     * @param bean  postProcessBeforeInitialization返回的bean
+     * @param beanName
+     * @return
+     * @throws BeansException
+     */
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("后处理器 在init之后执行~~~"+bean.getClass());
+        return bean;// 此处的返回是 getBean() 最终的返回值
+    }
+}
+```
+
+
+
+### 14.10.2 配置后处理器
+
+```xml
+<!-- 配置后处理器,将对工厂中所有的bean声明周期进行干预 -->
+<bean class="com.qianfeng.beanpostprocessor.MyBeanPostProcessor"></bean>
+```
+
+### 14.10.3 bean生命周期
+
+构造 》 注入属性 满足依赖 》 后处理器前置过程  》 初始化  》后处理器后置过程 》 返回 》 销毁
+
+### 14.10.4 动态代理源码(了解)
+
+```java
+// AbstractAutoProxyCreator是 AspectJAwareAdvisorAutoProxyCreator的父类
+// 该后处理器类中的 wrapIfNecessary方法即动态代理生成过程
+AbstractAutoProxyCreator#postProcessAfterInitialization(Object bean, String beanName){
+    if (!this.earlyProxyReferences.contains(cacheKey)) {
+        // 开始动态定制代理
+        return wrapIfNecessary(bean, beanName, cacheKey);
+   	}
+}
+```
 
 # 十五、Spring + MyBatis
 
