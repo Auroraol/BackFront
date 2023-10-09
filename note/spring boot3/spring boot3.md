@@ -6765,7 +6765,7 @@ Druid官网：https://github.com/alibaba/druid
 
 ## 基本使用
 
- <font color = red>在spring测试中不要使用静态变量或者main方法！！</font>
+ <font color = red>在spring测试中不要使用静态变量或者main方法！！尽量把方法定义成public方法</font>
 
 ```java
 @RunWith(SpringRunner.class)
@@ -6783,7 +6783,7 @@ public class TestServiceImplTest {
     
     @DisplayName("测试2")
     @Test
-    void test01(){
+    public void test01(){
     	System.out.println("aaaa");
     }
 

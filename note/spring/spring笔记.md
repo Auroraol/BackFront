@@ -389,6 +389,8 @@ public class User {
 
 例子1
 
+applicationContext.xml
+
 ```xml
 <!--次要bean，被作为属性-->
 <bean id="addr" class="com.lfj.dao.Address">
@@ -400,6 +402,20 @@ public class User {
 <bean id="u2" class="com.lfj.dao.User">
     <property name="address" ref="addr" /><!--address属性引用addr对象-->
 </bean>
+```
+
+使用
+
+```java
+// 初始化spring容器，加载applicationContext.xml配置
+ApplicationContext applicationContext = new
+    ClassPathXmlApplicationContext("applicationContext.xml");
+// 通过容器，获取JdbcTemplate的实例
+U2 u2 =
+    (U2) applicationContext.getBean("u2");
+
+//或者
+U2 u2 = applicationContext.getBean("u2", U2.class);
 ```
 
 例子2
@@ -1042,7 +1058,378 @@ public void test01(){
 | :----------------------------------------------------------- |
 | ![image-20231009095103768](spring笔记.assets/image-20231009095103768.png) |
 
-# 十一
+# 十一、 整合Jdbc
+
+代码见:  [jdbc整合.zip](code\jdbc整合.zip) 
+
+依赖
+
+```xml
+		<!-- spring-jdbc -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>5.2.3.RELEASE</version>
+        </dependency>
+        
+        <!--MySql驱动依赖-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.47</version>
+        </dependency>
+```
+
+## 11.1 Spring配置文件
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+    <context:component-scan base-package="com.lfj"></context:component-scan>
+
+    <!-- 1配置数据源 -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <!--数据库驱动 -->
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <!--连接数据库的url -->
+        <property name="url" value="jdbc:mysql://localhost/experiment02_spring"/>
+        <!--连接数据库的用户名 -->
+        <property name="username" value="root"/>
+        <!--连接数据库的密码 -->
+        <property name="password" value="741106"/>
+    </bean>
+    <!-- 2配置JDBC模板 -->
+    <bean id="jdbcTemplate"
+          class="org.springframework.jdbc.core.JdbcTemplate">
+        <!-- 默认必须使用数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--3.定义id为accountDao的Bean-->
+    <bean id="accountDao" class="com.lfj.dao.impl.AccountDaoImpl">
+        <!--属性赋值-->
+        <!-- 将jdbcTemplate注入到accountDao实例中 -->
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+</beans>
+```
+
+## 11.2 实体类
+
+```java
+package com.lfj.entity;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-09 11:56
+ */
+
+public class Account {
+	private Integer id;        // 账户id
+	private String username;    // 用户名
+	private Double balance;    // 账户余额
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public Double getBalance() {
+		return balance;
+	}
+
+	public void setBalance(Double balance) {
+		this.balance = balance;
+	}
+
+	@Override
+	public String toString() {
+		return "Account{" +
+				"id=" + id +
+				", username='" + username + '\'' +
+				", balance=" + balance +
+				'}';
+	}
+}
+```
+
+## 11.3 doa层
+
+接口
+
+```java
+package com.lfj.dao;
+
+import com.lfj.entity.Account;
+
+import java.util.List;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-09 11:58
+ */
+public interface AccountDao {
+	// 添加
+	int addAccount(Account account);
+
+	// 更新
+	int updateAccount(Account account);
+
+	// 删除
+	int deleteAccount(int id);
+
+	// 通过id查询 
+	Account findAccountById(int id);
+
+	// 查询所有账户
+	List<Account> findAllAccount();
+}
+```
+
+实现
+
+```java
+package com.lfj.dao.impl;
+
+import com.lfj.dao.AccountDao;
+import com.lfj.entity.Account;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import java.util.List;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-09 11:58
+ */
+
+public class AccountDaoImpl implements AccountDao {
+	// 定义JdbcTemplate属性及其setter方法
+	private JdbcTemplate jdbcTemplate;   // 通过xml注入
+
+
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
+
+	// 添加账户
+	@Override
+	public int addAccount(Account account) {
+		// 定义SQL
+		String sql = "insert into account(username,balance) value(?,?)";
+		// 定义数组来存放SQL语句中的参数
+		Object[] obj = new Object[]{
+				account.getUsername(),
+				account.getBalance()
+		};
+		// 执行添加操作，返回的是受SQL语句影响的记录条数
+		int num = this.jdbcTemplate.update(sql, obj);
+		return num;
+	}
+
+	// 更新账户
+	@Override
+	public int updateAccount(Account account) {
+		// 定义SQL
+		String sql = "update account set username=?,balance=? where id = ?";
+		// 定义数组来存放SQL语句中的参数
+		Object[] params = new Object[]{
+				account.getUsername(),
+				account.getBalance(),
+				account.getId()
+		};
+		// 执行更新操作，返回的是受SQL语句影响的记录条数
+		int num = this.jdbcTemplate.update(sql, params);
+		return num;
+	}
+
+	// 删除账户
+	@Override
+	public int deleteAccount(int id) {
+		// 定义SQL
+		String sql = "delete  from account where id = ? ";
+		// 执行删除操作，返回的是受SQL语句影响的记录条数
+		int num = this.jdbcTemplate.update(sql, id);
+		return num;
+	}
+
+	// 通过id查询账户数据信息
+	public Account findAccountById(int id) {
+		//定义SQL语句
+		String sql = "select * from account where id = ?";
+		// 创建一个新的BeanPropertyRowMapper对象
+		RowMapper<Account> rowMapper = new BeanPropertyRowMapper<Account>(Account.class);
+		// 将id绑定到SQL语句中， 并通过RowMapper返回一个Object类型的 单行记录
+		return this.jdbcTemplate.queryForObject(sql, rowMapper, id);
+	}
+
+	// 查询所有账户信息
+	public List<Account> findAllAccount() {
+		//定义SQL语句
+		String sql = "select * from account";
+		// 创建一个新的BeanPropertyRowMapper对象
+		RowMapper<Account> rowMapper = new BeanPropertyRowMapper<Account>(Account.class);
+		//执行静态的SQL查询，并通过RowMapper返回结果
+		return this.jdbcTemplate.query(sql, rowMapper);
+	}
+}
+
+```
+
+## 11.4 测试
+
+```java
+package com.lfj.test1;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-09 11:50
+ */
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:applicationContext.xml")
+public class TestJdbcTemplate {
+
+	/**
+	 * 调用execute()方法建表
+	 */
+	@Test
+	public void testJdbcTemplate() {
+
+		// 初始化spring容器，加载applicationContext.xml配置
+		ApplicationContext applicationContext = new
+				ClassPathXmlApplicationContext("applicationContext.xml");
+		// 通过容器，获取JdbcTemplate的实例
+		JdbcTemplate jdTemplate =
+				(JdbcTemplate) applicationContext.getBean("jdbcTemplate");
+		// 使用execute()方法执行SQL语句，创建用户账户管理表account
+		jdTemplate.execute("create table account(" +
+				"id int primary key auto_increment," +
+				"username varchar(50)," +
+				"balance double)");
+		System.out.println("账户表account创建成功！");
+	}
+    
+    @Test
+	public void testAddAccount() {
+		//1. 获取 Spring 上下文对象，创建的时候需要配置 Spring 的配置文件
+		ApplicationContext applicationContext = new
+				ClassPathXmlApplicationContext("applicationContext.xml");
+		//2. 获取指定的 Bean 对象
+		AccountDao accountDao =
+				applicationContext.getBean("accountDao", AccountDao.class);
+		// 创建Account对象，并向Account对象中添加数据
+		Account account = new Account();
+		account.setUsername("tom");
+		account.setBalance(1000.00);
+		// 执行addAccount()方法，并获取返回结果
+		int num = accountDao.addAccount(account);
+		if (num > 0) {
+			System.out.println("成功插入了" + num + "条数据！");
+		} else {
+			System.out.println("插入操作执行失败！");
+		}
+	}
+    
+    @Test
+	public void testDeleteAccount() {
+		//1. 获取 Spring 上下文对象，创建的时候需要配置 Spring 的配置文件
+		ApplicationContext applicationContext = new
+				ClassPathXmlApplicationContext("applicationContext.xml");
+		//2. 获取指定的 Bean 对象
+		AccountDao accountDao =
+				applicationContext.getBean("accountDao", AccountDao.class);
+		// 执行deleteAccount()方法，并获取返回结果
+		int num = accountDao.deleteAccount(1);
+		if (num > 0) {
+			System.out.println("成功删除了" + num + "条数据！");
+		} else {
+			System.out.println("删除操作执行失败！");
+		}
+	}
+    
+    @Test
+	public void testUpdateAccount() {
+		//1. 获取 Spring 上下文对象，创建的时候需要配置 Spring 的配置文件
+		ApplicationContext applicationContext = new
+				ClassPathXmlApplicationContext("applicationContext.xml");
+		//2. 获取指定的 Bean 对象
+		AccountDao accountDao =
+				applicationContext.getBean("accountDao", AccountDao.class);
+		// 创建Account对象，并向Account对象中添加数据
+		Account account = new Account();
+		account.setId(1);
+		account.setUsername("tom");
+		account.setBalance(2000.00);
+		// 执行updateAccount()方法，并获取返回结果
+		int num = accountDao.updateAccount(account);
+		if (num > 0) {
+			System.out.println("成功修改了" + num + "条数据！");
+		} else {
+			System.out.println("修改操作执行失败！");
+		}
+	}
+    
+    
+    @Test
+	public void findAccountByIdTest() {
+		// 加载配置文件
+		ApplicationContext applicationContext = new
+				ClassPathXmlApplicationContext("applicationContext.xml");
+		// 获取AccountDao实例
+		AccountDao accountDao =
+				(AccountDao) applicationContext.getBean("accountDao");
+		// 执行findAccountById()方法
+		Account account = accountDao.findAccountById(2);
+		System.out.println(account);
+	}
+    
+    @Test
+	public void findAllAccountTest() {
+		// 加载配置文件
+		ApplicationContext applicationContext = new
+				ClassPathXmlApplicationContext("applicationContext.xml");
+		// 获取AccountDao实例
+		AccountDao accountDao =
+				(AccountDao) applicationContext.getBean("accountDao");
+		// 执行findAllAccount()方法,获取Account对象的集合
+		List<Account> account = accountDao.findAllAccount();
+		// 循环输出集合中的对象
+		for (Account act : account) {
+			System.out.println(act);
+		}
+	}
+}
+```
+
+
 
 # 十二、Spring工厂特性
 
@@ -1716,6 +2103,8 @@ AbstractAutoProxyCreator#postProcessAfterInitialization(Object bean, String bean
 ------
 
 ## 15.1 配置数据源
+
+[spring配置 数据源datasource和连接池 的7种方式](https://blog.csdn.net/qq_36838191/article/details/91450908)
 
 将数据源配置到项目中
 
