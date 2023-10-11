@@ -1,0 +1,15 @@
+server:
+  port: 10086 # 端口号
+
+spring:
+  application:name: eurekaserver #eureka服务器
+
+eureka:
+  instance:
+    hostname: localhost   # localhost
+  client:
+    # 当前的eureka服务是单机版的
+    registerWithEureka: false
+    fetchRegistry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/

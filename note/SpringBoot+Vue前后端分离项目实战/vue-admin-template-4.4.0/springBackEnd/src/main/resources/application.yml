@@ -1,0 +1,43 @@
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:/mapper/*.xml
+server:
+  port: 9999
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: 741106
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://localhost:3306/xdb
+    username: root
+  redis:
+    host:
+      localhost:
+        port: 6379
+
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: delete
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+## token配置
+#token:
+#  # 令牌自定义标识
+#  header: Authorization
+#  # 令牌密钥
+#  secret: abcdefghijklmnopqrstuvwxyz
+#  # 令牌有效期（默认30分钟）
+#  expireTime: 30
+
+## 配置swagger
+#swagger:
+#  enable: true
+#  title: SpringBoot+Vue系统接口文档
+#  description: 用户信息操作
+#  version: 1.0.0
+#  author: LFJ
+#  url: https://www.cnblogs.com/jindao/
+#  email: fj1665834268@qq.com

@@ -1,26 +1,16 @@
 ### 一、SpringMVC
 
-------
+在没有springMVC时，需要编写了大量的Servlet(HttpServlet) , 也就是表示层实现)来处理来自浏览器的各种请求，但是我们发现，仅仅是几个很小的功能，以及几个很基本的页面，我们都要编写将近十个Servlet，如果是更加大型的网站系统，比如淘宝、B站，光是一个页面中可能就包含了几十甚至上百个功能，想想那样的话写起来得多恐怖。
 
 #### 1.1 引言
 
-
-
 **java开源框架，Spring Framework的一个独立模块。**
 
- 
-
-**MVC框架,在项目中开辟MVC层次架构**
-
- 
+ **MVC框架,在项目中开辟MVC层次架构**
 
 **对控制器中的功能 包装 简化 扩展践行工厂模式，功能架构在工厂之上**
 
-
-
 #### 1.2 MVC架构
-
-
 
 ##### 1.2.1 概念
 
@@ -30,30 +20,20 @@
 | View       | 视图：渲染数据，生成页面。对应项目中的Jsp                    |
 | Controller | 控制器：直接对接请求，控制MVC流程，调度模型，选择视图。对应项目中的Servlet |
 
-
+<img src="04-SpringMVC教程.assets/image-20231010222339058.png" alt="image-20231010222339058" style="zoom: 80%;" />
 
 ##### 1.2.2 好处
-
-
-
- 
 
 -  MVC是现下软件开发中的最流行的代码结构形态; 
 -  人们根据负责的不同逻辑，将项目中的代码分成 M V C 3个层次; 
 -  层次内部职责单一，层次之间耦合度低; 
 -  符合低耦合 高内聚的设计理念。也实际有利于项目的长期维护。 
 
- 
-
-
-
 ### 二、开发流程
 
 ------
 
 #### 2.1 导入依赖
-
-
 
 ```xml
 <dependency>
@@ -63,27 +43,15 @@
 </dependency>
 ```
 
-
-
 #### 2.2 配置核心(前端)控制器  struts2
-
-
 
 https://struts.apache.org/getting-started/hello-world-using-struts2.html
 
-
-
 作为一个MVC框架，首先要解决的是：如何能够收到请求！
-
- 
 
 所以MVC框架大都会设计一款前端控制器，选型在 Servlet 或 Filter两者之一,在框架最前沿率先工作，接收所有请求。
 
- 
-
 此控制器在接收到请求后，还会负责springMVC的核心的调度管理，所以既是前端又是核心。
-
-
 
 ```xml
 <servlet>
@@ -103,15 +71,9 @@ https://struts.apache.org/getting-started/hello-world-using-struts2.html
 </servlet-mapping>
 ```
 
-
-
 #### 2.3 后端控制器
 
-
-
 等价于之前定义的Servlet
-
-
 
 ```java
 @Controller //声明这是一个控制器
@@ -130,19 +92,11 @@ public class HelloController {
 }
 ```
 
-
-
 #### 2.4 配置文件
-
-
 
 默认名称：核心控制器名-servet.xml   默认位置：WEB-INF
 
- 
-
 随意名称：mvc.xml      随意位置：resources   但需要配置在核心控制器中
-
-
 
 ```xml
 <beans 	xmlns="http://www.springframework.org/schema/beans"
@@ -173,18 +127,12 @@ public class HelloController {
 </beans>
 ```
 
-
-
 #### 2.5 访问
-
-
 
 ```markdown
 http://localhost：8989/hello/test1
 http://localhost：8989/hello/test2
 ```
-
-
 
 ### 三、接收请求参数
 
@@ -192,16 +140,10 @@ http://localhost：8989/hello/test2
 
 #### 3.1 基本类型参数
 
-
-
 请求参数和方法的形参 同名即可
-
-
 
 springMVC默认可以识别的日期字符串格式为： YYYY/MM/dd HH:mm:ss
 通过@DateTimeFormat可以修改默认日志格式
-
-
 
 ```java
 // id  name gender
@@ -216,15 +158,9 @@ public String testParam1(Integer id,
 }
 ```
 
-
-
 #### 3.2 实体收参【`重点`】
 
-
-
 请求参数和实体的属性 同名即可
-
-
 
 ```java
 public class User {
@@ -245,15 +181,9 @@ public String testParam2(User user){
 }
 ```
 
-
-
 #### 3.3 数组收参
 
-
-
 简单类型的 数组
-
-
 
 ```html
 <form action="${pageContext.request.contextPath}/param/test3">
@@ -1422,15 +1352,9 @@ public void hello1(String name,HttpSession session,HttpServletResponse response)
 
 #### 12.1 作用
 
-
-
 防止暴力攻击，前端安全保障
 
-
-
 #### 12.2 导入jar
-
-
 
 ```xml
 <!-- Kaptcha -->
@@ -1663,72 +1587,38 @@ public class RestController {
 </script>
 ```
 
-
-
 ### 十四、跨域请求
 
 ------
 
 #### 14.1 域
 
-
-
 域：协议+IP+端口
-
- 
 
 -  http://localhost:8989 
 -  http://localhost:8080 
 -  http://www.baidu.com:80 
 
- 
-
-
-
 #### 14.2 Ajax跨域问题
-
-
-
- 
 
 -  Ajax发送请求时，不允许跨域，以防用户信息泄露。 
 -  当Ajax跨域请求时，响应会被浏览器拦截(同源策略)，并报错。即浏览器默认不允许ajax跨域得到响应内容。 
 -  互相信任的域之间如果需要ajax访问，(比如前后端分离项目中，前端项目和后端项目之间)，则需要额外的设置才可正常请求。 
 
- 
-
-
-
 #### 14.3 解决方案
-
-
-
- 
 
 -  允许其他域访问 
 -  在被访问方的Controller类上，添加注解 
 
- 
-
-
-
 ```java
 @CrossOrigin("http://localhost:8080") //允许此域发请求访问
 public class SysUserController {
-	....
+	...
 }
 ```
 
-
-
- 
-
 -  携带对方cookie，使得session可用 
--  在访问方，ajax中添加属性：withCredentials: true 
-
- 
-
-
+-  在访问方，ajax中添加属性：withCredentials: true
 
 ```javascript
 $.ajax({
@@ -1756,28 +1646,18 @@ xhr.withCredentials=true;
 | ------------------------------------------------------------ |
 | ![img](04-SpringMVC教程.assets/1645083253422-b35f1031-2be0-494b-8c3e-a1689f5f549e.png) |
 
-
-
 ### 十六、Spring整合
 
 ------
 
 #### 16.1 整合思路
 
-
-
 此时项目中有两个工厂
-
- 
 
 - DispatcherServlet 启动的springMVC工厂==负责生产C及springMVC自己的系统组件
 - ContextLoaderListener 启动的spring工厂==负责生产其他所有组件
 - springMVC的工厂会被设置为spring工厂的子工厂，可以随意获取spring工厂中的组件
 - 整合过程，就是累加：代码+依赖+配置。然后将service注入给controller即可
-
- 
-
-
 
 #### 16.2 整合技巧
 

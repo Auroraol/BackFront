@@ -1,4 +1,4 @@
-#  项目结构
+项目结构
 
 ![image-20230709103935383](spring boot3.assets/image-20230709103935383.png)
 
@@ -188,10 +188,8 @@ public class HelloController {
 
     @GetMapping("/hello")  //浏览器发送hello请求
     public String hello(){
-
         return "Hello,Spring Boot 3!";
     }
-
 }
 ```
 
@@ -220,6 +218,8 @@ public class HelloController {
 修改配置（外部放一个application.properties文件）、监控、健康检查
 
 ## 4. 自动配置机制
+
+意义是简化上手，原本用spring的各种组件，需要写一堆xml里的bean配置，然后才能开始。通过自动化配置，简化了基础项目的构建，你通过引入依赖，然后加个注解甚至不加注解就能启动起来。
 
 **默认的包扫描规则**
 
@@ -273,7 +273,7 @@ public class DemoApplication {
 
 ```
 
-
+或者使用IDEA显示service服务
 
 # 注解
 
@@ -1507,7 +1507,7 @@ public class HelloController {
 | @Component("?")      | bean注册,  和 Service 没有啥区别,  Component是比较通用的东西 |
 | @Autowired           | ①自动加载类(个人理解就是不用new)      ②或者使用@Autowired+@Qualifier![image-20231008233349225](spring boot3.assets/image-20231008233349225.png) |
 | @Resource(name="?")  | ①如果该接口有多个实现,    用@Resource，并指定name <br>②@AutoWired只适合spring框架，而@Resource扩展性更好 |
-| @Configuration+@Bean | bean注册(人为) —> 用于配置类                                 |
+| @Configuration+@Bean | bean注册(人为) —> 用于配置类   // bean下是注入的对象         |
 | @Values              | 从配置文件中取参数                                           |
 | @Repository("?")     | 用于将 DAO 层 (spring应用)                                   |
 
@@ -1518,6 +1518,8 @@ public class HelloController {
 自动导入对象到类中（自动装配），被注入的类同样要被 Spring 容器管理，比如：Service 类注入到 Controller 类中。
 
 ```java
+
+
 @Service
 public class UserService {
   ......
@@ -1531,6 +1533,12 @@ public class UserController {
    ......
 }
 ```
+
+在Spring框架中，@Service注解用于标识一个类为服务层组件，表示该类提供业务逻辑的处理。当使用@Service注解标注一个类时，Spring会自动将该类实例化并将其作为一个Bean进行管理。
+
+然而，即使使用了@Service注解标注了一个类，我们仍然需要使用@Autowired注解来进行依赖注入，以便在其他类中使用该服务。这是因为@Autowired注解告诉Spring容器在需要该服务的地方自动注入对应的实例。
+
+简而言之，@Service注解用于标识一个类为服务层组件，让Spring容器实例化并管理该类的实例。而@Autowired注解用于在其他类中自动注入对应的服务实例，以便使用该服务的功能。
 
 ### 2.2  @Component, @Repository, @Service, @Controller
 
@@ -5383,6 +5391,8 @@ mybatis.configuration.map-underscore-to-camel-case=true
 
 ## ==IDEA中使用自带的数据库(重要)==
 
+<img src="spring boot3.assets/image-20231011211119939.png" alt="image-20231011211119939" style="zoom:67%;" />
+
 > 首先打开IDEA页面
 > <img src="spring boot3.assets/image-20230911234743463.png" alt="image-20230911234743463" style="zoom: 80%;" />
 
@@ -5433,7 +5443,7 @@ ptions选项作用大致如下：
 #### pom.xml
 
 ```xml
-	    <!--        mybatisplus+数据库相关开始-->
+	    <!-- mybatisplus+数据库相关开始-->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-core</artifactId>
@@ -7176,11 +7186,12 @@ select 8
            RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
            redisTemplate.setConnectionFactory(factory);
            redisTemplate.setKeySerializer(new StringRedisSerializer());
-   
+   		//使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值（默认使用JDK的序列化方式）
+   		// 源代码private RedisSerializer<String> stringSerializer = RedisSerializer.string();
            Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
-           redisTemplate.setValueSerializer(serializer);
-   
+           redisTemplate.setValueSerializer(serializer);//Jackson2JsonRedisSerializer + fastjson2 可以用GenericJackson2JsonRedisSerializer替代
            ObjectMapper om = new ObjectMapper();
+           // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
            om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
            om.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
            om.setTimeZone(TimeZone.getDefault());
@@ -7195,7 +7206,7 @@ select 8
        }
    }
    ```
-
+   
    ```java
    @Autowired
    private RedisTemplate redisTemplate;
@@ -7211,9 +7222,9 @@ select 8
    // 反序列化 json对象反序列化成user对象
    XUser user = JSON.parseObject(JSON.toJSONString(obj), XUser.class);
    ```
-
+   
    测试redis中保存
-
+   
    ![image-20230923105605180](spring boot3.assets/image-20230923105605180.png)
 
 [springboot之使用redistemplate优雅地操作redis-阿里云开发者社区 (aliyun.com)](https://developer.aliyun.com/article/609263)
@@ -7224,7 +7235,7 @@ select 8
 
 # 反序列化(json)
 
-\[fastjson2 介绍及使用_西凉的悲伤的博客-CSDN博客](https://blog.csdn.net/qq_33697094/article/details/128114939)
+[fastjson2 介绍及使用](https://blog.csdn.net/qq_33697094/article/details/128114939)
 
 ## 一、导入fastjson2依赖
 
@@ -13628,6 +13639,46 @@ java -jar springbootAPP.jar
 
 - 配置应用程序： 默认情况下，Spring Boot应用程序将在8080端口上监听HTTP请求。
 
+## groupid和artifactid
+
+在创建 POM 之前，首先要确定工程组（groupId），及其名称（artifactId）和版本，在仓库中这些属性是项目的唯一标识。
+这两个属性，可以理解成地球上的经纬度，maven仓库，就是相应的地球。
+
+1、groupId一般分为多个段，可以定义成两段或者三段
+
+```java
+两段：域 + 组织
+groupId:  org.alibaba
+groupId:  org.sky
+ 
+三段：域 + 组织 + 项目名
+groupId:  org.alibaba.taobao
+groupId:  org.sky.taobao
+ 
+第一段：域
+常见的有：cn(china)，org(非营利组织)，com(商业组织)
+第二段：组织
+如果你的公司是阿里巴巴，就是alibaba。如果是个人的小项目，随便定义，比如说，就是sky
+第三段：项目名
+你创建项目时，肯定是有名字的。这里，就写你项目的名字，taobao
+```
+
+2、artifactid呢，一段两段都可以
+
+```java
+（1）一段怎么讲？就写子项目名（比如说 taobao 项目下有两个子项目 tianmao 和 xianyu ）
+artifactid：tianmao
+artifactid： xianyu 
+ 
+（2）两段怎么说？
+artifactid： tianmao.dev  和  artifactid： tianmao.prod
+artifactid： xianyu.dev  和   artifactid： xianyu.prod
+ 
+项目还能继续细分，比如开发环境的项目dev，生产环境的项目prod
+第一段：子项目名
+第二段：开发环境dev，还是，生产环境prod
+```
+
 
 
 ## Gradle
@@ -13650,5 +13701,33 @@ java -jar springbootAPP.jar
 
 
 
+# pom.xml 文件
 
+## 一、什么是POM
+
+`Project Object Model`，项目对象模型。通过xml可扩展标记语言（EXtensible Markup Language）格式保存的pom.xml文件。作用类似ant的build.xml文件，功能更强大。该文件用于管理：源代码、配置文件、开发者的信息和角色、问题追踪系统、组织信息、项目授权、项目的url、项目的依赖关系等等。一个完整的pom.xml文件，放置在项目的根目录下。
+
+## properties
+
+在properties标签内可以把版本号作为变量进行声明，方便maven依赖标签用${变量名}的形式动态获取版本号。这样做的优点是当版本号发生改变时，仅仅需要更新properties标签中的变量值就行了，不用煞费心思更新所有依赖的版本号。例如，定义如下两个变量：
+
+```xml
+<properties>
+    <java.version>13</java.version>
+    <lombok.version>1.18.10</lombok.version>
+</properties>
+```
+
+   则在Maven的pom.xml中导入lombok依赖的时候，使用如下格式即可定义依赖的版本号：
+
+```xml
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <optional>true</optional>
+    <version>${lombok.version}</version>
+</dependency>
+```
+
+<img src="spring boot3.assets/image-20231011210138697.png" alt="image-20231011210138697" style="zoom:67%;" />
 

@@ -1,0 +1,32 @@
+#server:
+#  port: 9099 # 端口号
+#
+#spring:
+#  application:name: eurekaserver #eureka服务器
+#
+#eureka:
+#  instance:
+#    hostname: localhost   # localhost
+##    leaseRenewalIntervalInSeconds: 30
+#  client:
+#    # 当前的eureka服务是单机版的
+#    register-with-eureka: false
+#    fetch-registry: false
+#    sevice-url:
+#      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+
+# Tomcat
+server:
+  port: 9099
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: eureka-demo
+eureka:
+  client:
+    sevice-url:
+      defaultZone: http://localhost:${server.port}/eureka
+    register-with-eureka: false
+    fetch-registry: false

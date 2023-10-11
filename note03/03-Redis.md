@@ -1,4 +1,6 @@
-#  一、引言
+
+
+# 一、引言
 
 ## 1.1 数据库压力过大
 
@@ -231,6 +233,12 @@ redis-cli -a 741106 -p 6379
 
 ```
 退出: quit
+```
+
+**中文支持**
+
+```
+redis-cli -a 741106 -p 6379 --raw
 ```
 
 ### Docke安装
@@ -1653,8 +1661,6 @@ idea创建
 
 ### 5.1.2 导入需要的依赖
 
-
-
 ```xml
 <dependencies>
     <!--    1、 Jedis-->
@@ -2458,7 +2464,7 @@ public void test(){
 
 官网地址：https://redis.io/docs/manual/persistence/
 
-![](03-Redis.assets/1.Redis持久化.jpg)
+<img src="03-Redis.assets/1.Redis持久化.jpg" style="zoom:67%;" />
 
 ![](03-Redis.assets/2.Redis持久化图示.jpg)
 
@@ -2520,11 +2526,29 @@ Redis7版本，按照redis.conf里配置的 save \<seconds> \<changes>
 
 **修改dump文件保存路径**
 
+```shell
+lfj@lfj-virtual-machine:/myredis$ ls
+redis.conf
+```
+
 ![](03-Redis.assets/9.dump文件路径.png)
+
+```shell
+root@lfj-virtual-machine:/myredis# redis-server /myredis/redis.conf 
+root@lfj-virtual-machine:/myredis# redis-cli -a 741106 -p 6379
+127.0.0.1:6379> CONFIG get dir
+```
 
 **修改dump文件名称**
 
 ![](03-Redis.assets/10.RDB修改备份文件名.png)
+
+<font color = red>注意: 改完配置, 重新启动Redis</font>
+
+```shell
+shutdown
+quite
+```
 
 **触发备份**
 
@@ -2555,7 +2579,7 @@ Redis7版本，按照redis.conf里配置的 save \<seconds> \<changes>
 
 - 执行flushall/flushdb命令也会产生dump.rdb文件，但里面是空的，无意义
 
-物理恢复，一定要将服务产生的RDB文件备份一份，然后分机隔离，避免生产上物理损坏后备份文件也挂了。
+==物理恢复，一定要将服务产生的RDB文件备份一份，然后分机隔离，避免生产上物理损坏后备份文件也挂了。==
 
 ##### 手动触发
 
@@ -2569,20 +2593,12 @@ $\textcolor{red}{redis提供了两个命令来生成RDB文件，分别是save和
 
 **bgsave(默认)**：
 
+![image-20231009164939223](03-Redis.assets/image-20231009164939223.png)
+
 - redis会在后台异步进行快照操作，**不阻塞**快照同时还可以相应客户端请求，该触发方式会fork一个子进程由子进程复制持久化过程
-
-- 官网说明
-
-  ![](03-Redis.assets/14.bgsave官网说明.png)
-
 - Redis会使用bgsave对当前内存中的所有数据做快照，这个操作是子进程在后台完成的，这就允许主进程同时可以修改数据。
+- LASTSAVE    可以通过lastsave命令获取最后一次成功执行快照的时间
 
-- fork是什么？
-  在Linux程序中，fork()会产生一个和父进程完全相同的子进程，但子进程在此后会exec系统调用，处于效率考虑，尽量避免膨胀
-
-- LASTSAVE
-
-  可以通过lastsave命令获取最后一次成功执行快照的时间
 
 ![](03-Redis.assets/15.lastsave命令.png)
 
@@ -2592,7 +2608,7 @@ $\textcolor{red}{redis提供了两个命令来生成RDB文件，分别是save和
 
 官网说明：
 
-![](03-Redis.assets/16.RDB优势官网说明.jpg)
+<img src="03-Redis.assets/16.RDB优势官网说明.jpg" style="zoom:67%;" />
 
 - RDB是Redis 数据的一个非常紧凑的单文件时间点表示。RDB文件非常适合备份。例如，您可能希望在最近的24小时内每小时归档一次RDB文件，并在30天内每天保存一个RDB快照。这使您可以在发生灾难时轻松恢复不同版本的数据集。
 - RDB非常适合灾难恢复，它是一个可以传输到远程数据中心或Amazon S3(可能已加密）的压缩文件。
@@ -2611,7 +2627,7 @@ $\textcolor{red}{redis提供了两个命令来生成RDB文件，分别是save和
 
 官网说明：
 
-![](03-Redis.assets/17.RDB劣势官网说明.jpg)
+<img src="03-Redis.assets/17.RDB劣势官网说明.jpg" style="zoom:67%;" />
 
 - 如果您需要在Redis停止工作时（例如断电后）将数据丢失的可能性降到最低，那么RDB并不好。您可以配置生成RDB的不同保存点（例如，在对数据集至少5分钟和100次写入之后，您可以有多个保存点)。但是，您通常会每五分钟或更长时间创建一次RDB快照，因此，如果Redis由于任何原因在没有正确关闭的情况下停止工作，您应该准备好丢失最新分钟的数据。
 - RDB需要经常fork()以便使用子进程在磁盘上持久化。如果数据集很大，fork()可能会很耗时，并且如果数据集很大并且CPU性能不是很好，可能会导致Redis停止为客户端服务几毫秒甚至一秒钟。AOF也需要fork()但频率较低，您可以调整要重写日志的频率，而不需要对持久性进行任何权衡。
@@ -2626,30 +2642,30 @@ $\textcolor{red}{redis提供了两个命令来生成RDB文件，分别是save和
 
 ![](03-Redis.assets/18.RDB模拟数据丢失.jpg)
 
-
-
 ### RDB快照文件.md
 
-#### 如何检查修复dump.rdb文件？
+#### 检查修复dump.rdb文件
 
-进入到redis安装目录，执行redis-check-rdb命令 redis-check-rdb ./redisconfig/dump.rdb
+进入到redis安装目录(/usr/local/bin)，执行redis-check-rdb命令 redis-check-rdb ./redisconfig/dump.rdb
 
-#### 哪些情况会触发RDB快照
+<img src="03-Redis.assets/image-20231009170418205.png" alt="image-20231009170418205" style="zoom:67%;" />
+
+####   哪些情况会触发RDB快照
 
 1. 配置文件中默认的快照配置
-2. 手动save/bgsave命令
+2. 手动bgsave命令
 3. 执行flushdb/fulshall命令也会产生dump.rdb文件，但是也会将命令记录到dump.rdb文件中，恢复后依旧是空，无意义
 4. 执行shutdown且没有设置开启AOF持久化
 5. 主从复制时，主节点自动触发
 
-#### 如何禁用快照
+#### 如何禁用快照(RDB)
 
-1. 动态所有停止RDB保存规则的方法：redis-cli config set value ""
-2. 手动修改配置文件
+1. 方法1: 动态所有停止RDB保存规则的方法：redis-cli config set value ""
+2. 方法2: 手动修改配置文件
 
 ![](03-Redis.assets/19.RDB快照禁用.jpg)
 
-#### RDB优化配置项详解
+### RDB优化配置项详解
 
 配置文件SNAPSHOTTING模块
 
@@ -2683,7 +2699,7 @@ $\textcolor{red}{redis提供了两个命令来生成RDB文件，分别是save和
 
 在没有持久化的情况下删除复制中使用的RDB文件。默认情况下no，此选项是禁用的。
 
-小总结：
+### 总结
 
 ![](03-Redis.assets/24.RDB小总结.jpg)
 
@@ -2693,19 +2709,17 @@ $\textcolor{red}{redis提供了两个命令来生成RDB文件，分别是save和
 
 ## AOF(Append Only File)
 
-### 官网介绍
+### 介绍
 
-![](03-Redis.assets/1.Redis持久化-16967476611551.jpg)
-
-### 是什么
+<img src="03-Redis.assets/1.Redis持久化-16967476611551.jpg" style="zoom:67%;" />
 
 $\textcolor{red}{以日志的形式来记录每个写操作}$，将Redis执行过的所有写指令记录下来(读操作不记录)，只许追加文件但是不可以改写文件，redis启动之初会读取该文件重新构建数据，换言之，redis重启的话就根据日志文件的内容将写指令从前到后执行一次以完成数据的恢复工作
 
 默认情况下，redis是没有开启AOF的。开启AOF功能需要设置配置：appendonly yes
 
-### 能干嘛
+### 作用
 
-![](03-Redis.assets/25.AOF能干嘛.jpg)
+<img src="03-Redis.assets/25.AOF能干嘛.jpg" style="zoom: 80%;" />
 
 AOF保存的是appendonly.aof文件
 
@@ -2733,25 +2747,23 @@ AOF保存的是appendonly.aof文件
 
 **no**：操作系统控制的写回，每个写命令执行完，只是先把日志写到AOF文件的内存缓冲区，由操作系统决定何时将缓冲区内容写回磁盘
 
-小总结：
+ **总结**
 
-![](03-Redis.assets/28.AOF三种写回策略.jpg)
+<img src="03-Redis.assets/28.AOF三种写回策略.jpg" style="zoom:80%;" />
 
+### AOF案例
 
+#### 配置文件说明 (6 VS 7)
 
-## AOF案例演示和优劣对比
+##### 如何开启aof
 
-### 配置文件说明 (6 VS 7)
+<img src="03-Redis.assets/29.开启AOF.jpg" style="zoom:67%;" />
 
-#### 如何开启aof
-
-![](03-Redis.assets/29.开启AOF.jpg)
-
-#### 使用默认写回策略
+##### 使用默认写回策略
 
 ![](03-Redis.assets/30.AOF默认保存策略.jpg)
 
-#### aof文件-保存路径
+##### aof文件-保存路径
 
 - redis6及以前
 
@@ -2767,14 +2779,14 @@ AOF保存的是appendonly.aof文件
 
 ![](03-Redis.assets/33.Redis新老版本区别.jpg)
 
-#### aof文件-保存名称
+##### aof文件-保存名称
 
-- redis6及以前 ，有且仅有一个
+###### redis6及以前 ，有且仅有一个
 
 
 ![](03-Redis.assets/34.AOF文件名称(Redis6及以前).jpg)
 
-- Redis7 Multi Part AOF的设计
+###### Redis7 Multi Part AOF的设计
 
 
 从1个文件到3个文件
@@ -2800,62 +2812,76 @@ Redis7.0config 中对应的配置项
 
 ![](03-Redis.assets/36.redis7AOF配置项.jpg)
 
-### 正常恢复
+<font color = red>注意: 改完配置, 重新启动Redis</font>
+
+```shell
+shutdown
+quite
+```
+
+##### 正常恢复
 
 1. 修改默认的appendonly no，改为yes
 2. 写操作继续，生成aof文件到指定目录（然后将appendonly文件备份，使用flushdb+shutdown服务器来模拟redis宕机数据丢失，删除生成的新aof文件，将备份文件恢复）
-   ![](03-Redis.assets/37.aof生成文件.jpg)
+   <img src="03-Redis.assets/image-20231009210103560.png" alt="image-20231009210103560" style="zoom: 80%;" />
 3. 恢复：重启redis然后重新加载，结果OK，将数据重新写入到了redis
 
-### 异常恢复
+##### 异常恢复
 
 1. 故意胡乱改动正常的AOF文件，模拟网络闪断文件写入不完整等其他异常情况
-   ![](03-Redis.assets/38.aof文件异常.jpg)
+
+   appendonly.aof.1.incr.aof文件
+
+   <img src="03-Redis.assets/image-20231009210252074.png" alt="image-20231009210252074" style="zoom:67%;" />
+
 2. 重启Redis之后就会进行AOF文件的载入
    ![](03-Redis.assets/39.aof异常服务启动失败.jpg)
+   
 3. 异常修复命令：redis-check-aof --fix进行修复
-   ![](03-Redis.assets/40.aof文件修复.jpg)
+   ![image-20231009210400635](03-Redis.assets/image-20231009210400635.png)
+   
 4. 启动后OK
 
 
-### 优势
+
+
+
+### AOF优劣
+
+#### 优势
 
 更好的保护数据不丢失、性能高、可做紧急恢复
 
-![](03-Redis.assets/41.AOF优势.png)
+<img src="03-Redis.assets/41.AOF优势.png" style="zoom:67%;" />
 
 - 使用AOF Redis 更加持久: 您可以有不同的fsync 策略: 根本不fsync、每秒 fsync、每次查询时fsync。使用每秒fsync的默认策略，写入性能仍然很棒。fsync 是使用后台线程执行的，当没有fsync正在进行时，主线程将努力执行写入，因此您只能丢失一秒钟的写入。
 - AOF 日志是一个仅附加日志，因此不会出现寻道问题，也不会在断电时出现损坏问题。即使由于某种原因(磁盘已满或其他原因) 日志以写一半的命令结尾，redis-check-aof 工具也能够轻松修复它。
 - 当AOF 变得太大时，Redis 能够在后台自动重写AOF。重写是完全安全的，因为当 Redis继续附加到旧文件时，会使用创建当前数据集所需的最少操作集生成一个全新的文件，一旦第二个文件准备就绪，Redis 就会切换两者并开始附加到新的那一个。
 - AOF以易于理解和解析的格式依次包含所有操作的日志。您甚至可以轻松导出AOF文件。例如，即使您不小心使用孩FLUSHALL命令刷新了所有内容，只要在此期间没有执行日志重写，您仍然可以通过停止服务器、删除最新命令并重新启动 Redis 来保存您的数据集。
 
-### 劣势
+#### 劣势
 
 相同数据集的数据而言AOF文件要远大于RDB文件，恢复速度慢于RDB
 
 AOF运行效率要慢于RDB，每秒同步策略效率较好，不同步效率和RDB相同
 
-![](03-Redis.assets/42.AOF劣势.png)
+<img src="03-Redis.assets/42.AOF劣势.png" style="zoom:67%;" />
 
 - AOF文件通常比相同数据集的等效 RDB 文件大。
 - 根据确切的 fsync策略，AOF可能比 RDB 慢。一般来说，将fsync 设置为每秒性能仍然非常高，并且在禁用 fsync的情况下，即使在高负载下它也应该与 RDB 一样快。即使在巨大的写入负载的情况下，RDB仍然能够提供关于最大延迟的更多保证。
 
+### AOF重写机制
 
-
-
-
-## AOF重写机制
-
-### 是什么？
+#### 介绍
 
 由于AOF持久化是Redis不断将写命令记录到 AOF 文件中，随着Redis不断的进行，AOF 的文件会越来越大,文件越大，占用服务器内存越大以及 AOF 恢复要求时间越长。
 为了解决这个问题，**Redis新增了重写机制**，当AOF文件的大小超过所设定的峰值时，Redis就会**自动**启动AOF文件的内容压缩.只保留可以恢复数据的最小指令集或者可以**手动使用命令 bgrewriteaof 来重新**。
 
-![](03-Redis.assets/43.AOF重写.png)
+<img src="03-Redis.assets/43.AOF重写.png" style="zoom:67%;" />
 
 一句话：启动AOF文件的内容压缩，只保留可以恢复数据的最小指令集。
 
-### 触发机制
+#### 触发机制
 
 - **官网默认配置**
 
@@ -2869,7 +2895,7 @@ AOF运行效率要慢于RDB，每秒同步策略效率较好，不同步效率�
 
 客户端向服务器发送bgrewriteaof命令
 
-### 案例说明
+#### 案例
 
 **需求说明：**
 
@@ -2917,9 +2943,9 @@ $\textcolor{green}{启动AOF文件的内容压缩，只保留可以恢复数据�
 
      ![](03-Redis.assets/48.aof重写后文件.jpg)
 
-  4. 重写触发
+  4. 重写触发(合并相同的)
 
-![](03-Redis.assets/49.aof重写后的base文件.jpg)
+<img src="03-Redis.assets/49.aof重写后的base文件.jpg" style="zoom:67%;" />
 
 - 手动触发案例02
 
@@ -2927,12 +2953,13 @@ $\textcolor{green}{启动AOF文件的内容压缩，只保留可以恢复数据�
 
 ![](03-Redis.assets/50.aof重写手动触发.jpg)
 
-- 结论
+结论
 
 **也就是说AOF文件重写并不是对原文件进行重新整理，而是直接读取服务器现有的键值对，然后用一条命令去代替之前记录这个键值对的多条命令，生成一个新的文件后去替换原来的AOF文件。**
+
 AOF文件重写触发机制:通过 redis.conf配置文件中的 auto-aof-rewrite-percentage:默认值为100，以及auto-aof-rewrite-min-size: 64mb配置，也就是说默认Redis会记录上次重写时的AOF大小，**默认配置是当AOF文件大小是上次rewrite后大小的一倍且文件大于64M时触发。**
 
-### 重写原理
+#### 重写原理
 
 1. 在重写开始前，redis会创建一个“重写子进程”，这个子进程会读取现有的AOF文件，并将其包含的指令进行分析压缩并写入到一个临时文件中。
 2. 与此同时，主进程会将新接收到的写指令一边累积到内存缓冲区中，一边继续写入到原有的AOF文件中，这样做是保证原有的AOF文件的可用性，避免在重写过程中出现意外。
@@ -2940,27 +2967,21 @@ AOF文件重写触发机制:通过 redis.conf配置文件中的 auto-aof-rewrite
 4. 当追加结束后，redis就会用新AOF文件来代替旧AOF文件，之后再有新的写指令，就都会追加到新的AOF文件中
 5. 重写aof文件的操作，并没有读取旧的aof文件，而是将整个内存中的数据库内容用命令的方式重写了一个新的aof文件，这点和快照有点类似
 
-## AOF 优化配置项详解
+### AOF 优化配置项详解
 
 配置文件 APPEND ONLY MODE模块
 
 ![](03-Redis.assets/51. APPEND ONLY MODE模块.jpg)
 
- 总结
+###  总结
 
 ![](03-Redis.assets/52.AOF小总结.jpg)
-
-
-
-
-
-
 
 ## RDB-AOF混合持久化
 
 ### 官网建议
 
-![](03-Redis.assets/53.混合持久化官网建议.jpg)
+<img src="03-Redis.assets/53.混合持久化官网建议.jpg" style="zoom:80%;" />
 
 ### RDB VS AOF
 
@@ -2978,7 +2999,7 @@ AOF文件重写触发机制:通过 redis.conf配置文件中的 auto-aof-rewrite
 
 ![](03-Redis.assets/55.混合持久化加载顺序.jpg)
 
-### 你怎么选？用哪个？
+### 选择
 
 - RDB持久化方式能够在指定的时间间隔对你的数据进行快照存储。
 - AOF持久化方式记录每次对服务器写的操作，当服务器重启的时候会重新执行这些命令来恢复原始的数据，AOF命令以redis协议追加保存每次写的操作到文件末尾。
@@ -3010,6 +3031,2414 @@ $\textcolor{red}{设置aof-use-rdb-preamble的值为yes， yes表示开启，设
 2. appendonly no  -- 禁用AOF
 
    禁用AOF持久化模式下，我们仍然可以使用命令bgrewriteaof生成AOF文件
+
+# 九、redis事务
+
+## 介绍
+
+官网：https://redis.io/docs/manual/transactions/
+
+可以一次执行多个命令，本质是一组命令的集合，一个事务中的所有命令都会序列化，$\textcolor{red}{按顺序地串行化执行而不会被其他命令插入，不许加塞}$
+
+一个队列中，一次性、顺序性、排他性的执行一系列命令
+
+==Redis不提供事务回滚的功能，开发者必须在事务执行出错后，自行恢复数据库状态==
+
+**Redis事务 VS 数据库事务**
+
+| Redis事务            | 数据库事务                                                   |
+| -------------------- | ------------------------------------------------------------ |
+| 1.单独的隔离操作     | Redis的事务仅仅是保证事务里的操作会被连续独占的执行，redis命令执行是单线程架构，在执行完事务内所有指令前是不可能再去同时执行其他客户端的请求的 |
+| 2.没有隔离级别的概念 | 因为事务提交前任何指令都不会被实际执行，也就不存在”事务内的查询要看到事务里的更新，在事务外查询不能看到”这种问题了 |
+| 3.不保证原子性       | Redis的事务**不保证原子性**，也就是不保证所有指令同时成功或同时失败，只有决定是否开始执行全部指令的能力，没有执行到一半进行回滚的能力 |
+| 4.排它性             | Redis会保证一个事务内的命令依次执行，而不会被其它命令插入    |
+
+## 常用命令
+
+官网 ：https://redis.io/docs/manual/transactions/
+
+<img src="03-Redis.assets/image-20231009152503731.png" alt="image-20231009152503731" style="zoom:67%;" />
+
+**Redis 事务命令**
+
+![image-20231009152543478](03-Redis.assets/image-20231009152543478.png)
+
+### case1：正常执行 MULTI EXEC
+
+![](03-Redis.assets/3.Redis事务正常执行.jpg)
+
+### case2：放弃事务 MULTI DISCARD
+
+![image-20231009215854065](03-Redis.assets/image-20231009215854065.png)
+
+### case3：全体连坐
+
+官网说明：
+
+![image-20231009220110481](03-Redis.assets/image-20231009220110481.png)
+
+![image-20231009220100673](03-Redis.assets/image-20231009220100673.png)
+
+一个语法出错，全体连坐。如果任何一个命令语法有错，Redis会直接返回错误，所有的命令都不会执行
+
+### case4：冤头债主
+
+**官网说明：**
+
+![](03-Redis.assets/7.Redis事务冤头债主.jpg)
+
+**补充：**
+
+![](03-Redis.assets/8.Redis不提供回滚功能.jpg)
+
+![](03-Redis.assets/9.Redis冤头债主.jpg)
+
+$\textcolor{red}{注意和传统数据库事务的区别，不一定要么全部成功要么全部失败}$
+
+### case5：watch监控
+
+- **Redis使用Watch来提供乐观锁定，类似于CAS(Check-and-Set)**
+
+  1. 悲观锁：悲观锁(Pessimistic Lock)，顾名思义，就是很悲观，每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会上锁，这样别人想拿这个数据就会block直到它拿到锁
+
+  2. 乐观锁：乐观锁(Optimistic Lock)，顾名思义，就是很乐观，每次去拿数据的时候都认为别人不会修改，$\textcolor{red}{所以不会上锁}$，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据。
+
+     $\textcolor{red}{乐观锁策略：提交版本必须大于记录当前版本才能执行更新}$
+
+  3. CAS
+
+     <img src="03-Redis.assets/10.Redis的CAS.jpg" style="zoom:67%;" />
+
+- **watch key [key ...]**
+
+  1. 初始化k1和balance两个key，先监控在开启multi，保证两个key变动在同一个事务内
+
+     ![](03-Redis.assets/11.Redis-watch.jpg)
+
+  2. 有加塞篡改：watch命令是一种乐观锁的实现，Redis在修改的时候会检测数据是否被更改，如果被更改了，则执行失败
+
+     ![image-20231009221931423](03-Redis.assets/image-20231009221931423.png)
+
+     <font color=red>注意: 图中3和4不管哪个先执行，最终的结果都是整个事务执行失败</font>>
+
+- **unwatch**  放弃监控
+
+  ![](03-Redis.assets/14.unwatch.jpg)
+
+- **小结**
+
+  一旦执行了exec之前加的监控锁都会被取消掉
+
+  当客户端连接丢失的时候(比如退出链接)，所有东西都会被取消监视
+
+## 总结
+
+$\textcolor{red}{开启}$：以multi开始一个事务
+
+$\textcolor{red}{入队}$：将多个命令入队到事务中，接到这些命令并不会立即执行，而是放到等待执行的事务队列里面
+
+$\textcolor{red}{执行}$：有exec命令触发事务
+
+# 十、Redis管道
+
+ **面试题：如何优化频繁命令往返造成的性能瓶颈？**
+
+Redis是一种基于**客户端-服务端模型**以及请求/响应协议的TCP服务。一个请求会遵循以下步骤:
+1客户端向服务端发送命令分四步(发送命令→命令排队→命令执行-返回结果)，并监听Socket返回，通常以阻塞模式等待服务端响应。
+2服务端处理命令，并将结果返回给客户端。
+上述两步称为: Round Trip Time(简称RTT,数据包往返于两端的时间)。
+
+<img src="03-Redis.assets/1.Redis客户端与服务端交互模型.jpg" style="zoom:67%;" />
+
+如果同时需要执行大量的命令，那么就要等待上一条命令应答后再执行，这中间不仅仅多了RTT (Round Time Trip) ，而且还频繁调用系统IO， 发送网络请求，同时需要redis调用多次read()和write()系统方法， 系统方法会将数据从用户态转移到内核态，这样就会对进程上下文有比较大的影响了，性能不太好，0(π_ π)0。这时候Redis管道就出现了。
+
+## 介绍
+
+**上述问题的解决思路**
+
+管道(pipeline)可以一次性发送多条命令给服务端，**服务端依次处理完毕后，通过一 条响应一次性将结果返回，通过减少客户端与redis的通信次数来实现降低往返延时时间**。pipeline实现的原理是队列，先进先出特性就保证数据的顺序性。
+
+<img src="03-Redis.assets/2.Redis pipeline交互模型.jpg" style="zoom:67%;" />
+
+ 官网：https://redis.io/docs/manual/pipelining/
+
+ 定义：pipeline是为了解决RTT往返时，仅仅是将命令打包一次性发送，对整个Redis的执行不造成其他任何影响
+
+## 使用
+
+**批处理命令变种优化措施**，类似Redis的原生批命令(mget和mset)
+
+![image-20231009224455815](03-Redis.assets/image-20231009224455815.png)
+
+## 总结
+
+- pipeline与原生批量命令对比
+  1. 原生批量命令是原子性(例如：mset、mget)，$\textcolor{red}{pipeline是非原子性的}$
+  2. 原生批量命令一次只能执行一种命令，pipeline支持批量执行不同命令
+  3. 原生批量命令是服务端实现，而pipeline需要服务端与客户端共同完成
+
+
+- 管道与事务对比
+  1. 事务具有原子性，管道不具有原子性
+  2. 管道一次性将多条命令发送到服务器，事务是一条一条的发，事务只有在接收到exec命令后才会执行，管道不会
+  3. 执行事务时会阻塞其他命令的执行，而执行管道中的命令时不会
+- 使用pipeline注意事项
+  1. pipeline缓冲的指令只是会依次执行，不保证原子性，如果执行中指令发生异常，将会继续执行后续的指令
+  2. **使用pipeline组装的命令个数不能太多**，不然数量过大客户端阻塞的时间可能过久，同时服务端此时也被迫回复一个队列答复，占用很多内存
+
+# 十一、Redis发布订阅(了解)
+
+## 介绍
+
+**定义：**是一种消息通信模式：发送者(PUBLISH)发送消息，订阅者(SUBSCRIBE)接收消息，可以实现进程间的消息传递
+
+**官网：**https://redis.io/docs/manual/pubsub/
+
+Redis可以实现消息中间件MQ的功能，通过发布订阅实现消息的引导和分流。但是目前不推荐使用该功能，专业的事情交给专业的中间件处理，redis就做好分布式缓存功能
+
+## 作用
+
+Redis客户端可以订阅任意数量的频道，类似我们微信关注多个公众号
+
+![](03-Redis.assets/1.Redis订阅.jpg)
+
+当有新消息通过publish命令发送给频道channel1时，订阅客户端都会收到消息
+
+![](03-Redis.assets/2.Redis发布.jpg)
+
+## 总结
+
+<img src="03-Redis.assets/3.发布订阅小总结.jpg" style="zoom:67%;" />
+
+## 常用命令
+
+![](03-Redis.assets/4.发布订阅常用命令.jpg)
+
+- SUBSCRIBE channel [channel ...]
+
+  订阅给定的一个或多个频道的信息
+
+  $\textcolor{red}{推荐先执行订阅然后在发布，订阅成功之前发布的消息是收不到的}$
+
+  订阅的客户端每次可以收到一个3个参数的消息
+
+  1. 消息种类
+  2. 始发频道的名称
+  3. 实际的消息内容
+
+![](03-Redis.assets/5.消息接收参数.jpg)
+
+- PUBLISH channel message
+
+  发布消息到指定的频道
+
+- PSUBSCRIBE pattern [pattern ...]
+
+  按照模式批量订阅，订阅一个或多个符合给定模式(支持*号？号之类的)的频道
+
+- PUBSUB subcommand [argument [argument ...]]
+
+  查看订阅与发布系统
+
+  PUBSUB CHANNELS
+
+  ​	由活跃频道组成的列表
+
+  ![](03-Redis.assets/6.PUBSUB CHANNELS.jpg)
+
+  PUBSUB NUMSUB [channel [channel ...]]
+
+  ​	某个频道有几个订阅者
+
+  ![](03-Redis.assets/7.PUBSUB NUMSUB.jpg)
+
+  PUBSUB NUMPAT
+
+  ​	只统计使用PSUBSCRIBE命令执行的返回客户端订阅的唯一$\textcolor{red}{模式的数量}$
+
+  ![](03-Redis.assets/9.模式订阅.jpg)
+
+
+- UNSUBSCRIBE [channel [channel ...]]
+
+  退订给定的频道
+
+- PUNSUBSCRIBE [pattern [pattern ...]]
+
+  退订所有给定模式的频道
+
+## 案例
+
+1. 开启3个客户端，演示客户端A、B订阅消息，客户端C发布消息
+
+   ![](03-Redis.assets/8.订阅演示.jpg)
+
+2. 演示批量订阅和发布
+
+   ![](03-Redis.assets/10.批量订阅和发布.jpg)
+
+3. 取消订阅
+
+![](03-Redis.assets/11.取消订阅.jpg)
+
+## 总结
+
+<font color = 'red'> **可以实现消息中间件MQ的功能，通过发布订阅实现消息的引导和分流。但是不推荐使用该功能，专业的事情交给专业的中间件处理，redis就做好分布式缓存功能**</font>
+
+PUB/SUB缺点
+
+1. 发布的消息在Redis系统中不能持久化，因此，必须先执行订阅，在等待消息发布。如果先发布了消息，那么该消息由于没有订阅者，消息将被直接丢弃
+2. 消息只管发送，对于发布者而言消息是即发即失，不管接受，也没有ACK机制，无法保证消息的消费成功
+3. 以上的缺点导致Redis的Pub/Sub模式就像个小玩具，在生产环境中几乎无用武之地，为此Redis5.0版本新增了Stream数据结构，不但支持多播，还支持数据持久化，相比Pub/Sub更加的强大
+
+
+
+# 十二、Redis复制(replica)
+
+## 介绍
+
+官网地址：https://redis.io/docs/management/replication/
+
+<img src="03-Redis.assets/1.数据复制.jpg" style="zoom:67%;" />
+
+<font color=red>主从复制，master以写为主，slave以读为主，当master数据变化的时候，自动将新的数据异步同步到其他的slave数据库</font>
+
+## 作用
+
+- 读写分离
+- 容灾恢复
+- 数据备份
+- 水平扩容支撑高并发
+
+## 使用
+
+$\textcolor{red}{原则: 配从(库)不配主(库)}$
+
+权限:  master如果配置了requirepass参数，需要密码登录 ，那么slave就要配置masterauth来设置校验密码，否则的话master会拒绝slave的访问请求
+
+​                     <img src="03-Redis.assets/2.从机配置主机密码.jpg" style="zoom: 80%;" />
+
+  基本操作命令:
+
++ **info replication** ：可以查看复制结点的主从关系和配置信息
++ **replicaof 主库IP 主库端口** ：一般写入进Redis.conf配置文件内，重启后依然生效
+
++ **slaveof 主库IP 主库端口** ：
+
+  + 每次与master断开之后，都需要重新连接，除非你配置进了redis.conf文件；
+
+  + 在运行期间修改slave节点的信息，如果该数据库已经是某个主数据库的从数据库，那么会停止和原主数据库的同步关系 $\textcolor{red}{转而和新的主数据库同步，重新拜码头}$
+
++  **slaveof no one** ：使当前数据库停止与其他数据库的同步，$\textcolor{red}{转成主数据库，自立为王}$
+
+## 案例-配置文件
+
+### 架构说明
+
+一个Master两个Slave，三台虚拟机，每台都安装redis
+
+<img src="03-Redis.assets/3.主从架构.jpg" style="zoom:80%;" />
+
+拷贝多个redis.conf文件
+
+redis6379.conf、redis6380.conf、redis6381.conf
+
+### 口诀
+
+三台虚拟机需要能相互ping通且需要注意防火墙配置
+
+三大命令：
+
+1. 主从复制
+
+   replicaof 主库IP 主库端口，配从(库)不配主(库)
+
+2. 改换门庭
+
+   slaveof 新主库IP 新主库端口
+
+3. 自立为王
+
+   slaveof no one
+
+### 修改配置文件
+
+redis6379.conf(主机)为例，步骤如下：
+
+1. 开启daemonize yes
+
+   ![](03-Redis.assets/4.配置daemonize .jpg)
+
+2. 注释掉bind 127.0.0.1
+
+3. protected-mode no
+
+   ![](03-Redis.assets/5.配置protected-mode.jpg)
+
+4. 指定端口
+
+5. 指定当前工作目录，dir
+
+   ![](03-Redis.assets/6.配置dir.jpg)
+
+6. pid文件名字，pidfile
+
+   ![](03-Redis.assets/7.配置pidfile.jpg)
+
+7. log文件名字，logfile
+
+   **如果日志文件和启动文件同级，这里可以配置为./6379.log，否则这里一定要写绝对路径，是个巨坑！！！**
+
+   ![](03-Redis.assets/8.配置logfile.jpg)
+
+8. 设置密码 requiredpass 
+
+   ![](03-Redis.assets/9.配置requiredpass .jpg)
+
+9. dump.rdb名字
+
+   ![](03-Redis.assets/10配置dump.rdb名字.jpg)
+
+10. aof文件，appendfilename
+
+    ![](03-Redis.assets/11.配置appendfilename.jpg)
+
+11. **从机需要:**(建议主从都写)
+
+    **从机访问主机的通行密码masterauth**，必须配置
+
+    ![](03-Redis.assets/12.从机配置主机密码.jpg)
+    
+    **从机需要配置，主机不用**
+
+### 一主二仆
+
+#### 方案1：配置文件固定写死主从关系
+
+- 配置文件执行：replicaof 主库IP 主库端口
+
+- 配从(库)不配(主)库：配置从机
+
+  ![image-20231010083145645](03-Redis.assets/image-20231010083145645.png)
+
+
+- 先master后两台slave依次启动
+
+   ![](03-Redis.assets/image-20231010083820088.png)
+
+- 主从关系查看
+
+  主机的日志
+
+<img src="03-Redis.assets/image-20231010084009939.png" alt="image-20231010084009939" style="zoom:80%;" />
+
+​	从机的日志
+
+<img src="03-Redis.assets/17.从机日志.jpg" style="zoom:80%;" />
+
++ 命令查看主从关系	
+
+命令：info replication命令查看 
+
+![](03-Redis.assets/18.命令查看主从关系.jpg)
+
+#### 方案2：命令操作手动主从关系指令
+
+1. 从机停机去掉配置文件中的配置项，3台目前都是主机状态，各不从属
+
+   <img src="03-Redis.assets/22.去掉从机配置.png" style="zoom:80%;" />
+
+2. 3台都是master
+
+   ![](03-Redis.assets/23.3台master.png)
+
+3. 预设的从机上执行命令
+
+   salveof 主库IP 主库端口
+
+   ![](03-Redis.assets/24.slaveof效果.png)
+
+#### <font color = red>主从问题</font>
+
+**配置 VS 命令的区别:**
+
++ 配置，持久稳定永久生效；
+
++ 命令，当成生效
+
+**用命令指定:**
+
+1. Q：用命令使用的话，2台从机重启后，关系还在吗？
+
+   A：不会存在了
+
+**写入配置文件固定写死:**
+
+1. Q：从机可以执行写命令吗？ 
+
+   A：**不可以，从机只能读**
+
+   ![](03-Redis.assets/19.从机只能读.png)
+
+2. Q：从机切入点问题？
+
+   Q：$\textcolor{blue}{slave是从头开始复制还是从切入点开始复制?}$
+   A：master启动，写到k3
+   slave1跟着master同时启动，跟着写到k3
+   slave2写到k3后才启动，那之前的是否也可以复制?
+   $\textcolor{blue}{Y，首次一锅端，后续跟随，master写，slave跟}$
+
+3. Q：主机shutdown后，从机会上位吗？
+
+   A：**从机不动，原地待命，从机数据可以正常使用，等待主机重启归来**
+
+   ![](03-Redis.assets/20.主机挂掉从机不上位.png)
+
+4. Q：主机shutdown后，重启后主从关系还在吗？从机还能否顺利复制？
+
+   A：主从关系依然存在，从机依旧是从机，可以顺利复制
+
+   ![](03-Redis.assets/21.主机重启.png)
+
+5. Q：某台从机down后，master继续，从机重启后它能跟上大部队吗？
+
+   A：可以，类似于从机切入点问题
+
+### 薪火相传
+
+- 上一个slave可以是下一个slave的master，slave同样可以接收其他slaves的连接和同步请求，那么该slave作为了链条中下一个的master,可以有效减轻主master的写压力
+- 中途变更转向:会清除之前的数据，重新建立主从关系并拷贝最新的
+- slaveof 新主库IP 新主库端口
+
+### 反客为主
+
+slaveof no one  使当前数据库停止与其他数据库的同步关系
+
+## 复制原理和工作流程
+
+### slave启动，同步初请
+
+- slave启动成功链接到master后会发送一个sync命令
+- slave首次全新连接master，**一次完全同步(全量复制)将被自动执行**，slave自身原有数据会被master数据覆盖清除
+
+### 首次连接，全量复制
+
+- master节点收到sync命令后会开始在后台保存快照(即RDB持久化，主从复制时会触发RDB)，同时收集所有接收到的用于修改数据集的命令并缓存起来，master节点执行RDB持久化完后，master将RDB快照文件和所有缓存的命令发送到所有slave，以完成一次完全同步
+- 而slave服务在接收到数据库文件数据后，将其存盘并加载到内存中，从而完成复制初始化
+
+### 心跳持续，保持通信
+
+- repl-ping-replica-period 10
+
+  ![image-20231010090053818](03-Redis.assets/image-20231010090053818.png)
+
+### 进入平稳，增量复制
+
+- master继续将新的所有收集到的修改命令自动依次传送给slave，完成同步
+
+### 从机下线，重连续传
+
+- master会检查backlog里面的offset，master和slave都会保存一个复制的offset还有一个masterId，offset是保存在backlog中的。$\textcolor{red}{master只会把已经缓存的offset后面的数据复制给slave，类似断点续传}$
+
+## 复制的缺点
+
+- 复制延时，信号衰减
+
+  由于所有的写操作都是先在Master上操作，然后同步更新到Slave上，所以从Master同步到Slave机器有一定的延迟，当系统很繁忙的时候，延迟问题会更加严重，Slave机器数量的增加也会使这个问题更加严重。
+
+  <img src="03-Redis.assets/26.主从同步延迟.png" style="zoom:80%;" />
+
+- master挂了
+
+  默认情况下，不会在slave节点中自动选一个master
+
+  那每次都要人工干预？ –> <font color = red>无人值守变成刚需, 所以引出后续的技术</font>
+
+# 十三、Redis哨兵
+
+## 作用
+
+吹哨人巡查监控后台master主机是否故障，如果故障了根据$\textcolor{red}{投票数}$自动将某一个从库转换为新主库，继续对外服务
+
+作用：**俗称无人值守运维**
+
+<img src="03-Redis.assets/image-20231010090947292.png" alt="image-20231010090947292" style="zoom:80%;" />
+
+官网理论：https://redis.io/docs/management/sentinel/
+
+<img src="03-Redis.assets/2.哨兵能干嘛.png" style="zoom:67%;" />
+
+**主从监控**：监控主从redis库运行是否正常
+
+**消息通知**：哨兵可以将故障转移的结果发送给客户端
+
+**故障转移**：如果master异常，则会进行主从切换，将其中一个slave作为新master
+
+**配置中心**：客户端通过连接哨兵来获得当前Redis服务的主节点地址
+
+## 配置参数说明
+
+### Redis Sentinel架构
+
+- 3个哨兵：自动监控和维护集群，不存放数据，只是吹哨人
+- 1主2从：用于数据读取和存放
+
+<img src="03-Redis.assets/image-20231010091324192.png" alt="image-20231010091324192" style="zoom: 67%;" />
+
+### 操作步骤
+
+1. /myredis目录下拷贝sentinel.conf文件按，名字绝对不能错
+
+2. 先看看/opt目录下默认的sentinel.conf文件的内容
+
+   <img src="03-Redis.assets/4.sentinel.conf目录地址.png" style="zoom:67%;" />
+
+3. 重要参数项说明
+
+   - bind：服务监听地址，用于客户端连接，默认本机地址
+
+   - daemonize：是否以后台daemon方式运行
+
+   - protected-model：安全保护模式
+
+   - port：端口
+
+   - logfile：日志文件路径
+
+   - pidfile：pid文件路径
+
+   - dir：工作目录
+
+   - ```
+     sentinel monitor <master-name> <ip> <redis-port> <quorum>
+     ```
+
+     设置要监控的master服务器
+
+     quorum表示最少有几个哨兵认可客观下线，同意故障迁移的法定票数
+
+     ![](03-Redis.assets/5.quorum票数解释.png)
+     
+     网络是不可靠的有时候一个sentinel会因为网络堵塞而误以为master redis已经死掉，在sentinel集群环境下需要多个sentinel互相沟通来确认某个master是否真的死掉了，quorum这个参数是进行客观下线的一个依据，意思是至少有quorum个sentinel认为这个master有故障，才会对这个master进行下线以及故障转移。因为有的时候，某个sentinel节点可能因为自身网络原因，导致无法连接master，而此时master并没有出现故障，所以，这就需要多个sentinel都一致认为改master有问题，才可以进行下一步操作，这就保证了公平性和高可用。
+
+
+   - ```
+     sentinel auth-pass <master-name> <password>
+     ```
+
+     master设置了密码，连接master服务的密码
+
+   - 其他
+
+     | sentinel down-after-milliseconds <master-name>  <milliseconds> | 指定多少毫秒之后，主节点没有应答哨兵，此时哨兵主观上认为主节点下线 |
+     | ------------------------------------------------------------ | ------------------------------------------------------------ |
+     | sentinel parallel-syncs <master-name> <nums>                 | 表示允许并行同步的slave个数，当Master挂了后，哨兵会选出新的Master，此时，剩余的slave会向新的master发起同步数据 |
+     | sentinel failover-timeout <master-name> <milliseconds>       | 故障转移的超时时间，进行故障转移时，如果超过设置的毫秒，表示故障转移失败 |
+     | sentinel notification-script <master-name> <script-path>     | 配置当某一事件发生时所需要执行的脚本                         |
+     | sentinel client-reconfig-script <master-name> <script-path>  | 客户端重新配置主节点参数脚本                                 |
+
+## sentinel通用配置及主从配置
+
+**sentinel26379.conf、sentinel26380.conf、sentinel26381.conf**
+
+```properties
+bind 0.0.0.0
+daemonize yes
+protected-mode no
+port 26379  #
+logfile "/myredis/sentinel26379.log"      #
+pidfile /var/run/redis-sentinel26379.pid  #
+dir /myredis                              #自定义存放目录
+sentinel monitor mymaster 192.168.111.169 6379 2 #
+sentinel auth-pass mymaster 111111               #
+```
+
+<img src="03-Redis.assets/6.sentinel配置.png" style="zoom:67%;" />
+
+**最终配置**
+
+![](03-Redis.assets/7.sentinel集群配置.png)
+
+## master主机配置文件
+
+理论上sentinel配置文件应该部署在不同的服务器上，做成集群，但是本次演示将其放到一台机器上
+
+![](03-Redis.assets/8.sentinel部署.png)
+
+### 先启动一主二从3个redis实例，测试正常的主从复制
+
+- 架构说明
+
+  ![image-20231010092354863](03-Redis.assets/image-20231010092354863.png)
+
+
+- 主机6379配置修改
+
+  ![](03-Redis.assets/10.主机配置master访问密码.png)
+
+  6379后续可能会变成从机，需要设置访问新主机的密码，所以**此处会设置masterauth**，**不然后续可能会报错 master_link_status:down**
+
+- 3台不同的虚拟机实例，启动三台真是机器实例并连接
+
+  ```shell
+  redis-server redis6379.conf
+  redis-server redis6380.conf
+  redis-server redis6381.conf
+  
+  redis-cli -a 123456 -p 6379
+  redis-cli -a 123456 -p 6380
+  redis-cli -a 123456 -p 6381
+  ```
+
+### 再启动3个哨兵监控后再测试一次主从复制
+  sentinel的两种启动方式
+
+  <img src="03-Redis.assets/image-20231010092649534.png" alt="image-20231010092649534" style="zoom: 80%;" />
+
+  ```shell
+  redis-server sentinel26379.conf --sentinel
+  redis-server sentinel26380.conf --sentinel
+  redis-server sentinel26381.conf --sentinel
+  ```
+
+![](03-Redis.assets/12.sentinel启动结果查询.png)
+
+启动后查看日志文件, 我们会发现sentinel配置文件会自动在配置文件中加上部分配置
+
+<img src="03-Redis.assets/13.sentinel文件重写.png" style="zoom: 80%;" />
+
+## 主节点异常情况
+
+### 原有的master挂了
+
+- 我们自己手动关闭6379服务器，模拟master挂了
+
+- 问题思考
+
+  1. 两台从机数据是否OK
+  2. 是否会从剩下的2台机器上选出新的master
+  3. 之前down机的master机器重启回来，谁将会是新老大？会不会双master冲突
+
+- 答案
+
+  1. 两台从机数据OK
+
+     <img src="03-Redis.assets/image-20231010094415198.png" alt="image-20231010094415198" style="zoom:67%;" />
+
+     错误警告: error: broken pipe
+
+     ![image-20231010094224701](03-Redis.assets/image-20231010094224701.png)
+
+     ![image-20231010094205427](03-Redis.assets/image-20231010094205427.png)
+
+  2. 会投票选出新的master主机
+
+     日志文件
+
+     ![](03-Redis.assets/15.sentinel选举.png)
+  
+  3. 谁是master，限本次案例
+  
+     本案例中6381被选举为新的master，上位成功
+  
+     **重启6379之后，它会从原来的master降级为slave, 会进行薪火相传**
+  
+     6380还是slave，只不过是换了一个新老大6381(从跟随6379变成跟随6381)
+
+### 挂掉后master配置文件的自动变化
+
+老master的redis6379.conf文件
+
+![](03-Redis.assets/16.旧master配置文件重写.jpg)
+
+新master的redis6381.conf文件
+
+![](03-Redis.assets/17.slave升master配置文件重写.jpg)
+
+**结论**
+
+$\textcolor{red}{文件的内容，在运行期间会被sentinel动态进行更改}$
+
+```
+Master-Slave切换后，master_redis.conf、slave_redis.conf、sentinel.conf的内容都会发生改变，即master_redis.conf中会多一行slaveof的配置，而升级为master的主机会去掉原来的slaveof配置，sentinel.conf的监控目标会随之调换}
+```
+
+### 其他备注
+
+生产上都是不同机房不同服务器，很少出现3个哨兵全部挂掉的情况
+
+可以同时监控多个master，一行一个
+
+<img src="03-Redis.assets/18.多master监控.jpg" style="zoom:67%;" />
+
+## 哨兵运行流程和选举原理
+
+当一个主从配置中master失效后，sentinel可以选举出一个新的master用于自动接替原master的工作，主从配置中的其他redis服务器自动指向新的master同步数据，一般建议sentinel采取奇数台，防止某一台sentinel无法连接到master导致误切换
+
+### 运行流程，故障切换
+
+![image-20231010103004712](03-Redis.assets/image-20231010103004712.png)
+
+- 三个哨兵监控一主二从，正常运行中
+
+  <img src="03-Redis.assets/image-20231010102718950.png" alt="image-20231010102718950" style="zoom: 67%;" />
+
+- SDown主观下线(Subjectively Down)
+
+  1. SDOWN（主观不可用）是**单个sentinel自己主观上**检测到的关于master的状态，从sentinel的角度来看，如果发送了PING心跳后，在一定时间内没有收到合法的回复，就达到了SDOWN的条件。
+
+  2. sentinel配置文件中的down-after-milliseconds设置了判断主观下线的时间长度
+
+  3. 说明
+
+     ![](03-Redis.assets/19.主观下线说明.jpg)
+
+- ODown客观下线(Objectively Down)
+
+  1. ODOWN需要一定数量的sentinel，$\textcolor{red}{多个哨兵达成一致意见}$才能认为一个master客观上已经宕机
+
+  2. 说明
+
+     ![](03-Redis.assets/20.ODown客观下线说明.jpg)
+
+     $\textcolor{red}{\large quorum这个参数是进行客观下线的一个依据，法定人数/法定票数}$
+     意思是至少有quorum个sentinel认为这个master有故障才会对这个master进行下线以及故障转移。因为有的时候，某个sentinel节点可能因为自身网络原因导致无法连接master，而此时master并没有出现故障，所以这就需要多个sentinel都一致认为该master有问题，才可以进行下一步操作，这就保证了公平性和高可用。
+
+- 选举出领导者哨兵(哨兵中选出兵王)
+
+  ![](03-Redis.assets/21.主哨兵解释.jpg)
+
+  1. 当主节点被判断客观下线后，各个哨兵节点会进行协商，先选举出一个$\textcolor{red}{\large 领导者哨兵节点（兵王）}$并由该领导者也即被选举出的兵王进行failover（故障转移）。
+
+     哨兵日志文件解读分析
+
+     ![](03-Redis.assets/22.哨兵兵王选举.jpg)
+
+  2. 哨兵领导者，兵王如何选出来的？-> **Raft算法**
+
+     ![](03-Redis.assets/23.Raft算法.jpg)
+
+     监视该主节点的所有哨兵都有可能被选为领导者，选举使用的算法是Raft算法;Raft算法的基本思路是先到先得:即在一轮选举中，哨兵A向B发送成为领导者的申请、如果B没有同意过其他哨兵，则会同意A成为领导者。
+
+
+- 由兵王开始推动故障切换流程并选出新的master
+
+  1. 新主登基
+
+     - $\textcolor{red}{\large 某个Slave被选中成为新Master}$
+
+     - 选出新master的规则，剩余Slave节点健康前提下，会按下图规则进行选举
+
+       <img src="03-Redis.assets/image-20231010102411939.png" alt="image-20231010102411939" style="zoom:67%;" />
+
+       + redis.conf文件中，优先级slave-priority或者replica-priority最高的从节点(数字越小优先级越高)
+
+       ![](03-Redis.assets/25.从节点升级为主节点默认优先级.jpg)
+
+       + 复制偏移位置offset最大的从节点(也就是在master还没有宕机时，复制到数据比其他Slave要多)
+       +  最小Run ID的从节点，字典顺序，ASCII码
+
+  2. 群臣俯首
+
+     - $\textcolor{red}{\large 一朝天子一朝臣，换个码头重新拜}$
+     - 执行slaveof no one命令让选出来的从节点成为新的主节点，并通过slaveof命令让其他节点成为其从节点
+     - sentinel leader会对选举出的新master执行slaveof on one操作，将其提升为master节点
+     - sentinel leader向其他slave发送命令，让剩余的slave成为新的master节点的slave
+
+  3. 旧主拜服( 如果老master回来也得认怂，会被降级为slave)
+
+     - 老master重新上线后，会将它设置为新选出的master的从节点
+     - sentinel leader会让原来的master降级为slave并恢复正常工
+
+总结
+
+上述的failover操作均由sentinel自己独自完成，完全不需要人工干预
+
+<img src="03-Redis.assets/26.选举新master总结.jpg" style="zoom: 80%;" />
+
+## 哨兵使用建议
+
+1. 哨兵节点的数量应为多个，哨兵本身应该集群，保证高可用
+2. 哨兵节点的数量应该是奇数
+3. 各个哨兵节点的配置应一致
+4. 如果哨兵节点部署在Docker等容器里面，尤其要注意端口的正确映射
+5. 哨兵集群+主从复制，并不能保证数据零丢失，$\textcolor{red}{\large所以需要使用集群}$
+
+# 十四、Redis集群(cluster)
+
+## 介绍
+
+定义:  <font color=red>由于数据量过大，单个Master复制集难以承担</font>，因此需要对多个复制集进行集群，形成水平扩展每个复制集只负责存储整个数据集的一部分，这就是Redis的集群，其作用是提供在多个Redis节点间共享数据的程序集。
+
+官网：https://redis.io/docs/reference/cluster-spec/
+
+**Redis集群是一个提供在多个Redis节点间共享数据的程序集，Redis集群可以支持多个master**
+
+<img src="03-Redis.assets/2.redis集群图.jpg" style="zoom:80%;" />
+
+## 作用
+
+- Redis集群支持多个master，每个master又可以挂载多个slave
+  1. 读写分离
+  2. 支持数据的高可用
+  3. 支持海量数据的读写存储操作
+- 由于Cluster自带Sentinel的故障转移机制，内置了高可用的支持，$\textcolor{red}{\large 无需再去使用哨兵功能}$
+- 客户端与Redis的节点连接，不再需要连接集群中所有的节点，只需要任意连接集群中的一个可用节点即可
+- $\textcolor{red}{\large 槽位slot}$负责分配到各个物理服务节点，由对应的集群来负责维护节点、插槽和数据之间的关系
+
+## 集群算法-分片-槽位slot
+
+### 官网出处
+
+![](03-Redis.assets/3.槽位官网说明.jpg)
+
+翻译说明：![](03-Redis.assets/4.官网翻译.jpg)
+
+### redis集群的槽位slot
+
+Redis集群的数据分片
+
+Redis集群没有使用一致性hash 而是引入了哈希槽的概念。
+
+Redis集群有16384个哈希槽每个key通过CRC16校验后对16384取模来决定放置哪个槽，集群的每个节点负责一部分hash槽，举个例子，比如当前集群有3个节点，那么：
+
+<img src="03-Redis.assets/5.槽位示例.jpg" style="zoom:80%;" />
+
+### redis集群的分片
+
+| 分片是什么            | 使用Redis集群时我们会将存储的数据分散到多台redis机器上，这称为分片。简言之，集群中的每个Redis实例都被认为是整个数据的一个分片。 |
+| --------------------- | ------------------------------------------------------------ |
+| 如何找到给定key的分片 | 为了找到给定key的分片，我们对key进行CRC16(key)算法处理并通过对总分片数量取模。然后，$\textcolor{red}{\large使用确定性哈希函数}$，这意味着给定的key$\textcolor{red}{\large将多次始终映射到同一个分片}$，我们可以推断将来读取特定key的位置。 |
+
+ ### 分片和槽位的优势
+
+$\textcolor{blue}{\large 最大优势，方便扩缩容和数据分派查找}$
+
+这种结构很容易添加或者删除节点，比如如果我想添加个节点D，我需要从节点A，B，C中得部分槽位到D上。如果我想一出节点A，需要将A中的槽移动到B和C节点上，然后将没有任何槽的节点从集群中移除即可。由于一个结点将哈希槽移动到另一个节点不会停止服务，所以无论添加删除或者改变某个节点的哈希槽的数量都不会造成集群不可用的状态。<img src="03-Redis.assets/5.槽位示例.jpg" style="zoom: 67%;" />
+
+## slot槽位映射方案
+
+### 哈希取余分区(小厂)
+
+<img src="03-Redis.assets/6.哈希取余分区.jpg" alt="6.哈希取余分区.jpg" style="zoom:67%;" />
+
+2亿条记录就是2亿个k,v，我们单机不行必须要分布式多机，假设有3台机器构成一个集群，用户每次读写操作都是根据公式：hash(key) % N个机器台数，计算出哈希值，用来决定数据映射到哪一个节点上。
+
+$\textcolor{blue}{\large 优点}$：简单粗暴，直接有效，只需要预估好数据规划好节点，例如3台、8台、10台，就能保证一段时间的数据 支撑。使用Hash算法让固定的一部分请求落到同一台服务器上，这样每台服务器固定处理一部分请求 (并维护这些请求的信息)， 起到负载均衡+分而治之的作用。
+
+$\textcolor{blue}{\large 缺点}$：原来规划好的节点，进行扩容或者缩容就比较麻烦了额，不管扩缩，每次数据变动导致节点有变动，映射关系需要重新进行计算，在服务器个数固定不变时没有问题，如果需要弹性扩容或故障停机的情况下，原来的取模公式就会发生变化: Hash(key)/3会 变成Hash(key) /?。此时地址经过取余运算的结果将发生很大变化，根据公式获取的服务器也会变得不可控。
+
+**某个redis机器宕机了，由于台数数量变化，会导致hash取余全部数据重新洗牌。**
+
+### 一致性哈希算法分区(中厂)
+
+   - 是什么？
+
+     一致性Hash算法背景是在1997年由麻省理工学院提出的，设计目标是**为了解决分布式缓存数据变动和映射问题**，某个机器宕机了，分母数量改变了，自然取余数不行了 
+
+   - 能干嘛？
+
+     提出一致性Hash解决方案。目的是当服务器个数发生变动时，尽量减少影响客户端到服务器的映射关系
+
+   - 3大步骤
+
+     $\textcolor{blue}{\large 算法构建一致性哈希环}$ 
+
+     一致性哈希算法必然有个hash函数并按照算法产生hash值，这个算法的所有可能哈希值会构成一个全量集，这个集合可以成为一个hash空间[0,2^32-1]，这个是一个线性空间，但是在算法中，我们通过适当的逻辑控制将它首尾相连(O= 2^32),这样让它逻辑上形成了一个环形空间。
+     它也是按照使用取模的方法，**前面笔记介绍的节点取模法是对节点（服务器）的数量进行取模。而一致性Hash算法是对2^32取模，简单来说，一致性Hash算法将整个哈希值空间组织成一个虚拟的圆环**，如假设某哈希函数H的值空间为0-2^32-1(即哈希值是一个32位无符号整形），整个哈希环如下图:整个空间**按顺时针方向组织**，圆环的正上方的点代表0，O点右侧的第一个点代表1，以此类推，2、3、4、……直到2^32-1，也就是说0点左侧的第一个点代表2^32-1，0和2个32-1在零点中方向重合，我们把这个由2^32个点组成的圆环称为Hash环。
+
+     ![](03-Redis.assets/7.Hash环.jpg)
+
+     $\textcolor{blue}{\large 服务器IP节点映射}$ 
+
+     将集群中各个IP节点映射到环上的某一个位置。
+     将各个服务器使用Hash进行一个哈希，具体可以选择服务器的IP或主机名作为关键字进行哈希，这样每台机器就能确定其在哈希环上的位置。假如4个节点NodeA、B、C、D，经过IP地址的**哈希函数**计算(hash(ip))，使用IP地址哈希后在环空间的位置如下:
+
+     ![](03-Redis.assets/8.对节点取Hash值.jpg)
+
+     $\textcolor{blue}{\large key落到服务器的落键规则}$ 
+
+     当我们需要存储一个kv键值对时，首先计算key的hash值，hash(key)，将这个key使用相同的函数Hash计算出哈希值并确定此数据在环上的位置，**从此位置沿环顺时针“行走”**，第一台遇到的服务器就是其应该定位到的服务器，并将该键值对存储在该节点上。
+     如我们有Object A、 Object B、 Object C. object D四个数据对象，经过哈希计算后，在环空间上的位置如下:根据一致性Hash算法，数据A会被定为到Node A上，B被定为到Node B上，C被定为到Node C上，D被定为到Node D上。
+
+     ![](03-Redis.assets/9.key的落键规则.jpg)
+
+   - 优点
+
+     $\textcolor{green}{\large 一致性哈希算法的容错性}$ ：假设Node C宕机，可以看到此时对象A、B、D不会受到影响。一般的，在一致性Hash算法中，如果一台服务器不可用，则受影响的数据仅仅是此服务器到其环空间中前一台服务悉**〈即沿着逆时针方向行走遇到的第一台服务器）之间数据**，其它不会受到影响。简单说，就是C挂了，受到影响的只是B、C之间的数据**且这些数据会转移到D进行存储**。
+
+     ![](03-Redis.assets/10.一致性哈希算法容错性.jpg)
+
+     $\textcolor{green}{\large 一致性哈希算法的扩展性}$ 
+
+     数据量增加了，需要增加一台节点NodeX，X的位置在A和B之间，那收到影响的也就是A到X之间的数据，重新把A到X的数据录入到X上即可，不会导致hash取余全部数据重新洗牌。
+
+     ![](03-Redis.assets/11.一致性哈希算法扩展性.jpg)
+
+   - 缺点
+
+     $\textcolor{green}{\large 一致性哈希算法的数据倾斜问题}$ 
+
+     一致性Hash算法在服务**节点太少时**，容易因为节点分布不均匀而造成**数据倾斜**（被缓存的对象大部分集中缓存在某一台服务器上)问题，例如系统中只有两台服务器:
+
+     ![](03-Redis.assets/12.一致性哈希算法缺点.jpg)
+
+   - 小总结
+
+     为了在节点数目发生改变时尽可能少的迁移数据
+
+     将所有的存储节点排列在收尾相接的Hash环上，每个key在计算Hash后会顺时针找到临近的存储节点存放。而当有节点加入或退出时仅影响该节点在Hash环上顺时针相邻的后续节点。
+
+     $\textcolor{green}{\large 优点}$ ：加入和删除节点只影响哈希环中顺时针方向的相邻的节点，对其他节点无影响。
+
+     $\textcolor{green}{\large 缺点}$ ：数据的分布和节点的位置有关，因为这些节点不是均匀的分布在哈希环上的，所以数据在进行存储时达不到均匀分布的效果。
+
+### $\textcolor{red}{\large 哈希槽分区}$(大厂)
+
+- 是什么？ HASH_SLOT = CRC16(key) mod 16384
+
+  1. 为什么出现
+
+     哈希槽实质就是一个数组，数组[0, 2^14 - 1]形成hash slot空间
+
+  2. 能干什么
+
+     解决均匀分配的问题，在<font color=red>数据和节点之间又加入了一层，把这层称为哈希槽(slot)</font>，用于管理数据和节点之间的关系}$，现在就相当于节点上放的是槽，槽里面放的是数据。![](03-Redis.assets/13.哈希槽.jpg)
+
+     槽解决的是粒度问题，相当于把粒度变大了，这样便于数据移动。哈希解决的是映射问题，使用key的哈希值来计算所在的槽，便于数据分配
+
+  3. 多少个hash
+
+     一个集群只能有16384个槽，编号0-16383(0-2^14-1)。这些槽会分配给集群中的所有主节点，分配策略没有要求。
+
+     集群会记录节点和槽的对应关系，解决了节点和槽的关系后，接下来就需要对key求哈希值，然后对16384取模，余数是几key就落入对应的槽里。HASH_SLOT = CRC16(key) mod 16384。以槽为单位移动数据，因为槽的数目是固定的，处理起来比较容易，这样数据移动问题就解决了。
+
+- 哈希槽计算
+
+  Redis集群中内置了16384个哈希槽，redis 会根据节点数量大致均等的将哈希槽映射到不同的节点。当需要在Redis集群中放置一个key-valuel时，redis先对key使用crc16算法算出一个结果然后用结果对16384求余数[ CRC16(key) % 16384]，这样每个key都会对应一个编号在0-16383之间的哈希槽，也就是映射到某个节点上。如下代码，key之A、B在Node2， key之C落在Node3上
+
+  ![](03-Redis.assets/14.hash槽计算.jpg)
+
+$\textcolor{red}{\large 经典面试题：为什么Redis集群的最大槽数是16384个？}$
+
+Redis集群并没有使用一致性hash而是引入了哈希槽的概念。Redis 集群有16384个哈希糟，每个key通过CRC16校验后对16384取模来决定放置哪个槽，集群的每个节点负责一部分hash槽。但为什么哈希槽的数量是16384 (2^14）个呢？
+
+CRC16算法产生的hash值有16bit，该算法可以产生2^16=65536个值。
+换句话说值是分布在0～65535之间，有更大的65536不用为什么只用16384就够?
+
+作者在做mod运算的时候，为什么不mod65536，而选择mod16384? $\textcolor{blue}{\large HASH\_SLOT = CRC16(key) mod 65536为什么没启用？}$
+
+作者回答：https://github.com/redis/redis/issues/2576
+
+![](03-Redis.assets/15.Redis集群最大槽位为什么是16384.jpg)
+
+说明1：
+
+正常的心跳数据包带有节点的完整配置，可以用幂等方式用旧的节点替换旧节点，以便更新旧的配置。
+这意味着它们包含原始节点的插槽配置，该节点使用2k的空间和16k的插槽，但是会使用8k的空间（使用65k的插槽）。同时，由于其他设计折衷，Redis集群不太可能扩展到1000个以上的主节点。
+因此16k处于正确的范围内，以确保每个主机具有足够的插槽，最多可容纳1000个矩阵，但数量足够少，可以轻松地将插槽配置作为原始位图传播。请注意，在小型群集中，位图将难以压缩，因为当N较小时，位图将设置的slot / N位占设置位的很大百分比。
+
+说明2：
+
+$\textcolor{blue}{\large (1)如果槽位为65536，发送心跳信息的消息头达8k，发送的心跳包过于庞大。}$
+在消息头中最占空间的是myslots[CLUSTER_SLOTS/8]。当槽位为65536时，这块的大小是:65536÷8÷1024=8kb
+
+在消息头中最占空间的是myslots[CLUSTER_SLOTS/8]。当槽位为16384时，这块的大小是:16384∶8∶1024=2kb
+
+因为每秒钟，redis节点需要发送一定数量的ping消息作为心跳包，如果槽位为65536，这个ping消息的消息头太大了，浪费带宽。
+$\textcolor{blue}{\large (2)redis的集群主节点数量基本不可能超过1000个。}$
+集群节点越多，心跳包的消息体内携带的数据越多。如果节点过1000个，也会导致网络拥堵。因此redis作者不建议redis cluster节点数量超过1000个。那么，对于节点数在1000以内的redis cluster集群，16384个槽位够用了。没有必要拓展到65536个。
+$\textcolor{blue}{\large (3)槽位越小，节点少的情况下，压缩比高，容易传输}$
+Redis主节点的配置信息中它所负责的哈希槽是通过一张bitmap的形式来保存的，在传输过程中会对bitmap进行压缩，但是如果bitmap的填充率slots /N很高的话(N表示节点数)， bitmap的压缩率就很低。如果节点数很少，而哈希槽数量很多的话，bitmap的压缩率就很低。
+
+计算结论
+
+Redis集群中内置了16384个哈希槽，redis会根据节点数量大致均等的将哈希槽映射到不同的节点。当需要在Redis集群中放置-一个key-value时， redis先对key使用crc16算法算出一个结果然后用结果对16384求余数[ CRC16(key) % 16384]， 这样每个key都会对应一个编号在0-16383之间的哈希槽，也就是映射到某个节点上。如下代码，key之A、B在Node2， key之C落在Node3上
+
+![](03-Redis.assets/14.hash槽计算.jpg)
+
+
+### Redis集群不保证强一致性
+
+redis集群$\textcolor{blue}{\large 不保证强一致性}$，这意味着在特定的条件下，Redis集群可能会丢掉一些被系统收到的写入请求命令
+
+last failover wins 最后一次故障转移获胜
+
+![](03-Redis.assets/16.Redis集群不保证强一致性.jpg)
+
+## 3主3从Redis集群配置
+
+![image-20231010111821518](03-Redis.assets/image-20231010111821518.png)
+
+![image-20231010111459357](03-Redis.assets/image-20231010111459357.png)
+
+### 找3台真实虚拟机，各自新建
+
+mkdir -p /myredis/cluster
+
+### 新建6个独立的Redis实例服务
+
+IP： 192.168.0.100 + 端口6381/6382
+
+```shell
+vim /myredis/cluster/redisCluster6381.conf
+```
+
+```conf
+bind 0.0.0.0
+daemonize yes
+protected-mode no
+port 6381
+logfile "/myredis/cluster/cluster6381.log"
+pidfile /myredis/cluster6381.pid
+dir /myredis/cluster
+dbfilename dump6381.rdb
+appendonly yes
+appendfilename "appendonly6381.aof"
+requirepass 123456
+masterauth 123456
+
+# 开启集群
+cluster-enabled yes
+cluster-config-file nodes-6381.conf  #集群的配置文件
+cluster-node-timeout 5000
+```
+
+```shell
+vim /myredis/cluster/redisCluster6382.conf
+```
+
+```
+bind 0.0.0.0
+daemonize yes
+protected-mode no
+port 6382
+logfile "/myredis/cluster/cluster6381.log"
+pidfile /myredis/cluster6381.pid
+dir /myredis/cluster
+dbfilename dump6381.rdb
+appendonly yes
+appendfilename "appendonly6382.aof"
+requirepass 123456
+masterauth 123456
+
+# 开启集群
+cluster-enabled yes
+cluster-config-file nodes-6382.conf  #集群的配置文件
+cluster-node-timeout 5000
+```
+
+IP：192.168.0.100 + 端口6383/6384
+
+```
+vim /myredis/cluster/redisCluster6383.conf
+vim /myredis/cluster/redisCluster6384.conf
+```
+
+IP：192.168.0.100 + 端口6385/6386
+
+```
+vim /myredis/cluster/redisCluster6385.conf
+vim /myredis/cluster/redisCluster6386.conf
+```
+
+启动6台主机实例
+
+```shell
+redis-server /myredis/cluster/redisCluster6381.conf
+
+...
+
+redis-server /myredis/cluster/redisCluster6386.conf
+```
+
+### 通过redis-cli 命令为6台机器构建集群关系
+
+**构建主从关系命令**
+
+```shell
+// 一定要注意，此处要修改自己的IP为真实IP
+redis-cli -a 123456 --cluster create --cluster-replicas 1 192.168.111.175:6381 192.168.111.175:6382 192:168.111.172:6383 192.168.111.172:6384 192.168.111.174:6385 192.168.111.174:6386
+```
+
+注:  
+
++ --cluster- replicas 1 表示为每个master创建一一个slave节点
++ 第一个位置192.168.111.175:6381表示集群的领路人
+
+![](03-Redis.assets/17.启动3主3从.jpg)
+
+ <img src="03-Redis.assets/image-20231010112626242.png" alt="image-20231010112626242" style="zoom:67%;" />
+
+**一切OK的话，3主3从搞定**
+
+### 6381作为切入点，查看并检验集群状态
+
+**连接进6381作为切入点，$\textcolor{red}{\large 查看节点状态}$**
+
+<img src="03-Redis.assets/19.集群节点状态.jpg" style="zoom:67%;" />
+
+**cluster nodes**
+
+<img src="03-Redis.assets/20.集群节点状态查看.jpg" style="zoom:67%;" />
+
+**CLUSTER INFO**
+
+<img src="03-Redis.assets/image-20231010112725444.png" alt="image-20231010112725444" style="zoom: 67%;" />
+
+## 3主3从redis集群读写
+
+### 问题 
+
+#### 对6381新增连个key，看看效果如何
+
+![](03-Redis.assets/22.集群环境对6381新增两个key.jpg)
+
+#### 为什么报错
+
+![](03-Redis.assets/23.为什么报错.jpg)
+
+#### 如何解决
+
+防止路由失效加参数-c并新增两个key：
+
+```shell
+redis-cli -a 123456 -p 6381 -c
+```
+
+<img src="03-Redis.assets/24.集群重定向.jpg" style="zoom:67%;" />
+
+### 集群启动
+
+命令:
+
+```shell
+redis-cli -a 123456 -p 6381 -c
+```
+
+#### 服务加上-c后查看集群信息
+
+信息无变化
+
+![](03-Redis.assets/25.查看集群信息.jpg)
+
+#### 查看某个key该属于对应的槽位值 cluster keyslot 键名称
+
+![](03-Redis.assets/26.cluster keyslot 键名称.jpg)
+
+## 主从容错切换迁移案例
+
+### 容错切换迁移
+
+- 主6381和从机切换，先停止主机6381
+
+  6381主机停了，对应的真实从机上位
+
+  6381作为1号主机分配的从机以实际情况为准，具体是几号机器就是几号机器
+
+
+- 再次查看集群信息，本次6381主6384从
+
+  ![](03-Redis.assets/28.集群主从查看.png)
+
+- 停止主机6381，再次查看集群信息
+
+  ![](03-Redis.assets/27.从机上位.png)
+
+  6384成功上位
+
+- 随后，6381原来的主机回来了，是否会上位？
+
+  恢复前：![](03-Redis.assets/29.集群主节点恢复前.png)
+
+  恢复后：![](03-Redis.assets/30.集群主节点恢复后.png)
+
+  $\textcolor{red}{\large 从机6381不会上位, 以从机的形式回归}$, 使用cluster failover命令
+
+### 集群不保证数据一致性100%OK，是会有数据丢失的情况
+
+Redis集群不保证强一致性这意味着在特定的条件下，Redis集群可能会丢掉一些被系统收到的写入请求命令
+
+![](03-Redis.assets/16.Redis集群不保证强一致性-16968372161634.jpg)
+
+### 节点从属调整该
+
+上面6381宕机后，6381机6384主从对调了，和原始设计图不一样了,该如何调换主从位置呢
+
+重新登录6381机器 
+
+```
+常用命令：cluster failover
+```
+
+![](03-Redis.assets/31.6391上位命令.png)
+
+## 主从扩容案例
+
+### 新建6387、6388两个服务实例配置文件+新建后启动
+
+IP：192.168.11.174+端口6387/端口6388
+
+```shell
+vim /myredis/cluster/redisCluster6387.conf
+```
+
+![](03-Redis.assets/32.6387配置文件.png)
+
+```shell
+vim /myredis/cluster/redisCluster6388.conf
+```
+
+### 启动87/88两个新的节点实例，此时他们自己都是master
+
+```shell
+redis-server /myredis/cluster/redisCluster6387.conf
+redis-server /myredis/cluster/redisCluster6388.conf
+```
+
+![image-20231010114924527](03-Redis.assets/image-20231010114924527.png)
+
+### 将新增的6387节点(空槽位)作为master节点加入集群领路人
+
+==一般情况下使用一主一从的形式加入==
+
+将新增的6387作为master节点加入原有集群
+
+```shell
+redis-cli -a 密码 --cluster 新建节点所在的IP地址:6387 原来集群节点里面的领路人的IP地址:6381
+```
+
++ 6387就是将要作为master新增节点
++ 6381 就是原来集群节点里面的领路人，相当于6387拜拜6381的码头从而找到组织加入集群redis-cli -a 123456 --cluster add-node 192.168.111.174:6387 192.168.111.175:6381
+
+![](03-Redis.assets/33.新节点加入集群master.png)
+
+### 检查集群情况第一次
+
+```shell
+redis-cli --cluster check 领路人端口所在的真实ip地址：领路人端口
+```
+
+例如：redis-cli -a 123456 --cluster check 192.168.111.175:6381
+
+![](03-Redis.assets/34.加入后集群情况.png)
+
+### 领路人重新分派槽位( reshard)
+
+重新分派槽号
+
+```shell
+命令:redis-cli -a 密码 --cluster reshard IP地址:端口号
+```
+
+redis-cli -a 123456 --cluster reshard 192.168.111.175:6381
+
+ ![image-20231010120600101](03-Redis.assets/image-20231010120600101.png)
+
+![image-20231010120649389](03-Redis.assets/image-20231010120649389.png)
+
+### 检查集群情况第二次
+
+```shell
+redis-cli --cluster check 领路人端口所在的真实ip地址：领路人端口
+```
+
+redis-cli --cluster check 192.168.111.175:6381
+
+![](03-Redis.assets/37.集群情况查看.png)
+
+
+
+**槽位分派说明**
+
+为什么6387是3个新的区间，以前的还是连续？  
+
++ **重新分配成本太高，所以前3家各自匀出来一部分**，从6381/6383/6385三个旧节点分别匀出1367个坑位给信节点6387
+
+<img src="03-Redis.assets/38.槽号分配说明.png" style="zoom:80%;" />
+
+### 为新增主节点6387分配从节点6388
+
+命令：
+
+```shell
+redis-cli -a 密码 --cluster add-node ip:新slave端口 ip:新master端口 --cluster-slave --cluster-master-id 新主机节ID
+```
+
+redis-cli -a 111111 --cluster add-node 192.168.111.174:6388 192.168.111.174:6387 --cluster-slave
+--cluster-master-id 4feb6a7ee0ed2b39f86474cf4189ab2a554a40f-------这个是6387的编号，按照自己实际情况
+
+![](03-Redis.assets/38.为主机分配从节点.png)
+
+### 检查集群情况第三次
+
+redis-cli --cluster check 真实IP地址：6381
+
+redis-cli --cluster check 192.168.111.175:6381
+
+![](03-Redis.assets/40.集群情况第三次查看.png)
+
+
+
+## 主从缩容案例
+
+### 案例6388和6387下线
+
+6387和6388:   集群中的一个主机和它的从机
+
+**1.获取从节点ID**
+
+- 检查集群情况第一次，先获得从节点6388的节点ID
+
+  redis-cli -a 123456 --cluster check 192.168.111.174:6388
+
+![](03-Redis.assets/41.获取缩容结点.png)
+
+- 从集群中将4号结点6388删除
+
+  redis-cli -a 123456 --cluster del-node 192.168.111.174:6388 218e7b8b4f81be54ff173e4776b4f4faaf7c13da
+
+  ![](03-Redis.assets/42.删除从节点.png)
+
+- 将6387的槽号清空，重新分配，本例将清出来的槽号都给6381(清出来的槽号都给领路人)
+
+  redis-cli -a 123456 --cluster reshard 192.168.111.175:6381
+
+  ![](03-Redis.assets/43.查询节点ID.png)
+
+  ![](03-Redis.assets/44.删除节点槽位分配.png)
+
+- 检查集群情况第二次
+
+  redis-cli -a 123456 --cluster check 192.168.111.175:6381
+
+  4096个槽位都指给6381，它变成了8192个槽位，相当于全部都给6381了，不然要输入三次 Source node
+
+  ![](03-Redis.assets/45.集群缩容第二次检查.png)
+
+- 将6387删除
+
+  redis-cli -a 123456 --cluster del-node 192.168.111.174:6387 307a5f6617a6eeb4949f3cb9124ed04c6962c348
+
+  ![](03-Redis.assets/46.从节点删除.png)
+
+- 检查集群情况第三次 6387/6388被彻底删除
+
+  redis-cli -a 123456 --cluster check 192.168.111.174:6381
+
+  ![](03-Redis.assets/47.集群缩容彻底删除.png)
+
+## 集群常用操作命令和CRC16算法分析
+
+### 不在同一个slot槽位下的多键操作支持不好，通识占位符登场
+
+![](03-Redis.assets/48.集群取值失败.jpg)
+
+不在同一个slot槽位下的键值无法使用mset、mget等多键操作
+
+可以通过{}来定义同一个组的概念，使key中{}内相同内容的键值对放到一个slot槽位去，对照下图类似k1k2k3都映射为x，自然槽位一样
+
+![](03-Redis.assets/49.集群通配符获取.jpg)
+
+### Redis集群有16384个哈希槽，每个key通过CRC16校验后对16384取模来决定放置哪个槽。集群的每个节点负责一部分hash槽。
+
+**CRC16源码浅谈**
+
+cluster.c源码分析一下
+
+![](03-Redis.assets/50.crc16源码浅谈.jpg)
+
+### 常用命令
+
+- 集群是否完整才能对外提供服务
+
+  ![](03-Redis.assets/51.集群是否完整才能对外提供服务..jpg)
+
+  | 默认YES，现在集群架构是3主3从的redis cluster由3个master平分16384个slot，每个master的小集群负责1/3的slot，对应一部分数据。cluster-require-full-coverage:默认值yes，即需要集群完整性，方可对外提供服务通常情况，如果这3个小集群中，任何一个(1主1从）挂了，你这个集群对外可提供的数据只有2/3了，整个集群是不完整的， redis默认在这种情况下，是不会对外提供服务的。 |
+  | ------------------------------------------------------------ |
+  | 如果你的诉求是，集群不完整的话也需要对外提供服务，需要将该参数设置为no，这样的话你挂了的那个小集群是不行了，但是其他的小集群仍然可以对外提供服务。 |
+
+  cluster-require-full-coverage
+
+- CLUSTER COUNTKEYSINSLOT 槽位数字编号
+
+  CLUSTER COUNTKEYSINSLOT 12706
+
+  返回结果：
+
+  ​	1 该槽位被占用
+
+  ​	0 该槽位没有被占用
+
+- CLUSTER KEYSLOT 键名称
+
+  CLUSTER KEYSLOT k1
+
+  返回对应key的槽位数据，key不存在则返回0
+
+
+
+# 十五、  SpringBoot集成Redis
+
+### 总概述
+
+jedis-lettuce-RedisTemplate三者的联系
+
+## 本地Java连接Redis常见问题，小白注意
+
+1. bind配置请注释掉
+2. 保护模式设置为no
+3. Linux系统的防火墙设置
+4. Redis服务器的IP地址和密码是否正确
+5. 忘记写访问redis的服务端口号和auth密码
+
+![image-20231010193546859](03-Redis.assets/image-20231010193546859.png)
+
+## 方法1  集成Jedis
+
+是什么：Jedis Client是Redis官网推荐的一个面向Java客户端，库文件实现了对各类API进行封装调用
+
+步骤：
+
+1. 建module
+
+2. 改pom
+
+   ```pom
+   <?xml version="1.0" encoding="UTF-8"?>
+   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+       <modelVersion>4.0.0</modelVersion>
+       <parent>
+           <groupId>org.springframework.boot</groupId>
+           <artifactId>spring-boot-starter-parent</artifactId>
+           <version>2.7.11</version>
+           <relativePath/> <!-- lookup parent from repository -->
+       </parent>
+       <groupId>com.luojia</groupId>
+       <artifactId>redis7_study</artifactId>
+       <version>0.0.1-SNAPSHOT</version>
+       <name>redis7_study</name>
+       <description>Demo project for Spring Boot</description>
+       <properties>
+           <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+           <maven.compiler.source>1.8</maven.compiler.source>
+           <maven.compiler.target>1.8</maven.compiler.target>
+           <junit.version>4.12</junit.version>
+           <log4j.version>1.2.17</log4j.version>
+           <lombok.version>1.16.18</lombok.version>
+       </properties>
+   
+       <dependencies>
+           <!--SpringBoot 通用依赖模块-->
+           <dependency>
+               <groupId>org.springframework.boot</groupId>
+               <artifactId>spring-boot-starter-web</artifactId>
+           </dependency>
+           <!-- jedis -->
+           <dependency>
+               <groupId>redis.clients</groupId>
+               <artifactId>jedis</artifactId>
+               <version>4.3.1</version>
+           </dependency>
+           <!-- 通用基础配置 -->
+           <dependency>
+               <groupId>junit</groupId>
+               <artifactId>junit</artifactId>
+               <version>${junit.version}</version>
+           </dependency>
+           <dependency>
+               <groupId>log4j</groupId>
+               <artifactId>log4j</artifactId>
+               <version>${log4j.version}</version>
+           </dependency>
+           <dependency>
+               <groupId>org.projectlombok</groupId>
+               <artifactId>lombok</artifactId>
+               <version>${lombok.version}</version>
+           </dependency>
+   
+           <dependency>
+               <groupId>org.springframework.boot</groupId>
+               <artifactId>spring-boot-starter-test</artifactId>
+               <scope>test</scope>
+           </dependency>
+       </dependencies>
+       <build>
+           <plugins>
+               <plugin>
+                   <groupId>org.springframework.boot</groupId>
+                   <artifactId>spring-boot-maven-plugin</artifactId>
+               </plugin>
+           </plugins>
+       </build>
+   </project>
+   ```
+
+3. 写YML
+
+   ```yaml
+   server.port=7777
+   spring.application.name=redis7_study
+   ```
+
+4. 主启动
+
+5. 业务类
+
+## 方法2  集成letter
+
+1. 是什么
+
+   Lettuce是一个Redis的Java驱动包，Lettuce翻译为生菜，就是吃的那种生成，所以它的logo如下：
+
+![](03-Redis.assets/1.Redis驱动之Lettuce.jpg)
+
+2. lettuce VS Jedis
+
+   ![](03-Redis.assets/2.lettuce VS Jedis.jpg)
+
+## 方法3  RedisTemplate-推荐使用
+
+### 连接单机
+
+pom
+
+```xml
+        <!-- SpringBoot 与Redis整合依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+        <!-- swagger2 接口文档-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+```
+
+写YML
+
+```yml
+server.port=7777
+
+spring.application.name=redis7_study
+
+# ===========================logging===========================
+logging.level.root=info
+logging.1evel.com.luojia.redis7_study.redis7=info
+1ogging.pattern.console=%d{yyyy-MM-dd HH:m:ss.SSS} [%thread] %-5level %1ogger- %msg%n
+
+1ogging.file.name=F:\workspace\数据结构和算法\Learning-in-practice\Redis\redis7-study
+1ogging.pattern.fi1e=%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger- %msg%n
+
+# ===========================swagge===========================
+spring.swagger2.enabled=true
+#在springboot2.6.X结合swagger2.9.X会提示documentationPluginsBootstrapper空指针异常，
+#原因是在springboot2.6.X中将SpringMVC默认路径匹配策略MAntPathMatcher更改为athPatternParser,
+#导致出错，解决办法是matching-strategy 切换回之前ant_path_matcher
+spring.mvc.pathmatch.matching-strategy=ant_path_matcher
+
+# ===========================redis单机===========================
+spring.redis.database=0
+#修改为自己真实IP
+spring.redis.host=127.0.0.1
+spring.redis.port=6379
+spring.redis.password=123456
+spring.redis.lettuce.pool.max-active=8
+spring.redis.1ettuce.pool.max-wait=-1ms
+spring.redis.1ettuce.pool.max-idle=8
+spring.redis.lettuce.pool.min-idle=0
+```
+
+主启动
+
+业务类
+
+- 配置类(解决RedisTemplate使用的是JDK序列化方式（默认）惹的祸)
+
+  ```java
+  package com.luojia.redis7_study.config;
+  
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+  import org.springframework.data.redis.core.RedisTemplate;
+  import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+  import org.springframework.data.redis.serializer.StringRedisSerializer;
+  
+  @Configuration
+  public class RedisConfig {
+  
+      /**
+       * *redis序列化的工具定置类，下面这个请一定开启配置
+       * *127.0.0.1:6379> keys *
+       * *1) “ord:102” 序列化过
+       * *2)“\xaclxedlxeelx05tixeelaord:102” 野生，没有序列化过
+       * *this.redisTemplate.opsForValue(); //提供了操作string类型的所有方法
+       * *this.redisTemplate.opsForList();// 提供了操作List类型的所有方法
+       * *this.redisTemplate.opsForset(); //提供了操作set类型的所有方法
+       * *this.redisTemplate.opsForHash(); //提供了操作hash类型的所有方认
+       * *this.redisTemplate.opsForZSet(); //提供了操作zset类型的所有方法
+       * param LettuceConnectionFactory
+       * return
+       */
+      @Bean
+      public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
+          //pom导入对应的依-->导包
+          RedisTemplate<String,Object> redisTemplate = new RedisTemplate<>();
+          redisTemplate.setConnectionFactory(lettuceConnectionFactory);
+          // 设置key序列化方式string
+          redisTemplate.setKeySerializer(new StringRedisSerializer());
+          
+          //	// 源代码private RedisSerializer<String> stringSerializer = RedisSerializer.string();
+          // 设置value的序列化方式json，使用GenericJackson2JsonRedisSerializer替换默认序列化
+          redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+  
+          redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+          redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+          redisTemplate.afterPropertiesSet();
+          return redisTemplate;
+      }
+  }
+  ```
+
+  ```java
+  package com.luojia.redis7_study.config;
+  
+  import org.springframework.beans.factory.annotation.Value;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import springfox.documentation.builders.ApiInfoBuilder;
+  import springfox.documentation.builders.PathSelectors;
+  import springfox.documentation.builders.RequestHandlerSelectors;
+  import springfox.documentation.service.ApiInfo;
+  import springfox.documentation.spi.DocumentationType;
+  import springfox.documentation.spring.web.plugins.Docket;
+  import springfox.documentation.swagger2.annotations.EnableSwagger2;
+  
+  import java.time.LocalDate;
+  import java.time.format.DateTimeFormatter;
+  
+  @Configuration
+  @EnableSwagger2
+  public class SwaggerConfig {
+  
+      @Value("${spring.swagger2.enabled}")
+      private Boolean enabled;
+  
+      @Bean
+      public Docket createRestApi() {
+          return new Docket (DocumentationType.SWAGGER_2)
+                  .apiInfo(apiInfo())
+                  .enable(enabled)
+                  .select()
+                  .apis(RequestHandlerSelectors.basePackage("com.luojia.redis7_study.config")) //你自己的package
+                  .paths (PathSelectors.any())
+                  .build();
+  
+      }
+  
+      public ApiInfo apiInfo() {
+          return new ApiInfoBuilder()
+                  .title("springboot利用swagger2构建api接口文档 "+"\t"
+                          + DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now()))
+                  .description( "springboot+redis整合" )
+                  .version("1.0")
+                  .termsOfServiceUrl("https://github.com/Romantic-Lei")
+                  .build();
+      }
+  
+  }
+  ```
+
+- **service**
+
+  ```java
+  package com.luojia.redis7_study.service;
+  
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.data.redis.core.RedisTemplate;
+  import org.springframework.stereotype.Service;
+  
+  import java.util.UUID;
+  import java.util.concurrent.ThreadLocalRandom;
+  
+  @Service
+  @Slf4j
+  public class OrderService {
+  
+      @Autowired
+      private RedisTemplate redisTemplate;
+  
+      public static final String ORDER_KEY="ord:";
+  
+      public void addOrder() {
+          int keyId = ThreadLocalRandom.current().nextInt(1000) + 1;
+          String serialNo = UUID.randomUUID().toString();
+          String key = ORDER_KEY+keyId;
+          String value = "JD" + serialNo;
+          
+          redisTemplate.opsForValue().set(key, value);  // redisTemplate.opsForValue()表示String类型
+          log.info("***key:{}", key);
+          log.info("***value:{}", value);
+  
+      }
+  
+      public String getOrderById(Integer keyId) {
+          return (String)redisTemplate.opsForValue().get(ORDER_KEY+keyId); // 取
+      }
+  }
+  ```
+
+- **controller**
+
+  ```java
+  package com.luojia.redis7_study.controller;
+  
+  import com.luojia.redis7_study.service.OrderService;
+  import io.swagger.annotations.Api;
+  import io.swagger.annotations.ApiOperation;
+  import io.swagger.models.auth.In;
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.web.bind.annotation.GetMapping;
+  import org.springframework.web.bind.annotation.PostMapping;
+  import org.springframework.web.bind.annotation.RestController;
+  
+  @RestController
+  @Slf4j
+  @Api(tags="订单接口")
+  public class OrderController {
+  
+      @Autowired
+      private OrderService orderService;
+  
+      @ApiOperation("新增订单")
+      @PostMapping("/order/add")
+      public void addOrder() {
+          orderService.addOrder();
+      }
+  
+      @ApiOperation("根据keyId查询订单")
+      @GetMapping("/order/query")
+      public String queryOrder(Integer keyId) {
+          return orderService.getOrderById(keyId);
+      }
+  }
+  ```
+
+测试：
+
+项目启动，连接swagger：http://localhost:7777/swagger-ui.html
+
+$\textcolor{red}{\large 序列化问题}$： 因为java和redis数据类型不同
+
+![](03-Redis.assets/3.序列化问题.jpg)
+
+为什么会这样？
+
+![](03-Redis.assets/4.RedisTemplate 序列化.png)
+
+RedisTemplate使用的是JDK序列化方式（默认）惹的祸
+
+![](03-Redis.assets/5.jdk序列化方式.png)
+
+解决:  用RedisTemplate子类或者用配置类
+
+### RedisTemplate连接集群
+
+- 启动Redis集群6台实例
+
+- 第一次改写YML
+
+  ```yaml
+  # ===========================redis集群===========================
+  spring.redis.password=123456
+  # 获取失败 最大重定向次数
+  spring.redis.cluster.max-redirects=3
+  spring.redis.lettuce.pool.max-active=8
+  spring.redis.1ettuce.pool.max-wait=-1ms
+  spring.redis.1ettuce.pool.max-idle=8
+  spring.redis.lettuce.pool.min-idle=0
+  spring.redis.cluster.nodes=192.168.111.175:6381,192.168.111.175:6382,192.168.111.176:6383,192.168.111.176:6384
+  ```
+
+
+- 直接通过微服务访问Redis集群
+
+  一切正常 （http://localhost:7777/swagger-ui.html）
+
+- $\textcolor{red}{\large 问题来了}$
+
+  1. 人为模拟，master-6381机器意外宕机，手动shutdown
+
+  2. 先对redis集群用命令的方式，手动验证各种读写命令，看看6384是否上位
+
+  3. Redis Cluster集群能自动感知并自动完成主备切换，对应的slave6384会被选举为新的master节点
+
+  4. 通过redis客户端连接6384可以正常进行读写操作
+
+  5. $\textcolor{green}{\large 微服务客户端再次读写访问试试}$
+
+     - 故障现象
+
+       SpringBoot客户端没有动态感知RedisCluster的最新集群信息
+
+       金典故障 
+
+       【故障演练】 Redis Cluster集群部署采用了3主3从拓扑结构，数据读写访问master节点，slave节点负责备份。$\textcolor{red}{\large 当master宕机主从切换成功，redis手动OK，but 2个经典故障}$
+
+       ![](03-Redis.assets/6.Java连接Redis经典故障.png)
+
+     - 导致原因
+       SpringBoot 2.X版本，Redis默认的连接池采用Lettuce，当Redis集群节点发生变化后，Letture默认是不会刷新节点拓扑
+
+     - 解决方案
+
+       1. 排除lettuce采用Jedis（不推荐）
+
+          ![](03-Redis.assets/7.将Lettuce二方包仲裁掉.png)
+
+       2. 重写连接工厂实例（极度不推荐）
+
+       3. 刷新节点集群拓扑动态感应
+
+          ![](03-Redis.assets/8.刷新节点集群拓扑动态感应官网说明.png)
+
+          解决方法：
+
+          - 调用 RedisClusterClient.reloadPartitions
+          - 后台基于时间间隔的周期刷新
+          - 后台基于持续的 **断开** 和 **移动**、**重定向** 的自适应更新
+
+  
+
+  
+
+## Redis之RedisTemplate的序列化方式深入解读
+
+使用Spring提供的Spring Data Redis操作redis必然要使用Spring提供的模板类[RedisTemplate](https://so.csdn.net/so/search?q=RedisTemplate&spm=1001.2101.3001.7020)，使用RedisTemplate离不开Redis的序列化方式
+
+### RedisTemplate
+
+![image-20231011084232442](03-Redis.assets/image-20231011084232442.png)
+
+4个序列化相关的属性 ，主要是用于KEY和VALUE的序列化，比如说经常会将POJO对象存储到Redis中，一般情况下会使用JSON方式序列化成字符串存储到Redis中 。
+
+Spring提供的Redis数据结构的操作类
+
+- ValueOperations 类，提供 Redis String API 操作
+- ListOperations 类，提供 Redis List API 操作
+- SetOperations 类，提供 Redis Set API 操作
+- ZSetOperations 类，提供 Redis ZSet(Sorted Set) API 操作
+- GeoOperations 类，提供 Redis Geo API 操作
+- HyperLogLogOperations 类，提供 Redis HyperLogLog API 操作
+
+比如操作Redis String可以通过opsForValue方法返回ValueOperations来进行操作
+
+### StringRedisTemplate
+
+RedisTemplate支持泛型，StringRedisTemplate K/V 均为String类型, 是RedisTemplate的子类。
+
+<img src="03-Redis.assets/image-20231011084931312.png" alt="image-20231011084931312" style="zoom: 60%;" />
+
+org.springframework.data.redis.core.StringRedisTemplate 继承RedisTemplate类，使用org.springframework.data.redis.serializer.StringRedisSerializer字符串序列化方式
+
+<img src="03-Redis.assets/image-20231011085021961.png" alt="image-20231011085021961" style="zoom: 60%;" />
+
+### RedisSerializer序列化接口
+
+**RedisSerializer**接口是Redis序列化]接口，用于Redis KEY和VALUE的序列化。
+
+<img src="03-Redis.assets/image-20231011085227404.png" alt="image-20231011085227404" style="zoom:67%;" />
+
+RedisSerializer接口的实现类如下：
+
+<img src="03-Redis.assets/image-20231011085325690.png" alt="image-20231011085325690" style="zoom:50%;" />
+
+**默认Redis提供了11中的序列化方式，主要分为：**
+
+- JDK序列化方式（默认）
+- String序列化方式
+- JSON序列化方式
+- XML序列化方式
+
+#### JDK序列化方式（默认）
+
+org.springframework.data.redis.serializer.JdkSerializationRedisSerializer，默认不配置的情况RedisTemplate采用的是该数据序列化方式：
+
+<img src="03-Redis.assets/image-20231011085505083.png" alt="image-20231011085505083" style="zoom:67%;" />
+
+Spring Boot自动化配置RedisTemplate Bean对象时，就会设置默认的序列化方式。绝大多数情况下，并不推荐使用
+JdkSerializationRedisSerializer进行序列化。
+
+key跟value的值都是16进制字符串，可以看到key跟value实际上保存的都是以byte[]字节数组的格式存储：
+
+![image-20231011085806542](03-Redis.assets/image-20231011085806542.png)
+
+#### String序列化方式
+
+org.springframework.data.redis.serializer.StringRedisSerializer，字符串和二进制数组都直接转换：
+
+<img src="03-Redis.assets/image-20231011085915081.png" alt="image-20231011085915081" style="zoom:67%;" />
+
+默认的话，**StringRedisTemplate**的key和value采用的就是这种序列化方案
+
+#### JSON序列话方式
+
+##### GenericJackson2JsonRedisSerializer
+
+org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer 使用Jackson 实现JSON的序列化方式，
+
+Generic单词翻译过来表示：通用的意思，可以看出，是支持所有
+
+ **RedisConfig配置**
+
+通过配置方式选择对应Redis数据的序列化方式，配置如下：
+
+```java
+package com.example.jedisserializefrombytestojson.config;
+ 
+import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
+import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+ 
+/**
+ * Redis配置
+ */
+      
+@Configuration
+public class RedisConfig {
+ 
+    //GenericJackson2JsonRedisSerializer
+    @Bean
+    @ConditionalOnMissingBean(name = "redisTemplate")
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory){
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+ 
+        //String的序列化方式
+        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+        // 使用GenericJackson2JsonRedisSerializer 替换默认序列化(默认采用的是JDK序列化)
+        GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
+ 
+        //key序列化方式采用String类型
+        template.setKeySerializer(stringRedisSerializer);
+        //value序列化方式采用jackson类型
+        template.setValueSerializer(genericJackson2JsonRedisSerializer);
+        
+      	//hash的key序列化方式也是采用String类型
+        template.setHashKeySerializer(stringRedisSerializer);
+        //hash的value也是采用jackson类型
+        template.setHashValueSerializer(genericJackson2JsonRedisSerializer);
+        template.afterPropertiesSet();
+        return template;
+    }
+ 
+    Jackson2JsonRedisSerializer
+    //@Bean
+    //@ConditionalOnMissingBean(name = "redisTemplate")
+    //public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+    //    RedisTemplate<String, Object> template = new RedisTemplate<>();
+    //    template.setConnectionFactory(factory);
+    //
+    //    //String的序列化方式
+    //    StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+    //    // 使用Jackson2JsonRedisSerialize 替换默认序列化(默认采用的是JDK序列化)
+    //    Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+    //
+    //    //key序列化方式采用String类型
+    //    template.setKeySerializer(stringRedisSerializer);
+    //    //value序列化方式采用jackson类型
+    //    template.setValueSerializer(jackson2JsonRedisSerializer);
+    //    //hash的key序列化方式也是采用String类型
+    //    template.setHashKeySerializer(stringRedisSerializer);
+    //    //hash的value也是采用jackson类型
+    //    template.setHashValueSerializer(jackson2JsonRedisSerializer);
+    //    template.afterPropertiesSet();
+    //    return template;
+    //}
+    //
+    FastJsonRedisSerializer
+    //@Bean("redisTemplate")
+    //public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory){
+    //    RedisTemplate<String, Object> template = new RedisTemplate<>();
+    //    template.setConnectionFactory(factory);
+    //
+    //    //String序列化方式
+    //    StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+    //    // 使用FastJsonRedisSerializer替换默认序列化(默认采用的是JDK序列化)
+    //    FastJsonRedisSerializer<Object> fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
+    //
+    //    //key序列化方式采用String类型
+    //    template.setKeySerializer(stringRedisSerializer);
+    //    //value序列化方式采用jackson类型
+    //    template.setValueSerializer(fastJsonRedisSerializer);
+    //    //hash的key序列化方式也是采用String类型
+    //    template.setHashKeySerializer(stringRedisSerializer);
+    //    //hash的value也是采用jackson类型
+    //    template.setHashValueSerializer(fastJsonRedisSerializer);
+    //    template.afterPropertiesSet();
+    //    return template;
+    //}
+ 
+}
+```
+
+运行以下测试类：
+
+```java
+@Test
+void redisTemplateSerializeTest() {
+    
+    // key
+    String redisTemplateStringKey = "redisTemplateStringKey";
+    String redisTemplateUserObjectKey = "redisTemplateUserObjectKey";
+    String redisTemplateUserArrayObjectKey = "redisTemplateUserArrayObjectKey";
+    String redisTemplateJSONObjectKey = "redisTemplateJSONObjectKey";
+    String redisTemplateJSONArrayKey = "redisTemplateJSONArrayKey";
+ 
+    // value
+    //序列化String类型和反序列化String类型
+    redisTemplate.opsForValue().set(redisTemplateStringKey, "austin");
+    String austin = (String) redisTemplate.opsForValue().get(redisTemplateStringKey);
+    System.out.println("stringGet: " + austin);
+ 
+    //序列化Object对象类型和反序列化Object对象类型 (User对象)
+    User user = new User("123", "austin", 25);
+    redisTemplate.opsForValue().set(redisTemplateUserObjectKey, user);
+    User userGet = (User) redisTemplate.opsForValue().get(redisTemplateUserObjectKey);
+    System.out.println("userGet: " + userGet);
+ 
+    //序列化Object对象数组类型和反序列化Object对象数组类型 (User[]对象数组)
+    User user1 = new User("1", "austin1", 25);
+    User user2 = new User("2", "austin2", 25);
+    User[] userArray = new User[]{user1, user2};
+    redisTemplate.opsForValue().set(redisTemplateUserArrayObjectKey, userArray);
+    User[] userArrayGet = (User[]) redisTemplate.opsForValue().get(redisTemplateUserArrayObjectKey);
+    System.out.println("userArrayGet: " + userArrayGet);
+ 
+    //序列化JSONObject对象类型和反序列化JSONObject对象类型
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("id", "123");
+    jsonObject.put("name", "austin");
+    jsonObject.put("age", 25);
+    redisTemplate.opsForValue().set(redisTemplateJSONObjectKey, jsonObject);
+    JSONObject jsonObjectGet = (JSONObject) redisTemplate.opsForValue().get(redisTemplateJSONObjectKey);
+    System.out.println("jsonObjectGet: " + jsonObjectGet);
+ 
+    //序列化JSONArray对象类型和反序列化JSONArray对象类型
+    JSONArray jsonArray = new JSONArray();
+    JSONObject jsonObject1 = new JSONObject();
+    jsonObject1.put("id", "1");
+    jsonObject1.put("name", "austin1");
+    jsonObject1.put("age", 25);
+    JSONObject jsonObject2 = new JSONObject();
+    jsonObject2.put("id", "1");
+    jsonObject2.put("name", "austin2");
+    jsonObject2.put("age", 25);
+    jsonArray.add(jsonObject1);
+    jsonArray.add(jsonObject2);
+    redisTemplate.opsForValue().set(redisTemplateJSONArrayKey, jsonArray);
+    JSONArray jsonArrayGet = (JSONArray) redisTemplate.opsForValue().get(redisTemplateJSONArrayKey);
+    System.out.println("jsonArrayGet: " + jsonArrayGet);
+}
+```
+
+观察redis数据的存储格式：
+
+<img src="03-Redis.assets/image-20231011090825531.png" alt="image-20231011090825531" style="zoom:67%;" />
+
+运行结果:
+
+**key- value** ：
+
+- 字符串类型
+
+```vbnet
+Key: redisTemplateStringKey
+Value: "austin"
+```
+
+- 对象类型
+
+```cobol
+Key: redisTemplateUserObjectKey
+Value:
+{
+    "@class": "com.example.jedisserializefrombytestojson.User",
+    "id": "123",
+    "name": "austin",
+    "age": 25
+}
+```
+
+- 对象数组类型
+
+```cobol
+Key: redisTemplateUserArrayObjectKey
+Value: 
+[
+    "[Lcom.example.jedisserializefrombytestojson.User;",
+    [
+        {
+            "@class": "com.example.jedisserializefrombytestojson.User",
+            "id": "1",
+            "name": "austin1",
+            "age": 25
+        },
+        {
+            "@class": "com.example.jedisserializefrombytestojson.User",
+            "id": "2",
+            "name": "austin2",
+            "age": 25
+        }
+    ]
+]
+```
+
+- JSONObject类型
+
+```cobol
+Key: redisTemplateJSONObjectKey
+Value:
+{
+    "@class": "com.alibaba.fastjson.JSONObject",
+    "name": "austin",
+    "id": "123",
+    "age": 25
+}
+```
+
+- JSONArray类型
+
+```cobol
+Key: redisTemplateJSONArrayKey
+Value: 
+[
+    "com.alibaba.fastjson.JSONArray",
+    [
+        {
+            "@class": "com.alibaba.fastjson.JSONObject",
+            "name": "austin1",
+            "id": "1",
+            "age": 25
+        },
+        {
+            "@class": "com.alibaba.fastjson.JSONObject",
+            "name": "austin2",
+            "id": "1",
+            "age": 25
+        }
+    ]
+]
+```
+
+运行redisTemplateSerializeTest测试类，结果发现该方式序列化和反序列化都没有问题，是通用性序列化方式：
+
+<img src="03-Redis.assets/image-20231011091103207.png" alt="image-20231011091103207" style="zoom:67%;" />
+
+补充:  在将一个对象序列化成一个字符串，怎么保证字符串反序列化成对象的类型:   Jackson通过 Default Typing，会在字符串多冗余一个类型，这样反序列化就知道具体的类型了。**使用GenericJackson2JsonRedisSerializer序列化方式，String类型、对象、对象数组、JSONObject、JSONArray序列化和反序列化都没有问题，value值序列化后多了@class属性，反序列化的对象的类型就可以从这里获取到。@class属性完美解决了反序列化后的对象类型，所以实际项目中，目前很多采用 GenericJackson2JsonRedisSerializer序列化方式。**
+
+##### jackson2JsonRedisSerializer
+
+org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
+
+```java
+	@Bean
+    @ConditionalOnMissingBean(name = "redisTemplate")
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+    
+        //String的序列化方式
+        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+        // 使用Jackson2JsonRedisSerialize 替换默认序列化(默认采用的是JDK序列化)
+        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+    
+        //key序列化方式采用String类型
+        template.setKeySerializer(stringRedisSerializer);
+        //value序列化方式采用jackson类型
+        template.setValueSerializer(jackson2JsonRedisSerializer);
+        //hash的key序列化方式也是采用String类型
+        template.setHashKeySerializer(stringRedisSerializer);
+        //hash的value也是采用jackson类型
+        template.setHashValueSerializer(jackson2JsonRedisSerializer);
+        template.afterPropertiesSet();
+        return template;
+    }
+```
+
+观察redis数据的存储格式：
+
+<img src="03-Redis.assets/image-20231011091611715.png" alt="image-20231011091611715" style="zoom:67%;" />
+
+运行结果
+
+**key- value**:
+
+- 字符串类型
+
+```vbnet
+Key: redisTemplateStringKey
+Value: "austin"
+```
+
+- 对象类型
+
+```cobol
+Key: redisTemplateUserObjectKey
+Value:
+{
+    "id": "123",
+    "name": "austin",
+    "age": 25
+}
+```
+
+与GenericJackson2JsonRedisSerializer序列化方式结果不同的是，value没有@class属性。
+
+- 对象数组类型
+
+```cobol
+Key: redisTemplateUserArrayObjectKey
+Value: 
+[
+    {
+        "id": "1",
+        "name": "austin1",
+        "age": 25
+    },
+    {
+        "id": "2",
+        "name": "austin2",
+        "age": 25
+    }
+]
+```
+
+与GenericJackson2JsonRedisSerializer序列化方式结果不同的是，value没有"@class":"com.example.jedisserializefrombytestojson.User" 对象类型属性。
+
+- JSONObject类型
+
+```cobol
+Key: redisTemplateJSONObjectKey
+Value:
+{
+    "name": "austin",
+    "id": "123",
+    "age": 25
+}
+```
+
+与GenericJackson2JsonRedisSerializer序列化方式结果不同的是，value没有"@class":"com.alibaba.fastjson.JSONObject"属性。
+
+- JSONArray类型
+
+```cobol
+Key: redisTemplateJSONArrayKey
+Value: 
+[
+    {
+        "name": "austin1",
+        "id": "1",
+        "age": 25
+    },
+    {
+        "name": "austin2",
+        "id": "1",
+        "age": 25
+    }
+]
+```
+
+与GenericJackson2JsonRedisSerializer序列化方式结果不同的是，value没有 "com.alibaba.fastjson.JSONArray" 对象类型属性。
+
+--------
+**Jackson2JsonRedisSerializer与GenericJackson2JsonRedisSerializer序列化结果不同的是:**
+
++ 前者并没有@class或者@type类型属性，这种序列化方式可能会导致获取redis数据反序列化成POJO对象时候出错，导致反序列化失败，所以一般也很少使用该方式。
+
+比如在对象强制转换的情况，会报错：
+
+![image-20231011091918762](03-Redis.assets/image-20231011091918762.png)
+
+报错信息很明显，不能直接将JSONObject对象强制转换成User对象，不能通过方式获取转换：
+
+```java
+//该方式强转会报错
+User userGet = (User) redisTemplate.opsForValue().get(redisTemplateUserObjectKey);
+```
+
+而正确的方式应该是：
+
+通过jackson中的com.fastxml.jackson的ObjectMapper对象进行转换
+
+```java
+Object userObject = redisTemplate.opsForValue().get(redisTemplateUserObjectKey);
+ObjectMapper objectMapper = new ObjectMapper();
+User userGet = objectMapper.convertValue(userObject, User.class);
+System.out.println("userGet: " + userGet);
+```
+
+<img src="03-Redis.assets/image-20231011092009633.png" alt="image-20231011092009633" style="zoom: 50%;" />
+
+或者使用fastjson2(推荐)
+
+```java
+// 从redis查询token
+Object obj = redisTemplate.opsForValue().get(token);  //  <!-- redis -->
+// 反序列化 json对象反序列化成user对象
+XUser user = JSON.parseObject(JSON.toJSONString(obj), XUser.class);
+```
+
+#### 总结
+
++ 采用**GenericJackson2JsonRedisSerializer**序列化方式对于String、对象、对象数组、JSONObject、JSONArray的序列化反序列化操作都正常，对象强转是没有任何问题
+
++ 采用**Jackson2JsonRedisSerializer**序列化方式在对象强制时，也就是使用 User userGet = (User) redisTemplate.opsForValue().get(redisTemplateUserObjectKey);方式获取对象，会操作对象转换失败，建议的解决方式是默认都采用 com.fastxml.jackson的ObjectMapper对象进行转换，也就是：
+
+  ```
+  ObjectMapper objectMapper = new ObjectMapper();
+  objectMapper.convertValue(Object fromValue, Class<T> toValueType);
+  ```
+
+  该方式支持将任意类型的Object对象转换为相应的实体对象。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
