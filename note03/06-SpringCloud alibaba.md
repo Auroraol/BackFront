@@ -83,11 +83,7 @@ Nacos 致力于帮助您发现、配置和管理微服务。Nacos 提供了一�
 
 Nacos 帮助您更敏捷和容易地构建、交付和管理微服务平台。 Nacos 是构建以“服务”为中心的现代应用架构 (例如微服务范式、云原生范式) 的服务基础设施。
 
-
-
-![img](SpringCloud alibaba.assets/1533045871534-e64b8031-008c-4dfc-b6e8-12a597a003fb-169651825574214.png)
-
-
+<img src="SpringCloud alibaba.assets/1533045871534-e64b8031-008c-4dfc-b6e8-12a597a003fb-169651825574214.png" alt="img" style="zoom: 50%;" />
 
 ## 二、 安装nocos
 
@@ -109,55 +105,42 @@ Nacos 依赖 [Java](https://docs.oracle.com/cd/E19182-01/820-7851/inst_cli_jdk_j
 
 https://nacos.io/zh-cn/
 
-
-
 https://github.com/alibaba/nacos/releases
 
 https://github.com/alibaba/nacos/releases/tag/2.0.3
 
 ![img](SpringCloud alibaba.assets/1638670855625-8eecdaa5-361b-45f1-ba33-c11012c486c3-169651825574418.png)
 
-
-
 ### 2.4、安装nacos
 
 ![img](SpringCloud alibaba.assets/1638671939489-0f6e65b5-3585-403a-b5cd-715111661649-169651825574520.png)
 
+```
+linux/unix/mac启动
+打开终端进入nacos的bin目录执行如下命令
+./startup.sh -m standaloner
 
-
-![img](SpringCloud alibaba.assets/1638671968692-c27e1af2-0e8d-4a04-b4fb-7281c84e9efd-169651825574522.png)
+windows启动
+cmd startup.cmd或者双击startup,cmd运行文件
+```
 
 启动查看
 
+```
 startup -m standalone
+```
 
 ![img](SpringCloud alibaba.assets/1638672199623-64cf8539-4d57-480d-ae94-c0576cb1be39-169651825574524.png)
-
-
 
 访问地址：[http://43.156.149.47:8848/nacos](http://162.14.64.72:8848/nacos)
 
 初始化账户和密码：nacos和nacos
 
-
-
-![img](SpringCloud alibaba.assets/1638672295265-c9b34f1d-45b2-454f-b172-6c80e0860497-169651825574526.png)
-
-
+<img src="SpringCloud alibaba.assets/1638672295265-c9b34f1d-45b2-454f-b172-6c80e0860497-169651825574526.png" alt="img" style="zoom: 33%;" />
 
 进入页面
 
-![img](SpringCloud alibaba.assets/1638672345779-52534c59-aec3-4a09-a11e-67df6cf6a7d1-169651825574528.png)
-
-
-
-出现以上页面 nacos 搭建完成
-
-
-
-![img](SpringCloud alibaba.assets/1688350898760-6302341c-47cf-4436-bad7-a0bf59e6abb6-169651825574530.png)
-
-
+<img src="SpringCloud alibaba.assets/1638672345779-52534c59-aec3-4a09-a11e-67df6cf6a7d1-169651825574528.png" alt="img" style="zoom:33%;" />
 
 ### 2.5、数据持久化到数据库
 
@@ -175,10 +158,6 @@ db.password.0=gitea
 
 执行我们  nacos-mysql .sql![img](SpringCloud alibaba.assets/1689146540790-c0677ccb-94cb-4a70-9f5f-d6f268d89bd3-169651825574532.png)
 
-
-
-
-
 ### 2.6、集群搭建
 
 ```yaml
@@ -195,13 +174,9 @@ nacos2
 127.0.0.1:8850
 ```
 
-
-
 注意事项：
 
 ![img](SpringCloud alibaba.assets/1688442316978-d64628a4-3b4a-45eb-ad8b-94b6f8b18adb-169651825574534.png)
-
-
 
 ### 2.7、nginx做负载均衡
 
@@ -227,11 +202,26 @@ server {
 
 ![img](SpringCloud alibaba.assets/1688369897071-7f892223-f702-4852-bc09-0a3d46540888-169651825574536.png)
 
-
-
 服务注册时在服务端本地会通过轮询注册中心集群节点地址进行服务得注册，在注册中心上，即Nacos Server上采用了Map保存实例信息，当然配置了持久化的服务会被保存到数据库中，在服务的调用方，为了保证本地服务实例列表的动态感知，Nacos与其他注册中心不同的是，采用了 Pull/Push同时运作的方式。通过这些我们对Nacos注册中心的原理有了一定的了解。我们从源码层面去验证这些理论知识。
 
 
+
+![image-20231013152724576](06-SpringCloud alibaba.assets/image-20231013152724576.png)
+
+![image-20231013153233774](06-SpringCloud alibaba.assets/image-20231013153233774.png)
+
+默认是临时实例, 推荐不修改
+
+**1.Nacos与eureka的共同点**
+
++ 都支持服务注册和服务拉取
++ 都支持服务提供者心跳方式做健康检测
+
+**2.Nacos与Eureka的区别**
+
++ Nacos支持服务端主动检测提供者状态:临时实例采用心跳模式，非临时实例采用主动检测模式临时实例心跳不正常会被剔除，非临时实例则不会被剔除
++ Nacos支持服务列表变更的消息推送模式，服务列表更新更及时
++ Nacos集群默认采用AP方式，当集群中存在非临时实例时，采用CP模式;Eureka采用AP方式
 
 ### 2.9、CAP定理
 
@@ -367,11 +357,122 @@ management:
 
 ![img](SpringCloud alibaba.assets/1638674165583-8d39502e-7d12-4678-9df1-2102c00098f2.png)
 
+# Nacos的依赖
 
+父工程：
+
+```xml
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+    <version>2.2.5.RELEASE</version>
+    <type>pom</type>
+    <scope>import</scope>
+</dependency>
+```
+
+客户端：
+
+```xml
+<!-- nacos客户端依赖包 -->
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+</dependency>
+```
+
+
+
+# 服务集群
+
+![image-20231013151440113](06-SpringCloud alibaba.assets/image-20231013151440113.png)
+
+1.修改user-service服务中的application.yml，添加如下内容
+
+![image-20231013150735202](06-SpringCloud alibaba.assets/image-20231013150735202.png)
+
+2.在Nacos控制台可以看到集群变化
+
+![image-20231013150917504](06-SpringCloud alibaba.assets/image-20231013150917504.png)
+
+# 负载均衡
+
+![image-20231013151346540](06-SpringCloud alibaba.assets/image-20231013151346540.png)
+
+
+
+![image-20231013151614829](06-SpringCloud alibaba.assets/image-20231013151614829.png)
+
+# 环境隔离
+
+![image-20231013152108458](06-SpringCloud alibaba.assets/image-20231013152108458.png)
+
+![image-20231013152154751](06-SpringCloud alibaba.assets/image-20231013152154751.png)
+
+![image-20231013152257125](06-SpringCloud alibaba.assets/image-20231013152257125.png)
+
+![image-20231013152330321](06-SpringCloud alibaba.assets/image-20231013152330321.png)
+
+不同名称空间的就是两个世界的人
+
+![image-20231013152356254](06-SpringCloud alibaba.assets/image-20231013152356254.png)
+
+# Nacos配置管理
+
+
+
+## Nacos流程
+
+![image-20231013154141722](06-SpringCloud alibaba.assets/image-20231013154141722.png)
+
+
+
+## 控制台配置
+
+![image-20231013153627256](06-SpringCloud alibaba.assets/image-20231013153627256.png)
+
+
+
+<img src="06-SpringCloud alibaba.assets/image-20231013154043454.png" alt="image-20231013154043454" style="zoom:67%;" />
+
+
+
+![image-20231013154008534](06-SpringCloud alibaba.assets/image-20231013154008534.png)
+
+## 代码配置
+
+**配置**
+
+![image-20231013154546392](06-SpringCloud alibaba.assets/image-20231013154546392.png)
+
+**简单测试**
+
+![image-20231013154514317](06-SpringCloud alibaba.assets/image-20231013154514317.png)
+
+**Ncos中的配置文件变更后，微服务无需重启就可以感知。不过需要通过下面两种配置实现：**
+
++ 方式一：在@Value注入的变量所在类上添加注解@RefreshScope
+
+  <img src="06-SpringCloud alibaba.assets/image-20231013155022720.png" alt="image-20231013155022720" style="zoom:67%;" />
+
++ 方式二: 直接使用配置类的方式, 读取配置文件, 无需加载@RefreshScope注解(推荐)
+
+## 多服务共享配置
+
+<img src="06-SpringCloud alibaba.assets/image-20231013160009902.png" alt="image-20231013160009902" style="zoom: 67%;" />
+
+
+
+# nacos集群搭建
+
+<img src="06-SpringCloud alibaba.assets/image-20231013160123888.png" alt="image-20231013160123888" style="zoom: 50%;" />
+
+>  集群搭自行百度
 
 # 三、服务间的调用-Feign
 
 **1 引言**
+
 Feign可以帮助我们实现面向接口编程，就直接调用其他的服务，简化开发。
 httpclient resttemplate
 

@@ -1,0 +1,33 @@
+server:
+  port: 9001 #端口
+spring:
+  application:
+    name: service-product #服务名称
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/shop?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 111111
+  jpa:
+    database: MySQL
+    show-sql: true
+    open-in-view: true
+  ###开始配置consul的服务注册
+  cloud:
+    consul:
+      host: 127.0.0.1 #consul服务器的主机地址
+      port: 8500 #consul服务器的ip地址
+      discovery:
+        #是否需要注册
+        register: true
+        #注册的实例ID (唯一标志)
+        instance-id: ${spring.application.name}-1
+        #服务的名称
+        service-name: ${spring.application.name}
+        #服务的请求端口
+        port: ${server.port}
+        #指定开启ip地址注册
+        prefer-ip-address: true
+        #当前服务的请求ip
+        ip-address: ${spring.cloud.client.ip-address}
+

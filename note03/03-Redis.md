@@ -3691,6 +3691,7 @@ sentinel auth-pass mymaster 111111               #
   ```
 
 ### 再启动3个哨兵监控后再测试一次主从复制
+
   sentinel的两种启动方式
 
   <img src="03-Redis.assets/image-20231010092649534.png" alt="image-20231010092649534" style="zoom: 80%;" />
