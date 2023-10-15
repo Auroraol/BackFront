@@ -1,4 +1,4 @@
-# 一、介绍
+一、介绍
 
 Spring Cloud Alibaba 为分布式应用开发提供一站式解决方案。它包含开发分布式应用程序所需的所有组件，使您可以轻松地使用 Spring Cloud 开发应用程序。
 
@@ -381,8 +381,6 @@ management:
 </dependency>
 ```
 
-
-
 # 服务集群
 
 ![image-20231013151440113](06-SpringCloud alibaba.assets/image-20231013151440113.png)
@@ -469,18 +467,42 @@ management:
 
 >  集群搭自行百度
 
-# 三、服务间的调用-Feign
+# 三、 服务间的调用-OpenFeign
 
-**1 引言**
+## 引言
 
-Feign可以帮助我们实现面向接口编程，就直接调用其他的服务，简化开发。
-httpclient resttemplate
+RestTemplate方式调用存在的问题: 代码可读性差，编程体验不统-
+
+<img src="06-SpringCloud alibaba.assets/image-20231013171447353.png" alt="image-20231013171447353" style="zoom:67%;" />
+
+使用Feign可以帮助我们实现面向接口编程，就直接调用其他的服务，简化开发
+
+功能:
+
++ Feign可插拔的注解支持，包括Feign注解和JAX-RS注解；
+
++ Feign与Ribbon负载均衡器、Hystrix或Sentinel熔断器无缝集成；
+
++ Feign支持可插拔的HTTP编码器和解码器；
+
++ Feign支持HTTP请求和响应的压缩等
+
+## 服务间调用的几种方式
+
+使用Spring Cloud开发微服务时，在服务消费者调用服务提供者时，底层通过HTTP Client 的方式访问。但实际上在服务调用时，有主要以下来实现：
+
++ 使用JDK原生的URLConnection
++ Apache提供的HTTP Client
++ Netty提供的异步HTTP Client
++ Spring提供的RestTemplate
+
++ Spring Cloud的Spring Cloud Open Feign相对是最方便与最优雅的，使Feign支持Spring MVC注解的同时并整合l 了Ribbon
 
 **2 Feign的快速入门**
 client 客服端 消费者
 导入依赖
 
-```java
+```xml
 <dependency>
     <groupId>org.springframework.cloud</groupId>
     <artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -521,7 +543,6 @@ public String customer(){
     return result;
 }
 ```
-
 
 **3 Feign的传递参数方式**
 注意事项
@@ -586,8 +607,6 @@ public Customer save(Customer customer){
 #### 4 Feign的Fallback
 
 Fallback可以帮助我们在使用Feign去调用另外一个服务时，如果出现了问题，走服务降级，返回一个错误数据，避免功能因为一个服务出现问题，全部失效。
-
-
 
 ##### 4.1 FallBack方式
 
@@ -2432,107 +2451,84 @@ CREATE TABLE `undo_log` (
 
 # 九 Gateway学习
 
-## 1、**⽹关介绍**
+## 核心概念
 
-1.1、微服务拆分之后遇到的问题？
+<img src="06-SpringCloud alibaba.assets/image-20231014111418307.png" alt=" " style="zoom:67%;" />
 
-当我们对锋迷商城进⾏微服务拆分之后，不同的接⼝是由不同的服务提供的，不同的服
++ **路由(Route)**：路由网关的基本构建块。它由ID，目的URI，断言（Predicate）集合和过滤器（filter）集合组成。如果断言聚合为真，则匹配该路由。
 
-务部署在不同的服务器上，因此前端进⾏接⼝调⽤的时候访问不同的接⼝会请求不同的
++ **断言(Predicate)**：这是一个 Java 8函数式断言。允许开发人员匹配来自HTTP请求的任何内容，例如请求头或参数。
 
-ip 和 port ，如果将接⼝服务的访问地址在前端代码中固定写死：
+- **过滤器(Filter)**：可以在发送下游请求之前或之后修改请求和响应。**一个标准的Spring webFilter，Spring Cloud Gateway中的Filter分为两种类型**，分别是Gateway Filter和Global Filter。过滤器Filter可以对请求和响应进行处理。
 
-前端需要记录很多服务器地址列表
+**路由根据断言进行匹配，匹配成功就会转发请求给URI，在转发请求之前或者之后可以添加过滤器。**
 
-当服务被迁移到不同的服务器上的时候，就必须修改前端代码才能继续访问
+## 使⽤Gateway实现⽹关服务
 
-当对服务进⾏集群部署的时候，没有办法实现负载均衡
+![image-20231014113556485](06-SpringCloud alibaba.assets/image-20231014113556485.png)
 
-1.2 什么是API⽹关？
+## 使用
 
-使⽤服务⽹关作为接⼝服务的统⼀代理，前端通过⽹关完成服务的统⼀调⽤ 
+### 添加gateway依赖
 
-![img](SpringCloud alibaba.assets/1672841908270-0536d3ff-9077-4694-bbf7-4bd5fe6882ae.png)
+<img src="06-SpringCloud alibaba.assets/image-20231014114237928.png" alt="image-20231014114237928" style="zoom:67%;" />
 
-1.3 ⽹关可以⼲什么？
-
-路由：接⼝服务的统⼀代理，实现前端对接⼝服务的统⼀访问
-
-过滤：对⽤户请求进⾏拦截、过滤（⽤户鉴权）、监控
-
-限流：限制⽤户的访问流量
-
-1.4 常⽤的⽹关
-
-Nginx
-
-Spring Cloud Netflix zuul
-
-Spring Cloud Gateway
-
-## 2、**使⽤Nginx实现⽹关服务**
-
-Nginx通常被⽤作应⽤服务器⽹关，服务⽹关通常使⽤zuul或者gateway 
-
-![img](SpringCloud alibaba.assets/1672841987904-ef3cdd77-2125-4291-a2bf-3b1befdca6b6.png)
-
-## 3、**使⽤Gateway实现⽹关服务**
-
-![img](SpringCloud alibaba.assets/1672842072948-6ca5021b-2ca5-4efe-8459-0c6c5a18068e.png)
-
-## **3.1** **搭建****gateway****服务器**
-
-创建SpringBoot应⽤，添加gateway依赖
+创建gateway服务，添加gateway依赖
 
 ```xml
+<!--nacos-->
 <dependency>
   <groupId>com.alibaba.cloud</groupId>
   <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
 </dependency>
+<!--gateway-->
 <dependency>
   <groupId>org.springframework.cloud</groupId>
   <artifactId>spring-cloud-starter-gateway</artifactId>
 </dependency>
 ```
 
-## **3.2** **配置路由规则**
+### 配置路由规则及nacos地址
 
 application.yml
 
+#### 代理单个服务
+
 ```yaml
 server:
-  port: 80
+  port: 10010 #网关端口号
 spring:
   application:
     name: gateway
   cloud:
     nacos:
       discovery:
-        server-addr: 127.0.0.1:8848
+        server-addr: 127.0.0.1:8848  #nacos地址
         username: nacos
         password: nacos
         namespace: public
+    
     gateway:
       discovery:
         locator:
           enabled: true #开启我们gateway
           lower-case-service-id: true #忽略服务名大小写
-      routes: #配置映射规则
-        - id: nacos-route     # 中杠“-”代表数组里面一个对象  #id代表在gateway唯一标识
-          uri: lb://nacos-test #需要跳转地址
-          predicates: #映射别名
-            - Path=/nacostest/**
+      routes: #配置映射规则 #网关路由配置
+        - id: nacos-route     # 中杠“-”代表数组里面一个对象#id代表在gateway唯一标识#一般写要代理的服务名称
+          uri: lb://nacos-test #需要跳转地址  路由的目标地址 Lb就是负载均衡，后面跟服务名称
+          predicates: #映射别名  
+            - Path=/nacostest/**  #断言 这个是按照路径匹配，只要以/nacostest/开头就符合要求
           filters:
             - RewritePath=/nacostest/(?<segment>/?.*), /$\{segment}
 ```
 
+#### 代理多个服务
 
-
-负载均衡网关配置
+<img src="06-SpringCloud alibaba.assets/image-20231014124247958.png" alt="image-20231014124247958" style="zoom: 50%;" />
 
 ```yaml
 server:
-  port: 80
+  port: 10010
 spring:
   application:
     name: gateway-server
@@ -2541,31 +2537,60 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: aaa
-          uri: lb://api-service1
+        - id: user-service
+          uri: lb://userservice  #需要跳转地址  路由的目标地址 Lb就是负载均衡，后面跟服务名称
           predicates:
-            - Path=/product/**
-        - id: bbb
-          uri: lb://api-service2
+            - Path=/user/**  #匹配的url
+        - id: order-servic
+          uri: lb://orderservic
           predicates:
             - Path=/order/**
 ```
 
-## 3.3 基本概念：
+![image-20231014115532950](06-SpringCloud alibaba.assets/image-20231014115532950.png)
 
-- **Route**：路由网关的基本构建块。它由ID，目的URI，断言（Predicate）集合和过滤器（filter）集合组成。如果断言聚合为真，则匹配该路由。
-- **Predicate**：这是一个 Java 8函数式断言。允许开发人员匹配来自HTTP请求的任何内容，例如请求头或参数。
-- **过滤器**：可以在发送下游请求之前或之后修改请求和响应。
+测试访问  http//localhost:10010/user/1   
 
-**路由根据断言进行匹配，匹配成功就会转发请求给URI，在转发请求之前或者之后可以添加过滤器。**
+<img src="06-SpringCloud alibaba.assets/image-20231014115631445.png" alt="image-20231014115631445" style="zoom:67%;" />
 
+### 相关细节
 
+#### 路由规则
 
-## 3.4 Gateway⼯作流程图
+![image-20231014123633375](06-SpringCloud alibaba.assets/image-20231014123633375.png)
 
-![img](SpringCloud alibaba.assets/1672842635817-13550f44-87e0-455f-8a8f-47aacbd42c8a.png)
+| ![image-20231014123944196](06-SpringCloud alibaba.assets/image-20231014123944196.png) |
+| ------------------------------------------------------------ |
 
-## 3.5 断言工厂
+#### 重写转发路径 
+
+将匹配路径改为/product-service/**
+
+![image-20231015231522986](06-SpringCloud alibaba.assets/image-20231015231522986.png)
+
+重新启动网关，我们在浏览器访问http://127.0.0.1:8080/product-service/product/1，会抛出404。这
+是由于路由转发规则默认转发到商品微服务（ http://127.0.0.1:9002/productservice/
+product/1 ）路径上，而商品微服务又没有product-service 对应的映射配置。
+
+（2） 添加RewritePath重写转发路径
+修改application.yml ，添加重写规则。
+
+![img](06-SpringCloud alibaba.assets/Z4XXX`GLD7RPOD8N63OXB_T.png)
+
+通过RewritePath配置重写转发的url，将/product-service/(?.*)，重写为{segment}，然后转发到订单
+微服务。比如在网页上请求http://localhost:8080/product-service/product，此时会将请求转发到htt
+p://127.0.0.1:9002/product/1（ 值得注意的是在yml文档中 $ 要写成 $\ ）
+
+## 断言工厂
+
+在配置文件中写的断言规则只是字符串，这些字符串会被Predicate Factory读取并处理，转变为路由判断的条件
+例如
+
+```
+Path=/user/**是按照路径匹配，这个规则是由org.springframework.cloud.qateway.handlerpredicate.PathRoutePredicateFactorv类来处理的
+```
+
+![image-20231015232639213](06-SpringCloud alibaba.assets/image-20231015232639213.png)
 
 Spring Cloud Gateway包含许多内置的Route Predicate工厂。所有这些断言都匹配HTTP请求的不同属性。多路由断言工厂通过**and**组合。
 
@@ -2711,25 +2736,27 @@ spring:
 
 
 
-## 4、过滤器
+## 过滤器
 
-## 4.1 Gateway内置⽹关过滤器
+### 4.1 Gateway内置⽹关过滤器
 
 gateway ⽹关可以对⽤户的请求和响应进⾏处理， gateway 提供了多个内置的过滤器，
 
 不同的过滤器可以完成不同的请求或者响应的处理
 
-![img](SpringCloud alibaba.assets/1672843171488-dfc854e5-86d5-4693-a794-9296682fc365.png)
+<img src="SpringCloud alibaba.assets/1672843171488-dfc854e5-86d5-4693-a794-9296682fc365.png" alt="img" style="zoom: 80%;" />
 
 这些过滤器工厂的配置方式，同样参照官方文档：https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.1.0.RELEASE/single/spring-cloud-gateway.html
 
-![img](SpringCloud alibaba.assets/1672843221703-674f0c37-67ae-491b-b378-b8e72dd187d9.png)
+<img src="SpringCloud alibaba.assets/1672843221703-674f0c37-67ae-491b-b378-b8e72dd187d9.png" alt="img" style="zoom:67%;" />
 
 过滤器 有 20 多个 实现类,根据过滤器工厂的用途来划分，可以分为以下几种：Header、Parameter、Path、Body、Status、Session、Redirect、Retry、RateLimiter和Hystrix
 
 ![img](SpringCloud alibaba.assets/1672843251370-67931844-63a4-48db-9b9f-6a8be21c8056.png)
 
-## 4.2 Gateway内置⽹关过滤器使用
+### 4.2 Gateway内置⽹关过滤器使用
+
+普通过滤器
 
 ```yaml
 spring:
@@ -2750,7 +2777,14 @@ spring:
           - StripPrefix=2 #去掉前缀（2 去掉两个前缀）
 ```
 
-## 4.3 Gateway 自定义内置过滤器
+默认过滤器
+
+ 如果要对所有的路由都生效，则可以将过滤器工厂写到default下。格式如下
+
+| ![image-20231015223754441](06-SpringCloud alibaba.assets/image-20231015223754441.png) |
+| ------------------------------------------------------------ |
+
+### 4.3 Gateway 自定义内置过滤器
 
 有两种方式：
 
@@ -2875,7 +2909,7 @@ public class MyPartGatewayFilterFactory extends AbstractGatewayFilterFactory<MyP
             - After=2022-07-25T08:30:00.003+08:00[Asia/Shanghai]
 ```
 
-## 4.4 Gateway全局过滤器
+### 4.4 Gateway全局过滤器
 
 需要实现：GlobalFilter, Ordered接口
 
@@ -2904,12 +2938,41 @@ public class MyPartGatewayFilterFactory extends AbstractGatewayFilterFactory<MyP
                 return response.writeWith(Mono.just(dataBuffer));
             }
         }
+        
+        
+        // 优先级
         @Override
         public int getOrder() {
             return 0;
         }
     }
 ```
+
+### 4.5 过滤器执行顺序
+
+![image-20231015225518793](06-SpringCloud alibaba.assets/image-20231015225518793.png)
+
+原理:
+
+![image-20231015230011610](06-SpringCloud alibaba.assets/image-20231015230011610.png)
+
+![image-20231015231010426](06-SpringCloud alibaba.assets/image-20231015231010426.png)
+
+![image-20231015231159961](06-SpringCloud alibaba.assets/image-20231015231159961.png)
+
+### 4.6 Gateway⼯作流程图
+
+![image-20231015231348689](06-SpringCloud alibaba.assets/image-20231015231348689.png)
+
+## 跨域
+
+
+
+
+
+
+
+
 
 ## 5、Gateway整合Sentinel
 

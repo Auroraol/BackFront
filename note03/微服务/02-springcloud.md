@@ -1,4 +1,4 @@
-# 分布式核心
+分布式核心
 
 ## 分布式中的远程调用
 
@@ -118,7 +118,7 @@ ZeroC IceGrid 是ZeroC公司的杰作，继承了CORBA的血统，是新一代�
 
 ## 微服务相关技术概念
 
-### 服务注册与发现
+### 服务注册与发现： 帮我们服务的通信地址的
 
 服务注册：
 
@@ -130,14 +130,14 @@ ZeroC IceGrid 是ZeroC公司的杰作，继承了CORBA的血统，是新一代�
 + 服务实例请求注册中心获取所依赖服务信息。服务实例通过注册中心，获取到注册到其中的
   服务实例的信息，通过这些信息去请求它们提供的服务。
 
-### 负载均衡
+### 负载均衡： 解决网络通信的
 
 负载均衡是高可用网络基础架构的关键组件，通常用于将工作负载分布到多个服务器来提高网站、应
 用、数据库或其他服务的性能和可靠性。
 
 <img src="02-springcloud.assets/image-20231012160721266.png" alt="image-20231012160721266" style="zoom: 67%;" />
 
-### 熔断
+### 熔断：解决微服务故障的
 
 熔断这一概念来源于电子工程中的断路器（Circuit Breaker）。在互联网系统中，当下游服务因访问压
 力过大而响应变慢或失败，上游服务为了保护系统整体的可用性，可以暂时切断对下游服务的调用。这
@@ -154,7 +154,7 @@ ZeroC IceGrid 是ZeroC公司的杰作，继承了CORBA的血统，是新一代�
 
 <img src="02-springcloud.assets/image-20231012160840105.png" alt="image-20231012160840105" style="zoom: 80%;" />
 
-### API网关
+### API网关：微服务的大门(安保部门)
 
 随着微服务的不断增多，不同的微服务一般会有不同的网络地址，而外部客户端可能需要调用多个服务
 的接口才能完成一个业务需求，如果让客户端直接与各个微服务通信可能出现：
@@ -406,527 +406,6 @@ API服务提供团队可以专注于自己的的业务逻辑处理，而API网�
 + 统一的把安全性校验都放在Zuul中
 
 ![img](02-springcloud.assets/1637463242659-92323230-d7cc-4bc7-b047-eba75013ed39-169651356808124.png)
-
-## 1 Zuul的快速入门
-
-创建Maven项目，修改为SpringBoot
-
-导入依赖
-
-```xml
-<dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-</dependency>
-
-<dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
-</dependency>
-```
-
-添加一个注解
-
-```
-@EnableEurekaClient
-@EnableZuulProxy
-```
-
-编写配置文件
-
-```yaml
-# 指定Eureka服务地址
-eureka:
-  client:
-    service-url:
-      defaultZone: http://root:root@localhost:8761/eureka,http://root:root@localhost:8762/eureka
-
-#指定服务的名称
-spring:
-  application:
-    name: ZUUL
-
-server:
-  port: 80
-```
-
-## 2 Zuul的监控界面
-
-导入依赖
-
-```
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-actuator</artifactId>
-</dependency>
-```
-
-访问地址：
-
-http://localhost/actuator/routes  （http://ip:port/actuator/routes）
-
-编写配置文件
-
-```
-# 查看zuul的监控界面（开发时，配置为*，上线，不要配置）
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-```
-
-## 3 忽略服务配置
-
-```
-# zuul的配置
-zuul:
-  # 基于服务名忽略服务，无法查看 ，如果要忽略全部的服务  "*",默认配置的全部路径都会被忽略掉（自定义服务的配置，无法忽略的）
-  ignored-services: eureka
-  # 监控界面依然可以查看，在访问的时候，404
-  ignored-patterns: /**/search/**
-```
-
-## 4 自定义服务配置
-
-```
-# zuul的配置
-zuul:
-  # 指定自定义服务(方式一 ， key（服务名）：value（路径）)
-#  routes:
-#    search: /ss/**
-#    customer: /cc/**
-  # 指定自定义服务(方式二)
-  routes:
-    kehu:   # 自定义名称
-      path: /ccc/**     # 映射的路径
-      serviceId: customer   # 服务名称
-```
-
-![img](02-springcloud.assets/1637828726592-687136fb-1435-443d-b3bd-aba558bd4f07-169651356808126.png)
-
-## 5 灰度发布（省略）
-
-添加一个配置类
-
-```
-
-@Bean
-public PatternServiceRouteMapper serviceRouteMapper() {
-    return new PatternServiceRouteMapper(
-        "(?<name>^.+)-(?<version>v.+$)",
-        "${version}/${name}");
-}
-```
-
-准备一个服务，提供2个版本
-
-```
-version: v1
-
-#指定服务的名称
-spring:
-  application:
-    name: CUSTOMER-${version}
-```
-
--Dversion=v2 -Dserver.port=9099
-
-
-
-修改Zuul的配置
-
-```
-# zuul的配置
-zuul:
-  # 基于服务名忽略服务，无法查看  ， 如果需要用到-v的方式，一定要忽略掉
-  # ignored-services: "*"
-```
-
-
-
-6 Zuul的过滤器执行流程 客户端请求发送到Zuul服务上，首先通过PreFilter链，如果正常放行，会吧请求再次转发给RoutingFilter，请求转发到一个指定的服务，在指定的服务响应一个结果之后，再次走一个PostFilter的过滤器链，最终再将响应信息交给客户端。 
-
-zuul
-
-PreFilter
-
-ErrorFilter
-
-其他服务
-
-RoutingFilter
-
-客户端
-
-PostFilter
-
-![img](02-springcloud.assets/1637463772879-390bd2d4-0d9f-41ef-8efd-4d4274ca1b7d-169651356808128.png)
-
-
-
-**Zuul过滤器入门**
-创建POJO类，继承ZuulFilter抽象类
-
-```
-@Component
-public class TestZuulFilter extends ZuulFilter {}
-```
-
-指定当前过滤器的类型
-
-```java
-@Override
-public String filterType() {
-    return FilterConstants.PRE_TYPE;
-}
-```
-
-指定过滤器的执行顺序
-
-```java
-@Override
-public int filterOrder() {
-    return FilterConstants.PRE_DECORATION_FILTER_ORDER - 1;
-}
-```
-
-配置是否启用
-
-```java
-@Override
-public boolean shouldFilter() {
-    // 开启当前过滤器
-    return true;
-}
-```
-
-指定过滤器中的具体业务代码
-
-```java
-@Override
-public Object run() throws ZuulException {
-    System.out.println("prefix过滤器执行~~~");
-    return null;
-}
-```
-
-**PreFilter实现token校验 （作业）**
-
-准备访问路径，请求参数传递token
-
-http://localhost/v2/customer/version?token=123
-
-创建AuthenticationFilter
-
-```java
-@Component
-public class AuthenticationFilter extends ZuulFilter {
-    @Override
-    public String filterType() {
-        return FilterConstants.PRE_TYPE;
-    }
-
-    @Override
-    public int filterOrder() {
-        return PRE_DECORATION_FILTER_ORDER - 2;
-    }
-
-    @Override
-    public boolean shouldFilter() {
-        return true;
-    }
-
-    @Override
-    public Object run() throws ZuulException {
-        //..
-    }
-    
-}
-```
-
-
-
-在run方法中编写具体的业务逻辑代码
-
-```java
-@Override
-public Object run() throws ZuulException {
-    //1. 获取Request对象
-    RequestContext requestContext = RequestContext.getCurrentContext();
-    HttpServletRequest request = requestContext.getRequest();
-
-    //2. 获取token参数
-    String token = request.getParameter("token");
-
-    //3. 对比token
-    if(token == null || !"123".equalsIgnoreCase(token)) {
-        //4. token校验失败，直接响应数据
-        requestContext.setSendZuulResponse(false);
-        requestContext.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
-    }
-    return null;
-}
-```
-
-## Zuul的降级
-
-
-
-创建POJO类，实现接口FallbackProvider
-
-```java
-@Component
-public class ZuulFallBack implements FallbackProvider {}
-```
-
-重写两个方法
-
-```
-@Override
-public String getRoute() {
-    return "*";   // 代表指定全部出现问题的服务，都走这个降级方法
-}
-
-@Override
-public ClientHttpResponse fallbackResponse(String route, Throwable cause) {
-    System.out.println("降级的服务：" + route);
-    cause.printStackTrace();
-
-    return new ClientHttpResponse() {
-        @Override
-        public HttpStatus getStatusCode() throws IOException {
-            // 指定具体的HttpStatus
-            return HttpStatus.INTERNAL_SERVER_ERROR;
-        }
-
-        @Override
-        public int getRawStatusCode() throws IOException {
-            // 返回的状态码
-            return HttpStatus.INTERNAL_SERVER_ERROR.value();
-        }
-
-        @Override
-        public String getStatusText() throws IOException {
-            // 指定错误信息
-            return HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
-        }
-
-        @Override
-        public void close() {
-
-        }
-
-        @Override
-        public InputStream getBody() throws IOException {
-            // 给用户响应的信息
-            String msg = "当前服务：" + route + "出现问题！！！";
-            return new ByteArrayInputStream(msg.getBytes());
-        }
-
-        @Override
-        public HttpHeaders getHeaders() {
-            // 指定响应头信息
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            return headers;
-        }
-    };
-}
-```
-
-## Zuul动态路由
-
-创建一个过滤器
-
-//  执行顺序最好放在Pre过滤器的最后面
-
-在run方法中编写业务逻辑
-
-```java
-@Override
-public Object run() throws ZuulException {
-    //1. 获取Request对象
-    RequestContext context = RequestContext.getCurrentContext();
-    HttpServletRequest request = context.getRequest();
-
-    //2. 获取参数，redisKey
-    String redisKey = request.getParameter("redisKey");  //路径
-   
-
-    //3. 直接判断
-    设计模式23一种
-    
-    if(redisKey != null && redisKey.equalsIgnoreCase("customer")){
-        // http://localhost:8080/customer
-        context.put(FilterConstants.SERVICE_ID_KEY,"customer-v1");
-        context.put(FilterConstants.REQUEST_URI_KEY,"/customer");
-    }else if(redisKey != null && redisKey.equalsIgnoreCase("search")){
-        // http://localhost:8081/search/1
-        context.put(FilterConstants.SERVICE_ID_KEY,"search");
-        context.put(FilterConstants.REQUEST_URI_KEY,"/search/1");
-    }
-
-    return null;
-}
-```
-
-GATEWAY介绍
-
-一、负载均衡
-
-1、依赖
-
-```java
-<dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-gateway</artifactId>
-</dependency>
-```
-
-2、配置文件
-
-```yaml
-spring:
-  cloud:
-      gateway:
-        discovery:
-          locator:
-            enabled: true #开启网关 gateway
-            lower-case-service-id: true #忽略服务器的名字大小写
-        routes:
-          - id: order #服务名
-            uri: lb://order #lb loadbalanced （代表是负载均衡）
-            #        uri: http://localhost:8012/order
-            predicates:
-              - Path=/test #uri http://localhost:8012/order/test
-              - After=2017-01-20T17:42:47.789-07:00[America/Denver]
-            filters:
-              - StripPrefix=1 #忽略一级服务名 以前方式：http://localhost:8012/order/test 加上后 http://localhost:8012/test
-```
-
-3、服务者端
-
-```yaml
-eureka:
- instance:
-   prefer-ip-address: true
-```
-
-二、全局跨域
-
-1、配置文件方式
-
-```yaml
-spring:
-  cloud:
-    gateway:
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "https://docs.spring.io"  #这里配置是需要跨域请求地址 http://localhost:8080
-            allowedMethods:
-            - GET
-```
-
-2、代码方式
-
-```java
-@Configuration
-public class MyCorsConfiguration {
-
-    @Bean
-    public CorsWebFilter corsWebFilter(){
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        //1.配置跨域
-        //允许哪种请求头跨域
-        corsConfiguration.addAllowedHeader("*");
-        //允许哪种方法类型跨域 get post delete put
-        corsConfiguration.addAllowedMethod("*");
-        // 允许哪些请求源跨域
-        corsConfiguration.addAllowedOrigin("*");
-        // 是否携带cookie跨域
-        corsConfiguration.setAllowCredentials(true);
-
-        //允许跨域的路径
-        source.registerCorsConfiguration("/**",corsConfiguration);
-        return new CorsWebFilter(source);
-    }
-}
-import com.flow.utils.JsonUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.cloud.gateway.filter.NettyWriteResponseFilter;
-import org.springframework.core.Ordered;
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-
-@Slf4j
-public class CorsResponseHeaderFilter implements GlobalFilter, Ordered {
-    @Override
-    public int getOrder() {
-        // 指定此过滤器位于NettyWriteResponseFilter之后
-        // 即待处理完响应体后接着处理响应头
-        return NettyWriteResponseFilter.WRITE_RESPONSE_FILTER_ORDER + 1;
-    }
-
-    @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        return chain.filter(exchange).then(Mono.defer(() -> {
-            exchange.getResponse().beforeCommit(() -> {
-                exchange.getResponse().getHeaders().entrySet().stream()
-                        .filter(kv -> (kv.getValue() != null && kv.getValue().size() > 1))
-                        .filter(kv -> (kv.getKey().equals(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)
-                                || kv.getKey().equals(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)))
-                        .forEach(kv -> {
-                            kv.setValue(new ArrayList<String>() {{
-                                add(kv.getValue().get(0));
-                            }});
-                        });
-
-
-                log.info("处理后的数据:{}", JsonUtils.objectToString(exchange.getResponse().getHeaders().entrySet()));
-                return chain.filter(exchange);
-            });
-
-            return chain.filter(exchange);
-        }));
-    }
-
-}
-@Bean
-    public CorsResponseHeaderFilter corsResponseHeaderFilter() {
-        return new CorsResponseHeaderFilter();
-    }
-```
-
-作业：
-
-
-
-1、权限登录  登录界面 需要一个主页 
-
-2、登录成功，需要左边菜单动态生成
-
-3、要设置我们的按钮权限（增加 删除 修改 查询功能）
-
-4、权限需要动态配置（t_user  t_role t_auth t_menu）
-
-
-
-![未命名文件(4).png](02-springcloud.assets/1664506578673-63656c5e-af46-44ad-a280-4a0c71b0c8dd-169651366118530.png)
-
-5、登录成功后需要需要当前用户基本信息  角色 权限 和菜单查出来 放到缓存中
-
-6、前端用vue
-
-7、登录账号 ：管理员账号 普通账号 
 
 
 
@@ -1553,7 +1032,7 @@ public class UrlFilter implements Filter {
 
 
 
-# ①服务的注册与发现
+# ①服务的注册与发现[重要]
 
 ## 常见的注册中心
 
@@ -1969,6 +1448,8 @@ public String customer(){
 ```
 
 ####  1.5 启动类中RestTemplate配置
+
+==RestTemplate方式调用存在的问题不方便,  后面都是使用服务调用Feign技术==
 
  RestTemplate
 
@@ -2697,21 +2178,15 @@ consul members
 功能实际上服务还是不可用的。当然发现别的服务也可以不使用本机节点，可以通过访问一个Nginx实
 现的若干Consul节点的负载均衡来实现。
 
-### ③服务的注册与实现-nacos
+## 服务的注册与实现-nacos (推荐)
 
-见[SpringCloud alibaba笔记](./06-SpringCloud alibaba.md)
+见[SpringCloud alibaba笔记](../06-SpringCloud alibaba.md)
 
-
-
-# 负载均衡-Ribbon
+# ②负载均衡-Ribbon
 
 ## Ribbon概要
 
-是 Netflixfa 发布的一个负载均衡器，有助于控制 HTTP 和 TCP客户端行为。在 SpringCloud 中，
-Eureka一般配合Ribbon进行使用，Ribbon提供了客户端负载均衡的功能，Ribbon利用从Eureka中读
-取到的服务信息，在调用服务节点提供的服务时，会合理的进行负载。
-在SpringCloud中可以将注册中心和Ribbon配合使用，Ribbon自动的从注册中心中获取服务提供者的
-列表信息，并基于内置的负载均衡算法，请求服务
+是 Netflixfa 发布的一个负载均衡器，有助于控制 HTTP 和 TCP客户端行为。在 SpringCloud 中，Eureka一般配合Ribbon进行使用，Ribbon提供了客户端负载均衡的功能，Ribbon利用从Eureka中读取到的服务信息，在调用服务节点提供的服务时，会合理的进行负载。在SpringCloud中可以将注册中心和Ribbon配合使用，Ribbon自动的从注册中心中获取服务提供者的列表信息，并基于内置的负载均衡算法，请求服务
 
 ## Ribbon的主要作用
 
@@ -2755,8 +2230,10 @@ public @interface LoadBalanced {
 }
 ```
 
-通过注释可以知道@LoadBalanced注解是用来给RestTemplate做标记，方便我们对RestTemplate添加
+**通过注释可以知道@LoadBalanced注解是用来给RestTemplate做标记**，方便我们对RestTemplate添加
 一个LoadBalancerClient，以实现客户端负载均衡。
+
+==RestTemplate方式调用存在的问题不方便,  后面都是使用服务调用Feign==
 
 ## 案例
 
@@ -2871,6 +2348,8 @@ public Product findById(@PathVariable Long id) {
 
 ![img](02-springcloud.assets/1653814544318-3addd47b-3de3-47da-ac1a-0c993a1f1fdc.png)
 
+### 使用 
+
 ```xml
 #修改ribbon的负载均衡策略   
 服务名:
@@ -2894,6 +2373,8 @@ service-product:
 ## Ribbon-饥饿加载
 
 ![img](02-springcloud.assets/1653823307515-a92e8446-73a9-4f31-a647-1ed0ebfd8768.png)
+
+### 使用
 
 ```xml
 ribbon:
@@ -2946,7 +2427,15 @@ public class RibbonAutoConfiguration {
 
 
 
+服务注册发现——Netflix Eureka ： 帮我们服务的通信地址的
 
+客服端[负载均衡](https://so.csdn.net/so/search?q=负载均衡&spm=1001.2101.3001.7020)——Netflix Ribbon\Feign ： 解决网络通信的
+
+断路器——Netflix Hystrix ：解决微服务故障的
+
+服务网关——Netflix Zuul ：微服务的大门(安保部门)
+
+分布式配置——Spring Cloud Config ：统一管理微服务的配置
 
 ```xml
     <!--对应的nacos版本为 2.0.4, Sentinel Version 1.8.5, RocketMQ Version 4.9.4,Seata Version 1.5.2 -->
@@ -2959,7 +2448,1080 @@ public class RibbonAutoConfiguration {
             </dependency>
 ```
 
+# ③ 服务间的调用-OpenFeign[重要]
+
+代码见 [服务的调用案例.zip](..\code\服务的调用案例.zip) 
+
+## 引言
+
+RestTemplate方式调用存在的问题: 代码可读性差，编程体验不统-
+
+<img src="02-springcloud.assets/image-20231013171447353.png" alt="image-20231013171447353" style="zoom:67%;" />
+
+使用Feign可以帮助我们实现面向接口编程，就直接调用其他的服务，简化开发
+
+功能:
+
++ Feign可插拔的注解支持，包括Feign注解和JAX-RS注解；
+
++ Feign与Ribbon负载均衡器、Hystrix或Sentinel熔断器无缝集成；
+
++ Feign支持可插拔的HTTP编码器和解码器；
+
++ Feign支持HTTP请求和响应的压缩等
+
+## 服务间调用的几种方式
+
+使用Spring Cloud开发微服务时，在服务消费者调用服务提供者时，底层通过HTTP Client 的方式访问。但实际上在服务调用时，有主要以下来实现：
+
++ 使用JDK原生的URLConnection
++ Apache提供的HTTP Client
++ Netty提供的异步HTTP Client
++ Spring提供的RestTemplate
+
++ Spring Cloud的Spring Cloud Open Feign相对是最方便与最优雅的，使Feign支持Spring MVC注解的同时并整合l 了Ribbon
+
+## 使用
+
+基于Feign的服务调用
+
+![image-20231013220009976](02-springcloud.assets/image-20231013220009976.png)
+
+### (1)引入依赖
+
+在服务消费者shop_service_order 添加Fegin依赖
+
+```xml
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+```
+
+### (2)服务启动类添加Feign的支持
+
+```java
+    @SpringBootApplication(scanBasePackages="cn.itcast.order")
+    @EntityScan("cn.itcast.entity")
+    @EnableFeignClients
+    public class OrderApplication {
+        public static void main(String[] args) {
+        SpringApplication.run(OrderApplication.class, args);
+    }
+}
+```
+
+### (3)编写Feign客户端
+
+**在shop_service_order服务中编写Feign客户端:**
+
+```java
+//指定需要调用的服务名称
+@FeignClient(name="shop-service-product")
+public interface ProductFeginClient {
+    //调用的请求路径 // 调用shop-service-product服务的方法
+    @RequestMapping(value = "/product/{id}",method = RequestMethod.GET)
+	public Product findById(@PathVariable("id") Long id);  //现在
+}
+```
+
+主要是基于SpringMVC的注解来声明远程调用的信息，比如:
+
++ 服务名称:userservice
++ 请求方式:GET
++ 请求路径:/user/{id
++ 请求参数:Longid
++ 返回值类型:User
+
+**其中shop_service_order服务的Controller调用**
+
+```java
+    @RestController
+    @RequestMapping("/order")
+    public class OrderController {
+        @Autowired
+        private ProductFeginClient productFeginClient;
+        //
+        @GetMapping("/buy/{id}")
+        public Product order(@PathVariable Long id) {
+        	return productFeginClient.findById(id);
+        }
+	}
+```
+
+### (4)编写Feign客户端要调用的服务接口
+
+**shop-service-product服务:**
+
+```java
+@RestController
+@RequestMapping("/product")
+public class ProductController {
+
+	@Autowired
+	private ProductService productService;
+
+	@Value("${server.port}")
+	private String port;
+
+	@Value("${spring.cloud.client.ip-address}") //spring cloud 自动的获取当前应用的ip地址
+	private String ip;
+
+	@RequestMapping(value = "/{id}",method = RequestMethod.GET)
+	public Product findById(@PathVariable Long id) {
+		Product product = productService.findById(id);
+		product.setProductName("访问的服务地址:"+ip + ":" + port);
+		return product;
+	}
+
+	@RequestMapping(value = "",method = RequestMethod.POST)
+	public String save(@RequestBody Product product) {
+		productService.save(product);
+		return "保存成功";
+	}
+}
+```
+
+### (5)测试效果
+
+![image-20231013213028426](02-springcloud.assets/image-20231013213028426.png)
+
+## 负载均衡
+
+Feign中本身已经集成了Ribbon依赖和自动配置，因此我们不需要额外引入依赖，也不需要再注册RestTemplate 对象。写配置文件就行, 可以通过ribbon.xx 来进行全局配置。也可以通过服务名.ribbon.xx 来对指定服务配置：
+
+### 1.1 导入依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+```
+
+### 1.2 编写customer
+
+#### 1.2.1 编写启动类
+
+```java
+@SpringBootApplication
+@EnableDiscoveryClient  //有些版本不用写
+public class CustomerApplication {
+    public static void main(String[] args) {
+
+        SpringApplication.run(CustomerApplication.class,args);
+
+    }
+}
+```
+
+#### 1.2.2 编写yml
+
+```yaml
+server:
+  port: 9012
+spring:
+  application:
+    name: customer
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://162.14.64.72:8848
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+```
+
+#### 1.2.3 编写comtroller
+
+```java
+@RestController
+@RequestMapping(value = "customer")
+public class TestCustomerComtroller {
+    @Value("${server.port}")
+    private String port;
+    @GetMapping("/test")
+    public String test(){
+        System.out.println("customer port:"+port);
+
+        return port;
+    }
+
+}
+```
+
+### 1.3 编写pulisher 
+
+#### 1.3.1 编写controller
+
+```java
+@RestController
+@RequestMapping("publisher")
+public class PublisherController {
+    @Autowired
+    private CostomerFeignClient costomerFeignClient;
+    @GetMapping("/test")
+    public String test(){
+        String test = costomerFeignClient.test();
+        return test;
+    }
+}
+```
+
+#### 1.3.2 编写feignclient
+
+```java
+@FeignClient(value = "customer")
+    public interface CostomerFeignClient {
+
+    @RequestMapping("/customer/test")
+    public String test();
+}
+```
+
+### 1.4 测试
+
+![image.png](02-springcloud.assets/1638675963975-bc625ec4-e06e-4e01-90db-980267749a6c.png)
+
+## 服务调用Feign高级
+
+### Feign的配置
+
+从Spring Cloud Edgware开始，Feign支持使用属性自定义Feign。对于一个指定名称的Feign
+Client（例如该Feign Client的名称为feignName ），Feign支持如下配置项：
+
+```yaml
+feign:
+    client:
+        config:
+            feignName: ##定义FeginClient的名称
+                connectTimeout: 5000 # 相当于Request.Options
+                readTimeout: 5000 # 相当于Request.Options
+                # 配置Feign的日志级别，相当于代码配置方式中的Logger
+                loggerLevel: full
+                # Feign的错误解码器，相当于代码配置方式中的ErrorDecoder
+                errorDecoder: com.example.SimpleErrorDecoder
+                # 配置重试，相当于代码配置方式中的Retryer
+                retryer: com.example.SimpleRetryer
+                # 配置拦截器，相当于代码配置方式中的RequestInterceptor
+                requestInterceptors:
+                - com.example.FooRequestInterceptor
+                - com.example.BarRequestInterceptor
+                decode404: false
+```
+
+feignName：FeginClient的名称
+connectTimeout ： 建立链接的超时时长
+readTimeout ： 读取超时时长
+loggerLevel: Fegin的日志级别
+errorDecoder ：Feign的错误解码器
+retryer ： 配置重试
+requestInterceptors ： 添加请求拦截器
+decode404 ： 配置熔断不处理404异常
+
+#### Feign的性能优化-连接池配置
+
+![image-20231013224953830](02-springcloud.assets/image-20231013224953830.png)
+
+### 请求压缩
+
+Spring Cloud Feign 支持对请求和响应进行GZIP压缩，以减少通信过程中的性能损耗。通过下面的参数
+即可开启请求与响应的压缩功能：
+
+```yaml
+feign:
+    compression:
+        request:
+        	enabled: true # 开启请求压缩
+        response:
+        	enabled: true # 开启响应压缩
+```
+
+同时，我们也可以对请求的数据类型，以及触发压缩的大小下限进行设置：
+
+```yaml
+feign:
+    compression:
+    	request:
+    		enabled: true # 开启请求压缩
+   			mime-types: text/html,application/xml,application/json # 设置压缩的数据类型
+    		min-request-size: 2048 # 设置触发压缩的大小下限
+```
+
+注：上面的数据类型、压缩大小下限均为默认值。
+
+### 日志级别
+
+#### 配置Feign日志有两种方式
+
+##### 配置文件的方式
+
+![image-20231013222551536](02-springcloud.assets/image-20231013222551536.png)
+
+##### java代码方式
+
+需要先声明一个Bean:
+
+![image-20231013223222860](02-springcloud.assets/image-20231013223222860.png)
+
+```yaml
+feign:
+    client:
+        config:
+            shop-service-product:
+            	loggerLevel: FULL
+logging:
+    level:
+    	cn.itcast.order.fegin.ProductFeginClient: debug
+```
+
++ logging.level.xx : debug : Feign日志只会对日志级别为debug的做出响应
+
++ feign.client.config.shop-service-product.loggerLevel : 配置Feign的日志Feign有四种
+
+日志级别:
+
++ NONE【性能最佳，适用于生产】：不记录任何日志（默认值）
++ BASIC【适用于生产环境追踪问题】：仅记录请求方法、URL、响应状态代码以及执行时间
++ HEADERS：记录BASIC级别的基础上，记录请求和响应的header。
++ FULL【比较适用于开发及测试环境定位问题】：记录请求和响应的header、body和元数
+
+![image-20231013222359385](02-springcloud.assets/image-20231013222359385.png)
 
 
 
+## 最佳方案
+
+**方式一(继承):**
+
+给消费者的FeignClient和提供者的controller定义统一的父接口作为标准。
+
+![image-20231013233553128](02-springcloud.assets/image-20231013233553128.png)
+
+**方式二(抽取)(推荐):**
+
+将FeignClient抽取为独立模块，并且把接口有关的POJ0、默认的Feign配置都放到这个模块中，提供给所有消费者使用
+
+![image-20231013233531769](02-springcloud.assets/image-20231013233531769.png)
+
+
+
+![image-20231014095008105](02-springcloud.assets/image-20231014095008105.png)
+
+### 编写api
+
+引入依赖
+
+```
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+```
+
+编写Feign客户端()
+
+```
+//指定需要调用的服务名称
+@FeignClient(name="shop-service-product")
+public interface ProductFeginClient {
+    //调用的请求路径 // 调用shop-service-product服务的方法
+    @RequestMapping(value = "/product/{id}",method = RequestMethod.GET)
+	public Product findById(@PathVariable("id") Long id);  //现在
+}
+```
+
+所需实体类
+
+```
+Product实体类
+```
+
+<img src="02-springcloud.assets/image-20231014095633975.png" alt="image-20231014095633975" style="zoom:67%;" />
+
+### 使用
+
+引入依赖自定义api的依赖
+
+![image-20231014095815713](02-springcloud.assets/image-20231014095815713.png)
+
+
+
+服务启动类添加Feign的支持
+
+<img src="02-springcloud.assets/image-20231014100449550.png" alt="image-20231014100449550" style="zoom:67%;" />
+
+其他他的不变化
+
+## Feign的Fallback
+
+Fallback可以帮助我们在使用Feign去调用另外一个服务时，如果出现了问题，走服务降级，返回一个错误数据，避免功能因为一个服务出现问题，全部失效。
+
+### FallBack方式
+
+创建一个POJO类(及普通Java对象)，实现Client接口。
+
+```java
+@Component
+public class SearchClientFallBack implements SearchClient {
+    @Override
+    public String search() {
+        return "出现问题啦！！！";
+    }
+
+    @Override
+    public Customer findById(Integer id) {
+        return null;
+    }
+
+    @Override
+    public Customer getCustomer(Integer id, String name) {
+        return null;
+    }
+
+    @Override
+    public Customer save(Customer customer) {
+        return null;
+    }
+}
+```
+
+<img src="02-springcloud.assets/image-20231014102718070.png" alt="image-20231014102718070" style="zoom:67%;" />
+
+调用另外一个服务时，如果出现了问题，走服务降级走 fallback 
+
+在client添加yml配置
+
+```java
+feign:
+  hystrix:
+    enabled: true
+```
+
+### FallBackFactory方式
+
+调用方无法知道具体的错误信息是什么，通过FallBackFactory的方式去实现这个功能
+
+FallBackFactory基于Fallback
+
+创建一个POJO类，实现FallBackFactory<Client>
+
+```java
+import feign.hystrix.FallbackFactory;
+
+@Component
+public class SearchClientFallBackFactory implements FallbackFactory<SearchClient> {
+
+    @Autowired
+    private SearchClientFallBack searchClientFallBack;
+
+    @Override
+    public SearchClient create(Throwable throwable) {
+        throwable.printStackTrace();
+        return searchClientFallBack;
+    }
+}
+```
+
+修改Client接口中的属性
+
+```java
+@FeignClient(value = "SEARCH",fallbackFactory = SearchClientFallBackFactory.class)
+```
+
+
+
+# ④ API网关
+
+## 概要
+
+### 微服务拆分之后遇到的问题
+
+当我们对锋迷商城进⾏微服务拆分之后，不同的接⼝是由不同的服务提供的，不同的服务部署在不同的服务器上，因此前端进⾏接⼝调⽤的时候访问不同的接⼝会请求不同的ip 和 port ，如果将接⼝服务的访问地址在前端代码中固定写死：
+
++ 前端需要记录很多服务器地址列表
+
++ 当服务被迁移到不同的服务器上的时候，就必须修改前端代码才能继续访问
+
++ 当对服务进⾏集群部署的时候，没有办法实现负载均衡
+
+### API⽹关
+
+使⽤服务⽹关作为接⼝服务的统⼀代理，前端通过⽹关完成服务的统⼀调⽤ 
+
+![img](02-springcloud.assets/1672841908270-0536d3ff-9077-4694-bbf7-4bd5fe6882ae.png)
+
+<img src="02-springcloud.assets/image-20231014105436946.png" alt="image-20231014105436946" style="zoom:67%;" />
+
+## 常见的API网关实现方式
+
+Kong
+
++ 基于Nginx+Lua开发，性能高，稳定，有多个可用的插件(限流、鉴权等等)可以开箱即用。
++ 问题：只支持Http协议；二次开发，自由扩展困难；提供管理API，缺乏更易用的管控、配置方
+  式。
+
+Traefik
+
++ Go语言开发；轻量易用；提供大多数的功能：服务路由，负载均衡等等；提供WebUI
++ 问题：二进制文件部署，二次开发难度大；UI更多的是监控，缺乏配置、管理能力；
+
++ 
+
+Spring Cloud **Gateway**  (推荐)
+
++ SpringCloud提供的网关服务
+
+Zuul
+
++ Netflix开源，功能丰富，使用JAVA开发，易于二次开发；需要运行在web容器中，如Tomcat。
++ 问题：缺乏管控，无法动态配置；依赖组件较多；处理Http请求依赖的是Web容器，性能不如
+  Nginx；
+
+Nginx+lua实现
+
++ 使用Nginx的反向代理和负载均衡可实现对api服务器的负载均衡及高可用
++ 问题：自注册的问题和网关本身的扩展性
+
+## 微服务网关-GateWay(推荐)
+
+### 使用Nacos进行服务注册与发现
+
+见[SpringCloud alibaba笔记](../06-SpringCloud alibaba.md)
+
+### 使用Eureka进行服务注册与发现
+
+1、依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-gateway</artifactId>
+</dependency>
+```
+
+2、配置文件
+
+```yaml
+spring:
+  cloud:
+      gateway:
+        discovery:
+          locator:
+            enabled: true #开启网关 gateway
+            lower-case-service-id: true #忽略服务器的名字大小写
+        routes:
+          - id: order #服务名
+            uri: lb://order #lb loadbalanced （代表是负载均衡）
+            #        uri: http://localhost:8012/order
+            predicates:
+              - Path=/test #uri http://localhost:8012/order/test
+              - After=2017-01-20T17:42:47.789-07:00[America/Denver]
+            filters:
+              - StripPrefix=1 #忽略一级服务名 以前方式：http://localhost:8012/order/test 加上后 http://localhost:8012/test
+```
+
+3、服务者端
+
+```yaml
+eureka:
+ instance:
+   prefer-ip-address: true
+```
+
+二、全局跨域
+
+1、配置文件方式
+
+```yaml
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "https://docs.spring.io"  #这里配置是需要跨域请求地址 http://localhost:8080
+            allowedMethods:
+            - GET
+```
+
+2、代码方式
+
+```java
+@Configuration
+public class MyCorsConfiguration {
+
+    @Bean
+    public CorsWebFilter corsWebFilter(){
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        //1.配置跨域
+        //允许哪种请求头跨域
+        corsConfiguration.addAllowedHeader("*");
+        //允许哪种方法类型跨域 get post delete put
+        corsConfiguration.addAllowedMethod("*");
+        // 允许哪些请求源跨域
+        corsConfiguration.addAllowedOrigin("*");
+        // 是否携带cookie跨域
+        corsConfiguration.setAllowCredentials(true);
+
+        //允许跨域的路径
+        source.registerCorsConfiguration("/**",corsConfiguration);
+        return new CorsWebFilter(source);
+    }
+}
+import com.flow.utils.JsonUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.cloud.gateway.filter.NettyWriteResponseFilter;
+import org.springframework.core.Ordered;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+
+@Slf4j
+public class CorsResponseHeaderFilter implements GlobalFilter, Ordered {
+    @Override
+    public int getOrder() {
+        // 指定此过滤器位于NettyWriteResponseFilter之后
+        // 即待处理完响应体后接着处理响应头
+        return NettyWriteResponseFilter.WRITE_RESPONSE_FILTER_ORDER + 1;
+    }
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        return chain.filter(exchange).then(Mono.defer(() -> {
+            exchange.getResponse().beforeCommit(() -> {
+                exchange.getResponse().getHeaders().entrySet().stream()
+                        .filter(kv -> (kv.getValue() != null && kv.getValue().size() > 1))
+                        .filter(kv -> (kv.getKey().equals(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)
+                                || kv.getKey().equals(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)))
+                        .forEach(kv -> {
+                            kv.setValue(new ArrayList<String>() {{
+                                add(kv.getValue().get(0));
+                            }});
+                        });
+
+
+                log.info("处理后的数据:{}", JsonUtils.objectToString(exchange.getResponse().getHeaders().entrySet()));
+                return chain.filter(exchange);
+            });
+
+            return chain.filter(exchange);
+        }));
+    }
+
+}
+@Bean
+    public CorsResponseHeaderFilter corsResponseHeaderFilter() {
+        return new CorsResponseHeaderFilter();
+    }
+```
+
+## 微服务网关-Zuul
+
+自行百度
+
+ZUUL是Netflix开源的微服务网关，它可以和Eureka、Ribbon、Hystrix等组件配合使用，Zuul组件的
+核心是一系列的过滤器，这些过滤器可以完成以下功能：
+动态路由：动态将请求路由到不同后端集群
+压力测试：逐渐增加指向集群的流量，以了解性能
+负载分配：为每一种负载类型分配对应容量，并弃用超出限定值的请求
+静态响应处理：边缘位置进行响应，避免转发到内部集群
+身份认证和安全: 识别每一个资源的验证要求，并拒绝那些不符的请求。Spring Cloud对Zuul进行
+了整合和增强。
+Spring Cloud对Zuul进行了整合和增强
+
+### 1 Zuul的快速入门
+
+创建Maven项目，修改为SpringBoot
+
+导入依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+</dependency>
+```
+
+添加一个注解
+
+```
+@EnableEurekaClient
+@EnableZuulProxy
+```
+
+编写配置文件
+
+```yaml
+# 指定Eureka服务地址
+eureka:
+  client:
+    service-url:
+      defaultZone: http://root:root@localhost:8761/eureka,http://root:root@localhost:8762/eureka
+
+#指定服务的名称
+spring:
+  application:
+    name: ZUUL
+
+server:
+  port: 80
+```
+
+### 2 Zuul的监控界面
+
+导入依赖
+
+```
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+```
+
+访问地址：
+
+http://localhost/actuator/routes  （http://ip:port/actuator/routes）
+
+编写配置文件
+
+```
+# 查看zuul的监控界面（开发时，配置为*，上线，不要配置）
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+```
+
+### 3 忽略服务配置
+
+```
+# zuul的配置
+zuul:
+  # 基于服务名忽略服务，无法查看 ，如果要忽略全部的服务  "*",默认配置的全部路径都会被忽略掉（自定义服务的配置，无法忽略的）
+  ignored-services: eureka
+  # 监控界面依然可以查看，在访问的时候，404
+  ignored-patterns: /**/search/**
+```
+
+### 4 自定义服务配置
+
+```
+# zuul的配置
+zuul:
+  # 指定自定义服务(方式一 ， key（服务名）：value（路径）)
+#  routes:
+#    search: /ss/**
+#    customer: /cc/**
+  # 指定自定义服务(方式二)
+  routes:
+    kehu:   # 自定义名称
+      path: /ccc/**     # 映射的路径
+      serviceId: customer   # 服务名称
+```
+
+![img](02-springcloud.assets/1637828726592-687136fb-1435-443d-b3bd-aba558bd4f07-169651356808126.png)
+
+### 5 灰度发布（省略）
+
+添加一个配置类
+
+```
+@Bean
+public PatternServiceRouteMapper serviceRouteMapper() {
+    return new PatternServiceRouteMapper(
+        "(?<name>^.+)-(?<version>v.+$)",
+        "${version}/${name}");
+}
+```
+
+准备一个服务，提供2个版本
+
+```
+version: v1
+
+#指定服务的名称
+spring:
+  application:
+    name: CUSTOMER-${version}
+```
+
+-Dversion=v2 -Dserver.port=9099
+
+
+
+修改Zuul的配置
+
+```
+# zuul的配置
+zuul:
+  # 基于服务名忽略服务，无法查看  ， 如果需要用到-v的方式，一定要忽略掉
+  # ignored-services: "*"
+```
+
+
+
+6 Zuul的过滤器执行流程 客户端请求发送到Zuul服务上，首先通过PreFilter链，如果正常放行，会吧请求再次转发给RoutingFilter，请求转发到一个指定的服务，在指定的服务响应一个结果之后，再次走一个PostFilter的过滤器链，最终再将响应信息交给客户端。 
+
+zuul
+
+PreFilter
+
+ErrorFilter
+
+其他服务
+
+RoutingFilter
+
+客户端
+
+PostFilter
+
+![img](02-springcloud.assets/1637463772879-390bd2d4-0d9f-41ef-8efd-4d4274ca1b7d-169651356808128.png)
+
+
+
+**Zuul过滤器入门**
+创建POJO类，继承ZuulFilter抽象类
+
+```
+@Component
+public class TestZuulFilter extends ZuulFilter {}
+```
+
+指定当前过滤器的类型
+
+```java
+@Override
+public String filterType() {
+    return FilterConstants.PRE_TYPE;
+}
+```
+
+指定过滤器的执行顺序
+
+```java
+@Override
+public int filterOrder() {
+    return FilterConstants.PRE_DECORATION_FILTER_ORDER - 1;
+}
+```
+
+配置是否启用
+
+```java
+@Override
+public boolean shouldFilter() {
+    // 开启当前过滤器
+    return true;
+}
+```
+
+指定过滤器中的具体业务代码
+
+```java
+@Override
+public Object run() throws ZuulException {
+    System.out.println("prefix过滤器执行~~~");
+    return null;
+}
+```
+
+**PreFilter实现token校验 （作业）**
+
+准备访问路径，请求参数传递token
+
+http://localhost/v2/customer/version?token=123
+
+创建AuthenticationFilter
+
+```java
+@Component
+public class AuthenticationFilter extends ZuulFilter {
+    @Override
+    public String filterType() {
+        return FilterConstants.PRE_TYPE;
+    }
+
+    @Override
+    public int filterOrder() {
+        return PRE_DECORATION_FILTER_ORDER - 2;
+    }
+
+    @Override
+    public boolean shouldFilter() {
+        return true;
+    }
+
+    @Override
+    public Object run() throws ZuulException {
+        //..
+    }
+    
+}
+```
+
+
+
+在run方法中编写具体的业务逻辑代码
+
+```java
+@Override
+public Object run() throws ZuulException {
+    //1. 获取Request对象
+    RequestContext requestContext = RequestContext.getCurrentContext();
+    HttpServletRequest request = requestContext.getRequest();
+
+    //2. 获取token参数
+    String token = request.getParameter("token");
+
+    //3. 对比token
+    if(token == null || !"123".equalsIgnoreCase(token)) {
+        //4. token校验失败，直接响应数据
+        requestContext.setSendZuulResponse(false);
+        requestContext.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+    return null;
+}
+```
+
+### Zuul的降级
+
+创建POJO类，实现接口FallbackProvider
+
+```java
+@Component
+public class ZuulFallBack implements FallbackProvider {}
+```
+
+重写两个方法
+
+```
+@Override
+public String getRoute() {
+    return "*";   // 代表指定全部出现问题的服务，都走这个降级方法
+}
+
+@Override
+public ClientHttpResponse fallbackResponse(String route, Throwable cause) {
+    System.out.println("降级的服务：" + route);
+    cause.printStackTrace();
+
+    return new ClientHttpResponse() {
+        @Override
+        public HttpStatus getStatusCode() throws IOException {
+            // 指定具体的HttpStatus
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        @Override
+        public int getRawStatusCode() throws IOException {
+            // 返回的状态码
+            return HttpStatus.INTERNAL_SERVER_ERROR.value();
+        }
+
+        @Override
+        public String getStatusText() throws IOException {
+            // 指定错误信息
+            return HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
+        }
+
+        @Override
+        public void close() {
+
+        }
+
+        @Override
+        public InputStream getBody() throws IOException {
+            // 给用户响应的信息
+            String msg = "当前服务：" + route + "出现问题！！！";
+            return new ByteArrayInputStream(msg.getBytes());
+        }
+
+        @Override
+        public HttpHeaders getHeaders() {
+            // 指定响应头信息
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            return headers;
+        }
+    };
+}
+```
+
+### Zuul动态路由
+
+创建一个过滤器
+
+//  执行顺序最好放在Pre过滤器的最后面
+
+在run方法中编写业务逻辑
+
+```java
+@Override
+public Object run() throws ZuulException {
+    //1. 获取Request对象
+    RequestContext context = RequestContext.getCurrentContext();
+    HttpServletRequest request = context.getRequest();
+
+    //2. 获取参数，redisKey
+    String redisKey = request.getParameter("redisKey");  //路径
+   
+
+    //3. 直接判断
+    设计模式23一种
+    
+    if(redisKey != null && redisKey.equalsIgnoreCase("customer")){
+        // http://localhost:8080/customer
+        context.put(FilterConstants.SERVICE_ID_KEY,"customer-v1");
+        context.put(FilterConstants.REQUEST_URI_KEY,"/customer");
+    }else if(redisKey != null && redisKey.equalsIgnoreCase("search")){
+        // http://localhost:8081/search/1
+        context.put(FilterConstants.SERVICE_ID_KEY,"search");
+        context.put(FilterConstants.REQUEST_URI_KEY,"/search/1");
+    }
+
+    return null;
+}
+```
+
+## 基于Nginx的网关实现
+
+应⽤服务器⽹关: Nginx
+
+服务⽹关:  zuul或者gateway 
+
+![image-20231014113651534](02-springcloud.assets/image-20231014113651534.png)
+
+Ngnix具体使用看具体的笔记
+
+```
+启动shop_service_order 微服务，单独请求地址：http://127.0.0.1:9001/
+启动shop_service_product 微服务,单独请求地址：http://127.0.0.1:9002/
+```
+
+配置Nginx的请求转发
+
+```xml
+location /api-order {
+	proxy_pass http://127.0.0.1:9001/;
+}
+location /api-product {
+	proxy_pass http://127.0.0.1:9002/;
+}
+```
 

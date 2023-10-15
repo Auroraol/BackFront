@@ -1,0 +1,22 @@
+server:
+  port: 9001 #端口
+spring:
+  application:
+    name: service-product #服务名称
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/shop?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 111111
+  jpa:
+    database: MySQL
+    show-sql: true
+    open-in-view: true
+#配置Eureka
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9000/eureka/
+  instance:
+    prefer-ip-address: true #使用ip地址注册
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}

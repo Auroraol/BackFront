@@ -404,7 +404,22 @@ applicationContext.xml
 </bean>
 ```
 
-使用
+赋值
+
+```java
+
+	private addr address;
+
+	public addr getaddr() {
+		return address;
+	}
+
+	public void setJdbcTemplate(addr address) {
+		this.address = address;
+	}
+```
+
+显示调用
 
 ```java
 // 初始化spring容器，加载applicationContext.xml配置
@@ -554,6 +569,8 @@ ApplicationContext context = new ClassPathXmlApplicationContext("spring-test.xml
 ------
 
 #### 6.2.6.2 获取指定的 Bean 对象
+
+> 用于使用Bean和@Autowired , @Resource注解功能一样
 
 **getBean() 方法的使用**
 
@@ -1426,6 +1443,35 @@ public class TestJdbcTemplate {
 			System.out.println(act);
 		}
 	}
+}
+```
+
+jdbcTemplate使用
+
+```java
+//返回字段
+public String findAccountPasswordByName(String name) {
+    // 定义SQL语句
+    String sql = "SELECT password FROM student WHERE name = ?";
+    // 执行查询，并返回密码作为一个字符串
+    return this.jdbcTemplate.queryForObject(sql, String.class, name);
+}
+
+public int findAccountCountByName(String name) {
+    // 定义SQL语句
+    String sql = "SELECT COUNT(*) FROM student WHERE name = ?";
+    // 执行查询，并返回结果作为一个整数
+    return this.jdbcTemplate.queryForObject(sql, Integer.class, name);
+}
+
+// 返回对象
+public List<Account> findAllAccount() {
+    //定义SQL语句
+    String sql = "select * from account";
+    // 创建一个新的BeanPropertyRowMapper对象
+    RowMapper<Account> rowMapper = new BeanPropertyRowMapper<Account>(Account.class);
+    //执行静态的SQL查询，并通过RowMapper返回结果
+    return this.jdbcTemplate.query(sql, rowMapper);
 }
 ```
 

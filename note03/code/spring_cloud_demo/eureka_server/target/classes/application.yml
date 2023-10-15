@@ -1,0 +1,18 @@
+#模拟两个EurekaServer
+#端口9000 , 8000
+#两个server需要相互注册
+spring:
+  application:
+    name: eureka-server
+server:
+  port: 9000 #端口
+#配置eureka server
+eureka:
+  client:
+    register-with-eureka: false #是否将自己注册到注册中心
+    fetch-registry: false #是否从eureka中获取注册信息
+    service-url: #配置暴露给Eureka Client的请求地址
+      defaultZone: http://127.0.0.1:9000/eureka/
+  server:
+    enable-self-preservation: false #关闭自我保护
+    eviction-interval-timer-in-ms: 4000 #剔除服务间隔

@@ -952,3 +952,937 @@ Idea中有Maven面板，其中可以快速执行Maven指令
 
 
 注意：如上的 repository的 id 依然是要和settings.xml中配置的server中的id 一致，才能通过私服的认证
+
+
+
+
+
+
+
+# Maven 和 Gradle
+
+## Maven
+
+### Maven 的两个经典作用
+
+#### 一.   依赖管理 也就是管理jar包
+
+Maven 的一个核心特性就是依赖管理。
+
+当涉及到多模块的项目（包含成百个模块或者子项目），管理依赖就变成一项困难的任务。这时用Maven 可以对处理这种情形的高度控制。
+
+在传统的 WEB 项目中，我们必须将工程所依赖的 jar 包复制到工程中，导致了工程的变得很大。比如
+
+idea常见普通Maven项目目录：
+                   <img src="../note/spring boot3/spring boot3.assets/20201204225021484.png%23pic_center" alt="Alt" style="zoom: 80%;" />
+
+**maven工程中不直接将 jar包导入到工程中，而是通过在 pom.xml** **文件中添加所需jar包的坐标**。
+
+到仓库中找到 jar 包不会影响程序性能：
+maven 中也有索引的概念，通过建立索引，可以大大提高加载 jar 包的速度，使得我们认为 jar 包基本跟放在本地的工程文件中再读取出来的速度是一样的。**Maven中仓库分为三类：**
+
+​                                  ![](https://th.bing.com/th/id/R.e0c7d085e393ba437bf61aadde678c47?rik=cSX4nWv0RmzLTg&riu=http%3a%2f%2fcdn.imodou.com.cn%2fwp-content%2fuploads%2f2021%2f04%2fimage-1617589018144.png&ehk=b1UJfJY%2bH8tSnPJ9vnUkKXGbZgvNV8WKJZiGEMvV8%2fs%3d&risl=&pid=ImgRaw&r=0)         
+
+
+
++ **本地仓库：**存放在本地服务器中，当运行项目的时候，maven会自动根据配置文件查找本地仓库，再从本地仓库中调用jar包使用。
+
++ **远程仓库**
+  当本地仓库中没有项目所需要的jar包时，那么maven会继续查找远程仓库，一般远程仓库指的是公司搭建的私有服务器，也叫私服；
+  当jar包在私服中查找到之后，maven会将jar包下载到本地仓库中，下次使用的时候就不用再去找远程仓库。
+  **中央仓库：**
+  当远程仓库获取不到jar包时，就需要到中央仓库去查找，并下载在远程仓库中，本地仓库再从远程仓库中下载回来使用。
+
+#### 二. 一键构建
+
+**Maven 规范化构建流程如下：**
+
+​           ![在这里插入图片描述](../note/spring boot3/spring boot3.assets/2020120423190572.png%23pic_center)
+
+### Maven坐标
+
+Maven通过坐标对jar包进行唯一标识。坐标通过3个元素进行定义，groupId、artifactId、version。
+
+1. groupId：组织标识，一般为域名倒置。
+2. artifactId：项目名或模块名，是当前项目中的唯一标识。
+3. version：当前项目版本。
+
+### Spring Boot应用 打包与部署
+
+#### 打包
+
+> 打包工具使用的是Maven
+
+首先需要在pom.xml文件build节点增加如下配置：
+
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>1.8</source>
+                <target>1.8</target>
+                <encoding>UTF-8</encoding>
+            </configuration>
+        </plugin>
+        <!--打包-->
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+    </plugins>
+</build>
+```
+
+另外，需要确认pom.xml文件的package节点配置：
+
+```
+<!--打成 jar 包,一般为默认-->
+<packaging>jar</packaging>
+<!--打成 war 包-->
+<packaging>war</packaging>
+```
+
+在项目的根目录下，打开命令行工具，并执行以下命令：
+
+```
+mvn clean package
+```
+
+![image-20231005093824942](file://C:/Users/16658/Documents/GitHub/java_note/note/spring%20boot3/spring%20boot3.assets/image-20231005093824942.png?lastModify=1696340279)
+
+使用Maven构建工具编译和打包应用程序。打包完成后，会在`target`目录下找到一个名为`<项目名>.jar`的JAR文件。
+
+![image-20231005093753847](file://C:/Users/16658/Documents/GitHub/java_note/note/spring%20boot3/spring%20boot3.assets/image-20231005093753847.png?lastModify=1696340279)
+
+测试
+
+本地运行测试cmd 到控制台，通过 java 命令运行 jar 包
+
+```
+java -jar springbootAPP.jar
+```
+
+#### 部署
+
+有多种方式可以部署Spring Boot应用程序，包括将其部署到独立的[服务器](https://so.csdn.net/so/search?q=服务器&spm=1001.2101.3001.7020)、容器化平台（如Docker）或云平台（如AWS、Azure等）。下面将介绍其中的一种简单的部署方式。
+
+- 将JAR文件上传到服务器： 将打包好的JAR文件上传到目标服务器，可以使用FTP、SCP或其他文件传输工具。
+
+- 运行应用程序： 在服务器上打开命令行工具，并导航到JAR文件所在的目录。然后执行以下命令来运行应用程序：
+
+  ```
+  java -jar <项目名>.jar
+  ```
+
+  这将启动Spring Boot应用程序。
+
+- 配置应用程序： 默认情况下，Spring Boot应用程序将在8080端口上监听HTTP请求。
+
+## groupid和artifactid
+
+在创建 POM 之前，首先要确定工程组（groupId），及其名称（artifactId）和版本，在仓库中这些属性是项目的唯一标识。
+这两个属性，可以理解成地球上的经纬度，maven仓库，就是相应的地球。
+
+1、groupId一般分为多个段，可以定义成两段或者三段
+
+```java
+两段：域 + 组织
+groupId:  org.alibaba
+groupId:  org.sky
+ 
+三段：域 + 组织 + 项目名
+groupId:  org.alibaba.taobao
+groupId:  org.sky.taobao
+ 
+第一段：域
+常见的有：cn(china)，org(非营利组织)，com(商业组织)
+第二段：组织
+如果你的公司是阿里巴巴，就是alibaba。如果是个人的小项目，随便定义，比如说，就是sky
+第三段：项目名
+你创建项目时，肯定是有名字的。这里，就写你项目的名字，taobao
+```
+
+2、artifactid呢，一段两段都可以
+
+```java
+（1）一段怎么讲？就写子项目名（比如说 taobao 项目下有两个子项目 tianmao 和 xianyu ）
+artifactid：tianmao
+artifactid： xianyu 
+ 
+（2）两段怎么说？
+artifactid： tianmao.dev  和  artifactid： tianmao.prod
+artifactid： xianyu.dev  和   artifactid： xianyu.prod
+ 
+项目还能继续细分，比如开发环境的项目dev，生产环境的项目prod
+第一段：子项目名
+第二段：开发环境dev，还是，生产环境prod
+```
+
+
+
+## Gradle
+
+如果你经常使用Maven，可能会发现Maven有一些地方用的让人不太舒服：
+
++ Maven的配置文件是XML格式的，假如你的项目依赖的包比较多，那么XML文件就会变得非常非常长；
+
++ XML文件不太灵活，假如你需要在构建过程中添加一些自定义逻辑，搞起来非常麻烦；
+
++ Maven非常的稳定，但是相对的就是对新版java支持不足，哪怕就是为了编译java11，也需要更新内置的Maven插件；
+
+如果你对Maven的这些缺点也有所感触，尝试gradle构建工具，这是一个全新的java构建工具，解决了Maven的一些痛点。
+
+[Gradle使用教程 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/440595132)
+
+[gradle使用教程，一篇就够 - 简书 (jianshu.com)]()
+
+
+
+
+
+# pom.xml 文件
+
+## 一、什么是POM
+
+`Project Object Model`，项目对象模型。通过xml可扩展标记语言（EXtensible Markup Language）格式保存的pom.xml文件。作用类似ant的build.xml文件，功能更强大。该文件用于管理：源代码、配置文件、开发者的信息和角色、问题追踪系统、组织信息、项目授权、项目的url、项目的依赖关系等等。一个完整的pom.xml文件，放置在项目的根目录下。
+
+## properties
+
+在properties标签内可以把版本号作为变量进行声明，方便maven依赖标签用${变量名}的形式动态获取版本号。这样做的优点是当版本号发生改变时，仅仅需要更新properties标签中的变量值就行了，不用煞费心思更新所有依赖的版本号。例如，定义如下两个变量：
+
+```xml
+<properties>
+    <java.version>13</java.version>
+    <lombok.version>1.18.10</lombok.version>
+</properties>
+```
+
+   则在Maven的pom.xml中导入lombok依赖的时候，使用如下格式即可定义依赖的版本号：
+
+```xml
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <optional>true</optional>
+    <version>${lombok.version}</version>
+</dependency>
+```
+
+<img src="01-Maven教程.assets/image-20231011210138697.png" alt="image-20231011210138697" style="zoom:67%;" />
+
+
+
+1. 构建一个普通的Maven项目，删掉里面的src目录，作为父项目.  这个空的工程就是Maven主工程；
+
+1. maven自动生成
+
+   父工程中pom.xml会有：
+
+   ```xml
+        <modules>
+            <module>servlet-01</module>
+        </modules>
+   ```
+
+   子项目pom.xml中会有：
+
+   ```xml
+        <parent>
+            <groupId>org.example</groupId>
+            <artifactId>javaweb-servlet</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </parent>
+   ```
+
+3. 父项目中的jar包，子项目可以直接使用。反之，不可。
+
+   
+
+
+
+
+
+### 2、maven的基本信息
+
+```xml
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.funtl</groupId>
+    <artifactId>itoken-dependencies</artifactId>
+    <version>1.0.0</version>
+    <packaging>war</packaging>
+    <name>itoken dependencies</name>
+    <url>www.funtl.com</url>
+</project>
+```
+
+| 字段           | 说明                                                         |
+| -------------- | ------------------------------------------------------------ |
+| `modelVersion` | 声明项目描述符遵循哪一个POM模型版本。模型本身的版本很少改变，虽然如此，但它仍然是必不可少的， 这是为了当Maven引入了新的特性或者其他模型变更的时候，确保稳定性。 |
+| `groupId`      | 公司或者组织的唯一标志，并且配置时生成的路径也是由此生成， 如com.winner.trade，maven会将该项目打成的jar包放本地路径：/com/winner/trade |
+| `artifactId`   | 本项目的唯一ID，一个groupId下面可能多个项目，就是靠artifactId来区分的 |
+| `version`      | 本项目目前所处的版本号                                       |
+| `packaging`    | 打包类型，可取值：pom , jar , maven-plugin , ejb , war , ear , rar , par等等 |
+| `name`         | 项目的名称, Maven产生的文档用，可省略                        |
+| `url`          | 项目主页的URL, Maven产生的文档用 ，可省略                    |
+
+等等还好好多属性，具体参见博客末尾的 `完整版pom.xml`；
+其中groupId，artifactId，version，packaging这四项组成了项目的唯一坐标。一般情况下，前面三项就足矣。
+
+### 3、POM之间的关系
+
+主要用于POM文件的复用和依赖。
+
+#### a）依赖关系：依赖关系列表
+
+该元素描述了项目相关的所有依赖。 这些依赖组成了项目构建过程中的一个个环节。它们自动从项目定义的仓库中下载。
+
+```xml
+ <dependencies>
+    <!--单元测试依赖--> 
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.0</version>
+      <scope>test</scope>
+      <optional>true</optional>
+      <!--排除项目中的依赖冲突时使用，不依赖该项目-->  
+      <exclusions>
+      	<exclusion>  
+          <groupId>xxx</groupId>
+          <artifactId>xxx</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    …
+  </dependencies>
+```
+
+| 字段         | 说明                                                         |
+| ------------ | ------------------------------------------------------------ |
+| `groupId`    | 依赖项的组织名                                               |
+| `artifactId` | 依赖项的子项目名                                             |
+| `version`    | 依赖项的版本                                                 |
+| `type`       | 依赖类型一般省略，默认类型是jar，其他还有jar，war，ejb-client和test-jar |
+| `scope`      | 依赖项的适用范围 ，包括compile，provided，runtime，test，system，exclusions [^1] |
+| `optional`   | 可选依赖，如果你在项目B中把C依赖声明为可选，你就需要在依赖于B的项目（例如项目A）中显式的引用对C的依赖。 |
+| `exclusions` | 排除项目中的依赖冲突时使用，不依赖该项目                     |
+
+[^1]scope 依赖项的适用范围
+
+- compile，缺省值，适用于所有阶段，会随着项目一起发布。
+- provided，类似compile，期望JDK、容器或使用者会提供这个依赖。如servlet.jar。
+- runtime，只在运行时使用，如JDBC驱动，适用运行和测试阶段。
+- test，只在测试时使用，用于编译和运行测试代码。不会随项目发布。
+- system，类似provided，需要显式提供包含依赖的jar，Maven不会在Repository中查找它。
+- optional: 当项目自身被依赖时，标注依赖是否传递。用于连续依赖时使用
+
+我们知道，maven的依赖关系是有传递性的。如：A–>B，B–>C。但有时候，项目A可能不是必需依赖C，因此需要在项目A中排除对C的依赖。在maven的依赖管理中，有两种方式可以对依赖关系进行，分别是`可选依赖（Optional Dependencies）`以及`依赖排除（Dependency Exclusions）`。
+
+##### 可选依赖 Optional Dependencies
+
+当一个项目A依赖另一个项目B时，项目A可能用到了项目B很少一部分功能，此时就可以在A中配置对B的可选依赖。举例来说，项目B类似hibernate，它支持对mysql、oracle等各种数据库的支持，但是在引用这个项目时，我们可能只用到其对mysql的支持，此时就可以在A项目中配置对项目B的可选依赖。
+
+```
+配置可选依赖的原因：1、节约磁盘、内存等空间；2、避免license许可问题；3、避免类路径问题，等等。
+```
+
+示例：
+
+```xml
+<project>
+  ...
+  <dependencies>
+    <!-- declare the dependency to be set as optional -->
+    <dependency>
+      <groupId>sample.ProjectB</groupId>
+      <artifactId>Project-B</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+      <optional>true</optional> <!-- value will be true or false only -->
+    </dependency>
+  </dependencies>
+</project>
+12345678910111213
+```
+
+假设以上配置是项目A的配置，即：Project-A <-- Project-B。在编译项目A时，是可以正常通过的。
+
+如果有一个新的项目C依赖A，即：Project-C <-- Project-A `<-- Project-B`。此时项目C就不会依赖项目B了。
+如果项目C用到了涉及项目B的功能，那么就需要在pom.xml中重新配置对项目B的依赖。
+
+##### 依赖排除 Dependency Exclusions
+
+###### 第一种情况
+
+当一个项目A依赖项目B，而项目B同时依赖项目C，如果项目A中因为各种原因不想引用项目C，在配置项目B的依赖时，可以排除对C的依赖。
+
+示例（假设配置的是A的pom.xml，依赖关系为：A<–B<–C）：
+
+```XML
+<project>
+  ...
+  <dependencies>
+    <dependency>
+      <groupId>sample.ProjectB</groupId>
+      <artifactId>Project-B</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>  <!-- declare the exclusion here -->
+          <groupId>sample.ProjectC</groupId>
+          <artifactId>Project-C</artifactId>
+        </exclusion>
+      </exclusions> 
+    </dependency>
+  </dependencies>
+</project>
+```
+
+当然，对于多重依赖，配置也很简单，参考如下示例：
+
+Project-A
+-> Project-B
+-> Project-D
+-> Project-E <! – This dependency should be excluded -->
+-> Project-F
+-> Project C
+A对于E相当于有多重依赖，我们在排除对E的依赖时，只需要在配置B的依赖中进行即可：
+
+```XML
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>sample.ProjectA</groupId>
+  <artifactId>Project-A</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  ...
+  <dependencies>
+    <dependency>
+      <groupId>sample.ProjectB</groupId>
+      <artifactId>Project-B</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <groupId>sample.ProjectE</groupId> <!-- Exclude Project-E from Project-B -->
+          <artifactId>Project-E</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+</project>
+123456789101112131415161718192021
+```
+
+###### 第二种情况
+
+如果我们的项目有两个依赖项：A & B，而且A和B同时依赖了C，但不是同一个版本。那么我们怎么办呢？
+
+###### 1 添加检查插件
+
+```xml
+<reporting>
+	<plugins>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-project-info-reports-plugin</artifactId>
+		</plugin>
+	</plugins>
+</reporting>
+12345678
+```
+
+然后运行：mvn project-info-reports:dependencies，来查看依赖项报告。
+
+###### 2 去除依赖项
+
+```xml
+<dependency>
+      <groupId>org.apache.struts</groupId>
+      <artifactId>struts2-core</artifactId>
+      <version>${struts.version}</version>
+      <exclusions>
+          <exclusion>
+              <groupId>org.freemarker</groupId>
+              <artifactId>freemarker</artifactId>
+          </exclusion>
+      </exclusions>
+</dependency>
+1234567891011
+```
+
+#### b）继承关系：继承其他pom.xml配置的机制。
+
+在我们已经聚合的项目中，有很多重复的配置，有相同的groupId和version，有相同的spring-core, spring-beans, spring-context和juit依赖，造成大量的浪费也会引发问题，所以如何使用继承机制来统一配置这些重复的信息，做到”一处声明，处处使用“呢？
+
+思路：创建POM的父子结构，在父POM中声明一些配置供子POM继承、
+
+##### 父 pom.xml
+
+```xml
+<project>
+  [...]
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.4</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  [...]
+</project>
+```
+
+##### 子 pom.xml
+
+```xml
+[...]
+<parent>
+  <groupId>com.devzuz.mvnbook.proficio</groupId>
+  <artifactId>proficio</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <relativePath>../ParentProject/pom.xml</relativePath>   
+</parent>
+[...]
+```
+
+`relativePath`默认为…/pom.xml，如果路径不一样需要手动指定
+
+#### c）聚合关系：用于将多个maven项目聚合为一个大的项目。
+
+我们想要一次构建两个项目，而不是到两个模块的目录下分别执行mvn命令 – Maven的聚合就是为该需求服务的。
+
+为了能够使用一条命令就能构建account-email和account-persist两个模块，需要创建一个额外的名为account-aggregator的模块，然后通过该模块构建整个项目的所有模块。
+
+account-aggregator也有它自己的POM文件，内容如下：
+
+```xml
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+        http://maven.apache.org.maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.park.mvnDemo.account</groupId>
+    <artifactId>account-aggregator</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Account Aggregator</name>
+    <modules>
+        <module>account-email</module>
+        <module>account-persist<module>
+    </modules>
+</project>
+123456789101112131415
+```
+
+> 在上面的xml文件中，packaging的方式为pom。对于聚合模块来说， **其打包方式必须为pom**，否则无法构建！
+
+`modules`: 这里是实现聚合的最核心的配置，可以声明任意数量的module元素来实现元素的聚合；
+其中，每个module的值为当前聚合POM的相对路径;
+如：
+当前的聚合POM位于`D:\m2\code\account-aggregator\`
+另有一个项目A位于`D:\m2\code\account-aggregator\`account-email\
+一个项目B位于`D:\m2\code\-aggregatoraccount\`account-persist\
+与上面聚合pom内的的module值相对应。也可写成/account-email
+为了方便用户构建项目，通常将聚合模块放在项目目录的最顶层，其他模块则作为聚合模块的子目录存在。
+当然，你也可以手动指定路径
+
+### 4、 Maven的六类属性
+
+#### 1) maven内置属性
+
+主要有两个常用内置属性：
+
+| 属性         | 说明                                |
+| ------------ | ----------------------------------- |
+| `${basedir}` | 项目的根目录(包含pom.xml文件的目录) |
+| `${version}` | 项目版本                            |
+
+#### 2) POM属性
+
+用户可以使用该属性引用POM文件中对应元素的值，常用的POM属性包括：
+
+| 属性                                   | 说明                                                         |
+| -------------------------------------- | ------------------------------------------------------------ |
+| `${project.build.sourceDirectory}`     | 项目的主源码目录，默认为 src/main/java                       |
+| `${project.build.testSourceDirectory}` | 项目的测试源码目录，默认为 src/test/java                     |
+| `${project.build.directory}`           | 项目构件输出目录，默认为 target/                             |
+| `${project.outputDirectory}`           | 项目主代码编译输出目录，默认为 target/classes/               |
+| `${project.testOutputDirectory}`       | 项目测试代码编译输出目录，默认为 target/test-classes/        |
+| `${project.groupId}`                   | 项目的 groupId                                               |
+| `${project.artifactId}`                | 项目的 artifactId                                            |
+| `${project.version}`                   | 项目的 version，与${version}等价                             |
+| `${project.build.fianlName}`           | 项目打包输出文件的名称，默认为"`${project.artifactId}` - `${project.version}`" |
+
+#### 3) 自定义属性
+
+用户可以在POM的元素下自定义Maven属性
+
+```xml
+ <!--配置依赖版本-->
+ <properties>
+     <!-- Environment Settings -->
+     <java.version>1.8</java.version>
+     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+     <!-- Spring cloud Settings   -->
+     <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
+     <spring-boot-admin.version>2.0.1</spring-boot-admin.version>
+     <zipkin.version>2.10.1</zipkin.version>
+ </properties>
+```
+
+然后在pom文件中通过${zipkin.version}来使用他们
+
+##### dependencies 和 dependencyManagement 标签
+
+在通常情况下，由于我们的模块很多，我们需要一个itoken-denpendencies的项目来管理子项目的公共的依赖。
+
+为了项目的正确运行，必须让所有的子项目使用依赖项的统一版本，必须确保应用的各个项目的依赖项和版本一致，才能保证测试的和发布的是相同的结果。
+
+在我们项目顶层的POM文件中，我们会看到`dependencyManagement`元素。通过它元素来管理jar包的版本，让子项目中引用一个依赖而不用显示的列出版本号。
+
+结合maven的自定义属性，我们来看看项目中的具体应用：
+
+###### itoken-denpendencies 中的 pom.xml
+
+在父项目中用`dependencyManagement`声明依赖的版本，需要
+
+```xml
+<dependencyManagement>
+	<dependencies>
+	    <!--spring cloud-->
+	    <dependency>
+	        <groupId>org.springframework.cloud</groupId>
+	        <artifactId>spring-cloud-dependencies</artifactId>
+	        <version>${spring-cloud.version}</version>
+	        <type>pom</type>
+	        <scope>import</scope>
+	    </dependency>
+	    <!--zipkin-->
+	    <dependency>
+	        <groupId>io.zipkin.java</groupId>
+	        <artifactId>zipkin</artifactId>
+	        <version>${zipkin.version}</version>
+	    </dependency>
+	    [...]
+	<dependencies>
+</dependencyManagement>            
+12345678910111213141516171819
+```
+
+###### itoken-zipkin 中的 pom.xml
+
+在子项目中，Maven会沿着父子层次向上走，直到找到一个拥有dependencyManagement元素的项目，然后它就会使用在这个dependencyManagement元素中指定的版本号。
+
+```xml
+<dependencies>
+    <!--spring cloud-->
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+    </dependency>
+    <!--zipkin-->
+    <dependency>
+        <groupId>io.zipkin.java</groupId>
+        <artifactId>zipkin</artifactId>
+    </dependency>
+    [...]
+<dependencies>
+12345678910111213
+```
+
+###### 需要注意的是：
+
+`dependencyManagement`里只是声明依赖，并不实现引入。如果不在子项目中声明依赖，是不会从父项目中继承下来的；只有在子项目中写了该依赖项，并且没有指定具体版本，才会从父项目中继承该项，并且version和scope都读取自父pom。
+
+```
+如果子项目中指定了版本号，那么会使用子项目中指定的jar版本。
+```
+
+#### 4) Settings属性
+
+用户使用`${settings.}`开头的属性可以引用 maven settings.xml 文件中XML元素的值
+
+| 属性                       | 说明                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| `settings.localRepository` | 自定义本地库路径，默认在 ${user.home}/.m2中；                |
+| `settings.interactiveMode` | 交互模式，Maven是否应该尝试与用户输入交互，默认是true，如果不是false。 |
+| `settings.offline`         | 是否每次编译都去查找远程中心库， 如果此构建系统应以离线模式运行，则为true，默认为false。由于网络设置或安全原因，此元素对于构建无法连接到远程存储库的服务器非常有用。 |
+| `settings.pluginGroups`    | 插件组，例如org.mortbay.jetty；                              |
+
+#### 5) Java系统属性
+
+所有Java系统属性都可以使用Maven属性引用，这里列举一些常用的java系统属性
+
+| 属性                            | 说明                              |
+| ------------------------------- | --------------------------------- |
+| `java.version`                  | Java 运行时环境版本               |
+| `java.vendor Java`              | 运行时环境供应商                  |
+| `java.vendor.url`               | Java 供应商的 URL                 |
+| `java.home`                     | Java 安装目录                     |
+| `java.vm.specification.version` | Java 虚拟机规范版本               |
+| `java.vm.specification.vendor`  | Java 虚拟机规范供应商             |
+| `java.vm.specification.name`    | Java 虚拟机规范名称               |
+| `java.vm.version`               | Java 虚拟机实现版本               |
+| `java.vm.vendor`                | Java 虚拟机实现供应商             |
+| `java.vm.name`                  | Java 虚拟机实现名称               |
+| `java.specification.version`    | Java 运行时环境规范版本           |
+| `java.specification.vendor`     | Java 运行时环境规范供应商         |
+| `java.specification.name`       | Java 运行时环境规范名称           |
+| `java.class.version`            | Java 类格式版本号                 |
+| `java.class.path`               | Java 类路径                       |
+| `java.library.path`             | 加载库时搜索的路径列表            |
+| `java.io.tmpdir`                | 默认的临时文件路径                |
+| `java.compiler`                 | 要使用的 JIT 编译器的名称         |
+| `java.ext.dirs`                 | 一个或多个扩展目录的路径          |
+| `os.name`                       | 操作系统的名称                    |
+| `os.arch`                       | 操作系统的架构                    |
+| `os.version`                    | 操作系统的版本                    |
+| `file.separator`                | 文件分隔符（在 UNIX 系统中是“/”） |
+| `path.separator`                | 路径分隔符（在 UNIX 系统中是“:”） |
+| `line.separator`                | 行分隔符（在 UNIX 系统中是“/n”）  |
+| `user.name`                     | 用户的账户名称                    |
+| `user.home`                     | 用户的主目录                      |
+| `user.dir`                      | 用户的当前工作目录                |
+
+#### 6) 环境变量属性
+
+所有环境变量都可以使用以env.开头的Maven属性引用
+`${env.JAVA_HOME}`表示JAVA_HOME环境变量的值;
+
+### 5、构建设置
+
+```xml
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/maven-v4_0_0.xsd">
+  …
+  <!– "Project Build" contains more elements than just the BaseBuild set –>
+  <build>…</build>
+  <profiles>
+    <profile>
+      <!– "Profile Build" contains a subset of "Project Build"s elements –>
+      <build>…</build>
+    </profile>
+  </profiles>
+</project>
+1234567891011121314
+```
+
+build中的主要标签：Resources和Plugins。
+
+#### Resources：资源文件管理
+
+用于引用或排除资源文件
+
+```xml
+<resources>
+	<resource>
+		<targetPath>META-INF/plexus</targetPath>
+		<filtering>false</filtering>
+		<directory>${basedir}/src/main/plexus</directory>
+		<includes>
+		  <include>configuration.xml</include>
+		</includes>
+		<excludes>
+		  <exclude>**/*.properties</exclude>
+		</excludes>
+	</resource>
+</resources>
+12345678910111213
+```
+
+| 属性       | 说明                                                         |
+| ---------- | ------------------------------------------------------------ |
+| targetPath | 资源的打包路径，该路径相对target/classes目录                 |
+| filtering  | 主要用来替换项目中的资源文件（* .xml、* . properties）当中的$ {…}属性值如$ {db.url} 如果filtering=tru 在resources目录中存在资源文件并且 配置了db.url=aaa的话， 在项目编译的时候，就会自动的把pom文件中的${db.url}替换为aaa |
+| directory  | 描述存放资源的目录，该路径相对POM路径                        |
+| includes   | 包含的模式列表，例如**/*.xml                                 |
+| excludes   | 排除的模式列表，例如**/*.xml                                 |
+
+#### Plugins：设置构建的插件
+
+**为什么我们需要插件？**
+1.需要某个特殊的 jar包，但是有不能直接通过maven依赖获取，或者说在其他环境的maven仓库内不存在，那么如何将我们所需要的jar包打入我们的生产jar包中。
+2.某个jar包内部包含的文件是我们所需要的，或者是我们希望将它提取出来放入指定的位置 ，那么除了复制粘贴，如何通过maven插件实现呢。
+
+##### plugins 和 pluginmanagement
+
+maven 通过 `plugins` 和 `pluginmanagement` 来管理插件，类似 `dependencies` 和 `dependencyment`
+但需要注意的是，`plugins` 和 `pluginmanagement` 隶属于 `build` 标签下，而不是最外层的 `project`
+
+###### 在父项目中声明插件和版本信息
+
+同样pluginmanagement也不会直接引入插件
+
+```xml
+<pluginManagement>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.1</version>
+            <configuration>
+                <attach>true</attach>
+            </configuration>
+            <executions>
+                <execution>
+                    <phase>compile</phase>
+                    <goals>
+                        <goal>jar</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</pluginManagement>
+1234567891011121314151617181920
+```
+
+###### 在子项目中引入插件
+
+同样，子项目继承父项目的plugin设置，并可以自由定义
+
+```xml
+<plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+    </plugin>
+</plugins>
+123456
+```
+
+### 6、maven仓库配置
+
+**什么是Maven仓库?**
+Maven仓库就是放置所有JAR文件（WAR，ZIP，POM等等）的地方，所有Maven项目可以从同一个Maven仓库中获取自己所需要的依赖JAR，这节省了磁盘资源。此外，由于Maven仓库中所有的JAR都有其自己的坐标，该坐标告诉Maven它的组ID，构件ID，版本，打包方式等等，因此Maven项目可以方便的进行依赖版本管理。你也不在需要提交JAR文件到SCM仓库中，你可以建立一个组织层次的Maven仓库，供所有成员使用。
+**简言之，Maven仓库能帮助我们管理构件（主要是JAR）。**
+
+**maven寻找仓库的顺序大致可以理解为：**
+
+- 1，在本地仓库中寻找，如果没有则进入下一步。
+- 2，在全局应用的私服仓库中寻找，如果没有则进入下一步。
+- 3，在项目自身的私服仓库中寻找，如果没有则进入下一步。
+- 4，在中央仓库中寻找，如果没有则终止寻找。
+
+补充：
+1，如果在找寻的过程中，如果发现该仓库有镜像设置，则用镜像的地址代替。
+2，如果仓库的id设置成“`central`”，则该配置会覆盖maven默认的中央仓库配置。
+
+#### 本地仓库
+
+Maven缺省的本地仓库地址为`${user.home}/.m2/repository` 。也就是说，一个用户会对应的拥有一个本地仓库。
+你也可以自定义本地仓库的位置，修改`${user.home}/.m2/settings.xml` ：
+
+```xml
+  <!-- localRepository
+   | The path to the local repository maven will use to store artifacts.
+   |
+   | Default: ${user.home}/.m2/repository-->
+  <localRepository>D:/.m2/repository</localRepository>
+12345
+```
+
+还可以在运行时指定本地仓库位置：
+
+```
+mvn clean install -Dmaven.repo.local=/home/juven/myrepo/
+1
+```
+
+#### 中央仓库
+
+3.xxx版本之后，在： maven安装目录下的：`/lib/maven-model-builder-${version}.jar`中
+打开该文件，能找到`超级POM`：`\org\apache\maven\model\pom-4.0.0.xml`，它是所有Maven POM的父POM，所有Maven项目继承该配置，你可以在这个POM中发现如下配置：
+
+```xml
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+1234567891011
+```
+
+中央仓库的id为central，远程url地址为http://repo.maven.apache.org/maven2，它关闭了snapshot 快照版本构件下载的支持。
+
+#### 在POM中配置远程仓库
+
+前面我们看到超级POM配置了ID为central的远程仓库，我们可以在POM中配置其它的远程仓库。这样做的原因有很多，比如你有一个局域网的远程仓库，使用该仓库能大大提高下载速度，继而提高构建速度，也有可能你依赖的一个jar在central中找不到，它只存在于某个特定的公共仓库，这样你也不得不添加那个远程仓库的配置。
+这里我配置一个远程仓库指向中央仓库的中国镜像：
+
+```xml
+<project>
+...
+  <repositories>
+    <repository>
+      <id>maven-net-cn</id>
+      <name>Maven China Mirror</name>
+      <url>http://maven.net.cn/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>maven-net-cn</id>
+      <name>Maven China Mirror</name>
+      <url>http://maven.net.cn/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>    
+    </pluginRepository>
+  </pluginRepositories>
+...
+</project>
+123456789101112131415161718192021222324252627282930
+```
+
+我们先看一下的配置，你可以在它下面添加多个 ，每个都有它唯一的ID，一个描述性的name，以及最重要的，远程仓库的url。
+此外，
+
+```
+<releases><enabled>true</enabled></releases>   告诉Maven可以从这个仓库下载releases版本的构件
+
+<snapshots><enabled>false</enabled></snapshots>告诉Maven不要从这个仓库下载snapshot版本的构件。
+123
+```
+
+禁止从公共仓库下载snapshot构件是推荐的做法，因为这些构件不稳定，且不受你控制，你应该避免使用。当然，如果你想使用局域网内组织内部的仓库，你可以激活snapshot的支持。
+
+
+
+[pom.xml文件中的parent标签 - CHENSISI - 博客园 (cnblogs.com)](https://www.cnblogs.com/chensisi/p/13343602.html)
+
+
+
+
+
+## 6. dependencies与dependencyManagement搭配使用
+
+- **dependencies**即使在子项目中不写该依赖项，那么子项目仍然会从父项目中继承该依赖项（全部继承）
+- **dependencyManagement**里只是声明依赖，并不实现引入，因此子项目需要显示的声明需要用的依赖。如果不在子项目中声明依赖，是不会从父项目中继承下来的；只有在子项目中写了该依赖项，并且没有指定具体版本，才会从父项目中继承该项，并且version和scope都读取自父pom;另外如果子项目中指定了版本号，那么会使用子项目中指定的jar版本。
