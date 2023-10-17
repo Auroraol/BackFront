@@ -1,4 +1,4 @@
-一、介绍
+# 一、介绍
 
 Spring Cloud Alibaba 为分布式应用开发提供一站式解决方案。它包含开发分布式应用程序所需的所有组件，使您可以轻松地使用 Spring Cloud 开发应用程序。
 
@@ -357,7 +357,9 @@ management:
 
 ![img](SpringCloud alibaba.assets/1638674165583-8d39502e-7d12-4678-9df1-2102c00098f2.png)
 
-# Nacos的依赖
+# 使用
+
+## Nacos的依赖
 
 父工程：
 
@@ -371,7 +373,7 @@ management:
 </dependency>
 ```
 
-客户端：
+客户端(服务)：
 
 ```xml
 <!-- nacos客户端依赖包 -->
@@ -381,7 +383,7 @@ management:
 </dependency>
 ```
 
-# 服务集群
+## 服务集群
 
 ![image-20231013151440113](06-SpringCloud alibaba.assets/image-20231013151440113.png)
 
@@ -393,7 +395,7 @@ management:
 
 ![image-20231013150917504](06-SpringCloud alibaba.assets/image-20231013150917504.png)
 
-# 负载均衡
+## 负载均衡
 
 ![image-20231013151346540](06-SpringCloud alibaba.assets/image-20231013151346540.png)
 
@@ -401,7 +403,7 @@ management:
 
 ![image-20231013151614829](06-SpringCloud alibaba.assets/image-20231013151614829.png)
 
-# 环境隔离
+## 环境隔离
 
 ![image-20231013152108458](06-SpringCloud alibaba.assets/image-20231013152108458.png)
 
@@ -415,17 +417,15 @@ management:
 
 ![image-20231013152356254](06-SpringCloud alibaba.assets/image-20231013152356254.png)
 
-# Nacos配置管理
+## Nacos配置管理
 
-
-
-## Nacos流程
+### Nacos流程
 
 ![image-20231013154141722](06-SpringCloud alibaba.assets/image-20231013154141722.png)
 
 
 
-## 控制台配置
+### 控制台配置
 
 ![image-20231013153627256](06-SpringCloud alibaba.assets/image-20231013153627256.png)
 
@@ -437,7 +437,7 @@ management:
 
 ![image-20231013154008534](06-SpringCloud alibaba.assets/image-20231013154008534.png)
 
-## 代码配置
+### 代码配置
 
 **配置**
 
@@ -455,13 +455,13 @@ management:
 
 + 方式二: 直接使用配置类的方式, 读取配置文件, 无需加载@RefreshScope注解(推荐)
 
-## 多服务共享配置
+### 多服务共享配置
 
 <img src="06-SpringCloud alibaba.assets/image-20231013160009902.png" alt="image-20231013160009902" style="zoom: 67%;" />
 
 
 
-# nacos集群搭建
+## nacos集群搭建
 
 <img src="06-SpringCloud alibaba.assets/image-20231013160123888.png" alt="image-20231013160123888" style="zoom: 50%;" />
 
@@ -2449,7 +2449,7 @@ CREATE TABLE `undo_log` (
 
 
 
-# 九 Gateway学习
+# 九 Gateway
 
 ## 核心概念
 
@@ -2786,12 +2786,13 @@ spring:
 
 ### 4.3 Gateway 自定义内置过滤器
 
+内置的过滤器已经可以完成大部分的功能，但是对于企业开发的一些业务功能处理，还是需要我们自己
+编写过滤器来实现的，那么我们一起通过代码的形式自定义一个过滤器，去完成统一的权限校验。
+
 有两种方式：
 
 - 在上面全局模式的基础上，改为实现gatewayFilter和Ordered接口
 - 继承AbstractGatewayFilterFactory类（推荐)
-
-
 
 自定义Gateway Filter
 
@@ -2966,17 +2967,319 @@ public class MyPartGatewayFilterFactory extends AbstractGatewayFilterFactory<MyP
 
 ## 跨域
 
+跨域:域名不一致就是跨域，主要包括
+
++ 域名不同: www.taobao.com 和 www.taobao.org 和 wwwjd.com 和 miaosha,jd.com
++ 域名相同, 端口不同: localhost:8080和lcalhost8081
+
+跨域问题:浏览器禁止请求的发起者与服务端发生或ajax请求，请求被浏览器拦截的问题
+
+解决方案: CORS
+
+![image-20231016092236858](06-SpringCloud alibaba.assets/image-20231016092236858.png)
+
+## 网关限流(和断言工厂作用相同)
+
+（1） 计数器
+计数器限流算法是最简单的一种限流实现方式。其本质是通过维护一个单位时间内的计数器，每次请求
+计数器加1，当单位时间内计数器累加到大于设定的阈值，则之后的请求都被拒绝，直到单位时间已经
+过去，再将计数器重置为零
+
+<img src="06-SpringCloud alibaba.assets/image-20231016093919416.png" alt="image-20231016093919416" style="zoom:67%;" />
+
+（2） 漏桶算法
+漏桶算法可以很好地限制容量池的大小，从而防止流量暴增。漏桶可以看作是一个带有常量服务时间的
+单服务器队列，如果漏桶（包缓存）溢出，那么数据包会被丢弃。 在网络中，漏桶算法可以控制端口的
+流量输出速率，平滑网络上的突发流量，实现流量整形，从而为网络提供一个稳定的流量。
+为了更好的控制流量，漏桶算法需要通过两个变量进行控制：一个是桶的大小，支持流量突发增多时可
+以存多少的水（burst），另一个是水桶漏洞的大小（rate）。
+                                                  <img src="06-SpringCloud alibaba.assets/image-20231016093941594.png" alt="image-20231016093941594" style="zoom: 67%;" />
+（3） 令牌桶算法
+令牌桶算法是对漏桶算法的一种改进，桶算法能够限制请求调用的速率，而令牌桶算法能够在限制调用
+的平均速率的同时还允许一定程度的突发调用。在令牌桶算法中，存在一个桶，用来存放固定数量的令
+牌。算法中存在一种机制，以一定的速率往桶中放令牌。每次请求调用需要先获取令牌，只有拿到令
+牌，才有机会继续执行，否则选择选择等待可用的令牌、或者直接拒绝。放令牌这个动作是持续不断的
+进行，如果桶中令牌数达到上限，就丢弃令牌，所以就存在这种情况，桶中一直有大量的可用令牌，这
+时进来的请求就可以直接拿到令牌执行，比如设置qps为100，那么限流器初始化完成一秒后，桶中就
+已经有100个令牌了，这时服务还没完全启动好，等启动完成对外提供服务时，该限流器可以抵挡瞬时
+的100个请求。所以，只有桶中没有令牌时，请求才会进行等待，最后相当于以一定的速率执行。
+
+<img src="06-SpringCloud alibaba.assets/image-20231016094011942.png" alt="image-20231016094011942" style="zoom: 80%;" />
+
+### 基于Filter的限流
+SpringCloudGateway官方就提供了基于令牌桶的限流支持。基于其内置的过滤器工厂
+RequestRateLimiterGatewayFilterFactory 实现。在过滤器工厂中是通过Redis和lua脚本结合的方
+式进行流量控制。
+（1） 环境搭建
+
++ 导入redis的依赖
+  首先在工程的pom文件中引入gateway的起步依赖和redis的reactive依赖，代码如下：
+
+```
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-gateway</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifatId>spring-boot-starter-data-redis-reactive</artifactId>
+</dependency>
+```
+
++ 准备redis
+
+（2) 修改application.yml配置文件
+在application.yml配置文件中加入限流的配置，代码如下：
+<img src="06-SpringCloud alibaba.assets/image-20231016094154807.png" alt="image-20231016094154807" style="zoom:67%;" />
+在application.yml 中添加了redis的信息，并配置了RequestRateLimiter的限流过滤器：
+burstCapacity，令牌桶总容量。
+replenishRate，令牌桶每秒填充平均速率。
+key-resolver，用于限流的键的解析器的 Bean 对象的名字。它使用 SpEL 表达式根据#
+{@beanName}从 Spring 容器中获取 Bean 对象。
+（3） 配置KeyResolver
+为了达到不同的限流效果和规则，可以通过实现 KeyResolver 接口，定义不同请求类型的限流键。
+
+```java
+@Configuration
+public class KeyResolverConfiguration {
+/**
+* 基于请求路径的限流
+*/
+@Bean
+public KeyResolver pathKeyResolver() {
+    return exchange -> Mono.just(
+    exchange.getRequest().getPath().toString()
+    );
+}
+    
+/**
+* 基于请求ip地址的限流
+*/
+@Bean
+public KeyResolver ipKeyResolver() {
+    return exchange -> Mono.just(
+    	exchange.getRequest().getHeaders().getFirst("X-Forwarded-For")
+    );
+}
+/**
+* 基于用户的限流
+*/
+@Bean
+public KeyResolver userKeyResolver() {
+        return exchange -> Mono.just(
+        	exchange.getRequest().getQueryParams().getFirst("user")
+        );
+    }
+}
+
+```
+
+使用Jmetter模拟5组线程访问，会发现如下结果，当达到令牌桶的总容量3时，其他的请求会返回429错
+误。
+
+![image-20231016094329195](06-SpringCloud alibaba.assets/image-20231016094329195.png)
+
+通过reids的MONITOR可以监听redis的执行过程。这时候Redis中会有对应的数据：
+
+![image-20231016094349014](06-SpringCloud alibaba.assets/image-20231016094349014.png)
+
+大括号中就是我们的限流Key,这边是IP，本地的就是localhost
+timestamp:存储的是当前时间的秒数，也就是System.currentTimeMillis() / 1000或者
+Instant.now().getEpochSecond()
+tokens:存储的是当前这秒钟的对应的可用的令牌数量
+Spring Cloud Gateway目前提供的限流还是相对比较简单的，在实际中我们的限流策略会有很多种情
+况，比如：
+对不同接口的限流
+被限流后的友好提示
 
 
 
+### 基于Sentinel的限流
+
+Sentinel 支持对 Spring Cloud Gateway、Zuul 等主流的 API Gateway 进行限流。
+
+（1）环境搭建
+导入Sentinel 的响应依赖
+
+```
+<dependency>
+<groupId>com.alibaba.csp</groupId>
+<artifactId>sentinel-spring-cloud-gateway-adapter</artifactId>
+<version>x.y.z</version>
+</dependency>
+```
+
+（2） 编写配置类
+
+```java
+@Configuration
+public class GatewayConfiguration {
+    private final List<ViewResolver> viewResolvers;
+    private final ServerCodecConfigurer serverCodecConfigurer;
+    public GatewayConfiguration(ObjectProvider<List<ViewResolver>>
+    viewResolversProvider,
+    ServerCodecConfigurer serverCodecConfigurer) {
+    this.viewResolvers =
+    viewResolversProvider.getIfAvailable(Collections::emptyList);
+    this.serverCodecConfigurer = serverCodecConfigurer;
+}
+/**
+* 配置限流的异常处理器:SentinelGatewayBlockExceptionHandler
+*/
+@Bean
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public SentinelGatewayBlockExceptionHandler
+sentinelGatewayBlockExceptionHandler() {
+	return new SentinelGatewayBlockExceptionHandler(viewResolvers,
+	serverCodecConfigurer);
+}
+/**
+* 配置限流过滤器
+*/
+@Bean
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public GlobalFilter sentinelGatewayFilter() {
+	return new SentinelGatewayFilter();
+}
+/**
+* 配置初始化的限流参数
+*/
+@PostConstruct
+public void initGatewayRules() {
+    Set<GatewayFlowRule> rules = new HashSet<>();
+    rules.add(
+        new GatewayFlowRule("order-service") //资源名称
+        .setCount(1) // 限流阈值
+        .setIntervalSec(1) // 统计时间窗口，单位是秒，默认是 1 秒
+    	);
+    	GatewayRuleManager.loadRules(rules);
+    }
+}
+```
+
+基于Sentinel 的Gateway限流是通过其提供的Filter来完成的，使用时只需注入对应的
+SentinelGatewayFilter 实例以及 SentinelGatewayBlockExceptionHandler 实例即可。
+@PostConstruct定义初始化的加载方法，用于指定资源的限流规则。这里资源的名称为orderservice
+，统计时间是1秒内，限流阈值是1。表示每秒只能访问一个请求。
+
+（3）网关配置
+
+![image-20231016094755256](06-SpringCloud alibaba.assets/image-20231016094755256.png)
+
+在一秒钟内多次访问http://localhost:8080/order-service/order/buy/1就可以看到限流启作用了。
+
+![image-20231016094822636](06-SpringCloud alibaba.assets/image-20231016094822636.png)
+
+（4）自定义异常提示
+当触发限流后页面显示的是Blocked by Sentinel: FlowException。为了展示更加友好的限流提示，
+Sentinel支持自定义异常处理。
+您可以在 GatewayCallbackManager 注册回调进行定制：
+setBlockHandler ：注册函数用于实现自定义的逻辑处理被限流的请求，对应接口为
+BlockRequestHandler 。默认实现为 DefaultBlockRequestHandler ，当被限流时会返回类似
+于下面的错误信息： Blocked by Sentinel: FlowException 。
+
+```java
+@PostConstruct
+public void initBlockHandlers() {
+BlockRequestHandler blockRequestHandler = new BlockRequestHandler() {
+    public Mono<ServerResponse> handleRequest(ServerWebExchange
+    serverWebExchange, Throwable throwable) {
+        Map map = new HashMap<>();
+        map.put("code", 001);
+        map.put("message", "对不起,接口限流了");
+        return ServerResponse.status(HttpStatus.OK).
+        contentType(MediaType.APPLICATION_JSON_UTF8).
+        body(BodyInserters.fromObject(map));
+        }
+    };
+    GatewayCallbackManager.setBlockHandler(blockRequestHandler);
+}
+```
+
+![image-20231016094930298](06-SpringCloud alibaba.assets/image-20231016094930298.png)
+
+（5） 参数限流
+上面的配置是针对整个路由来限流的，如果我们只想对某个路由的参数做限流，那么可以使用参数限流
+方式
+
+```java
+rules.add(new GatewayFlowRule("order-service")
+    .setCount(1)
+    .setIntervalSec(1)
+    .setParamItem(new GatewayParamFlowItem()
+    .setParseStrategy(SentinelGatewayConstants.PARAM_PARSE_STRATEGY_URL_PARAM).setFi
+    eldName("id")
+    )
+);
+```
+
+通过指定PARAM_PARSE_STRATEGY_URL_PARAM表示从url中获取参数，setFieldName指定参数名称
+
+（6） 自定义API分组
+
+```java
+@PostConstruct
+private void initCustomizedApis() {
+    Set<ApiDefinition> definitions = new HashSet<>();
+    ApiDefinition api1 = new ApiDefinition("product_api").setPredicateItems(new HashSet<ApiPredicateItem>() {{
+        //以/product-service/product 开头的请求
+        add(new ApiPathPredicateItem().setPattern("/productservice/product/**").setMatchStrategy(SentinelGatewayConstants.URL_MATCH_STRATEGY_PREFIX));
+    }});
+    
+    ApiDefinition api2 = new ApiDefinition("order_api")
+        .setPredicateItems(new HashSet<ApiPredicateItem>() {{
+        ///order-service/order 完成的url路径匹配
+        add(new ApiPathPredicateItem().setPattern("/order-service/order"));
+        }});
+    definitions.add(api1);
+    definitions.add(api2);
+    GatewayApiDefinitionManager.loadApiDefinitions(definitions);
+}
+```
+
+## 网关高可用
+
+高可用HA（High Availability）是分布式系统架构设计中必须考虑的因素之一，它通常是指，通过设计
+减少系统不能提供服务的时间。我们都知道，单点是系统高可用的大敌，单点往往是系统高可用最大的
+风险和敌人，应该尽量在系统设计的过程中避免单点。方法论上，高可用保证的原则是“集群化”，或者
+叫“冗余”：只有一个单点，挂了服务会受影响；如果有冗余备份，挂了还有其他backup能够顶上。
+
+<img src="06-SpringCloud alibaba.assets/image-20231016095359556.png" alt="image-20231016095359556" style="zoom:67%;" />
+
+（1） 准备多个GateWay工程
+修改**gateway_server** 的application.yml。添加如下配置
+
+| ![image-20231016101814949](06-SpringCloud alibaba.assets/image-20231016101814949.png) |
+| ------------------------------------------------------------ |
+
+通过不同的profiles配置启动两个网关服务，请求端口分别为8080和8081。浏览器验证发现效果是一致
+的。
+
+（2） 配置ngnix
+找到ngnix添加负载均衡配置
+
+```
+#配置多台服务器（这里只在一台服务器上的不同端口）
+upstream gateway {
+server 127.0.0.1:8081;
+server 127.0.0.1:8080;
+}
+#请求转向mysvr 定义的服务器列表
+location / {
+proxy_pass http://gateway;
+}
+```
+
+在浏览器上通过访问http://localhost/order-service/order/buy/1请求的效果和之前是一样的。这次关
+闭一台网关服务器，还是可以支持部分请求的访问。
+
+## 微服务的链路追踪概述
 
 
 
+## Gateway整合Sentinel
 
-
-## 5、Gateway整合Sentinel
-
-## 5.1、添加 sentinel 相关依赖：
+### 5.1、添加 sentinel 相关依赖：
 
 ```xml
 <!-- 引入sentinel进行服务降级熔断 -->
@@ -2991,7 +3294,7 @@ public class MyPartGatewayFilterFactory extends AbstractGatewayFilterFactory<MyP
 </dependency>
 ```
 
-## 5.2、配置文件中添加 sentinel 控制台的配置：
+### 5.2、配置文件中添加 sentinel 控制台的配置：
 
 ```yaml
 sentinel:  #sentinel的配置
@@ -3000,13 +3303,13 @@ sentinel:  #sentinel的配置
     port:  8719   #默认端口8719
 ```
 
-## 5.3、访问 sentinel 控制台：
+### 5.3、访问 sentinel 控制台：
 
 至此，我们就已经将 Spring Cloud Gateway 与 Sentinel 整合好了，进入 sentinel 控制台就能够看到网关项目被监控了
 
 ![img](SpringCloud alibaba.assets/1672847382632-958db87c-a9e5-4c70-93ff-978980321216.png)
 
-## 5.4、网关流控规则：
+### 5.4、网关流控规则：
 
 ![img](SpringCloud alibaba.assets/1672993542844-4d53afdc-93c2-408b-a004-cdd795dfc4d3.png)
 
@@ -3038,7 +3341,7 @@ pattern：参数值的匹配模式，只有匹配该模式的请求属性值会�
 
 matchStrategy：参数值的匹配策略，目前支持精确匹配（PARAM_MATCH_STRATEGY_EXACT）、子串匹配（PARAM_MATCH_STRATEGY_CONTAINS）和正则匹配（PARAM_MATCH_STRATEGY_REGEX）。
 
-## 5.5、API 分组管理：
+### 5.5、API 分组管理：
 
 API 分组就是对接口进行分组，然后对不同组的接口实施不同的限流策略。
 
@@ -3066,7 +3369,7 @@ API 分组有三种配置模式：精确、前缀和正则三种模式。
 
 新增之后，限流规则就会对符合匹配模式的 API 生效了。
 
-## 6、自定义流控异常消息
+### 6、自定义流控异常消息
 
 网关流控的默认异常返回信息并不够人性化，直接返回：“Blocked by Sentinel: ParamFlowException”，这种肯定是不能接受的，那么我们如何自定义配置流控异常信息呢？其实 sentinel 已经为我们实现了自定义流控异常的返回内容。只需要在配置文件中添加配置如下：
 

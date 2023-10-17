@@ -2296,8 +2296,7 @@ InputStream in = PropertiesUtil.class.getClassLoader().getResourceAsStream("xx.p
 ```html
 <%--->前端</%--->  
 <form action="<%= request.getContextPath()%>/account?method=login" class="form-validate" id="loginFrom" method="post">
-    
-    
+    //xxxxxxx
 </form>  
 <%--->                     
 分析:
@@ -3088,4 +3087,41 @@ public Map<String, Object> deleteUser(@RequestParam("id") String id) {
   return result;
 }
 ```
+
+
+
+
+
+# javaweb相关依赖
+
+```xml
+<!-- servlet: 运行在Web服务器或应用服务器上的程序(必要)-->
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>3.1.0</version>
+    <scope>provided</scope>
+</dependency>
+<!-- jsp: 就是在HTML里面嵌入Java代码-->
+<dependency>
+    <groupId>javax.servlet.jsp</groupId>
+    <artifactId>javax.servlet.jsp-api</artifactId>
+    <version>2.3.3</version>
+    <scope>provided</scope>
+</dependency>
+<!-- JSTL表达式的依赖 -->
+<dependency>
+    <groupId>javax.servlet.jsp.jstl</groupId>
+    <artifactId>jstl-api</artifactId>
+    <version>1.2</version>
+</dependency>
+<!-- standard标签库 -->
+<dependency>
+    <groupId>taglibs</groupId>
+    <artifactId>standard</artifactId>
+    <version>1.1.2</version>
+</dependency>
+```
+
+
 

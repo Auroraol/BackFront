@@ -1,4 +1,4 @@
-分布式核心
+# 分布式核心
 
 ## 分布式中的远程调用
 
@@ -1273,7 +1273,7 @@ eureka:
 
 #### 1.3 创建EurekaClient
 
-EurekaClient: 就是各种各样的服务
+**EurekaClient: 就是各种各样的服务**
 
 <img src="02-springcloud.assets/image-20231012165914682.png" alt="image-20231012165914682" style="zoom:67%;" />
 

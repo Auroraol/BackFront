@@ -69,7 +69,7 @@
 
 ## 2.3 基本使用
 
-代码见 [experiment01.zip](SpringMVC\code\experiment01.zip) 
+代码见  [基本使用.zip](code\基本使用.zip) 
 
 ### 导入依赖
 
@@ -299,33 +299,31 @@ http://localhost:8080/modelTest
 
 <img src="SpringMVC教程.assets/image-20231015200537589.png" alt="image-20231015200537589" style="zoom:80%;" />
 
-
-
 # 三、接收请求参数
 
 ------
 
-#### 3.1 基本类型参数
+## 3.1 基本类型参数
 
 请求参数和方法的形参 同名即可
 
-springMVC默认可以识别的日期字符串格式为： YYYY/MM/dd HH:mm:ss
-通过@DateTimeFormat可以修改默认日志格式
-
 ```java
-// id  name gender
-// http://localhost:8989/xxx/../test1?id=1&name=zzz&gender=false&birth=2018-12-12 12:20:30
-@RequestMapping("/test1")
-public String testParam1(Integer id,
-                         String name,
-                         Boolean gender,
-                         @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date birth){
-    System.out.println("test param1");
-    return "index";
-}
+	// id  name gender
+	// http://localhost:8989/xxx/../test1?id=1&name=zzz&gender=false&birth=2018-12-12 12:20:30
+	@RequestMapping("/test1")
+	public String testParam1(@RequestParam("id") Integer id,
+							 @RequestParam("name") String name,
+							 @RequestParam("gender") Boolean gender,
+							 @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date birth){
+		System.out.println("test param1");
+		System.out.println(id + name + gender + birth);
+		return "index";
+	}
 ```
 
-#### 3.2 实体收参【`重点`】
+springMVC默认可以识别的日期字符串格式为： YYYY/MM/dd HH:mm:ss通过@DateTimeFormat可以修改默认日志格式
+
+## 3.2 实体收参【`重点`】
 
 请求参数和实体的属性 同名即可
 
@@ -348,7 +346,7 @@ public String testParam2(User user){
 }
 ```
 
-#### 3.3 数组收参
+## 3.3 数组收参
 
 简单类型的 数组
 
@@ -361,8 +359,6 @@ public String testParam2(User user){
 </form>
 ```
 
-
-
 ```java
 //http://localhost:8989/.../test3?hobby=football&hobby=basketball
 @RequestMapping("/test3")
@@ -374,11 +370,7 @@ public String testParam3(String[] hobby){
 }
 ```
 
-
-
-#### 3.4 集合收参 【了解】分布式
-
-
+## 3.4 集合收参 【了解】分布式
 
 ```plain
 <form action="${pageContext.request.contextPath}/param/test4" method="post">
@@ -392,8 +384,6 @@ public String testParam3(String[] hobby){
     <input type="submit" value="提交"/>
 </form>
 ```
-
-
 
 ```java
 public class UserList {
@@ -414,11 +404,7 @@ public String testParam4(UserList userList){
 }
 ```
 
-
-
-#### 3.5 路径参数
-
-
+## 3.5 路径参数
 
 ```java
 // {id} 定义名为id的路径；【/hello/{id}】的匹配能力和【/hello/*】等价
@@ -439,26 +425,16 @@ public String testParam6(@PathVariable("username") String name){//将{username}�
 }
 ```
 
-
-
-#### 3.6 中文乱码
-
-
+## 3.6 中文乱码
 
 首先，页面中字符集统一
-
-
 
 ```plain
 JSP : <%@page  pageEncoding="utf-8" %>
 HTML : <meta charset="UTF-8">
 ```
 
-
-
 其次，tomcat中字符集设置，对get请求中，中文参数乱码有效
-
-
 
 ```markdown
 Tomcat配置：URIEncoding=utf-8
@@ -501,7 +477,7 @@ Tomcat配置：URIEncoding=utf-8
     </mvc:annotation-driven>
 ```
 
-### 四、跳转
+# 四、跳转
 
 ------
 
