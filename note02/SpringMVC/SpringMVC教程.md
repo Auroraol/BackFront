@@ -323,7 +323,7 @@ http://localhost:8080/modelTest
 
 springMVC默认可以识别的日期字符串格式为： YYYY/MM/dd HH:mm:ss通过@DateTimeFormat可以修改默认日志格式
 
-## 3.2 实体收参【`重点`】
+## 3.2 实体收参
 
 请求参数和实体的属性 同名即可
 
@@ -370,7 +370,7 @@ public String testParam3(String[] hobby){
 }
 ```
 
-## 3.4 集合收参 【了解】分布式
+## 3.4 集合收参
 
 ```plain
 <form action="${pageContext.request.contextPath}/param/test4" method="post">
@@ -425,13 +425,96 @@ public String testParam6(@PathVariable("username") String name){//将{username}�
 }
 ```
 
-## 3.6 中文乱码
+## 3.6 总结【`重点`】
+
+详细见[前后端相互传数据方式总结.md](C:\Users\16658\Documents\GitHub\java_note\note\spring boot3\前后端相互传数据方式总结\前后端相互传数据方式总结.md)
+
+```java
+package cn.lfj.controller;
+
+import cn.lfj.entity.People;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-17 17:20
+ */
+
+@Controller
+public class FrontParameter {
+
+	// @RequestParam()
+	/**
+	 * RequestParam(value = "参数名", required = false(表示该值非必须), defaultValue = "默认值")
+	* http://localhost:8989/test1?id=1&name=zzz&gender=false&birth=2018-12-12 12:20:30
+	 * param: id name gender birth
+	 * get post都可以, body传参一般都用get
+	 **/
+	@RequestMapping("/test1")
+	public String testParam1(@RequestParam("id") Integer id,
+							 @RequestParam(value = "name", required = false, defaultValue = "李刚") String name,
+							 @RequestParam(value = "gender", required = false) Boolean gender,
+							 @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+								 @RequestParam(value = "birth", defaultValue = "2023-12-12 12:20:30") Date birth){
+		System.out.println("test param1");
+		System.out.println(id + "--" + name+ "--" + gender+ "--" + birth);
+		return "index";
+	}
+
+
+	// @PathVariable()
+	/**
+	 * PathVariable(value = "参数名", required = 默认值)  注:没有defaultValue
+	 * http://localhost:8080/test2/1234/john/true/2023-01-01 12:00:00
+	 * param: id name gender birth
+	 * get post都可以, body传参一般都用get
+	 **/
+	@RequestMapping("/test2/{id}/{name}/{gender}/{birth}")    //PathVariable顾名思义需要固定url路径
+	public String testParam2(@PathVariable("id") Integer id,
+							 @PathVariable(value = "name") String name,
+							 @PathVariable(value = "gender", required = false) Boolean gender,
+							 @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+							 @PathVariable(value = "birth",  required = false) Date birth){
+		//为空时指定默认值
+		if (birth == null) {
+			birth = new Date("2023-12-12 12:20:30");
+		}
+		System.out.println("test param2");
+		System.out.println(id + "--" + name+ "--" + gender+ "--" + birth);
+		return "index";
+	}
+
+
+	// @RequestBody
+	/**
+	 * http://localhost:8080/test3
+	 * body: {"peoplename":"张刚","student":{"studentname":"你好"}}
+	 * get post都可以, body传参一般都用post
+	 * @param
+	 */
+	@RequestMapping("/test3")
+	@ResponseBody
+	public People testParam3(@RequestBody People people) {
+		System.out.println("打印参数:" + people.getPeoplename() + people.getStudent().getStudentname());
+		return people;
+	}
+
+}
+```
+
+## 3.7 中文乱码
 
 首先，页面中字符集统一
 
-```plain
-JSP : <%@page  pageEncoding="utf-8" %>
-HTML : <meta charset="UTF-8">
+```js
+//JSP : 
+	<%@page  pageEncoding="utf-8" %>
+//HTML : 
+    <meta charset="UTF-8">
 ```
 
 其次，tomcat中字符集设置，对get请求中，中文参数乱码有效
@@ -458,8 +541,6 @@ Tomcat配置：URIEncoding=utf-8
 </filter-mapping>
 ```
 
-
-
 响应乱码
 
 ```xml
@@ -477,13 +558,11 @@ Tomcat配置：URIEncoding=utf-8
     </mvc:annotation-driven>
 ```
 
-# 四、跳转
+# 四、页面跳转
 
 ------
 
-#### 4.1 转发
-
-
+## 4.1 转发forward
 
 ```java
 @RequestMapping("/forw")
@@ -499,18 +578,12 @@ class ForwardController{
     public String testForward2(){
         System.out.println("test forward2");
         //转发到  /forw/test1
-        //return "forward:test1";//相对路径(转发到本类中的test1)
-        //转发到  /forw/test1
         return "forward:/forw/test1"; //绝对路径
     }
 }
 ```
 
-
-
-#### 4.2 重定向
-
-
+## 4.2 重定向redirect
 
 ```java
 @RequestMapping("/redir")
@@ -531,100 +604,137 @@ class RedirectController{
 }
 ```
 
+## 4.3 异同
 
+相同点：页面都会实现跳转
 
-#### 4.3 跳转细节
+不同点：
 
+- 请求转发的时候，url地址栏不会产生变化。307
+- 重定向的时候，url地址栏会发生变化。302
 
+## 4.4 重定向与转发
 
- 
+```java
+public String index1(User user)
+{
+    .....
+    return "redirect:/user.jsp";//重定向
+    return "forward:页面";//转发 
+}
+```
+
+当我们使用重定向时可以解决一些传参问题，比如两个Controller的传参问题
+
+### Controller传参到另一个Controller中
+
+> - 有时候可能会碰到这样的问题：
+>   - 在A的Controller中传参到B的Controller中，
+>   - 而A的返回值是作为B的参数，
+>   - 并且本身请求A的参数中有一些需要进行一些处理后才能用于请求B（而可能甚至我们并不需要用到注入Service的方法（这个条件也是。。。亿点死亡😅））
+>   - A中一些传参名需要更改成对应B中的传参名（尤其这个条件很致命😅，相同的参数数量，可能其中有一个需要经过处理后再改参数名再传到B的Controller中作为请求参数之一）
+
+这时候那个需要进行一定处理的参数传到B的Controller时，会发现传过去的这个参数为null，而无论用到上文的request作用域中的什么Model、ModelAndView、Map等方法时均会失灵（是这种感觉），但是明明代码又没有问题
+
+#### 解决方法
+
+用`RedirectAttributes attributes`传参
+
+```java
+@RequestMapping("xxx")
+public String xxx(String 无需做处理可直接请求下一个controller的参数, String 需要经过处理才能请求下一个controller的参数（且传递过去的参数名会变），假设此参数叫做a1, RedirectAttributes attributes){
+
+    //一系列处理操作....
+
+    String a2 = xxxxx;	//此时a1参数经过处理转换成a2
+    
+    //用attributes.addAttribute("key",value)来传递参数（可以发现方法中写好的参数是不用再次添加的，可能是被存进request作用域中了，上面提到的Model、Map等方法也是如此，不确定是否可以不写，不过这样本人试了的确是即使没写也直接传过去了）
+    attributes.addAttribute("a2", a2);
+    //写好重定向的路径即可
+    return "redirect:/aaaa/bbbbbbbbb";
+}
+```
+
+拆分来看是这样的（因为这个问题让我心态炸了一下午，所以解释起来会很磨叽😬，而且这个情况应该也比较少，网上一堆不靠谱的）：
+
+1、用`RedirectAttributes attributes`传参
+
+2、用`attributes.addAttribute("key",value)`来传递参数
+
+3、写好重定向的路径即可（不用多写什么其它乱七八糟的）
+
+```java
+return "redirect:/aaaa/bbbbbbbbb";
+```
+
+## 4.5 跳转细节
 
 -  在增删改之后，为了防止请求重复提交，重定向跳转 
 -  在查询之后，可以做转发跳转 
 
- 
+# 五、返回响应
 
+**前端jsp**
 
+jsp中用EL表达式 取值,  重点复习 EL  JSTL
 
-### 五、响应
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" isELIgnored="false" language="java" %>
+<html>
+<body>
+<h2>Hello World!</h2>
+<h2>${uname}</h2>
+<h2>${msg}</h2>
+</body>
+</html>
+```
 
-------
+<img src="SpringMVC教程.assets/image-20231018164736369.png" alt="image-20231018164736369" style="zoom: 67%;" />
+
+##  ① 页面间参数传递
 
 C得到数据后，跳转到V，并向V传递数据。进而V中可以渲染数据，让用户看到含有数据的页面
 
- 
-
 转发跳转：Request作用域
-
- 
 
 重定向跳转：Session作用域
 
+### request作用域
 
+#### 1、@ModelAttribute注解(不常用)
 
-#### 5.1 Request和Session
-
-
-
-```plain
-${requestScope.age}
-${sessionScope.name}
-```
-
-
+Controller层
 
 ```java
-//形参中 即可获得 request 和 session对象
-@RequestMapping("/test1")
-public String testData(HttpSession session,HttpServletRequest req，Integer id){
-    session.setAttribute("user",new User());
-    req.setAttribute("age", 18);
-    req.setAttribute("users",Arrays.asList(new User(),new User()));
-    //return "test2";
-    return "forward:/WEB-INF/test2.jsp";
+@RequestMapping("/providerInfo1")
+public ModelAndView providerInfo1(@ModelAttribute("uname") String uname) {
+    return new ModelAndView("/hello");
 }
 ```
 
+效果
 
+![请添加图片描述](SpringMVC教程.assets/ca312b94930d4e31b927a6968bdc3d03.png)
 
-#### 5.2 JSP中取值
+#### 2、ModelAndView对象（较麻烦）
 
+> 使用mav.addObject();
 
-
-建议：重点复习 EL  JSTL
-
-
-
-```plain
-//jsp中用EL表达式 取值即可
-<fmt:formatDate value="${sessionScope.user.birth}" pattern="yyyy-MM-dd"/> <br/>
-${sessionScope.user.birth} <br>
-${requestScope.age}
-```
-
-
-
-#### 5.3 Model
-
-
+Controller层
 
 ```java
-//model中的数据，会在V渲染之前，将数据复制一份给request
-@RequestMapping("/test")
-public String testData(Model model){
-    model.addAttribute("name", "张三");
-    return "index";
+@RequestMapping("/providerInfo2")
+public ModelAndView providerInfo2() {
+    ModelAndView mav = new ModelAndView("/hello");
+    String msg = "我是providerInfo2";
+    mav.addObject("msg", msg);
+    return mav;
 }
-
-//jsp中用EL表达式 取值即可
-${requestScope.name}
 ```
 
+效果
 
-
-#### 5.4 ModelAndView
-
-
+![请添加图片描述](SpringMVC教程.assets/4b74348f4e4e471885581324ed84a25c.png)
 
 ```java
 //modelandview 可以集中管理 跳转和数据
@@ -643,75 +753,382 @@ public ModelAndView testData(){//返回值类型为ModelAndView
 ${requestScope.age}
 ```
 
+#### 3、用Model传参（常用）
 
+> 使用model.addAttribute();
 
-#### 5.5 [@SessionAttributes ]() （了解）
-
-
-
- 
-
--  @SessionAttributes({"gender","name"})  ：model中的 name和gender 会存入session中 
--  SessionStatus 移除session 
-
- 
-
-
+Controller层（返回类型是String）
 
 ```java
-@Controller
-@SessionAttributes({"gender","name"}) // model中的 name和gender 会存入session中
-public class UserController {
-
-    @RequestMapping("/hello")
-    public String hello(Model m){
-        m.addAttribute("gender",true); // 会存入session
-        mv.addObject("name","zhj"); // 会存入session
-        return "index";
-    }
-    
-    @RequestMapping("/hello2")
-    public String hello(SessionStatus status){
-        // 移除通过SessionAttributes存入的session
-        status.setComplete();
-        return "index";
-    }
+@RequestMapping("/providerInfo3")
+public String providerInfo3(Model model) {
+    String msg = "我是providerInfo3";
+    model.addAttribute("msg", msg);
+    return "/hello";
 }
+```
+
+效果
+
+![请添加图片描述](SpringMVC教程.assets/76b209ccf84e49309664204087f0fd57.png)
+
+```java
+//model中的数据，会在V渲染之前，将数据复制一份给request
+@RequestMapping("/test")
+public String testData(Model model){
+    model.addAttribute("name", "张三");
+    return "index";
+}
+
+//jsp中用EL表达式 取值即可
+${requestScope.name}
 ```
 
 
 
-### 六、静态资源
+#### 4、用map传参（常用）
 
-------
+> 使用map.put();
 
-#### 6.1 静态资源问题
+Controller层（返回类型是String）
+
+```java
+@RequestMapping("/providerInfo4")
+public String providerInfo4(Map<String, Object> map) {
+    String msg = "我是providerInfo4";
+    map.put("msg", msg);
+    return "/hello";
+}
+```
+
+效果
+
+![请添加图片描述](SpringMVC教程.assets/bb78f83520de48a287369fe48c1c1202.png)
+
+#### 5、使用HttpServletRequest传参
+
+需要先引入servlet-api.jar
+
+pom.xml
+
+```xml
+<!-- javax-Servlet -->
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>servlet-api</artifactId>
+    <version>2.5</version>
+</dependency>
+```
+
+Controller层
+
+```java
+@RequestMapping("/providerInfo5")
+public ModelAndView providerInfo5(HttpServletRequest request) {
+    String msg = "我是providerInfo5";
+    request.setAttribute("msg", msg);
+    return new ModelAndView("/hello");
+}
+```
+
+效果
+
+![请添加图片描述](SpringMVC教程.assets/c3f96bc2ef5a4dae931398523a1aac7d.png)
+
+### session作用域
+
+#### 1、@SessionAttributes
+
+只能定义在类上,作用是将指定的Model中的键值对添加至session中
+
+Controller层
+
+```java
+@Controller
+@SessionAttributes(value = {"uname"})
+@RequestMapping("provider") //模块路径：更清晰也防止映射路径访问同名混乱出现问题
+public class ProviderController {
+    
+    @RequestMapping("/providerInfo")
+    public ModelAndView providerInfo(String uname) {
+        ModelAndView mav = new ModelAndView("/hello");
+        mav.addObject("uname",uname);
+        return mav;
+    }
+}
+```
+
+效果
+
+![请添加图片描述](SpringMVC教程.assets/5449fa75000045838ea24aec783afc89.png)
+
+先访问providerInfo加入参数添加session，再访问其它方法（providerInfo1）能够接收到
+
+> @SessionAttributes(types=User.class)会将model中所有类型为 User的属性添加到会话中。
+> @SessionAttributes(value={“user1”, “user2”}) 会将model中属性名为user1和user2的属性添加到会话中。
+> @SessionAttributes(types={User.class, Dept.class}) 会将model中所有类型为 User和Dept的属性添加到会话中。
+> @SessionAttributes(value={“user1”,“user2”},types={Dept.class})会将model中属性名为user1和user2以及类型为Dept的属性添加到会话中。
+
+#### 2、以Servlet方式存储
+
+```xml
+<!-- javax-Servlet -->
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>servlet-api</artifactId>
+    <version>2.5</version>
+</dependency>
+```
+
+##### 1.使用HttpServletRequest
+
+Controller层
+
+```java
+@RequestMapping("/providerInfo11")
+public ModelAndView providerInfo11(HttpServletRequest request) {
+    String msg = "我是Session11";
+    request.getSession().setAttribute("msg", msg);
+    return new ModelAndView("/hello");
+}
+```
+
+##### 2.使用HttpSession
+
+Controller层
+
+```java
+@RequestMapping("/providerInfo22")
+public ModelAndView providerInfo22(HttpSession session) {
+    String msg = "我是Session22";
+    session.setAttribute("msg", msg);
+    return new ModelAndView("/hello");
+}
+```
+
+可以先进入然后再分别返回providerInfo1方法中试一下
+
+效果
+
+![请添加图片描述](SpringMVC教程.assets/1d75239a7fb249a8bb3bf728be96f2de.png)
+
+运行的是providerInfo1方法但仍然保存着providerInfo22的session值
+
+## ② @ResponseBody
+
+### 传对象参数
+
+使用@ResponseBody注解
+
+Controller层
+
+```java
+@RequestMapping("findProviderJson")
+@ResponseBody
+public Provider findProviderJson() {
+    Provider provider = new Provider();
+    provider.setProName("呆古米");
+    provider.setProCode("222");
+    provider.setCreationDate(new Date());
+
+    return provider;
+}
+```
+
+效果
+
+![请添加图片描述](SpringMVC教程.assets/2b9cb7aee730473aa17919b79a411268.png)
+
+想为null时不返回可以用上面说过的（放在实体类所需属性或类上）：
+
+```java
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+```
+
+效果
+
+![请添加图片描述](SpringMVC教程.assets/3cc5a22f105a4a9fa66dd0eede431d78.png)
+
+### 传集合参数
+
+Controller层
+
+```java
+@RequestMapping("findProviderListJson")
+@ResponseBody
+public List<Provider> findProviderListJson() {
+    List<Provider> providers = new ArrayList<>();
+
+    Provider provider1 = new Provider();
+    provider1.setProName("呆古米");
+    provider1.setProCode("222");
+    provider1.setCreationDate(new Date());
+
+    Provider provider2 = new Provider();
+    provider2.setProName("海胆kuma");
+    provider2.setProCode("333");
+    provider2.setCreationDate(new Date());
+
+    providers.add(provider1);
+    providers.add(provider2);
+
+    return providers;
+}
+```
+
+效果
+![请添加图片描述](SpringMVC教程.assets/6d0d67576c504ea681b67e2353fb7c8a.png)
+
+## servlet(javaweb方式)
+
+引入servlet-api.jar
+
+pom.xml
+
+```xml
+<!-- javax-Servlet -->
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>servlet-api</artifactId>
+    <version>2.5</version>
+</dependency>
+```
+
+Controller层
+
+```java
+public String cs(HttpServletRequest request, HttpServletResponse response, HttpSession session){
+    session.setAttribute("username","123");
+    return "user";
+}
+不是以`？参数`的形式显示且比较美观
+请求路径为：.../ts1/参数.html
+    如：..../ts1/1.html或..../ts1/10.html
+```
+
+```java
+@RequestMapping(value="/ts1/{user_id}.html")
+public String index1(@PathVariable("user_id") Long user_id)
+{
+    System.out.println("id======"+user_id);
+    return "user";
+}
+```
+
+## 总结【`重点`】:crossed_swords:
+
+ [传值[全总结].zip](..\..\note\spring boot3\前后端相互传数据方式总结\传值[全总结].zip) 
+
+```xml
+<!--使用HttpSession所需依赖-->
+<!-- javax-Servlet -->
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>servlet-api</artifactId>
+    <version>2.5</version>
+</dependency>
+```
+
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" isELIgnored="false" language="java" %>
+<html>
+<body>
+<h2>Hello World 后端参数传递!</h2>
+<h2>${uname}</h2>
+<h2>${msg}</h2>
+</body>
+</html>
+```
+
+```java
+package cn.lfj.controller;
+
+import cn.lfj.entity.People;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpSession;
+import java.util.Date;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-18 17:01
+ */
+
+@Controller
+@RequestMapping("/BackParameter")
+public class BackParameter {
+
+	// 转发
+	/**
+	 * http://localhost:8080/BackParameter/test1
+	 * param: id name gender birth
+	 **/
+	@RequestMapping("/test1")
+	public String testParam1(Model model){
+		String msg = "我是---request---forward:/BackParameter.jsp";
+		model.addAttribute("msg", msg);
+		// return "hello";
+		return "forward:/BackParameter.jsp";
+	}
+
+	// 重定向
+	/**
+	 * http://localhost:8080/BackParameter/test2
+	 * 重定向到: http://localhost:8080/BackParameter.jsp
+	 **/
+	@RequestMapping("/test2")
+	public String providerInfo22(HttpSession session) {
+		String msg = "我是---session---redirect:/BackParameter.jsp";
+		session.setAttribute("msg", msg);
+		//return new ModelAndView("redirect:/hello");
+		return "redirect:/BackParameter.jsp";
+	}
+
+	// @RequestBody
+	/**
+	 * http://localhost:8080/BackParameter/test3
+	 */
+	@RequestMapping("/test3")
+	@ResponseBody
+	public People testParam3() {
+		People people = new People();
+		people.setCount(100);
+		people.setPeoplename("张刚");
+		return people;
+	}
+}
+```
+
+<img src="SpringMVC教程.assets/ca38179a2bc1c40f3e56e5cb9e4d645.png" alt="ca38179a2bc1c40f3e56e5cb9e4d645" style="zoom: 73%;" />
 
 
+
+<img src="SpringMVC教程.assets/df9b632d2c043e3b68eacdbc24cf121.png" alt="df9b632d2c043e3b68eacdbc24cf121" style="zoom:67%;" />
+
+<img src="SpringMVC教程.assets/image-20231018204908690.png" alt="image-20231018204908690" style="zoom:80%;" />
+
+# 六、静态资源
+
+## 6.1 静态资源问题
 
 静态资源：html，js文件，css文件，图片文件
 
-
-
 静态文件没有url-pattern,所以默认是访问不到的，之所以可以访问，是因为，tomcat中有一个全局的servlet：org.apache.catalina.servlets.DefaultServlet，它的url-pattern是 "/",是全局默认的Servlet.  所以每个项目中不能匹配的静态资源的请求，有这个Servlet来处理即可。
-
-
 
 但，在SpringMVC中DispatcherServlet也采用了 “/” 作为url-pattern, 则项目中不会再使用全局的Serlvet，则静态资源不能完成访问。
 
-
-
-#### 6.2 解决方案1
-
-
+## 6.2 解决方案1
 
 DispathcerServlet采用其他的url-pattern
 
- 
-
-此时，所有访问handler的路径都要以 action结尾！！
-
-
+ 此时，所有访问handler的路径都要以 action结尾！！
 
 ```xml
 <servlet>
@@ -724,15 +1141,9 @@ DispathcerServlet采用其他的url-pattern
 </servlet-mapping>
 ```
 
-
-
-#### 6.3 解决方案2
-
-
+## 6.3 解决方案2
 
 DispathcerServlet的url-pattern依然采用 "/",但追加配置
-
-
 
 ```xml
 <!-- 
@@ -743,35 +1154,21 @@ DispathcerServlet的url-pattern依然采用 "/",但追加配置
 <mvc:default-servlet-handler/>
 ```
 
-
-
-#### 6.4 解决方案3
-
-
-
- 
+## 6.4 解决方案3
 
 - mapping是访问路径，location是静态资源存放的路径
 - 将/html/ **中 /**匹配到的内容，拼接到 /hhh/后
   http://..../html/a.html  访问 /hhh/a.html
 
- 
-
-
-
 ```xml
 <mvc:resources mapping="/html/**" location="/hhh/"/>
 ```
 
-
-
-### 七、Json处理（了解）
+# 七、Json处理（了解）
 
 ------
 
 #### 7.1 导入依赖
-
-
 
 ```xml
 <!-- Jackson springMVC默认的Json解决方案选择是 Jackson，所以只需要导入jackson的jar，即可使用。-->
@@ -782,11 +1179,7 @@ DispathcerServlet的url-pattern依然采用 "/",但追加配置
 </dependency>
 ```
 
-
-
-#### 7.2 使用[@ResponseBody ]() 
-
-
+#### 7.2 使用[@ResponseBody ]()
 
 ```java
 @Controller
@@ -815,15 +1208,9 @@ public class JsonController{
 }
 ```
 
-
-
 #### 7.3 使用[@RestController ]() 
 
-
-
 Controller类上加了@RestController注解，等价于在类中的每个方法上都加了[@ResponseBody ]() 
-
-
 
 ```java
 @Controller
@@ -845,23 +1232,11 @@ public class JsonController{
 }
 ```
 
-
-
-#### 7.4 使用[@RequestBody ]() 
-
-
-
- 
+#### 7.4 使用[@RequestBody ]()
 
 #### [**@RequestBody** ]() , 接收Json参数
 
- 
-
-
-
 ##### 7.4.1 定义Handler
-
-
 
 ```java
 class User{
@@ -1198,21 +1573,13 @@ new User(1，null，null，new Date()，100.5);
 
 
 
-### 八、异常解析器
+# 八、异常解析器:crossed_swords:
 
-------
-
-#### 8.1 现有方案，分散处理
-
-
+## 8.1 现有方案，分散处理
 
 Controller中的每个Handler自己处理异常
 
- 
-
-此种处理方案，异常处理逻辑，分散在各个handler中，不利于集中管理
-
-
+ 此种处理方案，异常处理逻辑，分散在各个handler中，不利于集中管理
 
 ```java
 public String xxx(){
@@ -1228,25 +1595,12 @@ public String xxx(){
 }
 ```
 
+## 8.2 异常解析器，统一处理（推荐）
 
-
-#### 8.2 异常解析器，统一处理（重点）
-
-
-
-Controller中的每个Handler不再自己处理异常，而是直接throws所有异常。
-
- 
-
-定义一个“异常解析器” 集中捕获处理 所有异常
-
- 
-
-此种方案，在集中管理异常方面，更有优势！
-
-
+ 定义一个“异常解析器” 集中捕获处理 所有异常, 当使用throws抛出自定义异常时,自动跳转到异常解析器中
 
 ```java
+//继承HandlerExceptionResolver回车
 public class MyExResolver implements HandlerExceptionResolver{
 	/**
 	 * 异常解析器：主体逻辑
@@ -1271,34 +1625,169 @@ public class MyExResolver implements HandlerExceptionResolver{
 }
 ```
 
-
-
 ```xml
 <!-- 声明异常解析器 -->	
 <bean class="com.baizhi.exception.resolver.MyExResolver"></bean>
 ```
 
+### 实例
 
+```xml
+<!-- 声明异常解析器 -->
+<bean class="cn.lfj.exception.resolver.MyExResolver"></bean>
+```
 
-### 九、拦截器（非重点）
+**exception.resolver**
+
+```java
+package cn.lfj.exception.resolver;
+
+import cn.lfj.exception.PermissionException;
+import javafx.fxml.LoadException;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-18 21:22
+ * <p>
+ * 将在 handler中抛出异常时执行
+ * 将捕获任何一个handler的中任何一个异常
+ * * 异常解析器：主体逻辑
+ * * 执行时刻：当handler中抛出异常时，会执行：捕获异常，并可以跳到错误页面
+ * @param: httpServletRequest
+ * @param: httpServletResponse
+ * @param: o
+ * @param: e
+ * @return 返回一个ModelAndview，作用在于跳转错误视图
+ */
+public class MyExResolver implements HandlerExceptionResolver {
+	@Override
+	public ModelAndView resolveException(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) {
+		e.printStackTrace();//打印异常栈, 上线时删除
+		//创建一个ModelAndView
+		ModelAndView mv = new ModelAndView();
+		//识别异常
+		if (e instanceof LoadException) {
+			mv.setViewName("redirect:/user/login");   //跳转handler，handler转发login.jsp
+		} else if (e instanceof PermissionException) {
+			mv.setViewName("redirect:/user/perm");   //跳转handler,handler 转发 权限不错误页面
+		} else {
+			mv.setViewName("redirect:/user/global");
+		}
+		return mv;
+	}
+}
+```
+
+**exception**
+
+```java
+package cn.lfj.exception;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-18 21:29
+ */
+public class LoginException extends RuntimeException{
+	public LoginException() {
+	}
+
+	public LoginException(String message) {
+		super(message);
+	}
+}
+
+```
+
+```java
+package cn.lfj.exception;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-18 21:30
+ */
+public class PermissionException extends RuntimeException{
+
+	public PermissionException() {
+	}
+
+	public PermissionException(String message) {
+		super(message);
+	}
+}
+```
+
+**controller**
+
+```java
+package cn.lfj.controller;
+
+import cn.lfj.exception.LoginException;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-18 21:41
+ */
+
+@Controller
+@RequestMapping("/user")
+public class UserController {
+
+	// 抛出异常
+	/*
+	 * http://localhost:8080//user/test1
+	 * 抛出异常: 跳转到http://localhost:8080/user/global
+	 */
+	@RequestMapping("/test1")
+	public String test1() {
+		if (1 == 1)
+			throw new LoginException("test01~~");
+		return "index";
+	}
+
+	//
+	@RequestMapping("/login")
+	public String login_page() {
+		System.out.println("登录页面");
+		return "login";
+	}
+
+	//http://localhost:8080//user/perm
+	@RequestMapping("/perm")
+	public String perm_error() {
+		System.out.println("权限不足页面");
+		return "perm_error";
+	}
+
+	@RequestMapping("/global")
+	public String global_error() {
+		System.out.println("全局错误页面");
+		return "global_error";
+	}
+}
+```
+
+**jsp页面**
+
+创建 login.jsp,  perm_error.jsp, global_error.jsp页面
+
+# 九、拦截器(非重点)
 
 ------
 
-#### 9.1 作用
-
-
+## 9.1 作用
 
 作用：抽取handler中的冗余功能
 
-
-
-#### 9.2 定义拦截器
-
-
+## 9.2 定义拦截器
 
 执行顺序： preHandle--postHandle--afterCompletion
-
-
 
 ```java
 public class MyInter1 implements HandlerInterceptor{
@@ -1330,11 +1819,7 @@ public class MyInter1 implements HandlerInterceptor{
 }
 ```
 
-
-
-#### 9.3 配置拦截路径
-
-
+## 9.3 配置拦截路径
 
 ```xml
 <mvc:interceptors>
@@ -1351,13 +1836,11 @@ public class MyInter1 implements HandlerInterceptor{
 
 
 
-### 十、上传
+# 十、上传
 
 ------
 
-#### 10.1 导入jar
-
-
+## 10.1 导入jar
 
 ```xml
 <dependency>
@@ -1443,7 +1926,7 @@ public String hello1(String username,MultipartFile source,HttpSession session) {
 
 
 
-### 十一、下载
+# 十一、下载
 
 ------
 
@@ -1485,7 +1968,7 @@ public void hello1(String name,HttpSession session,HttpServletResponse response)
 
 
 
-### 十二、验证码
+# 十二、验证码
 
 ------
 
@@ -1569,26 +2052,18 @@ public void hello1(String name,HttpSession session,HttpServletResponse response)
 
 
 
-### 十三、REST（重要点）
+# 十三、REST（重要点）
 
 ------
 
 #### 13.1 开发风格
 
-
-
 是一种开发风格，遵从此风格开发软件，符合REST风格，则RESTFUL。
 
-
-
-两个核心要求：
-
- 
+两个核心要求： 
 
 - 每个资源都有唯一的标识(URL)
 - 不同的行为，使用对应的http-method
-
- 
 
 | 访问标识                                 | 资源              |
 | ---------------------------------------- | ----------------- |
@@ -1726,7 +2201,7 @@ public class RestController {
 </script>
 ```
 
-### 十四、跨域请求
+# 十四、跨域请求
 
 ------
 
@@ -1777,7 +2252,7 @@ xhr.withCredentials=true;
 
 
 
-### 十五、SpringMVC执行流程
+# 十五、SpringMVC执行流程
 
 ------
 
@@ -1785,7 +2260,7 @@ xhr.withCredentials=true;
 | ------------------------------------------------------------ |
 | ![img](SpringMVC教程.assets/1645083253422-b35f1031-2be0-494b-8c3e-a1689f5f549e.png) |
 
-### 十六、Spring整合
+# 十六、Spring整合
 
 ------
 
@@ -1802,7 +2277,7 @@ xhr.withCredentials=true;
 
 两个工厂不能有彼此侵入，即，生产的组件不能有重合。
 
-```
+```xml
 <!-- 告知SpringMVC  哪些包中 存在 被注解的类
 	use-default-filters=true 凡是被 @Controller @Service  @Repository注解的类，都会被扫描
 	use-default-filters=false 默认不扫描包内的任何类, 只扫描include-filter中指定的类
@@ -1813,19 +2288,13 @@ xhr.withCredentials=true;
 </context:component-scan>
 ```
 
-```
+```xml
 <!-- 告知Spring
      唯独不扫描@Controller注解的类 -->
 <context:component-scan base-package="com.zhj" use-default-filters="true">
 	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 </context:component-scan>
 ```
-
-
-
-
-
-
 
 ## 2.3、基于注解配置SpringMVC
 

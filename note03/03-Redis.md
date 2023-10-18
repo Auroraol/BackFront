@@ -5262,7 +5262,7 @@ Value:
 
 补充:  在将一个对象序列化成一个字符串，怎么保证字符串反序列化成对象的类型:   Jackson通过 Default Typing，会在字符串多冗余一个类型，这样反序列化就知道具体的类型了。**使用GenericJackson2JsonRedisSerializer序列化方式，String类型、对象、对象数组、JSONObject、JSONArray序列化和反序列化都没有问题，value值序列化后多了@class属性，反序列化的对象的类型就可以从这里获取到。@class属性完美解决了反序列化后的对象类型，所以实际项目中，目前很多采用 GenericJackson2JsonRedisSerializer序列化方式。**
 
-##### jackson2JsonRedisSerializer
+#### jackson2JsonRedisSerializer
 
 org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 

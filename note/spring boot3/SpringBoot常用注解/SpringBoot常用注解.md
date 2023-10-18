@@ -27,7 +27,6 @@ public class SpringSecurityJwtGuideApplication {
 | --------------- | ------------------------------------------------------------ |
 | @Controller     | 1.Controller +RequestMapping+GetMapping、<br/>2.引人freemarker<<br/>#   配置thymeleaf场景<br/>#   spring.thymeleaf<br/>spring.thymeleaf.prefix=classpath:templates/  <br/>spring.thymeleaf.suffix=.html<br/>#开发期间关闭，上线以后开启<br/>spring.thymeleaf.cache=falsebr/><br/>4、在application.properties中配置freemarker相关的信息<br/>5、返回的是页面<br/>6.  ==接收前端数据== |
 | @RestController | 1. 返回的是输出结果,返回对象，如json ，是==提供前端获取数据==、提交数据<br/>2. 结合 @RequestMapping、@GetMapping、@PostMapping...... |
-| @ResponseBody   | 一般在@Controller中使用: @ResponseBody+@Controller = @RestController,   后端发送java对象 ==记忆: 返回对象== |
 
 @Controller            返回: 视图页面 
 
@@ -345,12 +344,12 @@ public class AppConfig {
 
 ## 3、处理常见的 HTTP 请求类型
 
-| 注解            | 说明         |
-| --------------- | ------------ |
-| @RequestMapping | url统一前缀  |
-| @GetMapping     | 前端显示数据 |
-| @PutMapping     | 后端接受数据 |
-| @DeleteMapping  | 删除数据     |
+| 注解            | 说明                        |
+| --------------- | --------------------------- |
+| @RequestMapping | url统一前缀或者表示get,post |
+| @GetMapping     | 前端显示数据                |
+| @PutMapping     | 后端接受数据                |
+| @DeleteMapping  | 删除数据                    |
 
 5 种常见的请求类型:
 
@@ -417,7 +416,9 @@ public ResponseEntity deleteUser(@PathVariable(value = "userId") Long userId){
     }
 ```
 
-## 4、前端传值
+## 4、传值
+
+### 前端传值
 
 | 注解          | 说明                                                         |
 | ------------- | ------------------------------------------------------------ |
@@ -425,7 +426,7 @@ public ResponseEntity deleteUser(@PathVariable(value = "userId") Long userId){
 | @PathVariable | 动态参数 (PathVariable 不带?)                                |
 | @RequestBody  | 传递对象,  比如: 前端发送json封装的对象给后端，后端使用java对象来接收(传递对象)反之也可以用它 |
 
-### 4.1 @PathVariable("xxx")
+#### 4.1 @PathVariable("xxx")
 
 PathVariable 不带?  
 
@@ -454,7 +455,7 @@ public List<Teacher> getKlassRelatedTeachers(
 
 那么后端服务获取到的数据就是：klassId=123456,  type=web
 
-### 4.2 @RequestParam("xxx")
+#### 4.2 @RequestParam("xxx")
 
 RequestParam  带?  可以设置默认值, 不传值
 
@@ -468,7 +469,7 @@ public String hello(@RequestParam(value = "age",   defaultValue = "0") int age, 
 }
 ```
 
-#### 前端接口
+##### 前端接口
 
 ```js
 getUserList (searchModel){}
@@ -504,7 +505,7 @@ getUserList () {
 
 <img src="SpringBoot常用注解.assets/image-20230925143036839.png" alt="image-20230925143036839" style="zoom:67%;" />
 
-#### 后端接口
+##### 后端接口
 
 ```java
 @GetMapping("/user/list")
@@ -554,7 +555,7 @@ public Result<?> getUserListPage(@RequestParam(value = "username", required = fa
 
 ![image-20230925142927286](SpringBoot常用注解.assets/image-20230925142927286.png)
 
-### 4.3 @RequestBody
+#### 4.3 @RequestBody
 
 用于读取 Request 请求（可能是 POST,PUT,DELETE,GET 请求）的 body 部分并且Content-Type 为 application/json 格式的数据，接收到数据之后会自动将数据绑定到 Java 对象上去。系统会使用HttpMessageConverter或者自定义的HttpMessageConverter将请求的 body 中的 json 字符串转换为 java 对象。
 
@@ -572,7 +573,7 @@ public Result<?> getUserListPage(@RequestParam(value = "username", required = fa
 	}
 ```
 
-#### 前端接口
+##### 前端接口
 
 ```js
 export function login(data) {
@@ -584,7 +585,7 @@ export function login(data) {
 }
 ```
 
-#### 后端接口
+##### 后端接口
 
 controller
 
@@ -628,6 +629,14 @@ public Map<String, Object> login(XUser user) {
 测试效果
 
 ![image-20230923094816855](SpringBoot常用注解.assets/image-20230923094816855.png)
+
+### 后端传值
+
+| 方法          | 说明                                                         |
+| ------------- | ------------------------------------------------------------ |
+| 转发          | url地址栏不会产生变化                                        |
+| 重定向        | url地址栏会发生变化                                          |
+| @ResponseBody | 一般在@Controller中使用: @ResponseBody+@Controller = @RestController,   后端发送java对象 ==记忆: 返回对象== |
 
 ## 5、读取配置信息
 

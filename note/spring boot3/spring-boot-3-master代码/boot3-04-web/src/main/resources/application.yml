@@ -1,0 +1,8 @@
+server:
+  port: 8090
+
+spring:
+  auto:
+  openurl: true # 是否自动打开浏览器，false为否
+  web:
+  loginurl: http://localhost:8090 # 指定加载的页面地址

@@ -145,7 +145,7 @@ public class UserServiceImpl implements UserService {
 
 此时，如果需要更换其他UserDAO实现类，则UserServiceImpl不用任何改动！ 则此时的UserServiceImpl组件变得更加稳健！
 
-# 六、DI（依赖注入）
+# 六、DI（依赖注入）:crossed_swords:
 
 依赖注入（Dependency Injection）是一种设计模式，也是Spring框架的核心概念之一。其作用是去除组件之间的依赖关系，实现解耦合。 也就是说：所谓依赖注入，是指工程中需要的组件无须自己创建，而是依赖于外部环境注入。
 
@@ -407,8 +407,7 @@ applicationContext.xml
 赋值
 
 ```java
-
-	private addr address;
+    private addr address;
 
 	public addr getaddr() {
 		return address;
