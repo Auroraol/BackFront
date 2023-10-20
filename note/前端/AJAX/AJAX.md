@@ -208,7 +208,7 @@ xhr.open('GET', 'http://127.0.0.1:8000/server-ie?t' + Date.now());
 
 
 
-# AJAX使用
+# 原生方式 发送AJAX请求
 
 ## 准备
 
@@ -581,7 +581,7 @@ btns[0].addEventListener('click', () => {
 
 可以看出，如果频繁的点击按钮，发起同一个请求，则每次发起一个新的请求之前，都会取消上一个请求的发送
 
-# jQuery方式 发送 AJAX 请求
+# jQuery方式 发送ajax请求
 
 + jQuery 脚本  
 
@@ -755,13 +755,131 @@ $.ajax({
 
 ```
 
+##  ajax例子
 
+### 1.ajax请求豆瓣top250(douban.chengbenchao.top)
 
-# axios方式 发送 AJAX 请求
+```js
+<script src="lib/jquery-3.4.1.js"></script>
+</head>
+<body>
+    <script>
+        var url="https://douban.uieee.com/v2/movie/top250";
+        $.ajax({
+            url,
+            type:"get",
+            dataType:"jsonp",
+            success:res=>{
+                var subjects=res.subjects;
+                var movies=[];
+                for (var i=0;i<subjects.length;i++){
+                    var obj={}
+                    obj.title=subjects[i].title;
+                    obj.imageUrl=subjects[i].images.small;
+                    movies.push(obj)
+                }
+                
+                for(var j=0;j<movies.length;j++){
+                    var item=$(`<div><img src="${movies[j].imageUrl}"/><p>${movies[j].title}</p></div>`)
+                    $("body").append(item)//创建div元素
+                    // var $img=$("<img />")
+                    // var $p=$("p")
+                    // $img.attr("src",movies[j].imageUrl)
+                    // console.log($img)
+                    // $div.append($img)
+                    
+                }
+            },
+            error:err=>{
+                console.log(err.statue)
+                if(err.status==404){
+                    window.location.href="404.html"
+                }
+            }
+
+        })
+    </script>
+</body>
+```
+
+### 2.网易云音乐(music.wuhan-zhixing.top)
+
+```js
+<script src="lib/jquery-3.4.1.js"></script>
+    <style>
+        input{
+            width: 250px;
+            height: 35px;
+            border: 1px solid #333;
+            outline: none;
+            border-radius: 20px;
+            padding-left: 20px;
+        }
+        img{
+            width: 250px;
+        }
+    </style>
+</head>
+<body>
+    <input type="text" id="input" placeholder="请搜索">
+    <div>
+        <img src="" alt=""><br>
+        <audio src="" controls="controls" autoplay></audio>
+    </div>
+    <script>
+        var url="https://music.aityp.com/";
+        var input =document.getElementById("input");
+         input.onkeydown =function(event){
+            if(event.keyCode==13){
+                console.log(this.value)
+                /* 1.获取id */
+                $.ajax({
+                    url:`${url}search?keywords=${this.value}`,
+                    type:"get",
+                    dataType:"json",
+                    success:res=>{
+                        var id=res.result.songs[0].id;
+                        // console.log(id)
+                        /* 2.获取imgUrl */
+                        $.ajax({
+                            url:`${url}song/detail?ids=${id}`,
+                            type:"get",
+                            dataType:"json",
+                            success:res=>{
+                                var imgUrl=res.songs[0].al.picUrl;
+                                $("img").attr("src",imgUrl)
+                            }
+                        })
+                        /* 3.获取音乐Url */
+                        $.ajax({
+                            url:`${url}song/url?id=${id}`,
+                            type:"get",
+                            dataType:"json",
+                            success:res=>{
+                                //console.log(res.data[0].url)
+                                var audioUrl=res.data[0].url;
+                                $("audio").attr("src",audioUrl)
+                            }
+                        })
+                    }
+
+                })
+            }
+         }   
+    </script>
+</body>
+```
+
+# axios方式 发送 ajax 请求
 
 axios 官网：https://www.npmjs.com/package/axios
 
 下载: [axios.js](axios.js)
+
+```js
+<!-- 引入axios.js -->
+<script src="./axios.js"></script>
+```
 
 ## GET 请求
 
@@ -826,7 +944,7 @@ axios.post('server-axios', {
 
 ![img](AJAX.assets/5aXW9bOwYQ1FRkK.png)
 
-## 通用方法(推荐)
+## 通用方法
 
 - `axios(url[, config])`
 
@@ -859,7 +977,46 @@ axios({
 });
 ```
 
-#### 语法练习：带条件的GET请求
+## 通用模版(推荐):crossed_swords:
+
+```js
+axios发送get请求：
+axios.get('url地址', { params: {请求的参数对象}}).then(function(res){
+        //.then()表示成功的回调
+        console.log(res.data)   //res.data 是服务器返回的数据,会自动转为js对象格式
+    })
+-------------------------------------------------------------------------------------------
+axios发送post请求：
+axios.post('url地址', {要提交到服务器的数据}).then(function(res){
+        console.log(res.data)   //res.data 是服务器返回的数据
+    })
+-------------------------------------------------------------------------------------------
+直接使用axios发起请求:
+axios({
+     method: '请求类型',
+     url: '请求的URL地址',
+     data: { POST数据  },    //POST 数据要通过data属性提供
+     params: { GET参数 }     //GET参数要通过params属性提供
+}).then(function(res){
+    // 响应数据
+    console.log(res.data)
+}).catch(function (error) {
+    console.log(error);
+});
+```
+
+## 用 params & data
+
+- 接口文档写的是”**查询参数**”或者”**Query参数**”或者”**请求参数**”，则使用 **params**
+- 接口文档写的是”**请求体**”或者 ”**body参数**”，则使用 **data**
+
+ **前端参 {params: params} ,  后端@RequestParams("xxx") 接参**
+
+ **前端 {data : param} 传参，后端@RequestBody 接参**
+
+## 案例
+
+### 语法练习：带条件的GET请求
 
 带条件的查询，另一个说法是 带查询参数
 
@@ -880,12 +1037,11 @@ axios({
 })
 ```
 
-#### 语法练习：POST请求
+### 语法练习：POST请求
 
 提交的bookname、author、publisher 单词不能写错，值要求是2~10个字符
 
 ```html
-<button>添加一本书</button>
 <script src="./axios.js"></script>
 <script>
   // 发送POST请求，目的是提交数据给服务器，让服务器那边添加这条数据// 点击按钮的时候，在发送请求
@@ -906,17 +1062,6 @@ axios({
   })
 </script>
 ```
-
-### 用 params & data
-
-- 接口文档写的是”**查询参数**”或者”**Query参数**”或者”**请求参数**”，则使用 **params**
-- 接口文档写的是”**请求体**”或者 ”**body参数**”，则使用 **data**
-
- **前端参 {params: params} ,  后端@RequestParams("xxx") 接参**
-
- **前端 {data : param} 传参，后端@RequestBody 接参**
-
-## 案例
 
 ### 接口及接口文档
 
@@ -1055,7 +1200,7 @@ document.querySelector('tbody').addEventListener('click', function (e) {
 
 ### 案例-修改图书
 
-## 点击编辑显示模态框
+#### 点击编辑显示模态框
 
 在删除的基础之上，再加一个判断即可。
 
@@ -1080,9 +1225,7 @@ document.querySelector('tbody').addEventListener('click', function (e) {
 }
 ```
 
-
-
-## 数据回填
+#### 数据回填
 
 所有的修改，都需要数据回填。
 
@@ -1090,7 +1233,7 @@ document.querySelector('tbody').addEventListener('click', function (e) {
 
 具体做法：循环遍历的时候，用 编辑 按钮的 data-xxx 属性，将数据存储起来：
 
-```diff
+```html
 <button 
   data-id="${item.id}" 
   data-bookname="${item.bookname}" 
@@ -1120,7 +1263,7 @@ if (e.target.classList.contains('btn-update')) {
 }
 ```
 
-## 点击确认完成修改
+#### 点击确认完成修改
 
 ```js
 // --------------------------- 点击 编辑模态框中的 确认，完成修改 -----------------------
@@ -1145,9 +1288,237 @@ document.querySelector('#editBtn').addEventListener('click', function () {
 })
 ```
 
+### form-value插件
+
+#### 说明和基本语法
+
+在获取表单数据的时候，如果一个一个的获取，无疑是很麻烦的。比如目前的添加图书：
+
+```javascript
+let bookname = document.querySelector('#addForm [name=bookname]').value
+let author = document.querySelector('#addForm [name=author]').value
+let publisher = document.querySelector('#addForm [name=publisher]').value
+......
+......
+......
+```
+
+那么如何快速的获取表单各项的值呢？
+
+答案就是使用插件。
+
+课程设计的时候，使用的是 form-serialize 插件；不过我推荐使用 [form-value](https://www.npmjs.com/package/form-value) 插件
+
+form-value 就是一个快速获取表单数据的插件。
+
+该插件功能之一是快速获取表单各项的值，也可以快速进行数据回填。
+
+**获取表单各项值**的语法如下：
+
+```html
+<form action="">
+  用户名：<input type="text" name="username"><br />
+  手机号：<input type="text" name="phone" /><br />
+  性　别：<input type="radio" name="sex" value="nan">男
+  <input type="radio" name="sex" value="nv">女<br />
+  籍　贯：
+  <select name="address">
+    <option value="bj">北京</option>
+    <option value="sh">上海</option>
+    <option value="gz">广州</option>
+  </select><br />
+  <input type="hidden" name="id" value="100">
+  <button id="tijiao">提交</button>
+</form>
+
+<script src="./form-value.js"></script>
+<script>
+  document.querySelector('#tijiao').addEventListener('click', function (e) {
+    e.preventDefault()
+    // 使用插件提供的 val() 获取表单各项的值
+    // let data = val(表单)
+    let data = val(document.querySelector('form'))
+    console.log(data)
+  })
+</script>
+```
+
+**数据回填的语法**如下：
+
+1. 要求表单各项的 name 属性值必须具备
+2. 准备对象格式的数据，要求对象的键 和 表单各项的 name 一致
+3. 使用 `val(表单, 数据)` 的语法，进行数据回填
+
+示例代码如下：
+
+```html
+<body>
+  <form action="">
+    书名：<input type="text" name="bookname"><br>
+    作者：<input type="text" name="author"><br />
+    出版社：<input type="text" name="publisher"><br />
+    性别：<input type="radio" name="sex" value="nan">男
+    <input type="radio" name="sex" value="nv">女<br>
+    下拉框：<select name="address">
+      <option value="beijing">北京</option>
+      <option value="shanghai">上海</option>
+      <option value="guangzhou">广州</option>
+    </select>
+  </form>
+
+  <script src="./form-value.js"></script>
+  <script>
+    // 准备回填的数据
+    let shuju = {
+      // 要求对象的键和表单项的name一致
+      bookname: 'aa',
+      author: 'bb',
+      publisher: 'cc',
+      sex: 'nv',
+      address: 'guangzhou'
+    }
+    // 数据回填
+    // val(表单, 数据)
+    val(document.querySelector('form'), shuju)
+  </script>
+</body>
+```
+
+### 图书管理案例使用form-value插件
+
+- 添加图书时，使用 form-value 插件获取表单数据
+
+```diff
+ // 获取三个输入框的值
+-// let bookname = document.querySelector('#addForm [name=bookname]').value
+-// let author = document.querySelector('#addForm [name=author]').value
+-// let publisher = document.querySelector('#addForm [name=publisher]').value
+
++let data = val(document.querySelector('#addForm'))
++// console.log(data) // {bookname: 'aa', author: 'bb', publisher: 'cc'}
++data.appkey = 'laotang0099' // 给data对象，加appkey
+
+下面提交数据，直接用data
+```
+
+- 修改图书时，数据回填的时候，使用插件快速回填数据
+
+```diff
+ let shuju = e.target.dataset
+ // console.log(shuju) // {id: '2896', bookname: '遮天三部曲', author: '振东', publisher: '红毛怪'}
+ // 数据回填（找到编辑弹框中的 input，然后设置value值）
++// val(表单, 数据)
++val(document.querySelector('#editForm'), shuju)
+
+-// document.querySelector('#editModal [name=bookname]').value = shuju.bookname
+-// document.querySelector('#editModal [name=author]').value = shuju.author
+-// document.querySelector('#editModal [name=publisher]').value = shuju.publisher
+-// document.querySelector('#editModal [name=id]').value = shuju.id
+```
+
+- 修改图书时，使用form-value插件快速获取表单各项的值
+
+### 图书管理案例中使用简化方法
+
+不是说学了简化方法，前面的 axios().then() 就不用了。
+
+- 获取数据时，使用 axios.get() 试试
+- 添加图书时，使用 axios.post() 试试
+- 删除图书时，使用 axios.delete() 试试
+- 修改图书时，使用 axios.put() 试试
+
+### 图书管理案例中配置请求根路径
+
+- 在所有请求之前，配置请求根路径
+- 后续的所有请求，都不需要再写请求根路径了
+
+### 图书管理案例中使用拦截器
+
+**进度条插件**：
+
+```html
+加载好 nprogress.css 
+加载好 nprogress.js
+
+如果需要让进度条显示，则调用 NProgress.start()  // N P 都是大写的
+如果需要让进度条隐藏，则调用 NProgress.done()   // N P 都是大写的
+```
+
+**图书管理案例中使用**：
+
+- 加入请求拦截器和响应拦截器
+- 在请求拦截器的第1个函数中，return config 之前，加入 NProgress.start()
+- 在响应拦截器的两个函数中，都加入 NProgress.done() （在return那行之前加）
+
+拦截器是针对所有请求的，所以加好拦截器，无论是获取数据，添加数据，还是删除数据都会使得拦截器的代码执行，也就是都有进度条的效果了。
+
+## axios请求方法的别名:crossed_swords:
+
+实际上就是一些发送请求的简化写法，就是发送请求的另外的一些语法。
+
+- 实际使用，用前两天学的 `axios({ method: '', url: '' }).then()` 可以
+- 实际使用，用现在即将学的简化方法，也行
+
+![img](AJAX.assets/1651042834229-65486717-b992-4d75-bc12-eba6d492009e.png)
+
+![img](AJAX.assets/1668138288028-3624f1e0-16cc-45b8-9e1b-e623c073033c.jpeg)
+
+```javascript
+// 以前发送GET请求，使用的是万能语法
+// -------------------- 万能的写法 --------------------------------
+axios({
+  method: 'GET',
+  url: 'http://www.itcbc.com:3006/api/getbooks',
+  params: {
+    appkey: 'laotang0099'
+  }
+}).then(({ data: res }) => {
+  console.log(res)
+})
+
+// -------------------- GET和DELETE的简化写法 --------------------------------
+// axios.get('url', 配置对象) // 配置对象可选，配置对象就是以前传递给 axios() 的那个对象
+axios.get('http://www.itcbc.com:3006/api/getbooks', {
+  params: {
+    appkey: 'laotang0099'
+  }
+}).then(({ data: res }) => {
+  console.log(res)
+})
 
 
-##  fetch 函数 发送 AJAX 请求
+// ============================================================================
+// ---------------------- POST请求、PUT请求、PATCH请求 ---------------------------
+// axios.post('url', data, 配置对象).then()
+axios.post('http://www.itcbc.com:3006/api/addbook', { bookname: 'aad', author: 'dd', publisher: 'dd' }).then(result => {
+  console.log(result.data)
+})
+```
+
+## axios全局配置
+
+**官方参考**：https://www.axios-http.cn/docs/config_defaults
+
+**全局配置了请求根路径，后面所有的请求，都不需要加请求根路径了**
+
+```javascript
+// 全局配置请求根路径
+axios.defaults.baseURL = 'http://www.itcbc.com:3006';
+
+//////////////////////////////////////
+/////////////  全局配置了请求根路径，后面所有的请求，都不需要加请求根路径了  //////////////
+//////////////////////////////////////
+```
+
+## axios拦截器
+
+axios中的拦截器，分为请求拦截器和响应拦截器
+
+拦截器语法：https://www.axios-http.cn/docs/interceptors
+
+![img](AJAX.assets/1660373044723-560a734f-c9bf-459d-8539-500b2b4bc621.png)
+
+#  fetch 函数 发送 AJAX 请求
 
 ```javascript
 fetch('http://127.0.0.1:8000/server-fetch?a=100&b=100', {
@@ -1448,7 +1819,7 @@ response.end(`${cb}(${str})`);
 
 我们可以看到响应体内容已经自动获取了`callback`参数和服务端返回结果
 
-## CORS
+## CORS(前端处理)
 
 官网地址：https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS
 
@@ -1528,9 +1899,1046 @@ response.setHeader("Access-Control-Allow-Headers", "*");
 response.setHeader("Access-Control-A1low-Method", "*");
 ```
 
+# FormData（重点）
+
+## 基本使用
+
+FormData 是一个浏览器内置对象。作用是用于获取表单数据。
+
+- 表单各项必须有 name 属性
+- let fd = new FormData(表单)  // 可以把表单中的数据收集到了
+- ajax提交的时候，直接提交 fd 即可
+
+```html
+<body>
+  <form action="">
+    用户名：<input type="text" name="username"><br />
+    密　码：<input type="password" name="pwd"><br />
+    性　别：<input type="radio" value="男" name="sex">男 <input type="radio" value="女" name="sex">女<br />
+    <button>提交</button>
+  </form>
+
+  <script src="./lib/axios.js"></script>
+  <script>
+    axios.defaults.baseURL = 'http://www.itcbc.com:3006'
+    // 点击按钮，会造成表单提交，阻止默认行为，使用 FormData 收集表单数据,Ajax提交数据
+    document.querySelector('button').addEventListener('click', function (e) {
+      e.preventDefault() // 阻止默认行为
+      // let fd = new FormData(表单)
+      let fd = new FormData(document.querySelector('form'))
+      // ajax提交数据，也就是提交 fd 
+      axios.post('/api/formdata', fd).then(result => {
+        console.log(result.data)
+      })
+    })
+  </script>
+</body>
+```
+
+## FormData相关的API
+
+- `fd.append('键', 值)`  --- 向原有数据中，新增一个值
+- `fd.delete('键')` --- 从原有数据中，移除一个值
+- `fd.set('键', 值)` --- 修改原有数据中的一个值
+- `fd.forEach((value, key) => {})` --- 遍历查看对象中有哪些数据
+
+```javascript
+axios.defaults.baseURL = 'http://www.itcbc.com:3006'
+
+document.querySelector('form').addEventListener('submit', function (e) {
+  e.preventDefault() // () 必须加
+  // 使用内置的FormData收集表单各项数据
+  // let fd = new FormData(表单)
+  let fd = new FormData(this)
+  // console.log(fd) // 直接输出fd，是看不见数据的
+
+  // 1. 通过append来向 fd 对象中，追加一些数据
+  fd.append('age', 20)
+
+  // 2. 通过delete来删除 fd 对象中的数据
+  fd.delete('pwd')
+
+  // 3. 通过set来修改 fd 对象中的数据
+  fd.set('sex', '妖')
+
+  // 4. forEach遍历数据，通过它查看 fd 对象中有哪些数据
+  fd.forEach((value, key) => {
+    console.log(key, value)
+  })
+  // 下面，就可以把fd提交到服务器
+  // axios({
+  //   method: 'POST',
+  //   url: '/api/formdata',
+  //   data: fd,
+  // })
+  axios.post('/api/formdata', fd).then(({ data: res }) => {
+    console.log(res)
+  })
+})
+```
+
+# 上传文件
+
+原理和提交其他文本值一样，只不过上传，提交的是一个文件而已。
+
+**注意，文件选择框，name 必须是 avatar，因为接口要求的**。
+
+## 利用form标签
+
+- new FormData() 的时候，传入 表单。这样就可以获取到表单项的值。
+
+```html
+<body>
+  <form action="">
+    头像：<input type="file" name="avatar">
+    <button>上传</button>
+  </form>
+
+  <script src="./axios.js"></script>
+  <script>
+    document.querySelector('button').addEventListener('click', function (e) {
+      e.preventDefault()
+      // let fd = new FormData(表单)
+      let fd = new FormData(document.querySelector('form'))
+      axios.post('http://www.itcbc.com:3006/api/formdata', fd).then(({ data: res }) => {
+        console.log(res)
+      })
+    })
+  </script>
+</body>
+```
+
+## 单独上传
+
+```html
+<input type="file" multiple style="display:none;">
+<button>选择文件</button>
+<hr>
+<img src="" alt="">
+```
+
+【1】点击按钮，能够选择图片
+
+```javascript
+// 点击按钮，能够选择文件
+document.querySelector('button').addEventListener('click', function () {
+  // 用 代码的方式，触发一下 文件域的单击事件
+  document.querySelector('input').click()
+})
+```
+
+【2】文件域（文件选择框）值改变的时候，上传
+
+- 判断，是否选择了文件
+- 获取文件对象
+- 创建 FormData 对象
+- 把文件对象，加入到 FormData 中
+- Ajax提交 FormData
+
+```javascript
+// 当 文件域 改变的时候，上传
+document.querySelector('input').addEventListener('change', function () {
+  // 判断一下，用户是否选择了文件
+  if (this.files.length > 0) {
+    // console.log(1111)
+    // 1. 找到文件对象【描述文件的对象】
+    // console.dir(this)
+    let fileObj = this.files[0]
+    // 可以加入判断类型（type）、判断大小（size单位字节）
+    // 2. 创建FormData对象，并且把文件对象加入到 FormData中
+    let fd = new FormData()
+    // fd.append('age', 'zlis')
+    fd.append('avatar', fileObj)
+    // 3. ajax提交FormData
+    axios.post('http://www.itcbc.com:3006/api/formdata', fd).then(({ data: res }) => {
+      console.log(res)
+      document.querySelector('img').src = res.data.filename
+    })
+  }
+})
+```
+
+## 上传头像案例
+
+```js
+// 1. 点击按钮，触发文件域的单击事件；这一步保证点击按钮可以选择图片
+document.querySelector('#btnChoose').addEventListener('click', function () {
+  document.querySelector('#iptFile').click()
+})
+
+// 2. 文件域内容改变的时候，实现文件上传
+document.querySelector('#iptFile').addEventListener('change', function () {
+  // console.log(1111)
+  // console.dir(this)
+  if (this.files.length > 0) {
+    // 表示我们选择了图片
+    let fileObj = this.files[0]
+    // console.log(fileObj)
+    // 判断文件大小（不能超过50kb） size: 17873字节  【1024字节 = 1kb     1024kb=1M    1024M=1G】
+    if (fileObj.size > 50 * 1024) {
+      return alert('文件不能超过50kb') // 左右结构的代码，右侧先执行；先执行alert，然后再return
+    }
+    // 只允许上传 png、gif、jpg、jpeg的图片
+    const allowType = ['image/png', 'image/gif', 'image/jpeg']
+    if (!allowType.includes(fileObj.type)) {
+      return alert('只允许上传png、gif、jpg图片')
+    }
+
+    let fd = new FormData()
+    fd.append('avatar', fileObj)
+    axios.post('http://www.itcbc.com:3006/api/formdata', fd).then(({ data: res }) => {
+      // console.log(res)
+      document.querySelector('img').src = res.data.filename
+    })
+  }
+})
+```
+
+# Promise
+
+Promise能够处理异步程序。Array/String/Date.......... 他们的级别是一样的
+
+## 回调地狱
+
+![img](AJAX.assets/1652015629161-b9585a40-a02c-4223-a41c-f4618faa1ea4.png)
+
+JS中，大量的使用了**回调函数**进行异步操作，而异步操作什么时候返回结果是不可控的，如果我们希望几个异步请求按照顺序来执行，那么就需要将这些异步操作嵌套起来，嵌套的层数特别多，就会形成**回调地狱** 或者叫做 **横向金字塔**。
+
+假设有需求：
+
+1. 有三个任意的定时器，定时器时间随机
+2. 要求三个定时器都执行完毕，然后输出一句话
+
+如何实现上述需求呢？
+
+```javascript
+setTimeout(() => {
+  console.log('张三买酒回来了')
+}, Math.floor(Math.random() * 1000))
+
+setTimeout(() => {
+  console.log('李四买菜回来了')
+}, Math.floor(Math.random() * 1000))
+
+setTimeout(() => {
+  console.log('王五买肉回来了')
+}, Math.floor(Math.random() * 1000))
+
+console.log('开饭~')
+```
+
+解决方案：
+
+```javascript
+setTimeout(() => {
+  console.log('张三买酒回来了')
+  setTimeout(() => {
+    console.log('李四买菜回来了')
+    setTimeout(() => {
+      console.log('王五买肉回来了')
+      console.log('开饭~')
+    }, Math.floor(Math.random() * 1000)) // 时间，随机0~1000
+  }, Math.floor(Math.random() * 1000)) // 时间，随机0~1000
+}, Math.floor(Math.random() * 1000)) // 时间，随机0~1000
+```
+
+## Promise简单使用
+
+- Promise对象可以解决回调地狱的问题
+- Promise 是异步编程的一种解决方案，比传统的解决方案（回调函数和事件）更合理和更强大
+- Promise是JS内置对象（ES6新增）
+
+Promise是“承诺”的意思，实例中，它里面的异步操作就相当于一个承诺，而承诺就会有两种结果，要么完成了承诺的内容，要么失败。
+
+所以，使用Promise，分为两大部分，首先是有一个承诺（异步操作），然后再兑现结果。
+
+第一部分：定义“承诺”
+
+```javascript
+// 实例化一个Promise，需要给它传递一个函数作为参数，而该函数又有两个形参，通常用resolve和reject来表示。该函数里面可以写异步请求的代码
+// 换个角度，也可以理解为定下了一个承诺
+let p = new Promise((resolve, reject) => {
+  // 形参resolve，单词意思是 完成
+  // 形参reject ，单词意思是 失败
+  // ”承诺” 一般都需要一定的期限才能完成，当然也可能失败
+  // 比如，我承诺 3 年后赚 500万，然后回来娶你。
+  // 上述承诺可能成功的完成，也可能失败
+  // 在编程中，如果承诺成功的完成，则调用 resolve 函数；失败调用 reject 函数
+  setTimeout(() => {
+    let money = Math.floor(Math.random() * 1000)
+    if (money >= 500) {
+      resolve('赚到钱了，回来娶你')
+    } else {
+      reject('赚钱太难，找个好人嫁了吧')
+    }
+  }, 3000)
+  
+});
+```
+
+第二部分：获取“承诺”的结果
+
+```javascript
+// 通过调用 Promise对象 的then方法和catch方法，分别获取成功的结果和失败的结果
+p.then(success => {
+  console.log(success) // 赚到钱了，回来娶你
+}).catch(err => {
+  console.log(err) // 赚钱太难，找个好人嫁了吧
+})
+```
+
+## 完善Ajax封装
+
+为了能够通过 then方法获取响应结果：
+
+1. 将原生的 Ajax 请求代码封装进 Promise 中
+2. 将成功的响应结果，传递给 resolve （响应状态码为 200 视为成功）
+3. 将失败的结果传递给 reject （响应状态码超过 2xx 范围，视为失败）
+4. 最后，返回Promise对象（调用函数的时候就会得到Promise对象，从而可以使用.then）
+
+axios() 以及 axios.get() 调用之后都返回 Promise对象，所以能够调用 then()
+
+实际开发中，就是直接使用 axios。自己封装只能为了锻炼编程能力。
+
+## async 和 await 修饰符
+
+ES6 --- ES2015
+
+async 和 await 是 ES2017 中提出来的。
+
+异步操作是 JavaScript 编程的麻烦事，麻烦到一直有人提出各种各样的方案，试图解决这个问题。
+
+从最早的回调函数，到 Promise 对象，再到 Generator 函数，每次都有所改进，但又让人觉得不彻底。它们都有额外的复杂性，都需要理解抽象的底层运行机制。
+
+异步I/O不就是读取一个文件吗，干嘛要搞得这么复杂？**异步编程的最高境界，就是根本不用关心它是不是异步。**
+
+async 函数就是隧道尽头的亮光，很多人认为它是异步操作的终极解决方案。
+
+ES2017 提供了async和await关键字。await和async关键词能够将异步请求的结果以返回值的方式返回给我们。
+
+**使用async和await的基本步骤**：
+
+1. 需要一个函数，任意函数都可以，函数前加 async
+2. 函数中使用固定的语法获取结果：`let 结果 = await Promise对象`
+
+```javascript
+// async和await 代替了 then
+
+axios.defaults.baseURL = 'http://www.itcbc.com:3006'
+
+let p1 = axios.get('/api/province')
+
+let p2 = axios.get('/api/city', { params: { pname: '河北省' } })
+
+let p3 = axios.get('/api/county', { params: { pname: '河北省', cname: '承德市' } })
+
+async function abc() {
+  let res1 = await p1
+  let res2 = await p2
+  let res3 = await p3
+  console.log(res1.data, res2.data, res3.data)
+}
+abc()
+```
+
+## Promise的静态方法
+
+- Promise.resolve() --- 返回一个成功状态的Promise对象
+- Promise.reject() --- 返回一个失败状态的Promise对象
+
+```javascript
+Promise.resolve('hello world')
+.then(res => {
+  console.log(res) // 这里输出 hello world
+})
+.catch(err => {
+    console.log('错误的结果是：', err) // 这里不会输出
+})
+
+// --------------------------------------------------
+
+Promise.reject('参数有误')
+.then(res => {
+    console.log('正确的结果是：', res) // 这里不会输出
+})
+.catch(err => {
+    console.log('错误的结果是：', err) // 这里输出 错误的结果是：参数有误
+})
+```
+
+- Promise.all([ Promise对象, Promise对象, Promise对象 ]).then(res => {})
+
+- - all是所有的意思，等所有的Promise对象都完成，会触发then，res包含所有的3个结果
+
+- Promise.race([ Promise对象, Promise对象, Promise对象 ]).then(res => {})
+
+- - race是比赛、赛跑的意思，所以无论哪一个Promise对象得到结果，就算完成了
+
+```javascript
+axios.defaults.baseURL = 'http://www.itcbc.com:3006'
+
+let p1 = axios.get('/api/province')
+
+let p2 = axios.get('/api/city', { params: { pname: '河北省' } })
+
+let p3 = axios.get('/api/county', { params: { pname: '河北省', cname: '承德市' } })
+
+
+// all是所有的意思【需三个Promise对象都执行完，才会进入 then】
+Promise.all([p1, p2, p3]).then(res => {
+  console.log(res) // [ {第1个请求的result}, {第2个请求的result}, {第3个请求的result} ]
+})
+
+// race是赛跑的意思【有任意一个Promise对象执行完，就会进入 then】
+Promise.race([p1, p2, p3]).then(res => {
+  console.log(res) // 第1个请求的result 或 第2个请求的result 或 第3个请求的result
+})
+```
+
+## 链式调用then方法
+
+- 可以链式的调用 then 方法：`p.then().then().then()......catch()`
+- 前一个then里面返回的字符串，会被下一个then方法接收到。但是没有意义；
+- **前一个then里面返回Promise对象**
+
+- - **Promise 对象中 resolve 的数据，会被下一个then接收到**
+  - **Promise 对象中 reject 的数据，会被最后的 catch 接收到**
+
+- 前一个then里面如果没有返回值，则后续的then不会接收到任何值
+
+```javascript
+axios.defaults.baseURL = 'http://www.itcbc.com:3006'
+
+let p1 = axios.get('/api/province')
+
+let p2 = axios.get('/api/city', { params: { pname: '河北省' } })
+
+let p3 = axios.get('/api/county', { params: { pname: '河北省', cname: '承德市' } })
+
+
+p1.then(res1 => {
+  console.log(res1.data) // 得到全部的省
+  return p2
+}).then(res2 => {
+  console.log(res2.data) // 得到 河北省中所有的市
+  return p3
+}).then(res3 => {
+  console.log(res3.data) // 得到 河北省承德市中所有的县
+}).catch(err => {
+  console.log(err) // 输出错误信息
+})
+```
+
+catch 方法可以统一获取错误信息
+
+## 错误处理
+
+先得到Promise对象
+
+```javascript
+axios.defaults.baseURL = 'http://www.itcbc.com:3006'
+
+let p1 = axios.get('/api/province')
+
+// 下面的参数故意写错
+let p2 = axios.get('/api/city', { params: { xxx: '河北省' } })
+
+let p3 = axios.get('/api/county', { params: { pname: '河北省', cname: '承德市' } })
+```
+
+获取结果，有两个方案，方案一，使用then获取，在链式的尾端，加入catch来进行错误处理
+
+```javascript
+// 获取结果，方案一 -------------  使用then  -----------
+p1.then(res1 => {
+  console.log(res1.data) // 得到全部的省
+  return p2  // 由于p2请求出错了，所以直接跳到最后的catch
+}).then(res2 => {
+  console.log(res2.data) // 不会进入这个 then 里面
+  return p3
+}).then(res3 => {
+  console.log(res3.data) // 不会进入这个 then 里面
+}).catch(err => {
+  console.dir(err) // 输出错误对象；用console.dir() 可以看到错误对象内部结构
+})
+```
+
+获取结果，方案二，使用async和await获取结果，使用 `try...catch...` 来处理错误
+
+```javascript
+// 获取结果，方案二 --------- 使用async和await -----------
+async function abc() {
+  try {
+    let res1 = await p1
+    let res2 = await p2 // 由于p2请求出错了，所以直接跳到最后的catch
+    let res3 = await p3 // 不执行
+    console.log(res1.data, res2.data, res3.data) // 不执行
+  } catch (e) {
+    console.dir(e) // 输出错误对象；用console.dir() 可以看到错误对象内部结构
+  }
+}
+abc()
+```
+
+知识点：try 或 catch 中，如果有 return 返回值，则返回值相当于是 函数的返回值
+
+## 三种状态
+
+- 最初状态：pending，等待中，此时promise的结果为 undefined；
+- 当 resolve(value) 调用时，达到最终状态之一：fulfilled，（成功的）完成，此时可以获取结果value
+- 当 reject(error) 调用时，达到最终状态之一：rejected，失败，此时可以获取错误信息 error
+
+**当达到最终的 fulfilled 或 rejected 时，promise的状态就不会再改变了，结果也就固定了，不会再改变了**。
+
+当调用 resolve的时候，Promise 将到达最终的状态。 达到最终状态之后，Promise的状态就不会再改变了。
+
+![img](AJAX.assets/1663828791517-58246b65-5a2a-4bcf-9d9b-359da72dcf54.png)
+
+**多次调用 resolve 或 reject 函数，只有第一次有效，其他的调用都无效**。
+
+```javascript
+let p = new Promise((resolve, reject) => {
+  resolve(1) // 调用resolve，表示Promise到达了成功的状态；一旦成功了，Promise的结果就不会再变了
+  reject(2) // 无效
+  resolve(3) // 无效
+  setTimeout(() => {
+    resolve(4) // 无效
+  }, 1000)
+})
+
+p.then(res => {
+    console.log(res) // 输出 1
+}).catch(err => {
+    console.log(err) // 这里不执行
+})
+```
+
+## async和await补充
+
+- async 用于修饰一个 function
+
+- - async 修饰的函数，总是返回一个 Promise 对象
+  - 比如async函数中 `return 123`
+  - 相当于 `return new Promise((resolve, reject) => resolve(123))`
+  - 如果希望返回失败状态的Promise对象，则 `return Promise.reject(xxx)`
+
+- await 只能出现在 async 函数内
+
+- - 常规语法：`let 结果 = await Promise对象`;  // 获取Promise对象的结果
+  - 由于 await 会等待Promise结束，所以await会**暂停**函数的执行，但不会影响**函数外**的同步任务
+
+```javascript
+// async ----------------------------------------------------------------
+// async用于修饰一个函数
+// async修饰的函数，如果有返回值，无论返回了什么，相当于是返回了Promise对象，原本的返回值相当于传递给了resolve
+// -- 比如 return 123。相当于 return new Promise((resolve, reject) => { resolve(123) })
+// 如果希望返回一个失败状态的Promise对象，则 return Promise.reject(err)
+async function abc() {
+   return 123
+   // return Promise.reject('参数错误')
+}
+let p = abc() // 调用abc函数，得到Promise对象
+p.then(res => {
+  console.log(res)
+}).catch(err => {
+  console.log('错误信息是：', err)
+})
+
+// await ---------------------------------------------------------------
+// 1. await 只能出现在 async函数中
+// 2. await会暂停函数的执行，await下面的(不是后面的)代码会被挡住，当所有的同步代码执行完，才能执行下面的代码
+function test() {
+  console.log('test')
+}
+async function abc() {
+  console.log(111)
+  // await仅仅在async函数中才有效
+  await test() // 左右结合的代码，右侧先执行
+  // await会暂停函数的执行，await后续的代码都会暂停执行
+  // 等所有的同步任务执行完毕，才能执行
+  console.log(222)
+  console.log(333)
+}
+abc()
+console.log(444)
+console.log(555)
+```
+
+## 同步异步？
+
+- **new Promise里面的代码是立即执行的**
+- **获取结果时（then方法时）是异步的，是最后执行的**
+- **await下面的（不是await后面的）代码，可以理解是异步的，最后执行**
+
+```javascript
+console.log(1);
+new Promise((resolve, reject) => {
+  console.log(2);
+  resolve();
+  console.log(3);
+}).then(res => {
+  console.log(4); // 这里是异步的
+})
+console.log(5);
+// 输出顺序： 1  2  3  5  4 ,因为只有 .then() 是异步的
+```
+
+## 小结
+
+- Promise是异步任务的一种解决方案
+- 在避免回调地狱的基础上，可以获取到异步任务的结果
+- axios() 以及 axios.get() 等方法的返回值，就是 Promise对象。
+
+**如何使用？**
+
+- 第一步：得到Promise对象
+
+- - 自己 new Promise()  ----- 很少用
+  - 通过第三方工具得到Promise对象，比如 **axios() 、axios.get()** 等
+  - 通过 **Promise.all()**   Promise.race()  Promise.resolve()  Promise.reject()
+  - 调用async函数，返回值是Promise对象
+
+- 第二步：获取结果
+
+- - Promise对象.then(res => {}).catch(err => {})
+  - **async和await 配合**
+
+![img](AJAX.assets/1668408852511-f6f8ab0f-5252-49a5-89e7-d6cc04c6d407.png)
+
+**其他小点**
+
+- 多次调用 resolve() 或者 reject() ，只有第 1 次有效。
+- new Promise() 中的代码是立即执行的；then() 里面的代码 和 await 下面一行的代码 会在同步代码之后执行，可以理解为是异步的
+
+- - `new Promise(() => { /*这里的代码是立即执行的*/ })`
+  - `then(res => { /* 这是代码是异步的 */ })`
+  - `await **下面的** （不是后面的）代码是异步的`
+
+- 链式调用then方法：前一个then返回Promise对象的话，结果会被下一个then 或最后的 catch 得到
+- async函数如果有返回值，相当于函数返回了Promise对象，原来的返回值会被传递给 resolve()
+- async函数中如果需要返回一个失败状态的 Promise对象，则 `return Promise.reject()`
+
+# 个人设置案例
+
+## 在lib文件夹中，创建request.js
+
+在这个文件中，放请求的配置
+
+- 配置请求根路径
+- 配置拦截器
+
+创建 request.js 之后，在 其他html页面中，别忘记引入。
+
+```javascript
+// request 请求
+// 请求的配置，都放到这里
+
+axios.defaults.baseURL = 'http://www.itcbc.com:3006'
+```
+
+## 注册
+
+```javascript
+// 注册功能
+// 1. 找到按钮注册单击事件（找到表单注册submit事件也行）
+document.querySelector('button').addEventListener('click', async function (e) {
+  // 2. 阻止默认行为
+  e.preventDefault()
+  // 3. 获取账号密码
+  // val(表单)  // 只要表单各项有 name 属性，即可获取到这项的值
+  // console.log(val(document.querySelector('form')))
+  let data = val(document.querySelector('form'))
+  // 4. 按照接口文档要求，提交账号密码
+  // axios.post('/api/register', data).then(({ data: res }) => {})
+  const { data: res } = await axios.post('/api/register', data)
+  // console.log(res)
+  if (res.status === 0) {
+    // 5. 注册成功-提示、重置表单、跳转到登录页     注册失败-给出提示
+    location.href = './login.html'
+  }
+})
+```
+
+## 登录
+
+别忘了引入 request.js
+
+```javascript
+// 登录功能
+// 1. 找到按钮注册单击事件（找到表单注册submit事件也行）
+document.querySelector('button').addEventListener('click', async function (e) {
+  // 2. 阻止默认行为
+  e.preventDefault()
+  // 3. 获取账号密码
+  // val(表单)  // 只要表单各项有 name 属性，即可获取到这项的值
+  // console.log(val(document.querySelector('form')))
+  let data = val(document.querySelector('form'))
+  // 4. 按照接口文档要求，提交账号密码
+  // axios.post('/api/login', data).then(({ data: res }) => {})
+  const { data: res } = await axios.post('/api/login', data)
+  // console.log(res)
+  if (res.status === 0) {
+    // 5. 登录成功-提示、重置表单、跳转到首页     注册失败-给出提示
+    location.href = './index.html'
+  }
+})
+```
+
+## 使用响应拦截器处理错误提示
+
+```javascript
+// 2. 配置拦截器
+// 添加响应拦截器
+axios.interceptors.response.use(
+  function (response) {
+    // 2xx 范围内的状态码都会触发该函数。
+    // console.log('2xx', response)
+    if (response.data.status === 1) {
+      alert(response.data.message)
+    }
+    // 对响应数据做点什么
+    return response;
+  },
+  function (error) {
+    // 超出 2xx 范围的状态码都会触发该函数。
+    // console.dir('>2xx')
+    // console.dir(error)
+    // 加入下面的判断，是保证在有响应结果的情况下，在做。。。。。
+    if (error.response) {
+      if (error.response.data.status === 1) {
+        alert(error.response.data.message)
+      }
+    }
+    // 对响应错误做点什么
+    return Promise.reject(error);
+  }
+);
+```
+
+## 令牌的作用
+
+![img](AJAX.assets/1660640763773-aec5570b-8991-4401-9dee-bcdca4a96602.png)
+
+## 具体使用令牌
+
+1. 登录成功后，将接口响应的 token 存起来
+
+```javascript
+document.querySelector('form').addEventListener('submit', async function (e) {
+  e.preventDefault()
+  const { data: res } = await axios.post('/api/login', val(this))
+  if (res.status === 0) {
+    // 把服务器返回的令牌存到本地存储
+    localStorage.setItem('mytoken', res.token)
+    alert(res.message) // 登录成功提示
+    location.href = './index.html' // 跳转到index.html
+  }
+})
+```
+
+1. 请求获取用户信息接口的时候，加好请求头
+
+```javascript
+// 进入这个页面，应该马上获取用户信息
+// 发送请求，获取用户信息（获取用户的用户名、头像、省市县数据）
+axios({
+  method: 'GET',
+  url: '/user/info',
+  // 携带请求头
+  headers: {
+    Authorization: localStorage.getItem('mytoken')
+  }
+}).then(({ data: res }) => {
+  console.log(res);
+})
+```
+
+上述，发送请求的时候，带请求头 ，没有问题。
+
+但是，考虑到后续还有很多请求，都需要这个请求头，所以最好的办法是，统一配置。
+
+## 统一配置请求头
+
+统一配置请求头，有两个办法：
+
+办法一：像配置请求根路径那样
+
+```javascript
+// 全局配置 请求头
+axios.defaults.headers.common['Authorization'] = localStorage.getItem('mytoken')
+```
+
+办法二：加请求拦截器
+
+```javascript
+// 添加请求拦截器
+axios.interceptors.request.use(
+  function (config) {
+    // 在发送请求之前做些什么
+    // console.log(config) // config = { method: 'GET', url: '/user/info', ..... }
+    // url 以 /user 开头的，才需要加这个请求头
+    if (config.url.startsWith('/user/')) {
+      config.headers.Authorization = localStorage.getItem('mytoken')
+    }
+    return config
+  },
+  function (error) {
+    // 对请求错误做些什么
+    return Promise.reject(error)
+  }
+)
+```
+
+## token过期处理
+
+如果本地存储的token被人为的修改错了。
+
+或者，token过期了（目前，我们用的token有效期是10个小时）
+
+如果出现上述情况，那么服务器就会返回 `{ status: 1, message: '身份认证失败' }`
+
+所以，我们在**响应**拦截器的第**2**个函数中，加判断：
+
+- 判断status 和 message
+- 移除没用的token
+- 跳转到登录页面
+
+```javascript
+function (error) {
+  // 超出 2xx 范围的状态码都会触发该函数。
+  // console.dir(error)
+  if (error.response) {
+    // 因为有些请求可能没有响应结果。判断如果有响应结果的前提之下，然后在获取响应结果里面的内容
+    if (error.response.data.status === 1 && error.response.data.message === '身份认证失败') {
+      // 说明token遭到破坏了，或者token过期了
+      localStorage.removeItem('mytoken') // 移除没用的token
+      location.href = './login.html' // 跳转到登录页重新登录
+    } else if (error.response.data.status === 1) {
+      alert(error.response.data.message)
+    }
+  }
+  return Promise.reject(error)
+}
+```
+
+## 梳理token使用流程
+
+1. token只有登录接口才会返回。而且 我们后续要用token，所以在**登录之后**，**将**服务器返回的**token存到本地存储**。
+
+```
+localStorage.setItem('mytoken', 服务器返回的token)
+```
+
+1. 请求其他接口的时候，需要加请求头。一般都是全局配置请求头
+
+1. 1. 要么使用 `axios.defaults.headers.common['Authorization'] = localStorage.getItem('mytoken')`
+   2. 要么就用**请求**拦截器。`config.headers.Authorization = localStorage.getItem('mytoken')`
+
+1. 处理token过期的情况。token过期，服务器将会返回 401 状态码。在**响应拦截器**的第**2**个函数中：
+
+```javascript
+if (error.response.status === 401) {
+  // 说明token有问题了（修改错了、过期了.....）
+  localStorage.removeItem('mytoken') // 这行可选，可以选择将过期的token移除掉
+  location.href = './login.html'
+}
+```
+
+## 把获取的用户名，放到 input 中
+
+```javascript
+// 进入这个页面，应该马上获取用户信息
+;(async function () {
+  const { data: res } = await axios.get('/user/info')
+  // console.log(res)
+  // 设置用户名
+  document.querySelector('#username').value = res.data.username
+})()
+```
+
+## 获取省，放到下拉框中
+
+```javascript
+let province = document.querySelector('[name=province]')
+
+// 进入页码马上获取省、切换一个省的时候获取市、切换一个市的时候获取县
+;(async function () {
+  const { data: res } = await axios.get('/api/province')
+  // console.log(res)
+  let arr = [`<option value="">--省--</option>`]
+  res.forEach(item => arr.push(`<option value="${item}">${item}</option>`))
+  province.innerHTML = arr.join('')
+})()
+```
+
+## 省切换的时候，获取市，放到下拉框中
+
+```javascript
+let city = document.querySelector('[name=city]')
+
+// 切换一个省的时候获取市
+province.addEventListener('change', async function () {
+  // console.log(province.value)
+  // 切换省的时候，无论省是空值，还是有值，都要重置县
+  county.innerHTML = '<option value="">--县--</option>'
+  if (province.value === '') {
+    // 说明没有选择任何省(清空后面的市、并且return终止函数执行)
+    return (city.innerHTML = '<option value="">--市--</option>')
+  }
+  
+  // 如果省不是空值，则发送请求，获取对应的市
+  const { data: res } = await axios.get('/api/city', { params: { pname: province.value } })
+  let arr = [`<option value="">--市--</option>`]
+  res.forEach(item => arr.push(`<option value="${item}">${item}</option>`))
+  city.innerHTML = arr.join('')
+})
+```
+
+**切换省的时候，无论有没有选择省，都要重置县，重置县的代码写到 return 前面**。
+
+## 市切换的时候，获取县，放到下拉框
+
+```javascript
+let county = document.querySelector('[name=county]')
+
+// 切换一个市的时候获取县
+city.addEventListener('change', async function () {
+  // console.log(province.value)
+  if (city.value === '') {
+    // 说明没有选择任何市(清空后面的县、并且return终止函数执行)
+    return (county.innerHTML = '<option value="">--县--</option>')
+  }
+  // 如果市不是空值，则发送请求，获取对应的县
+  const { data: res } = await axios.get('/api/county', {
+    params: {
+      pname: province.value,
+      cname: city.value
+    }
+  })
+  let arr = [`<option value="">--县--</option>`]
+  res.forEach(item => arr.push(`<option value="${item}">${item}</option>`))
+  county.innerHTML = arr.join('')
+})
+```
 
 
 
+## 点击保存，把选择的省市县提交
+
+```javascript
+// ------------------------ 点击保存，提交省市县 -------------------------
+document.querySelector('button').addEventListener('click', async function (e) {
+  e.preventDefault()
+  let data = val(document.querySelector('form')) // 获取省市县的值
+  const { data: res } = await axios.post('/user/info', data)
+  if (res.status === 0) {
+    alert(res.message)
+  }
+})
+```
+
+## 更换头像
+
+```javascript
+// ----------------------- 头像上传 -----------------------------------
+// 点击 figcaption 触发文件域的单击事件
+document.querySelector('figcaption').addEventListener('click', function () {
+  document.querySelector('#upload').click()
+})
+// 文件域（文件选择框）的内容改变的时候，实现文件上传
+document.querySelector('#upload').addEventListener('change', async function () {
+  if (this.files.length > 0) {
+    // 说明选择了图片
+    // 找到文件对象
+    let fileObj = this.files[0]
+    // 实例化FormData
+    let fd = new FormData()
+    // 把文件对象加入到FormData中
+    fd.append('avatar', fileObj)
+    // Ajax提交FormData对象
+    const { data: res } = await axios.post('/user/avatar', fd)
+    if (res.status === 0) {
+      alert(res.message)
+      document.querySelector('img').src = res.data
+    }
+  }
+})
+```
+
+## 页面刷新后，数据回填
+
+页面刷新后，马上获取用户信息。
+
+我们需要把用户的 用户名、省、市、县、头像，设置到页面中（数据回填）
+
+但是，用户信息有三种情况：
+
+- 刚刚注册的用户，只有用户名，其他值都是 null
+- 更改了头像的用户，有头像
+- 更改了籍贯的用户，有省市县
+
+所以，数据回填的时候，需要判断一下用户是否有头像、是否有省市县。
+
+```diff
+// 进入这个页面，应该马上获取用户信息
+;(async function () {
+  const { data: res } = await axios.get('/user/info')
+  // console.log(res)
+  // 设置用户名（不需要判断，用户，肯定有用户）
+  document.querySelector('#username').value = res.data.username
++ // 判断用户是否有头像
++ // if (res.data.avatar) {
++ //   document.querySelector('img').src = res.data.avatar
++ // }
++ res.data.avatar && (document.querySelector('img').src = res.data.avatar)
+})()
+```
+
+处理默认的省市县：
+
+```js
+// 进入这个页面，应该马上获取用户信息
+;(async function () {
+  const { data: res } = await axios.get('/user/info')
+  // console.log(res)
+  // 设置用户名（不需要判断，用户，肯定有用户）
+  document.querySelector('#username').value = res.data.username
+  // 判断用户是否有头像
+  // if (res.data.avatar) {
+  //   document.querySelector('img').src = res.data.avatar
+  // }
+  res.data.avatar && (document.querySelector('img').src = res.data.avatar)
+  // 判断用户，是否有省市县
+  if (res.data.province && res.data.city && res.data.county) {
+    // 说明用户有省市县
+    // 把用户所在的省的全部的市都获取得到，放到第2个下拉框中
+    let p1 = axios.get('/api/city', { params: { pname: res.data.province } })
+    // 把用户所在的事里面的全部的县获取得到，放到第3个下拉框中
+    let p2 = axios.get('/api/county', {
+      params: {
+        pname: res.data.province,
+        cname: res.data.city
+      }
+    })
+    // 
+    const [{ data: shi }, { data: xian }] = await Promise.all([p1, p2])
+    // console.log(result) // [{ data: [市....] }, { data: [县.....] }]
+    // console.log(shi)
+    // console.log(xian)
+    let arr1 = ['<option value="">--市--</option>']
+    shi.forEach(item => arr1.push(`<option value="${item}">${item}</option>`))
+    city.innerHTML = arr1.join('')
+
+    let arr2 = ['<option value="">--县--</option>']
+    xian.forEach(item => arr2.push(`<option value="${item}">${item}</option>`))
+    county.innerHTML = arr2.join('')
+    // 勾选、用户所在的省、市、县
+    province.value = res.data.province
+    city.value = res.data.city
+    county.value = res.data.county
+  }
+})()
+```
 
 
 

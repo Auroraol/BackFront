@@ -1,4 +1,4 @@
-项目结构
+# 项目结构
 
 ![image-20230709103935383](spring boot3.assets/image-20230709103935383.png)
 
@@ -5364,7 +5364,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 ### 简单案例
 
-#### 定义拦截器
+#### 自定义拦截器(HandlerInterceptor)
 
 ```java
 @Component
@@ -10103,5 +10103,4 @@ services:
 **ElasticSearch分布式搜索框架**
 
 **SpringSession分布式会话框架**
-
 

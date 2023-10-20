@@ -1183,7 +1183,7 @@ DispathcerServlet采用其他的url-pattern
 </servlet-mapping>
 ```
 
-## 6.3 解决方案2
+## 6.3 解决方案2(推荐)
 
 DispathcerServlet的url-pattern依然采用 "/",但追加配置
 
@@ -1625,7 +1625,7 @@ new User(1，null，null，new Date()，100.5);
 
 
 
-# 八、异常解析器:crossed_swords:
+# 八、异常解析器(HandlerExceptionResolver):crossed_swords:
 
 ## 8.1 现有方案，分散处理
 
@@ -1652,7 +1652,7 @@ public String xxx(){
  定义一个“异常解析器” 集中捕获处理 所有异常, 当使用throws抛出自定义异常时,自动跳转到异常解析器中
 
 ```java
-//继承HandlerExceptionResolver回车
+//实现HandlerExceptionResolver 点回车,实现resolveException类
 public class MyExResolver implements HandlerExceptionResolver{
 	/**
 	 * 异常解析器：主体逻辑
@@ -1683,6 +1683,8 @@ public class MyExResolver implements HandlerExceptionResolver{
 ```
 
 ### 实例
+
+**配置文件**
 
 ```xml
 <!-- 声明异常解析器 -->
@@ -1829,19 +1831,14 @@ public class UserController {
 
 创建 login.jsp,  perm_error.jsp, global_error.jsp页面
 
-# 九、拦截器(非重点)
+# 九、拦截器(HandlerInterceptor)
 
-------
+**作用：抽取handler中的冗余功能**
 
-## 9.1 作用
-
-作用：抽取handler中的冗余功能
-
-## 9.2 定义拦截器
-
-执行顺序： preHandle--postHandle--afterCompletion
+## 9.1 自定义拦截器
 
 ```java
+//实现HandlerInterceptor 点回车,实现HandlerIntercepto类
 public class MyInter1 implements HandlerInterceptor{
 	//主要逻辑：在handler之前执行：抽取handler中的冗余代码
 	@Override
@@ -1849,11 +1846,12 @@ public class MyInter1 implements HandlerInterceptor{
 			HttpServletResponse response, Object handler) throws Exception {
 		System.out.println("pre~~~");
         /*
-        response.sendRedirect("/springMVC_day2/index.jsp");//响应
+        response.sendRedirect("/springMVC_day2/index.jsp"); //重定向到index.jsp页面
         return false;//中断请求
         */
 		return true;//放行，后续的拦截器或handler就会执行
 	}
+    
 	//在handler之后执行:进一步的响应定制
 	@Override
 	public void postHandle(HttpServletRequest request,
@@ -1861,7 +1859,8 @@ public class MyInter1 implements HandlerInterceptor{
 			ModelAndView modelAndView) throws Exception {
 		System.out.println("post~~");
 	}
-	//在页面渲染完毕之后，执行：资源回收
+    
+	//在全部页面渲染完毕之后，执行：资源回收
 	@Override
 	public void afterCompletion(HttpServletRequest request,
 			HttpServletResponse response, Object handler, Exception ex)
@@ -1871,14 +1870,16 @@ public class MyInter1 implements HandlerInterceptor{
 }
 ```
 
-## 9.3 配置拦截路径
+## 9.2 设置拦截路径
+
+**配置文件**
 
 ```xml
 <mvc:interceptors>
     <mvc:interceptor>
-        <mvc:mapping path="/inter/test1"/>
-        <mvc:mapping path="/inter/test2"/>
-        <mvc:mapping path="/inter/test*"/> <!-- test开头 -->
+        <mvc:mapping path="/inter/test1"/> <!-- 拦截url: xxxx/inter/test1 -->
+        <mvc:mapping path="/inter/test2"/> <!-- 拦截url: xxxx/inter/test2 -->
+        <mvc:mapping path="/inter/test*"/> <!-- 拦截test开头 -->
         <mvc:mapping path="/inter/**"/> <!-- /** 任意多级任意路径 -->
         <mvc:exclude-mapping path="/inter/a/**"/>   <!--不拦截此路径-->
         <bean class="com.baizhi.interceptor.MyInter1"></bean>   <!--拦截器类-->
@@ -1892,7 +1893,7 @@ public class MyInter1 implements HandlerInterceptor{
 
 ------
 
-## 10.1 导入jar
+## 10.1 依赖
 
 ```xml
 <dependency>
@@ -1914,42 +1915,33 @@ public class MyInter1 implements HandlerInterceptor{
 </dependency>
 ```
 
+## 10.2  前端
 
-
-#### 10.2 表单
-
-
+enctype="multipart/form-data"表示下载东西
 
 ```html
 <form action="${pageContext.request.contextPath }/upload/test1" method="post" 
-      enctype="multipart/form-data">
+      enctype="multipart/form-data"> 
+  <input type="text" name="username"><br>
   file: <input type="file" name="source"/> <br>
   <input type="submit" value="提交"/>
 </form>
 ```
 
+## 10.3 配置上传解析器
 
-
-#### 10.3 上传解析器
-
-
+配置文件
 
 ```xml
-<!-- 上传解析器 
-	     id必须是：“multipartResolver”
- -->
+<!-- 上传解析器  id必须是：“multipartResolver”-->
 <bean id="multipartResolver" 
       class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-    <!-- 最大可上传的文件大小  单位：byte  超出后会抛出MaxUploadSizeExceededException异常，可以异常解析器捕获 -->
+<!-- 最大可上传的文件大小  单位：byte  超出后会抛出MaxUploadSizeExceededException异常，可以异常解析器捕获 -->
     <property name="maxUploadSize" value="1048576"></property>
 </bean>
 ```
 
-
-
-#### 10.4 Handler
-
-
+## 10.4 controller
 
 ```java
 @RequestMapping("/test1")
@@ -1976,25 +1968,24 @@ public String hello1(String username,MultipartFile source,HttpSession session) {
 }
 ```
 
+运行结果
 
+<img src="SpringMVC教程.assets/image-20231020170445692.png" alt="image-20231020170445692"  />
 
 # 十一、下载
 
-------
-
-#### 11.1 超链
-
-
+## 11.1 前端
 
 ```html
-<a href="${pageContext.request.contextPath}/download/test1?name=Koala.jpg">下载</a>
+<@page pageEncoding="utf-8"%>
+<@taglib prefix="c" uri="http://ljava.sun. com/jsp/jstl/core"8><html>
+<body>
+    <h2>下载</h2>
+    <a href="$ {pageContext.request.contextPath}/xxx ?name=abc.exe"></a></body>
+</html>
 ```
 
-
-
-#### 11.2 Handler
-
-
+## 11.2 controller
 
 ```java
 @RequestMapping("/test1")
@@ -2014,17 +2005,18 @@ public void hello1(String name,HttpSession session,HttpServletResponse response)
     //读取目标文件，写出给客户端
     IOUtils.copy(new FileInputStream(real_path), response.getOutputStream());
 
-    //上一步，已经是响应了,所以此handler直接是void
 }
 ```
 
+运行结果
 
+<img src="SpringMVC教程.assets/image-20231020170310952.png" alt="image-20231020170310952" style="zoom:67%;" />
 
 # 十二、验证码
 
 ------
 
-#### 12.1 作用
+### 12.1 作用
 
 防止暴力攻击，前端安全保障
 
@@ -2045,11 +2037,7 @@ public void hello1(String name,HttpSession session,HttpServletResponse response)
 </dependency>
 ```
 
-
-
-#### 12.3 声明验证码组件
-
-
+## 12.3 声明验证码组件
 
 ```xml
 <servlet>
@@ -2083,11 +2071,7 @@ public void hello1(String name,HttpSession session,HttpServletResponse response)
   </servlet-mapping>
 ```
 
-
-
-#### 12.4 Page
-
-
+### 12.4 Page
 
 ```html
 <img src="${pageContext.request.contextPath}/captcha" style="width:85px" id="cap"/>
@@ -2102,13 +2086,11 @@ public void hello1(String name,HttpSession session,HttpServletResponse response)
 </script>
 ```
 
-
-
 # 十三、REST:crossed_swords:
 
 ------
 
-#### 13.1 开发风格
+## 13.1 开发风格
 
 是一种开发风格，遵从此风格开发软件，符合REST风格，则RESTFUL。
 
@@ -2138,13 +2120,11 @@ public void hello1(String name,HttpSession session,HttpServletResponse response)
 | PUT      | http://localhost:8989/xxx/users          | 在所有用户中<font color=red>修改一个</font>        |
 | DELETE   | http://localhost:8989/xxx/users/1        | <font color=red>删除</font>用户1                   |
 
-#### 13.2 优点
-
-#### 13.3 使用
+## 13.3 使用
 
 <img src="SpringMVC教程.assets/image-20231019223559120.png" alt="image-20231019223559120" style="zoom:67%;" />
 
-##### 13.3.1 定义Rest风格的 Controller
+### 13.3.1 定义Rest风格的 Controller
 
 ```java
 @RestController
@@ -2185,7 +2165,7 @@ public class RestController {
 }
 ```
 
-##### 13.3.2 Ajax请求
+### 13.3.2 Ajax请求
 
 ```html
 <script>    
@@ -2231,15 +2211,11 @@ public class RestController {
 </script>
 ```
 
-
-
-
-
 # 十四、跨域请求
 
 ------
 
-#### 14.1 域
+## 14.1 域
 
 域：协议+IP+端口
 
@@ -2247,13 +2223,13 @@ public class RestController {
 -  http://localhost:8080 
 -  http://www.baidu.com:80 
 
-#### 14.2 Ajax跨域问题
+## 14.2 Ajax跨域问题
 
 -  Ajax发送请求时，不允许跨域，以防用户信息泄露。 
 -  当Ajax跨域请求时，响应会被浏览器拦截(同源策略)，并报错。即浏览器默认不允许ajax跨域得到响应内容。 
 -  互相信任的域之间如果需要ajax访问，(比如前后端分离项目中，前端项目和后端项目之间)，则需要额外的设置才可正常请求。 
 
-#### 14.3 解决方案
+## 14.3 解决方案
 
 -  允许其他域访问 
 -  在被访问方的Controller类上，添加注解 
