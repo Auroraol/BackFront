@@ -110,21 +110,63 @@ https://struts.apache.org/getting-started/hello-world-using-struts2.html
 此控制器在接收到请求后，还会负责springMVC的核心的调度管理，所以既是前端又是核心。
 
 ```xml
-<servlet>
-    <servlet-name>mvc</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <!-- 局部参数：声明配置文件位置 -->
-    <init-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:mvc.xml</param-value>
-    </init-param>
-    <!-- Servlet启动时刻：可选 -->
-    <load-on-startup>1</load-on-startup>
-</servlet>
-<servlet-mapping>
-    <servlet-name>mvc</servlet-name>
-    <url-pattern>/</url-pattern>
-</servlet-mapping>
+<!DOCTYPE web-app PUBLIC
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                      http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0"
+         metadata-complete="true">
+    <display-name>Archetype Created Web Application</display-name>
+
+    <!--    拓展配置方式（推荐）-->
+    <!-- 配置SpringMVC的前端控制器，对浏览器发送的请求统一进行处理 -->
+    <!--处理中文乱码-->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <servlet>
+        <servlet-name>springMVC</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!-- 通过初始化参数指定SpringMVC配置文件的位置和名称 -->
+        <init-param>
+            <!-- contextConfigLocation为固定值 -->
+            <param-name>contextConfigLocation</param-name>
+            <!-- 使用classpath:表示从类路径查找配置文件，例如maven工程中的src/main/resources -->
+            <param-value>classpath:springMVC.xml</param-value>
+        </init-param>
+        <!--
+             作为框架的核心组件，在启动过程中有大量的初始化操作要做
+            而这些操作放在第一次请求时才执行会严重影响访问速度
+            因此需要通过此标签将启动控制DispatcherServlet的初始化时间提前到服务器启动时
+        -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>springMVC</servlet-name>
+        <!--
+            设置springMVC的核心控制器所能处理的请求的请求路径
+            /所匹配的请求可以是/login或.html或.js或.css方式的请求路径
+            但是/不能匹配.jsp请求路径的请求
+        -->
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>
 ```
 
 ### 后端控制器
@@ -1154,6 +1196,16 @@ DispathcerServlet的url-pattern依然采用 "/",但追加配置
 <mvc:default-servlet-handler/>
 ```
 
+这个配置会额外增加一个handler(controller类中的每一个方法都是一个handler), 且其 requestMapping 为: /**, 可以匹配所有请求, 但是优先级最低(注: /* 匹配任意单级路径, 如/a, /b等, /**匹配任意单, 多级路径, 如/a, /a/b/c..等), 所以如果其他所有的handler都匹配不上, 不会直接返回404, 而是会将请求转向该 /**, 恰好这个 handler 就是处理静态资源的处理方式: tomcat 中的 default servlet.
+
+由此, 我们可以按原来的方式顺利访问 servlet 和静态资源:
+
+![img](SpringMVC教程.assets/1468878-20201211111512642-376156475.png)
+
+ 
+
+​                                                          ![img](SpringMVC教程.assets/1468878-20201211111529009-846853376.png)
+
 ## 6.4 解决方案3
 
 - mapping是访问路径，location是静态资源存放的路径
@@ -2052,7 +2104,7 @@ public void hello1(String name,HttpSession session,HttpServletResponse response)
 
 
 
-# 十三、REST（重要点）
+# 十三、REST:crossed_swords:
 
 ------
 
@@ -2065,59 +2117,40 @@ public void hello1(String name,HttpSession session,HttpServletResponse response)
 - 每个资源都有唯一的标识(URL)
 - 不同的行为，使用对应的http-method
 
+每个资源都有唯一的标识
+
 | 访问标识                                 | 资源              |
 | ---------------------------------------- | ----------------- |
 | http://localhost:8989/xxx/users          | 所有用户          |
 | http://localhost:8989/xxx/users/1        | 用户1 pathvarbale |
 | http://localhost:8989/xxx/users/1/orders | 用户1的所有订单   |
 
-| 请求方式 | 标识                                     | 意图                        |
-| -------- | ---------------------------------------- | --------------------------- |
-| GET      | http://localhost:8989/xxx/users          | 查询所有用户                |
-| POST     | http://localhost:8989/xxx/users          | 在所有用户中增加一个        |
-| PUT      | http://localhost:8989/xxx/users          | 在所有用户中修改一个        |
-| DELETE   | http://localhost:8989/xxx/users/1        | 删除用户1                   |
-| GET      | http://localhost:8989/xxx/users/1        | 查询用户1                   |
-| GET      | http://localhost:8989/xxx/users/1/orders | 查询用户1的所有订单         |
-| POST     | http://localhost:8989/xxx/users/1/orders | 在用户1的所有订单中增加一个 |
 
+每个请求都有明确的动词(GET，POST，PUT，DELETE)
 
+| 请求方式 | 标识                                     | 意图                                               |
+| -------- | ---------------------------------------- | -------------------------------------------------- |
+| GET      | http://localhost:8989/xxx/users          | <font color=red>查询所有</font>用户                |
+| GET      | http://localhost:8989/xxx/users/1        | <font color=red>查询</font>用户1                   |
+| GET      | http://localhost:8989/xxx/users/1/orders | <font color=red>查询</font>用户1的所有订单         |
+| POST     | http://localhost:8989/xxx/users          | 在所有用户中<font color=red>增加一个</font>        |
+| POST     | http://localhost:8989/xxx/users/1/orders | 在用户1的所有订单中<font color=red>增加</font>一个 |
+| PUT      | http://localhost:8989/xxx/users          | 在所有用户中<font color=red>修改一个</font>        |
+| DELETE   | http://localhost:8989/xxx/users/1        | <font color=red>删除</font>用户1                   |
 
 #### 13.2 优点
 
-
-
- 
-
-- **输出json：
-
- 
-
-
-
 #### 13.3 使用
 
-
+<img src="SpringMVC教程.assets/image-20231019223559120.png" alt="image-20231019223559120" style="zoom:67%;" />
 
 ##### 13.3.1 定义Rest风格的 Controller
-
-
-
-@RequestMapping(value="/users",method = RequestMethod.GET)
-
- 
-
-等价
-
- 
-
-@GetMapping("/users")
-
-
 
 ```java
 @RestController
 public class RestController {
+    
+    // /users  整体
     @GetMapping("/users")
     public List<User> queryAllUsers(){
         System.out.println("get");
@@ -2137,6 +2170,7 @@ public class RestController {
         return "{status:1}";
     }
 
+    //   /users/{id} 个体                     
     @GetMapping("/users/{id}")
     public String queryOneUser(@PathVariable Integer id){//@PathVariable 接收路径中的值
         System.out.println("Get user id:"+id);
@@ -2151,18 +2185,14 @@ public class RestController {
 }
 ```
 
-
-
 ##### 13.3.2 Ajax请求
-
-
 
 ```html
 <script>    
 	function putUser(){ // 发送更新请求 （增加请求发送方式也是如此）
         var xhr = new XMLHttpRequest();
     	//定义 put，delete,get,post方式 即可，不用定义_method
-        xhr.open("put","${pageContext.request.contextPath}/rest04/users");
+        xhr.open("put","${pageContext.request.contextPath}/users");
     	// 设置请求头
         xhr.setRequestHeader("content-type","application/json")；
         // 设置请求参数
@@ -2200,6 +2230,10 @@ public class RestController {
     }
 </script>
 ```
+
+
+
+
 
 # 十四、跨域请求
 
@@ -2244,6 +2278,7 @@ $.ajax({
        withCredentials: true
      }
 });
+
 或
 var xhr = new XMLHttpRequest();
 // 跨域携带cookie

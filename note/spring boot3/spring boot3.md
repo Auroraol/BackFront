@@ -1304,11 +1304,32 @@ public class JwtService {
 
 #  日志配置(TODO)
 
+在项目开发中，日志十分的重要，不管是记录运行情况还是定位线上问题，都离不开对日志的分析。
+
+在 Java 领域里存在着多种日志框架，如 JCL、SLF4J、Jboss-logging、jUL、log4j、log4j2、logback 等等
+
+## 日志框架的选择
+
+市面上常见的日志框架可以被分为两类：日志门面（日志抽象层）和日志实现，如下表。
+
+| 日志分类 | 描述                                                         | 举例                                                         |
+| -------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 日志门面 | 为 Java 日志访问提供一套标准和规范的 API 框架，其主要意义在于提供接口。 | JCL（Jakarta Commons Logging）、SLF4j（Simple Logging Facade for Java）、jboss-logging |
+| 日志实现 | 日志门面的具体的实现                                         | Log4j、JUL（java.util.logging）、Log4j2、Logback             |
+
+通常情况下，日志由一个日志门面与一个日志实现组合搭建而成，Spring Boot 选用 SLF4J + Logback 的组合来搭建日志系统。
+
+SLF4J 是目前市面上最流行的日志门面，使用 Slf4j 可以很灵活的使用占位符进行参数占位，简化代码，拥有更好的可读性。
+
+Logback 是 Slf4j 的原生实现框架，它与 Log4j 出自一个人之手，但拥有比 log4j 更多的优点、特性和更做强的性能，现在基本都用来代替 log4j 成为主流。
+
+
+
+
+
 <img src="spring boot3.assets/image-20230707232608508.png" alt="image-20230707232608508" style="zoom:50%;" />
 
 规范：项目开发不要编写`System.out.println()`，应该用**日志**记录信息
-
-![img](spring boot3.assets/1680232037132-d2fa8085-3847-46f2-ac62-14a6188492aa-16886581349967.png)
 
 ## 1.  简介
 

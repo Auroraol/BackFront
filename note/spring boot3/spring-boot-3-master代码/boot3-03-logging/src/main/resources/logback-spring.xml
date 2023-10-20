@@ -10,7 +10,7 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder charset="UTF-8">
             <!-- 输出日志记录格式 -->
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} ==哈哈== [%thread] %-5level ==哈哈== %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} ==== [%thread] %-5level ==== %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
