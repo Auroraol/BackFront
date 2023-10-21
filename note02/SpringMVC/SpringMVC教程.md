@@ -532,6 +532,7 @@ public class FrontParameter {
 
 
 	// @RequestBody
+    // @RequestBody注解用于指示方法接受的JSON格式数据会被自动转换为对象。
 	/**
 	 * http://localhost:8080/test3
 	 * body: {"peoplename":"张刚","student":{"studentname":"你好"}}
@@ -958,6 +959,8 @@ public ModelAndView providerInfo22(HttpSession session) {
 
 ## ② @ResponseBody
 
+`@ResponseBody`注解用于指示方法返回的对象会被自动转换为JSON格式的数据。
+
 ### 传对象参数
 
 使用@ResponseBody注解
@@ -1020,6 +1023,70 @@ public List<Provider> findProviderListJson() {
 
 效果
 ![请添加图片描述](SpringMVC教程.assets/6d0d67576c504ea681b67e2353fb7c8a.png)
+
+### 传日期参数
+
+【**第一种办法**】在该属性上添加@JsonFormat(pattern = “yyyy-MM-dd”)注解，代码如下：
+
+```java
+package com.mango.json.bean;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
+
+public class User {
+
+    private Integer id;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd")  //
+    private Date birthday;
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+    
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+}
+```
+
+【**第二种办法**】json肯定离不开ObjectMapper，因为json格式和java中的对象之间进行转换就是通过ObjectMapper类, 重写方法
+
+WebMvcConfig.java
+
+```java
+package com.mango.json.config;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+
+import java.text.SimpleDateFormat;
+
+@Configuration
+public class WebMvcConfig {
+
+    @Bean
+    MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(){
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
+        converter.setObjectMapper(objectMapper);
+        return converter;
+    }
+}
+```
 
 ## servlet(javaweb方式)
 
@@ -1835,6 +1902,8 @@ public class UserController {
 
 **作用：抽取handler中的冗余功能**
 
+代码见 [拦截器.zip](code\拦截器.zip) 
+
 ## 9.1 自定义拦截器
 
 ```java
@@ -1889,7 +1958,7 @@ public class MyInter1 implements HandlerInterceptor{
 
 
 
-# 十、上传
+# 十、文件上传和下载
 
 ------
 
@@ -1897,11 +1966,16 @@ public class MyInter1 implements HandlerInterceptor{
 
 ```xml
 <dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>servlet-api</artifactId>
+    <version>3.1</version>
+</dependency>
+<!--文件下载上次-->
+<dependency>
     <groupId>commons-io</groupId>
     <artifactId>commons-io</artifactId>
     <version>2.4</version>
 </dependency>
-
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
@@ -1913,6 +1987,13 @@ public class MyInter1 implements HandlerInterceptor{
         </exclusion>
     </exclusions>
 </dependency>
+<!--jackson-->
+<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.13.3</version>
+</dependency>
 ```
 
 ## 10.2  前端
@@ -1920,12 +2001,47 @@ public class MyInter1 implements HandlerInterceptor{
 enctype="multipart/form-data"表示下载东西
 
 ```html
-<form action="${pageContext.request.contextPath }/upload/test1" method="post" 
-      enctype="multipart/form-data"> 
-  <input type="text" name="username"><br>
-  file: <input type="file" name="source"/> <br>
-  <input type="submit" value="提交"/>
-</form>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page isELIgnored="false" %>
+<html>
+<head>
+    <title>文件上传和下载</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+<table border="1">
+    <tr>
+        <td width="200" align="center">文件上传${msg}</td>
+        <td width="300" align="center">下载列表</td>
+    </tr>
+    <tr>
+        <td height="100">
+            <form action="${pageContext.request.contextPath}/fileload"
+                  method="post" enctype="multipart/form-data">
+                <input type="file" name="files" multiple="multiple"><br/>
+                <input type="reset" value="清空"/>
+                <input type="submit" value="提交"/>
+            </form>
+        </td>
+        <td id="files"></td>
+    </tr>
+</table>
+</body>
+<script>
+    $(document).ready(function () {
+        var url = "${pageContext.request.contextPath }/getFilesName";
+        $.get(url, function (files) {
+            var files = eval('(' + files + ')');
+            for (var i = 0; i < files.length; i++) {
+                $("#files").append("<li>" +
+                    "<a href=${pageContext.request.contextPath }" + "" +
+                    "\\" + "download?filename=" + files[i].name + ">" +
+                    files[i].name + "</a></li>");
+            }
+        })
+    })
+</script>
+</html>
 ```
 
 ## 10.3 配置上传解析器
@@ -1941,30 +2057,149 @@ enctype="multipart/form-data"表示下载东西
 </bean>
 ```
 
-## 10.4 controller
+## 10.4 pojo
 
 ```java
-@RequestMapping("/test1")
-public String hello1(String username,MultipartFile source,HttpSession session) { 
-    //文件的原始名称    
-    String filename = source.getOriginalFilename();    
-    //定制全局唯一的命名    
-    String unique = UUID.randomUUID().toString();    
-    //获得文件的后缀    
-    String ext = FilenameUtils.getExtension(filename);
-    //abc.txt   txt    hello.html  html   
-    //定制全局唯一的文件名    
-    String uniqueFileName = unique+"."+ext;    
-    System.out.println("唯一的文件名:"+uniqueFileName);    
-    //文件的类型    String type = source.getContentType();    
-    System.out.println("filename:"+filename+" type:"+type);    
-    //获得 upload_file的磁盘路径 ==> 在webapp目录下创建一个目录"upload_file",且此目录初始不要为空，否则编译时被忽略    
-    String real_path = session.getServletContext().getRealPath("/upload_file");    
-    System.out.println("real_path:"+real_path);    
-    //将上传的文件，存入磁盘路径中    
-    //source.transferTo(new File("d:/xxxx/xxxx/xx.jpg"))    
-    source.transferTo(new File(real_path+"\\"+uniqueFileName));    
-    return "index";
+package cn.lfj.pojo;
+
+public class Resource {
+	private String name;                //name属性表示文件名称
+
+	public Resource() {
+	}
+
+	public Resource(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+```
+
+## 10.5 utils
+
+```java
+package cn.lfj.utils;
+
+public class JSONFileUtils {
+	public static String readFile(String filepath) throws Exception {
+		FileInputStream fis = new FileInputStream(filepath);
+		return IOUtils.toString(fis);
+	}
+
+	public static void writeFile(String data, String filepath)
+			throws Exception {
+		FileOutputStream fos = new FileOutputStream(filepath);
+		IOUtils.write(data, fos);
+	}
+}
+```
+
+## 10.6 controller
+
+```java
+
+@Controller
+public class FileController {
+	/**
+	 * 文件上传
+	 */
+	@RequestMapping("fileload")
+	public String fileLoad(MultipartFile[] files, HttpSession request) throws Exception {
+		String path = request.getServletContext().getRealPath("/") + "files/";    //设置上传的文件所存放的路径
+		//创建Jackson的ObjectMapper对象，用于对象和JSON的转换。
+		ObjectMapper mapper = new ObjectMapper();
+		if (files != null && files.length > 0) { //判断是否有上传的文件
+			//循环获取上传的文件
+			for (MultipartFile file : files) {  //遍历上传的文件
+				//获取上传文件的名称
+				String filename = file.getOriginalFilename();
+				ArrayList<Resource> list = new ArrayList<>();  //创建一个Resource对象的集合，用于存储文件信息。
+				// 文件夹中是否有同名文件
+				//读取files.json文件中的文件名称
+				String json = JSONFileUtils.readFile(path + "/files.json");
+				if (json.length() != 0) {
+					//将files.json的内容转为集合
+					list = (ArrayList<Resource>) mapper.readValue(json, new TypeReference<List<Resource>>() {
+					});
+					for (Resource resource : list) {
+						//如果上传的文件在files.json文件中有同名文件，将当前上传的文件重命名，以避免重名
+						if (filename.equals(resource.getName())) {
+							String[] split = filename.split("\\.");
+							filename = split[0] + "(1)." + split[1];
+						}
+					}
+				}
+				// 设置文件保存的全路径
+				String filePath = path + filename;
+				// 保存上传的文件
+				file.transferTo(new File(filePath));
+				list.add(new Resource(filename));
+				json = mapper.writeValueAsString(list); //将集合中转换成json
+				//将上传文件的名称保存在files.json文件中
+				JSONFileUtils.writeFile(json, path + "/files.json");
+			}
+			request.setAttribute("msg", "(上传成功)");
+			return "forward:/fileload.jsp";
+		}
+		request.setAttribute("msg", "(上传失败)");
+		return "forward:/fileload.jsp";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/getFilesName",
+			produces = "text/html;charset=utf-8")
+	public String getFilesName(HttpSession request,
+							   HttpServletResponse response) throws Exception {
+		String path = request.getServletContext().getRealPath("/") + "files/files.json";
+		String json = JSONFileUtils.readFile(path);
+		return json;
+	}
+
+	/**
+	 * 根据浏览器的不同进行编码设置，返回编码后的文件名
+	 */
+	public String getFilename(HttpServletRequest request, String filename) throws Exception {
+		// IE不同版本User-Agent 中出现的关键词
+		String[] IEBrowserKeyWords = {"MSIE", "Trident", "Edge"};
+		// 获取请求头代理信息
+		String userAgent = request.getHeader("User-Agent");
+		for (String keyWord : IEBrowserKeyWords) {
+			if (userAgent.contains(keyWord)) {
+				// IE内核浏览器，统一为UTF-8编码
+				return URLEncoder.encode(filename, "UTF-8");
+			}
+		}
+		// 火狐等其他浏览器统一为ISO-8859-1编码显示
+		return new String(filename.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+	}
+
+	/**
+	 * 文件下载
+	 */
+	@RequestMapping("/download")
+	public ResponseEntity<byte[]> fileDownload(HttpServletRequest request, String filename) throws Exception {
+		// 指定要下载的文件所在路径
+		String path = request.getSession().getServletContext().getRealPath("/files/");
+		filename = new String(filename.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+		// 创建该文件对象
+		File file = new File(path + File.separator + filename);
+		// 设置响应头
+		HttpHeaders headers = new HttpHeaders();
+		// 对文件名编码，防止中文文件乱码
+		filename = this.getFilename(request, filename);
+		// 通知浏览器以下载的方式打开文件
+		headers.setContentDispositionFormData("attachment", filename);
+		// 定义以流的形式下载返回文件数据
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		// 使用Sring MVC框架的ResponseEntity对象封装返回下载数据
+		return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file), headers, HttpStatus.OK);
+	}
 }
 ```
 
@@ -1972,45 +2207,38 @@ public String hello1(String username,MultipartFile source,HttpSession session) {
 
 <img src="SpringMVC教程.assets/image-20231020170445692.png" alt="image-20231020170445692"  />
 
-# 十一、下载
+注意
 
-## 11.1 前端
+### 2.1、使用servlet-api的2.5版本时
 
-```html
-<@page pageEncoding="utf-8"%>
-<@taglib prefix="c" uri="http://ljava.sun. com/jsp/jstl/core"8><html>
-<body>
-    <h2>下载</h2>
-    <a href="$ {pageContext.request.contextPath}/xxx ?name=abc.exe"></a></body>
-</html>
+```
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>servlet-api</artifactId>
+    <version>2.5</version>
+    <scope>compile</scope>
+</dependency>
 ```
 
-## 11.2 controller
-
-```java
-@RequestMapping("/test1")
-public void hello1(String name,HttpSession session,HttpServletResponse response){
-    System.out.println("name:"+name);
-    //获得要下载文件的绝对路径
-    String path = session.getServletContext().getRealPath("/upload_file");
-    //文件的完整路径
-    String real_path = path+"\\"+name;
-    
-    //中文文件名的乱码解决
-    String encode = URLEncoder.encode(fileName, "utf-8");
-
-    //设置响应头  告知浏览器，要以附件的形式保存内容   filename=浏览器显示的下载文件名
-    response.setHeader("content-disposition","attachment;filename="+name);
-
-    //读取目标文件，写出给客户端
-    IOUtils.copy(new FileInputStream(real_path), response.getOutputStream());
-
-}
+```
+ ServletContext servletContext = request.getSession().getServletContext();
 ```
 
-运行结果
+### 2.2、使用servlet-api的3.1版本时
 
-<img src="SpringMVC教程.assets/image-20231020170310952.png" alt="image-20231020170310952" style="zoom:67%;" />
+```
+<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
+ <dependency>
+     <groupId>javax.servlet</groupId>
+     <artifactId>javax.servlet-api</artifactId>
+     <version>3.1.0</version>
+     <scope>provided</scope>
+ </dependency>
+```
+
+```
+ServletContext servletContext = request.getServletContext()
+```
 
 # 十二、验证码
 
@@ -2400,10 +2628,6 @@ public String mapTest(Map<String,String> map){
 
 在web.xml中配置filter
 
-
-
-![复制代码](SpringMVC教程.assets/3f7e636cc05c5f76e0f77a1a2053d6a5.gif)
-
 ```
 <!--处理中文乱码-->
   <filter>
@@ -2424,19 +2648,9 @@ public String mapTest(Map<String,String> map){
   </filter-mapping>
 ```
 
-
-
-![复制代码](SpringMVC教程.assets/f8fac948534e12e048989650dc7af947.gif)
-
-
-
 ### 2.5、配置静态资源访问
 
 在web.xml中配置：
-
-
-
-![复制代码](SpringMVC教程.assets/ee20df8e12a6349dbe96d78f4e1cd37e.gif)
 
 ```
 <!--设置访问静态资源-->
@@ -2453,4 +2667,3 @@ public String mapTest(Map<String,String> map){
   <url-pattern>*.jpg</url-pattern>
 </servlet-mapping>
 ```
-

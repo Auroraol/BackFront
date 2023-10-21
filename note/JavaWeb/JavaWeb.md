@@ -2038,7 +2038,7 @@ JSP自带比较简单的标签。
 - 执行运算
 - 获取web开发的常用对象
 
-**JSTL表达式**
+####  JSTL表达式
 
 JSTL支持通用的、结构化的任务，比如迭代，条件判断，XML文档操作，国际化标签，SQL标签。
 
@@ -3109,12 +3109,6 @@ public Map<String, Object> deleteUser(@RequestParam("id") String id) {
     <version>2.3.3</version>
     <scope>provided</scope>
 </dependency>
-<!-- JSTL表达式的依赖 -->
-<dependency>
-    <groupId>javax.servlet.jsp.jstl</groupId>
-    <artifactId>jstl-api</artifactId>
-    <version>1.2</version>
-</dependency>
 <!-- standard标签库 -->
 <dependency>
     <groupId>taglibs</groupId>
@@ -3123,5 +3117,9 @@ public Map<String, Object> deleteUser(@RequestParam("id") String id) {
 </dependency>
 ```
 
+**启用EL表达式的解析**
 
+```jsp
+<%@ page isELIgnored="false" %>
+```
 

@@ -636,7 +636,7 @@ public Map<String, Object> login(XUser user) {
 | ------------- | ------------------------------------------------------------ |
 | 转发          | url地址栏不会产生变化                                        |
 | 重定向        | url地址栏会发生变化                                          |
-| @ResponseBody | 一般在@Controller中使用: @ResponseBody+@Controller = @RestController,   后端发送java对象 ==记忆: 返回对象== |
+| @ResponseBody | 一般在@Controller中使用: @ResponseBody+@Controller = @RestController,   后端发送java对象 ==记忆: 返回对象,用于指示方法返回的对象会被自动转换为JSON格式的数据== |
 
 ## 5、读取配置信息
 
