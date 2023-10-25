@@ -467,7 +467,7 @@ public String testParam6(@PathVariable("username") String name){//将{username}�
 }
 ```
 
-## 3.6 总结【`重点`】
+## 3.6 总结【`重点`】:crossed_swords:
 
 详细见[前后端相互传数据方式总结.md](C:\Users\16658\Documents\GitHub\java_note\note\spring boot3\前后端相互传数据方式总结\前后端相互传数据方式总结.md)
 
@@ -1898,7 +1898,7 @@ public class UserController {
 
 创建 login.jsp,  perm_error.jsp, global_error.jsp页面
 
-# 九、拦截器(HandlerInterceptor)
+# 九、拦截器(HandlerInterceptor):crossed_swords:
 
 **作用：抽取handler中的冗余功能**
 
