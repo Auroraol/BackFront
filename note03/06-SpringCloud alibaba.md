@@ -121,7 +121,8 @@ linux/unix/mac启动
 ./startup.sh -m standaloner
 
 windows启动
-cmd startup.cmd或者双击startup,cmd运行文件
+startup.cmd -m standalone
+
 ```
 
 启动查看
@@ -132,7 +133,7 @@ startup -m standalone
 
 ![img](SpringCloud alibaba.assets/1638672199623-64cf8539-4d57-480d-ae94-c0576cb1be39-169651825574524.png)
 
-访问地址：[http://43.156.149.47:8848/nacos](http://162.14.64.72:8848/nacos)
+访问地址：[[Nacos](http://192.168.160.1:8848/nacos/index.html#/login)](http://162.14.64.72:8848/nacos)
 
 初始化账户和密码：nacos和nacos
 
@@ -140,7 +141,7 @@ startup -m standalone
 
 进入页面
 
-<img src="SpringCloud alibaba.assets/1638672345779-52534c59-aec3-4a09-a11e-67df6cf6a7d1-169651825574528.png" alt="img" style="zoom:33%;" />
+<img src="06-SpringCloud alibaba.assets/image-20231025212616269.png" alt="image-20231025212616269" style="zoom: 33%;" />
 
 ### 2.5、数据持久化到数据库
 
@@ -357,7 +358,7 @@ management:
 
 ![img](SpringCloud alibaba.assets/1638674165583-8d39502e-7d12-4678-9df1-2102c00098f2.png)
 
-# 使用
+# 使用:cloud:
 
 ## Nacos的依赖
 
@@ -2473,7 +2474,7 @@ CREATE TABLE `undo_log` (
 
 <img src="06-SpringCloud alibaba.assets/image-20231014114237928.png" alt="image-20231014114237928" style="zoom:67%;" />
 
-创建gateway服务，添加gateway依赖
+**创建gateway服务，添加gateway依赖**
 
 ```xml
 <!--nacos-->

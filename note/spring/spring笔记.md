@@ -2145,6 +2145,8 @@ AbstractAutoProxyCreator#postProcessAfterInitialization(Object bean, String bean
 
 # 十五、Spring + MyBatis
 
+[Spring + Mybatis + SpringMvc整合_spring mvc 以及 mybatis-CSDN博客](https://blog.csdn.net/bluelif/article/details/115874094)
+
 ------
 
 ## 15.1 配置数据源

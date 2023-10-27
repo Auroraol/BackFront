@@ -2336,7 +2336,7 @@ public Product findById(@PathVariable Long id) {
 客户端会有一个服务器地址列表，在发送请求前通过负载均衡算法选择一个服务器，然后进行访问，这
 是客户端负载均衡；即在客户端就进行负载均衡算法分配
 
-## Ribbon-负载均衡策略
+## Ribbon-负载均衡策略(核心)
 
 ![img](02-springcloud.assets/1653807308164-8b996298-f327-4d8e-9a80-551e56d7b77d.png)
 
@@ -2489,7 +2489,7 @@ RestTemplate方式调用存在的问题: 代码可读性差，编程体验不统
 
 ### (1)引入依赖
 
-在服务消费者shop_service_order 添加Fegin依赖
+在服务消费者shop_service_order 添加Fegin依赖—–谁用谁引用
 
 ```xml
 <dependency>
@@ -2599,6 +2599,8 @@ Feign中本身已经集成了Ribbon依赖和自动配置，因此我们不需要
 </dependency>
 ```
 
+默认Feign中本身已经集成了Ribbon依赖和自动配置
+
 ### 1.2 编写customer
 
 #### 1.2.1 编写启动类
@@ -2673,7 +2675,7 @@ public class PublisherController {
 #### 1.3.2 编写feignclient
 
 ```java
-@FeignClient(value = "customer")
+	@FeignClient(value = "customer")
     public interface CostomerFeignClient {
 
     @RequestMapping("/customer/test")
@@ -2812,18 +2814,18 @@ logging:
 
 ### 编写api
 
-引入依赖
+**引入依赖**
 
-```
+```java
 <dependency>
 <groupId>org.springframework.cloud</groupId>
 <artifactId>spring-cloud-starter-openfeign</artifactId>
 </dependency>
 ```
 
-编写Feign客户端()
+**编写Feign客户端()**
 
-```
+```java
 //指定需要调用的服务名称
 @FeignClient(name="shop-service-product")
 public interface ProductFeginClient {
@@ -2843,13 +2845,11 @@ Product实体类
 
 ### 使用
 
-引入依赖自定义api的依赖
+**引入依赖自定义api的依赖(及编写Feign客户端)**
 
 ![image-20231014095815713](02-springcloud.assets/image-20231014095815713.png)
 
-
-
-服务启动类添加Feign的支持
+**服务启动类添加Feign的支持**
 
 <img src="02-springcloud.assets/image-20231014100449550.png" alt="image-20231014100449550" style="zoom:67%;" />
 

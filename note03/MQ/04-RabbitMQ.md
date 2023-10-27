@@ -1,4 +1,4 @@
-一、引言
+# 一、引言
 
 模块之间的耦合度多高，导致一个模块宕机后，全部功能都不能用了，并且同步通讯的成本过高，用户体验差。
 
@@ -477,8 +477,6 @@ channel.basicPublish("routing-exchange","INFO",null,"INFO3".getBytes());
 
 消费者没有变化
 
-
-
 ## 5.7 Topic
 
 一个生产者，一个交换机，两个队列，两个消费者
@@ -666,15 +664,7 @@ public void getMessage(String msg, Channel channel, Message message) throws IOEx
 }
 ```
 
-
-
-
-
-
-
-
-
-## 序列化
+## 6.3 序列化
 
 ![image-20231016162910528](04-RabbitMQ.assets/image-20231016162910528.png)
 

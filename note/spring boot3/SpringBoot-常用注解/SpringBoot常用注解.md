@@ -117,7 +117,7 @@ public class UserActionController {
 
 | 注解                 | 备注                                                         |
 | -------------------- | ------------------------------------------------------------ |
-| @Service             | bean注册, ==一般加在service目录里面的类上==                  |
+| @Service             | bean注册, ==一般加在service目录里面的实现类上==              |
 | @Controller          | 控制层组件, controller目录里面的类上                         |
 | @Repository          | 数据层组件, dao目录里面的类上                                |
 | @Component           | bean注册, 和 Service 没有啥区别,  Component是比较通用的东西  |
