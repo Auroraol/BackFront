@@ -252,8 +252,9 @@ sudo docker images
 #### 删除本地镜像
 
 ```shell
-docker image rmi -f 镜像名/镜像ID     # 删除1个镜像
-docker image rmi -f 镜像名 镜像名         #删除多个镜像
+docker image rmi -f 镜像名/镜像ID         # 删除1个镜像
+docker image rmi -f 镜像名 镜像名         # 删除多个镜像
+ docker rmi $(docker images -q)          # 删除所有镜像
 ```
 
 ![image-20230308170230613](Docker.assets/37043aee7c6768894b2d0c44a4304c06.png)
@@ -343,6 +344,39 @@ root@e218edb10161:/#
 
 > 有了镜像才可以创建容器
 
+#### 重启&启动&停止&删除容器
+
+停止
+
+```shell
+docker stop 容器名/容器ID     # 停止全部容器
+docker stop $(docker ps -qa) # 删除指定容器
+```
+
+删除(删除容器前，需要先停止容器)
+
+```shell
+#删除一个容器
+docker rm -f 容器名/容器ID
+#删除多个容器 空格隔开要删除的容器名或容器ID
+docker rm -f 容器名/容器ID 容器名/容器ID 容器名/容器ID
+#删除全部容器
+docker rm -f $(docker ps -aq)
+```
+
+重启&启动
+
+```shell
+docker restart 容器id        # 重启停止运行的容器
+docker start 容器id          # 启动指定的容器
+```
+
++ docker restart 容器id   命令以相同的配置和状态重新启动。
+
++ docker start 容器id      命令用于启动已经停止的容器。
+
+==注意: 删除&启动操作的前提是使用停止操作==
+
 #### 运行容器
 
 运行容器需要制定具体镜像，如果镜像不存在，会直接下载
@@ -371,13 +405,6 @@ docker run -it -d --name 要取的别名 -p 宿主机端口:容器端口 -v 宿�
 -v 将容器内的指定文件夹挂载到宿主机对应位置
 ```
 
-#### 退出容器
-
-```shell
-exit            # 直接容器停止并退出
-Ctrl + p + q    # 容器不停止退出
-```
-
 #### 查看正在运行的容器
 
 查看全部正在运行的容器信息
@@ -398,7 +425,7 @@ docker top 容器id
 
 ![image-20231002220025497](Docker.assets/image-20231002220025497.png)
 
-#### 网络端口的快捷方式
+#### 指定网络端口
 
 docker port 可以查看指定 （ID 或者名字）容器的某个确定端口映射到宿主机的端口号。
 
@@ -414,12 +441,14 @@ docker port 可以查看指定 （ID 或者名字）容器的某个确定端口�
 查看容器日志，以查看容器运行的信息
 
 ```shell
-docker logs -f -t --tail  容器id(容器名)
+docker logs -f -t --tail number 容器id(容器名)
 
 -tf              # 显示日志
 -tf --tail number # 显示日志条数
 [root@kuangshen /]# docker logs -tf --tail 10 dce7b86171bf
 ```
+
+查看完毕后，`ctrl+c`即可退出
 
 #### 查看镜像的元数据
 
@@ -429,18 +458,29 @@ docker inspect 容器id
 
 ![image-20231002220308497](Docker.assets/image-20231002220308497.png)
 
-#### 进入容器内容部（重中重）
+#### 进入容器内容部
+
+#####  exec
 
 ```shell
 docker exec -it 容器id bash  #或者docker exec -it 容器ID sh
 #退出容器：exit
 ```
 
-#### 进入正在运行中的容器
+##### attach
 
 ```cobol
 sudo docker attach 容器ID/容器名
 ```
+
+##### 区别
+
+```shell
+exit            # 直接停止容器,退出容器的交互式终端  //exec 如果使用exit退出，容器也不会停止。
+Ctrl + p + q    # 容器不停止退出, 容器继续运行并保留端口映射配置
+```
+
+![image-20231030111356549](Docker.assets/image-20231030111356549.png)
 
 #### 主机内容和容器内容相互拷贝(没用)
 
@@ -449,38 +489,10 @@ sudo docker attach 容器ID/容器名
 将宿主机的文件复制到容器内部的指定目录
 
 ```shell
-docker cp 文件名称 容器id:容器内部路径
+docker cp 容器id:容器内部路径 文件名称
 ```
 
 ![image-20231002221107526](Docker.assets/image-20231002221107526.png)
-
-#### 重启&启动&停止&删除容器
-
-容器的启动，停止，删除等操作，后续经常会使用到
-
-```shell
-# 重新启动容器
-docker restart 容器id        # 启动停止运行的容器
-docker start 容器id          # 停止指定的容器（删除容器前，需要先停止容器）
-```
-
-停止
-
-```shell
-docker stop 容器名/容器ID     # 停止全部容器
-docker stop $(docker ps -qa) # 删除指定容器
-```
-
-删除
-
-```shell
-#删除一个容器
-docker rm -f 容器名/容器ID
-#删除多个容器 空格隔开要删除的容器名或容器ID
-docker rm -f 容器名/容器ID 容器名/容器ID 容器名/容器ID
-#删除全部容器
-docker rm -f $(docker ps -aq)
-```
 
 #### 导入和导出容器
 
@@ -670,6 +682,8 @@ firewall-cmd --reload
 ## 七、数据卷【`重点`】
 
  数据卷：将宿主机的一个目录映射到容器的一个目录中。可以在宿主机中操作目录中的内容，那么容器内部映射的文件，也会跟着一起改变。**容器的持久化和数据共享同步操作！**
+
+Docker 不支持在已经运行的容器中动态追加数据卷。一旦容器创建后，数据卷的挂载路径是固定的，无法直接追加新的数据卷或更改挂载点。
 
 #### 7.1 创建数据卷
 

@@ -218,8 +218,6 @@ primary shard （建立索引时一次设置，不能修改，默认5个）， r
 
 [各种版本部署:  ElasticSearch 7.7.0 安装部署 (yuque.com)](https://www.yuque.com/yanyulou-jxe2g/iz0eoq/bc0g2r)
 
-
-
 # ES基础语法
 
 > 索引库就类似数据库表，mapping映射就类似表的结构。要向es中存储数据，必须先创建“库”和“表”

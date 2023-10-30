@@ -1,18 +1,18 @@
-# 安装elasticsearch
+安装elasticsearch
 
 
 
 # 1.部署单点es
 
-## 1.1.创建网络
+## 1.1 创建网络
 
 因为我们还需要部署kibana容器，因此需要让es和kibana容器互联。这里先创建一个网络：
 
-```sh
+```shell
 docker network create es-net
 ```
 
-## 1.2.加载镜像
+## 1.2 加载镜像
 
 这里我们采用elasticsearch的7.12.1版本的镜像，这个镜像体积非常大，接近1G。不建议大家自己pull。
 
@@ -29,9 +29,19 @@ docker load -i es.tar
 
 同理还有`kibana`的tar包也需要这样做。
 
+## 1.3 创建挂载点目录
 
+```shell
+mkdir -p /usr/local/es/data /usr/local/es/config /usr/local/es/plugins
+```
 
-## 1.3.运行
+```shell
+chmod 777  /usr/local/es/data
+chmod 777  /usr/local/es/config
+chmod 777  /usr/local/es/plugins
+```
+
+## 1.4 运行
 
 运行docker命令，部署单点es：
 
@@ -40,14 +50,16 @@ docker run -d \
 	--name es \
     -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
     -e "discovery.type=single-node" \
-    -v /mydata/es/es-data:/usr/share/elasticsearch/data \
-    -v /mydata/es/es-plugins:/usr/share/elasticsearch/plugins \
+	-v /usr/local/es/data:/usr/share/elasticsearch/data \
+	-v /usr/local/es/plugins:/usr/share/elasticsearch/plugins \
     --privileged \
     --network es-net \
     -p 9200:9200 \
     -p 9300:9300 \
 elasticsearch:7.12.1
 ```
+
+![image-20231030152040649](安装elasticsearch.assets/image-20231030152040649.png)
 
 命令解释：
 
@@ -62,13 +74,15 @@ elasticsearch:7.12.1
 - `--network es-net` ：加入一个名为es-net的网络中
 - `-p 9200:9200`：端口映射配置
 
-在浏览器中输入：http://主机ip:9200 即可看到elasticsearch的响应结果：
+## 1.5 测试
 
-![image-20210506101053676](assets/image-20210506101053676.png)
+访问虚拟机地址+端口号，前面配置Elasticsearch 的端口号为：9200 即可看到elasticsearch的响应结果：
 
+<img src="安装elasticsearch.assets/image-20231030155455974.png" style="zoom: 67%;" />
 
+外部访问
 
-
+<img src="安装elasticsearch.assets/image-20231030160416747.png" alt="image-20231030160416747" style="zoom:67%;" />
 
 # 2.部署kibana
 
@@ -103,19 +117,27 @@ docker logs -f kibana
 
 此时，在浏览器输入地址访问：http://主机ip:5601，即可看到结果
 
-## 2.2.DevTools
+## 2.2 测试
+
+访问虚拟机地址+端口号，前面配置Kibana 的端口号为：5601
+
+```
+http://192.168.27.129:5601
+```
+
+<img src="安装elasticsearch.assets/image-20231030162658167.png" alt="image-20231030162658167" style="zoom: 33%;" />
+
+## 2.3 使用DevTools工具
 
 kibana中提供了一个DevTools界面：
 
-![image-20210506102630393](assets/image-20210506102630393.png)
+![image-20231030162952572](安装elasticsearch.assets/image-20231030162952572.png)
 
 这个界面中可以编写DSL来操作elasticsearch。并且对DSL语句有自动补全功能。
 
-
-
 # 3.安装IK分词器
 
-
+**注意：安装IK分词器的版本，必须和Elasticsearch的版本一致**
 
 ## 3.1.在线安装ik插件（较慢）
 
@@ -160,8 +182,6 @@ docker volume inspect es-plugins
 
 说明plugins目录被挂载到了：`/var/lib/docker/volumes/es-plugins/_data `这个目录中。
 
-
-
 ### 2）解压缩分词器安装包
 
 下面我们需要把课前资料中的ik分词器解压缩，重命名为ik
@@ -173,8 +193,6 @@ docker volume inspect es-plugins
 也就是`/var/lib/docker/volumes/es-plugins/_data `：
 
 ![image-20210506110704293](assets/image-20210506110704293.png)
-
-
 
 ###  4）重启容器
 
@@ -188,7 +206,7 @@ docker restart es
 docker logs -f es
 ```
 
-### 5）测试：
+### 5）测试
 
 IK分词器包含两种模式：
 
@@ -196,13 +214,11 @@ IK分词器包含两种模式：
 
 * `ik_max_word`：最细切分
 
-
-
 ```json
 GET /_analyze
 {
   "analyzer": "ik_max_word",
-  "text": "黑马程序员学习java太棒了"
+  "text": "程序员学习java太棒了"
 }
 ```
 
@@ -212,75 +228,64 @@ GET /_analyze
 {
   "tokens" : [
     {
-      "token" : "黑马",
+      "token" : "程序员",
       "start_offset" : 0,
-      "end_offset" : 2,
+      "end_offset" : 3,
       "type" : "CN_WORD",
       "position" : 0
     },
     {
-      "token" : "程序员",
-      "start_offset" : 2,
-      "end_offset" : 5,
+      "token" : "程序",
+      "start_offset" : 0,
+      "end_offset" : 2,
       "type" : "CN_WORD",
       "position" : 1
     },
     {
-      "token" : "程序",
+      "token" : "员",
       "start_offset" : 2,
-      "end_offset" : 4,
-      "type" : "CN_WORD",
+      "end_offset" : 3,
+      "type" : "CN_CHAR",
       "position" : 2
     },
     {
-      "token" : "员",
-      "start_offset" : 4,
+      "token" : "学习",
+      "start_offset" : 3,
       "end_offset" : 5,
-      "type" : "CN_CHAR",
+      "type" : "CN_WORD",
       "position" : 3
     },
     {
-      "token" : "学习",
+      "token" : "java",
       "start_offset" : 5,
-      "end_offset" : 7,
-      "type" : "CN_WORD",
+      "end_offset" : 9,
+      "type" : "ENGLISH",
       "position" : 4
     },
     {
-      "token" : "java",
-      "start_offset" : 7,
-      "end_offset" : 11,
-      "type" : "ENGLISH",
+      "token" : "太棒了",
+      "start_offset" : 9,
+      "end_offset" : 12,
+      "type" : "CN_WORD",
       "position" : 5
     },
     {
-      "token" : "太棒了",
-      "start_offset" : 11,
-      "end_offset" : 14,
+      "token" : "太棒",
+      "start_offset" : 9,
+      "end_offset" : 11,
       "type" : "CN_WORD",
       "position" : 6
     },
     {
-      "token" : "太棒",
-      "start_offset" : 11,
-      "end_offset" : 13,
-      "type" : "CN_WORD",
-      "position" : 7
-    },
-    {
       "token" : "了",
-      "start_offset" : 13,
-      "end_offset" : 14,
+      "start_offset" : 11,
+      "end_offset" : 12,
       "type" : "CN_CHAR",
-      "position" : 8
+      "position" : 7
     }
   ]
 }
 ```
-
-
-
-
 
 ## 3.3 扩展词词典
 
@@ -315,7 +320,6 @@ GET /_analyze
 
 ```sh
 docker restart es
-
 # 查看 日志
 docker logs -f elasticsearch
 ```
@@ -387,15 +391,9 @@ GET /_analyze
 
 > 注意当前文件的编码必须是 UTF-8 格式，严禁使用Windows记事本编辑
 
-
-
-
-
 # 4.部署es集群
 
 部署es集群可以直接使用docker-compose来完成，不过要求你的Linux虚拟机至少有**4G**的内存空间
-
-
 
 首先编写一个docker-compose文件，内容如下：
 
@@ -472,10 +470,243 @@ networks:
     driver: bridge
 ```
 
-
-
 Run `docker-compose` to bring up the cluster:
 
 ```sh
 docker-compose up
 ```
+
+# :candy:
+
+# 安装Elasticsearch 8.6.0 版本
+
+## 1. Elasticsearch 简介
+
+- Elasticsearch（ES） 是一个基于 Apache Lucene 开源的分布式、高扩展、近实时的搜索引擎，主要用于海量数据快速存储，实时检索，高效分析的场景。通过简单易用的 RESTful API，隐藏 Lucene 的复杂性，让全文搜索变得简单。
+- ES 功能总结有三点：
+  - 分布式 **存储**
+  - 分布式 **搜索**
+  - 分布式 **分析**
+- 因为是分布式，可将海量数据分散到多台服务器上存储，检索和分析，只要是海量数据需要完成上面这三种操作的业务场景，一般都会考虑使用 ES，比如维基百科，Stack Overflow，GitHub 后台均有使用。
+
+## 2. 基于Docker安装Elasticsearch
+
+### 2.1 创建网络
+
+```
+docker network create es-net
+```
+
+实例：
+
+```shell
+[root@bogon howlong]# docker network create es-net
+344f17ffe435894bc3ec98f3e3c1ad93cbde41a473576e645a0d24b6111e7e2e
+[root@bogon howlong]#
+```
+
+### 2.2 拉取镜像
+
+```cobol
+docker pull elasticsearch:8.6.0
+```
+
+实例：
+
+```shell
+[root@bogon howlong]# docker pull elasticsearch:8.6.0
+8.6.0: Pulling from library/elasticsearch
+846c0b181fff: Pull complete 
+f3516e94dfa9: Pull complete 
+b8d95ef1999f: Pull complete 
+69af40093f34: Pull complete 
+52d2fb478029: Pull complete 
+14619d64e022: Pull complete 
+ff00ac3f5836: Pull complete 
+2eed17832094: Pull complete 
+5a7083c2053b: Pull complete 
+Digest: sha256:12d0ff50b96a53d2a8e103ba2e0e69187babc3dcf8bdc88788d019cdebb75c0c
+Status: Downloaded newer image for elasticsearch:8.6.0
+docker.io/library/elasticsearch:8.6.0
+[root@bogon howlong]# 
+```
+
+### 2.3 创建挂载点目录
+
+```shell
+mkdir -p /usr/local/es/data /usr/local/es/config /usr/local/es/plugins
+```
+
+```shell
+chmod 777  /usr/local/es/data
+chmod 777  /usr/local/es/config
+chmod 777  /usr/local/es/plugins
+```
+
+### 2.4 部署单点es，创建es容器
+
+```shell
+docker run -d \
+--restart=always \
+--name es \
+--network es-net \
+-p 9200:9200 \
+-p 9300:9300 \
+--privileged \
+-v /usr/local/es/data:/usr/share/elasticsearch/data \
+-v /usr/local/es/plugins:/usr/share/elasticsearch/plugins \
+-e "discovery.type=single-node" \
+-e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
+elasticsearch:8.6.0
+```
+
+运行结果:
+
+![image-20231030102510733](安装elasticsearch.assets/image-20231030102510733.png)
+
+### 2.5 编写elasticsearch.yml
+
+```shell
+root@lfj-virtual-machine:# docker exec -it es /bin/bash
+elasticsearch@977d28738985:~$ cd config
+elasticsearch@977d28738985:~/config$ echo 'xpack.security.enabled: false' >> elasticsearch.yml
+elasticsearch@977d28738985:~/config$ 
+```
+
+### 2.6 重启es容器
+
+> 指令；
+>
+> ```undefined
+> docker restart es
+> ```
+
+### 2.7 测试Elasticsearch是否安装成功
+
+访问虚拟机地址+端口号，前面配置Elasticsearch 的端口号为：9200
+
+例如：
+
+```cobol
+http://192.168.200.134:9200/
+```
+
+<img src="安装elasticsearch.assets/image-20231030160416747.png" style="zoom:67%;" />
+
+## 3. 基于Docker安装Kibana
+
+### 3.1 拉取镜像
+
+```shell
+docker pull kibana:8.6.0
+```
+
+实例：
+
+```shell
+[root@bogon howlong]# docker pull kibana:8.6.0
+8.6.0: Pulling from library/kibana
+846c0b181fff: Already exists 
+d9d4723b53e8: Pull complete 
+3ce175049527: Pull complete 
+c5a9d626f54a: Pull complete 
+ce0bd3b890fe: Pull complete 
+4f4fb700ef54: Pull complete 
+1cb2fe49dd32: Pull complete 
+7cbec743e1ac: Pull complete 
+de07a2df0c3f: Pull complete 
+f138fef302e6: Pull complete 
+c6afac2b2f31: Pull complete 
+53c0672d0212: Pull complete 
+7522efaa8c9c: Pull complete 
+5e8db7e50c16: Pull complete 
+Digest: sha256:71d8a59d32b181c3b3c04a4fecf2197f00eb381659510d04261c2cd5d43a0225
+Status: Downloaded newer image for kibana:8.6.0
+docker.io/library/kibana:8.6.0
+[root@bogon howlong]# 
+```
+
+### 3.2 创建挂载点目录
+
+```shell
+mkdir -p /usr/local/kibana/config /usr/local/kibana/data
+```
+
+```shell
+chmod 777 /usr/local/kibana/data
+chmod 777 /usr/local/kibana/config
+```
+
+### 3.3 部署kibana，创建kibana容器
+
+```shell
+docker run -d \
+--restart=always \
+--name kibana \
+--network es-net \
+-p 5601:5601 \
+-e ELASTICSEARCH_HOSTS=http://es:9200 \
+kibana:8.6.0
+```
+
+### 3.4 测试Kibana是否安装成功
+
+访问虚拟机地址+端口号，前面配置Kibana 的端口号为：5601
+
+```
+http://192.168.27.129:5601
+```
+
+<img src="安装elasticsearch.assets/image-20231030162658167.png" alt="image-20231030162658167" style="zoom: 33%;" />
+
+## 4. 基于Docker安装IK分词器
+
+### 4.1 进入Elasticsearch容器
+
+```shell
+docker exec -it es /bin/bash
+```
+
+### 4.2 在线安装IK分词器
+
+**注意：安装IK分词器的版本，必须和Elasticsearch的版本一致，上文安装的是Elasticsearch 8.6.0的，所以接下来安装的IK分词器版本是8.6.0**
+
+```shell
+./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v8.6.0/elasticsearch-analysis-ik-8.6.0.zip
+```
+
+如果需要安装其他版本的IK分词器，需要把版本号修改即可
+
+如：
+
+```
+./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.4.2/elasticsearch-analysis-ik-7.4.2.zip
+```
+
+# 虚拟机内存不足
+
+```shell
+docker logs -f es
+```
+
+日志如下:
+
+{"type": "server", "timestamp": "2023-10-30T07:23:46,472Z", "level": "WARN", "component": "o.e.c.r.a.DiskThresholdMonitor", "cluster.name": "docker-cluster", "node.name": "989a610fc0c8", "message": "high disk watermark [90%] exceeded on [vg1lfD9rR1eSgKsBNBsN7A][989a610fc0c8][/usr/share/elasticsearch/data/nodes/0] free: 2gb[5.3%], shards will be relocated away from this node; currently relocating away shards totalling [0] bytes; the node is expected to continue to exceed the high disk watermark when these relocations are complete", "cluster.uuid": "9K3VuhoMRUuItnHnvUt4-A", "node.id": "vg1lfD9rR1eSgKsBNBsN7A"  } 
+
+根据提供的日志信息，可以看到高磁盘水位标记（high disk watermark）已超过90%。这意味着磁盘空间已经接近满了，导致Elasticsearch无法继续在当前节点上存储数据。
+
+解决该问题的方法是，清理或增加磁盘空间。以下是一些可行的解决方案：
+
+1. 清理磁盘空间：检查磁盘上是否存在不再需要的旧数据、日志文件或临时文件，并将其删除。可以使用命令如`du`和`rm`来查找和删除不必要的文件。
+2. 调整Elasticsearch的数据路径：检查Elasticsearch的配置文件中`path.data`属性的设置，并确保将数据存储在足够大的磁盘分区上。
+3. 扩大磁盘空间：如果磁盘空间不足，考虑增加磁盘大小或添加额外的磁盘。
+4. 在集群中重新平衡分片：当磁盘水位问题得到解决后，你可以重新平衡集群中的分片，以确保数据在各个节点上均衡分布。
+
+解决方法:
+
++ [虚拟机扩容](https://blog.csdn.net/m0_74923682/article/details/129255801)
++ [解决ubuntu20.04虚拟机无法上网的问题](https://blog.csdn.net/xu624735206/article/details/108797471)
++ [ubuntu20.04 -vm-扩展硬盘后30G后不能联网](https://blog.csdn.net/weixin_43224306/article/details/124892570?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-124892570-blog-105430944.235^v38^pc_relevant_sort_base1&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
+
+
+
