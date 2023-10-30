@@ -188,7 +188,7 @@ systemctl restart docker
 
 ![image-20231002200422844](Docker.assets/image-20231002200422844.png)
 
-##  五、常用命令
+##  五、常用命令 :cat:
 
 <img src="Docker.assets/image-20231002221406584.png" alt="image-20231002221406584" style="zoom: 67%;" />
 
@@ -210,7 +210,7 @@ sudo docker search 镜像名称
 + OFFICIAL:是否是官方的
 + AUTOMATED：是否自动构建的
 
-**访问 Nginx 镜像库地址**
+**比如:  访问 Nginx 镜像库地址**
 
  https://hub.docker.com/_/nginx?tab=tags可以通过 Sort by 查看其他版本的 Nginx，默认是最新版本 nginx:latest。
 
@@ -259,7 +259,7 @@ docker image rmi -f 镜像名 镜像名         # 删除多个镜像
 
 ![image-20230308170230613](Docker.assets/37043aee7c6768894b2d0c44a4304c06.png)
 
-#### 镜像的导入导出（重点）
+#### 镜像的导入导出
 
  **保存镜像**
 
@@ -393,6 +393,8 @@ docker run -d -p 宿主机端口:容器端口 --name 容器名称 镜像的标�
 
 docker run -d -p 8081:8080 --name tomcat b8
 ```
+
+运行的同时创建数据卷: 
 
 ```shell
 docker run -it -d --name 要取的别名 -p 宿主机端口:容器端口 -v 宿主机文件存储位置:容器内文件位置 镜像名:Tag /bin/bash 
@@ -731,11 +733,25 @@ docker volume rm 数据卷名称
 - 通过数据卷名称映射，如果数据卷不存在。Docker会帮你自动创建，会将容器内部自带的文件，存储在默认的存放路径中。
 - 通过路径映射数据卷，直接指定一个路径作为数据卷的存放位置。但是这个路径下是空的。
 
+语法
+
+```shell
+docker run -d --name <容器名称> -v <宿主机目录>:<容器内目标目录> <镜像名称>
+```
+
+- `<容器名称>`：容器指定的名称。
+- `-v` 或 `--volume`：用于映射数据卷的选项。
+- `<宿主机目录>`：宿主机上的目录或文件的路径，它将被映射到容器内部。
+- `<容器内目标目录>`：容器内部的目标路径，用于将宿主机的目录或文件映射到容器内的相应位置。
+- `<镜像名称>`：要运行的 Docker 镜像的名称和标签。
+
+例子
+
 ```shell
 # 通过数据卷名称映射docker run -v 数据卷名称:容器内部的路径 镜像id
 # 通过路径映射数据卷docker run -v 路径:容器内部的路径 镜像id   
 
-docker run -d -p 8081:8080 --name tomcat -v[volume] /opt/tocmat:/usr/local/tomcat/webapps/ROOT b8
+docker run -d -p 8081:8080 --name tomcat -v /opt/tocmat:/usr/local/tomcat/webapps/ROOT b8
 ```
 
 #### 7.6 通过Dockerfile挂载(推荐)
