@@ -70,7 +70,6 @@ jackson 由 fasterxml 组织开发，相比 fastjson，有着更强大的功能�
         String str = mapper.writeValueAsString(userList);
         return str;
     }
-12345678910111213141516171819
 ```
 
 ***效果：***
@@ -227,7 +226,6 @@ XUser user = JSON.parseObject(JSON.toJSONString(obj), XUser.class);
         System.out.println(info.getIntValue("age"));//18
         System.out.println(info.getJSONArray("gradle"));//["1班","2班","3班"]
         System.out.println(info.getJSONObject("schoolInfo"));//{"schoolName":"第一中学","teacher":"刘梅"}
-12345678910111213141516171819
 ```
 
 ### json数组遍历取值
@@ -303,7 +301,7 @@ public class Student {
 }
 ```
 
-### json字符串转java对象的转换
+### json字符串转java对象的转换:crossed_swords:
 
 ```java
 Student student = new Student("张三", 18);
