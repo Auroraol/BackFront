@@ -1,5 +1,7 @@
 # 引言
 
+[elasticsearch restful api (DSL)_es 语法参考](https://blog.csdn.net/qq_46548855/article/details/109503894)
+
 ## 定义
 
 官网原话: Elasticsearch is a real-time, distributed storage, search, and analytics engine
