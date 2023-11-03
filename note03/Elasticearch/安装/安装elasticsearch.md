@@ -1,6 +1,7 @@
-安装elasticsearch
+# 安装elasticsearch
 
-
+所需资料链接：https://pan.baidu.com/s/1E8DACM04zsg6nsjvgyrxQg 
+提取码：sdlp
 
 # 1.部署单点es
 
@@ -86,7 +87,7 @@ elasticsearch:7.12.1
 
 # 2.部署kibana
 
-kibana可以给我们提供一个elasticsearch的可视化界面，便于我们学习。
+kibana可以给我们提供一个elasticsearch的可视化界面
 
 ## 2.1.部署
 
@@ -105,7 +106,7 @@ kibana:7.12.1
 - `-e ELASTICSEARCH_HOSTS=http://es:9200"`：设置elasticsearch的地址，因为kibana已经与elasticsearch在一个网络，因此可以用容器名直接访问elasticsearch
 - `-p 5601:5601`：端口映射配置
 
-kibana启动一般比较慢，需要多等待一会，可以通过命令：
+**kibana启动一般比较慢，需要多等待一会**，可以通过命令：
 
 ```sh
 docker logs -f kibana
@@ -122,7 +123,7 @@ docker logs -f kibana
 访问虚拟机地址+端口号，前面配置Kibana 的端口号为：5601
 
 ```
-http://192.168.27.129:5601
+http://192.168.200.134:5601
 ```
 
 <img src="安装elasticsearch.assets/image-20231030162658167.png" alt="image-20231030162658167" style="zoom: 33%;" />
@@ -395,25 +396,22 @@ GET /_analyze
 
 部署es集群可以直接使用docker-compose来完成，不过要求你的Linux虚拟机至少有**4G**的内存空间
 
+## 4.1.创建es集群
+
 首先编写一个docker-compose文件，内容如下：
 
 ```sh
 version: '2.2'
 services:
   es01:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
+    image: elasticsearch:7.12.1
     container_name: es01
     environment:
       - node.name=es01
       - cluster.name=es-docker-cluster
       - discovery.seed_hosts=es02,es03
       - cluster.initial_master_nodes=es01,es02,es03
-      - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
     volumes:
       - data01:/usr/share/elasticsearch/data
     ports:
@@ -421,42 +419,35 @@ services:
     networks:
       - elastic
   es02:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
+    image: elasticsearch:7.12.1
     container_name: es02
     environment:
       - node.name=es02
       - cluster.name=es-docker-cluster
       - discovery.seed_hosts=es01,es03
       - cluster.initial_master_nodes=es01,es02,es03
-      - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
     volumes:
       - data02:/usr/share/elasticsearch/data
+    ports:
+      - 9201:9200
     networks:
       - elastic
   es03:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
+    image: elasticsearch:7.12.1
     container_name: es03
     environment:
       - node.name=es03
       - cluster.name=es-docker-cluster
       - discovery.seed_hosts=es01,es02
       - cluster.initial_master_nodes=es01,es02,es03
-      - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
     volumes:
       - data03:/usr/share/elasticsearch/data
     networks:
       - elastic
-
+    ports:
+      - 9202:9200
 volumes:
   data01:
     driver: local
@@ -475,6 +466,146 @@ Run `docker-compose` to bring up the cluster:
 ```sh
 docker-compose up
 ```
+
+es运行需要修改一些linux系统权限，修改`/etc/sysctl.conf`文件
+
+```sh
+vi /etc/sysctl.conf
+```
+
+添加下面的内容：
+
+```sh
+vm.max_map_count=262144
+```
+
+然后执行命令，让配置生效：
+
+```sh
+sysctl -p
+```
+
+通过docker-compose启动集群：
+
+```sh
+docker-compose -f docker-compose.yml up -d
+```
+
+## 4.2.集群状态监控
+
+kibana可以监控es集群，不过新版本需要依赖es的x-pack 功能，配置比较复杂。
+
+这里推荐使用cerebro来监控es集群状态，官方网址：https://github.com/lmenezes/cerebro
+
+资料已经提供了安装包：
+
+链接：https://pan.baidu.com/s/1c7hRrcBmWvdmJ4Q5ameUmg 
+提取码：51dn
+
+![image-20210602220751081](安装elasticsearch.assets/image-20210602220751081.png)
+
+解压即可使用，非常方便。
+
+解压好的目录如下：
+
+![image-20210602220824668](安装elasticsearch.assets/image-20210602220824668.png)
+
+进入对应的bin目录：
+
+![image-20210602220846137](安装elasticsearch.assets/image-20210602220846137.png)
+
+双击其中的cerebro.bat文件即可启动服务。
+
+![image-20210602220941101](安装elasticsearch.assets/image-20210602220941101.png)
+
+访问http://localhost:9000 即可进入管理界面：
+
+![image-20210602221115763](安装elasticsearch.assets/image-20210602221115763.png)
+
+输入你的elasticsearch的任意节点的地址和端口，点击connect即可：
+
+![](安装elasticsearch.assets/image-20231103182524039.png)
+
+绿色的条，代表集群处于绿色（健康状态）。
+
+## 4.3.创建索引库
+
+### 1）利用kibana的DevTools创建索引库
+
+在DevTools中输入指令：
+
+```json
+PUT /itcast
+{
+  "settings": {
+    "number_of_shards": 3, // 分片数量
+    "number_of_replicas": 1 // 副本数量
+  },
+  "mappings": {
+    "properties": {
+      // mapping映射定义 ...
+    }
+  }
+}
+```
+
+### 2）利用cerebro创建索引库
+
+利用cerebro还可以创建索引库：
+
+![image-20210602221409524](安装elasticsearch.assets/image-20210602221409524.png)
+
+填写索引库信息：
+
+![image-20210602221520629](安装elasticsearch.assets/image-20210602221520629.png)
+
+点击右下角的create按钮：
+
+![image-20210602221542745](安装elasticsearch.assets/image-20210602221542745.png)
+
+## 4.4.查看分片效果
+
+回到首页，即可查看索引库分片效果：
+
+<img src="安装elasticsearch.assets/image-20210602221914483.png" alt="image-20210602221914483" style="zoom: 67%;" />
+
+# 5. 拼音分词器插件
+
+要实现根据字母做补全，就必须对文档按照拼音分词。在GitHub上恰好有elasticsearch的拼音分词插件。地址：https://github.com/medcl/elasticsearch-analysis-pinyin
+
+![image-20210723205932746](安装elasticsearch.assets/image-20210723205932746.png)
+
+课前资料中也提供了拼音分词器的安装包：
+
+![image-20210723205722303](安装elasticsearch.assets/image-20210723205722303.png) 
+
+安装方式与IK分词器一样，分三步：
+
+​	①解压
+
+​	②上传到虚拟机中，elasticsearch的plugin目录
+
+​	③重启elasticsearch
+
+​	④测试
+
+详细安装步骤可以参考IK分词器的安装过程。
+
+测试用法如下：
+
+```json
+POST /_analyze
+{
+  "text": "如家酒店还不错",
+  "analyzer": "pinyin"
+}
+```
+
+结果：
+
+<img src="安装elasticsearch.assets/image-20210723210126506.png" alt="image-20210723210126506" style="zoom:67%;" /> 
+
+
 
 # :candy:
 

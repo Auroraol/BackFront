@@ -6,11 +6,20 @@
 
 ![4fbb7a24296afcc02cb2df8357c62b0](04-RabbitMQ.assets/4fbb7a24296afcc02cb2df8357c62b0.png)
 
+![image-20231103153400023](04-RabbitMQ.assets/image-20231103153400023.png)
+
+两种方式各有优劣，打电话可以立即得到响应，但是你却不能跟多个人同时通话。发送邮件可以同时与多个人收发邮件，但是往往响应会有延迟。
+
 # 二、RabbitMQ介绍
 
 市面上比较火爆的几款MQ：
 
 ![image-20231016135827747](04-RabbitMQ.assets/image-20231016135827747.png)
+
++ 追求可用性：Kafka、 RocketMQ 、RabbitMQ
++ 追求可靠性：RabbitMQ、RocketMQ
++ 追求吞吐能力：RocketMQ、Kafka
++ 追求消息低延迟：RabbitMQ、Kafka
 
 ActiveMQ，RocketMQ，Kafka分布式消息队列，RabbitMQ。
 
@@ -27,11 +36,12 @@ https://www.rabbitmq.com
 
 # 三、RabbitMQ安装
 
+## 单机部署
+
 创建目录，用于存放Docker Compose部署RabbitMQ的yaml文件：
 
-```
+```shell
 mkdir -p /root/composefile/rabbitmq
-写入该yaml文件：
 ```
 
 ```shell
@@ -46,7 +56,7 @@ version: '3'
 services:
   rabbitmq:
     image: rabbitmq:management
-    container_name: rabbitmq
+    container_name: mq
     restart: always
     ports:
       - 5672:5672
@@ -63,6 +73,8 @@ services:
 docker compose -f /root/composefile/rabbitmq/rabbitmq.yaml up -d
 ```
 
+查看
+
 ```shell
 root@lfj-virtual-machine:/# docker ps
 CONTAINER ID   IMAGE                 COMMAND                  CREATED              STATUS                                                                                         
@@ -77,19 +89,41 @@ ens33: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         RX errors 1083  dropped 1231  overruns 0  frame 0
         TX packets 52456  bytes 4125913 (4.1 MB)
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-        device interrupt 19  base 0x2000  
-        
+        device interrupt 19  base 0x2000       
 ```
 
-访问`http://192.168.200.134:15672/#/`，即可进入`RabbitMQ`的管理界面。
+访问`http://192.168.200.134:15672/#/`，即可进入`RabbitMQ`的管理界面
 
 ![image-20231016150613634](04-RabbitMQ.assets/image-20231016150613634.png)
 
 使用`Docker Compose`部署`RabbitMQ`很方便。如果部署出现问题，可以通过查看容器的日志来发现问题。
 
-```
+```shell
 docker logs rabbitmq
 ```
+
+## 集群部署
+
+### 集群分类
+
+在RabbitMQ的官方文档中，讲述了两种集群的配置方式：
+
+- 普通模式：普通模式集群不进行数据同步，每个MQ都有自己的队列、数据信息（其它元数据信息如交换机等会同步）。例如我们有2个MQ：mq1，和mq2，如果你的消息在mq1，而你连接到了mq2，那么mq2会去mq1拉取消息，然后返回给你。如果mq1宕机，消息就会丢失。
+- 镜像模式：与普通模式不同，队列会在各个mq的镜像节点之间同步，因此你连接到任何一个镜像节点，均可获取到消息。而且如果一个节点宕机，并不会导致数据丢失。不过，这种方式增加了数据同步的带宽消耗。
+
+###  设置网络
+
+首先，我们需要让3台MQ互相知道对方的存在。
+
+分别在3台机器中，设置 /etc/hosts文件，添加如下内容：
+
+```
+192.168.150.101 mq1
+192.168.150.102 mq2
+192.168.150.103 mq3
+```
+
+并在每台机器上测试，是否可以ping通对方
 
 # 四、RabbitMQ架构【重点】
 
@@ -101,7 +135,7 @@ docker logs rabbitmq
 - Queue - 队列：Exchange会将消息分发到指定的Queue，Queue和消费者进行交互
 - Routes - 路由：交换机以什么样的策略将消息发布到Queue
 
-![img](04-RabbitMQ.assets/1638063041766-274e55ff-9a81-4ac7-95c6-7896f5c96a56.png)
+<img src="04-RabbitMQ.assets/image-20231103153803695.png" alt="image-20231103153803695" style="zoom:67%;" />
 
 ## 4.2 RabbitMQ的完整架构图
 
@@ -116,8 +150,6 @@ docker logs rabbitmq
 http://162.14.64.72:15672/
 
 ![img](04-RabbitMQ.assets/1638063095101-d84089d2-93d3-431f-8279-49294847e5a2.png)
-
-
 
 # 五、RabbitMQ的使用【重点】
 
@@ -155,6 +187,7 @@ http://162.14.64.72:15672/
 public static Connection getConnection(){
     // 创建Connection工厂
     ConnectionFactory factory = new ConnectionFactory();
+    // 1.1.设置连接参数，分别是：主机名、端口号、vhost、用户名、密码
     factory.setHost("192.168.199.109");
     factory.setPort(5672);
     factory.setUsername("test");
@@ -514,19 +547,602 @@ channel.basicPublish("topic-exchange","fast.white.cat",null,"快白猫".getBytes
 
 消费者只是监听队列，没变化。
 
+# 六、 SpringAMQP:crossed_swords:
+
+SpringAMQP是基于RabbitMQ封装的一套模板，并且还利用SpringBoot对其实现了自动装配，使用起来非常方便。
+
+SpringAmqp的官方地址：https://spring.io/projects/spring-amqp
+
+![image-20231103154314500](04-RabbitMQ.assets/image-20231103154314500.png)
+
+SpringAMQP提供了三个功能：
+
+- 自动声明队列、交换机及其绑定关系
+- 基于注解的监听器模式，异步接收消息
+- 封装了RabbitTemplate工具，用于发送消息 
+
+## 6.1.Basic Queue 简单队列模型
+
+在父工程mq-demo中引入依赖
+
+```xml
+<!--AMQP依赖，包含RabbitMQ-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp</artifactId>
+</dependency>
+```
+
+### 6.1.1.消息发送
+
+首先配置MQ地址，在publisher服务的application.yml中添加配置：
+
+```yaml
+spring:
+  rabbitmq:
+    host: 192.168.150.101 # 主机名
+    port: 5672 # 端口
+    virtual-host: / # 虚拟主机
+    username: itcast # 用户名
+    password: 123321 # 密码
+```
+
+然后在publisher服务中编写测试类SpringAmqpTest，并**利用RabbitTemplate实现消息发送**：
+
+```java
+package cn.itcast.mq.spring;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SpringAmqpTest {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Test
+    public void testSimpleQueue() {
+        // 队列名称
+        String queueName = "simple.queue";
+        // 消息
+        String message = "hello, spring amqp!";
+        // 发送消息
+        rabbitTemplate.convertAndSend(queueName, message);
+    }
+}
+```
+
+### 6.1.2.消息接收
+
+首先配置MQ地址，在consumer服务的application.yml中添加配置：
+
+```yaml
+spring:
+  rabbitmq:
+    host: 192.168.150.101 # 主机名
+    port: 5672 # 端口
+    virtual-host: / # 虚拟主机
+    username: itcast # 用户名
+    password: 123321 # 密码
+```
 
 
-# 六、RabbitMQ整合SpringBoot【重点】
 
-## 6.1 SpringBoot整合RabbitMQ
+然后在consumer服务的`cn.itcast.mq.listener`包中新建一个类SpringRabbitListener，代码如下：
+
+```java
+package cn.itcast.mq.listener;
+
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SpringRabbitListener {
+
+    @RabbitListener(queues = "simple.queue")
+    public void listenSimpleQueueMessage(String msg) throws InterruptedException {
+        System.out.println("spring 消费者接收到消息：【" + msg + "】");
+    }
+}
+```
+
+## 6.2.WorkQueue
+
+Work queues，也被称为（Task queues），任务模型。简单来说就是**让多个消费者绑定到一个队列，共同消费队列中的消息**。
+
+<img src="04-RabbitMQ.assets/image-20210717164238910.png" alt="image-20210717164238910" style="zoom: 80%;" />
+
+当消息处理比较耗时的时候，可能生产消息的速度会远远大于消息的消费速度。长此以往，消息就会堆积越来越多，无法及时处理。
+
+此时就可以使用work 模型，多个消费者共同处理消息处理，速度就能大大提高了。
+
+### 6.2.1.消息发送
+
+这次我们循环发送，模拟大量消息堆积现象。
+
+在publisher服务中的SpringAmqpTest类中添加一个测试方法：
+
+```java
+/**
+     * workQueue
+     * 向队列中不停发送消息，模拟消息堆积。
+     */
+@Test
+public void testWorkQueue() throws InterruptedException {
+    // 队列名称
+    String queueName = "simple.queue";
+    // 消息
+    String message = "hello, message_";
+    for (int i = 0; i < 50; i++) {
+        // 发送消息
+        rabbitTemplate.convertAndSend(queueName, message + i);
+        Thread.sleep(20);
+    }
+}
+```
+
+### 6.2.2.消息接收
+
+要模拟多个消费者绑定同一个队列，我们在consumer服务的SpringRabbitListener中添加2个新的方法：
+
+```java
+@RabbitListener(queues = "simple.queue")
+public void listenWorkQueue1(String msg) throws InterruptedException {
+    System.out.println("消费者1接收到消息：【" + msg + "】" + LocalTime.now());
+    Thread.sleep(20);
+}
+
+@RabbitListener(queues = "simple.queue")
+public void listenWorkQueue2(String msg) throws InterruptedException {
+    System.err.println("消费者2........接收到消息：【" + msg + "】" + LocalTime.now());
+    Thread.sleep(200);
+}
+```
+
+注意到这个消费者sleep了1000秒，模拟任务耗时。
+
+### 6.2.3.测试
+
+启动ConsumerApplication后，在执行publisher服务中刚刚编写的发送测试方法testWorkQueue。
+
+可以看到消费者1很快完成了自己的25条消息。消费者2却在缓慢的处理自己的25条消息。
+
+也就是说消息是平均分配给每个消费者，并没有考虑到消费者的处理能力。这样显然是有问题的。
+
+### 6.2.4.能者多劳
+
+在spring中有一个简单的配置，可以解决这个问题。我们修改consumer服务的application.yml文件，添加配置：
+
+```yaml
+spring:
+  rabbitmq:
+    listener:
+      simple:
+        prefetch: 1 # 每次只能获取一条消息，处理完成才能获取下一个消息
+```
+
+### 6.2.5.总结
+
+Work模型的使用：
+
+- 多个消费者绑定到一个队列，同一条消息只会被一个消费者处理
+- 通过设置prefetch来控制消费者预取的消息数量
+
+## 6.3.发布/订阅
+
+发布订阅的模型如图：
+
+![image-20210717165309625](04-RabbitMQ.assets/image-20210717165309625.png)
+
+
+
+可以看到，在订阅模型中，多了一个exchange角色，而且过程略有变化：
+
+- Publisher：生产者，也就是要发送消息的程序，但是不再发送到队列中，而是发给X（交换机）
+- Exchange：交换机，图中的X。一方面，接收生产者发送的消息。另一方面，知道如何处理消息，例如递交给某个特别队列、递交给所有队列、或是将消息丢弃。到底如何操作，取决于Exchange的类型。Exchange有以下3种类型：
+  - Fanout：广播，将消息交给所有绑定到交换机的队列
+  - Direct：定向，把消息交给符合指定routing key 的队列
+  - Topic：通配符，把消息交给符合routing pattern（路由模式） 的队列
+- Consumer：消费者，与以前一样，订阅队列，没有变化
+- Queue：消息队列也与以前一样，接收消息、缓存消息。
+
+
+
+**Exchange（交换机）只负责转发消息，不具备存储消息的能力**，因此如果没有任何队列与Exchange绑定，或者没有符合路由规则的队列，那么消息会丢失！
+
+### 6.3.1.Fanout
+
+Fanout，英文翻译是扇出，我觉得在MQ中叫广播更合适。
+
+![image-20210717165438225](04-RabbitMQ.assets/image-20210717165438225.png)
+
+在广播模式下，消息发送流程是这样的：
+
+- 1）  可以有多个队列
+- 2）  每个队列都要绑定到Exchange（交换机）
+- 3）  生产者发送的消息，只能发送到交换机，交换机来决定要发给哪个队列，生产者无法决定
+- 4）  交换机把消息发送给绑定过的所有队列
+- 5）  订阅队列的消费者都能拿到消息
+
+#### 6.3.1.1.声明队列和交换机
+
+步骤：
+
+- 创建一个交换机 itcast.fanout，类型是Fanout
+- 创建两个队列fanout.queue1和fanout.queue2，绑定到交换机itcast.fanout
+
+<img src="04-RabbitMQ.assets/image-20210717165509466.png" alt="image-20210717165509466" style="zoom: 50%;" />
+
+Spring提供了一个接口Exchange，来表示所有不同类型的交换机：
+
+![image-20210717165552676](04-RabbitMQ.assets/image-20210717165552676.png)
+
+在consumer中创建一个类，声明队列和交换机：
+
+```java
+package cn.itcast.mq.config;
+
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class FanoutConfig {
+    /**
+     * 声明交换机
+     * @return Fanout类型交换机
+     */
+    @Bean
+    public FanoutExchange fanoutExchange(){
+        return new FanoutExchange("itcast.fanout");
+    }
+
+    /**
+     * 第1个队列
+     */
+    @Bean
+    public Queue fanoutQueue1(){
+        return new Queue("fanout.queue1");
+    }
+
+    /**
+     * 绑定队列和交换机
+     */
+    @Bean
+    public Binding bindingQueue1(Queue fanoutQueue1, FanoutExchange fanoutExchange){
+        return BindingBuilder.bind(fanoutQueue1).to(fanoutExchange);
+    }
+
+    /**
+     * 第2个队列
+     */
+    @Bean
+    public Queue fanoutQueue2(){
+        return new Queue("fanout.queue2");
+    }
+
+    /**
+     * 绑定队列和交换机
+     */
+    @Bean
+    public Binding bindingQueue2(Queue fanoutQueue2, FanoutExchange fanoutExchange){
+        return BindingBuilder.bind(fanoutQueue2).to(fanoutExchange);
+    }
+}
+```
+
+#### 6.3.1.2.消息发送
+
+在publisher服务的SpringAmqpTest类中添加测试方法：
+
+```java
+@Test
+public void testFanoutExchange() {
+    // 队列名称
+    String exchangeName = "itcast.fanout";
+    // 消息
+    String message = "hello, everyone!";
+    rabbitTemplate.convertAndSend(exchangeName, "", message);
+}
+```
+
+#### 6.3.1.3.消息接收
+
+在consumer服务的SpringRabbitListener中添加两个方法，作为消费者：
+
+```java
+@RabbitListener(queues = "fanout.queue1")
+public void listenFanoutQueue1(String msg) {
+    System.out.println("消费者1接收到Fanout消息：【" + msg + "】");
+}
+
+@RabbitListener(queues = "fanout.queue2")
+public void listenFanoutQueue2(String msg) {
+    System.out.println("消费者2接收到Fanout消息：【" + msg + "】");
+}
+```
+
+#### 6.3.1.4.总结
+
+交换机的作用是什么？
+
+- 接收publisher发送的消息
+- 将消息按照规则路由到与之绑定的队列
+- 不能缓存消息，路由失败，消息丢失
+- FanoutExchange的会将消息路由到每个绑定的队列
+
+声明队列、交换机、绑定关系的Bean是什么？
+
+- Queue
+- FanoutExchange
+- Binding
+
+
+
+### 6.3.2. Direct
+
+在Fanout模式中，一条消息，会被所有订阅的队列都消费。但是，在某些场景下，我们希望不同的消息被不同的队列消费。这时就要用到Direct类型的Exchange。
+
+![image-20210717170041447](04-RabbitMQ.assets/image-20210717170041447.png)
+
+ 在Direct模型下：
+
+- 队列与交换机的绑定，不能是任意绑定了，而是要指定一个`RoutingKey`（路由key）
+- 消息的发送方在 向 Exchange发送消息时，也必须指定消息的 `RoutingKey`。
+- Exchange不再把消息交给每一个绑定的队列，而是根据消息的`Routing Key`进行判断，只有队列的`Routingkey`与消息的 `Routing key`完全一致，才会接收到消息
+
+#### 6.3.2.1.基于注解声明队列和交换机
+
+**案例需求如下**：
+
+1. 利用@RabbitListener声明Exchange、Queue、RoutingKey
+
+2. 在consumer服务中，编写两个消费者方法，分别监听direct.queue1和direct.queue2
+
+3. 在publisher中编写测试方法，向itcast. direct发送消息
+
+<img src="04-RabbitMQ.assets/image-20210717170223317.png" alt="image-20210717170223317" style="zoom:50%;" />
+
+基于@Bean的方式声明队列和交换机比较麻烦，Spring还提供了基于注解方式来声明。
+
+在consumer的SpringRabbitListener中添加两个消费者，同时基于注解来声明队列和交换机：
+
+```java
+@RabbitListener(bindings = @QueueBinding(
+    value = @Queue(name = "direct.queue1"),
+    exchange = @Exchange(name = "itcast.direct", type = ExchangeTypes.DIRECT),
+    key = {"red", "blue"}
+))
+public void listenDirectQueue1(String msg){
+    System.out.println("消费者接收到direct.queue1的消息：【" + msg + "】");
+}
+
+@RabbitListener(bindings = @QueueBinding(
+    value = @Queue(name = "direct.queue2"),
+    exchange = @Exchange(name = "itcast.direct", type = ExchangeTypes.DIRECT),
+    key = {"red", "yellow"}
+))
+public void listenDirectQueue2(String msg){
+    System.out.println("消费者接收到direct.queue2的消息：【" + msg + "】");
+}
+```
+
+#### 6.3.2.2.消息发送
+
+在publisher服务的SpringAmqpTest类中添加测试方法：
+
+```java
+@Test
+public void testSendDirectExchange() {
+    // 交换机名称
+    String exchangeName = "itcast.direct";
+    // 消息
+    String message = "红色警报！日本乱排核废水，导致海洋生物变异，惊现哥斯拉！";
+    // 发送消息
+    rabbitTemplate.convertAndSend(exchangeName, "red", message);
+}
+```
+
+#### 6.3.2.3.总结
+
+**Direct交换机与Fanout交换机差异**
+
++ Fanout交换机将消息路由给每一个与之绑定的队列
++ Direct交换机根据RoutingKey判断路由给哪个队列
+
+### 6.3.3.Topic
+
+TopicExchange与DirectExchange类似，区别在于routing Key必须是多个单词的列表，并且以，分割。
+Queue与Exchange指定BindingKeyl时可以使用通配符：
+
+`Routingkey` 一般都是有一个或多个单词组成，多个单词之间以”.”分割，例如： `item.insert`
+
+ 通配符规则：
+
+`#`：匹配一个或多个词
+
+`*`：匹配不多不少恰好1个词
+
+举例：
+
+`item.#`：能够匹配`item.spu.insert` 或者 `item.spu`
+
+`item.*`：只能匹配`item.spu`
+
+ 图示：
+
+ ![image-20210717170705380](04-RabbitMQ.assets/image-20210717170705380.png)
+
+解释：
+
+- Queue1：绑定的是`china.#` ，因此凡是以 `china.`开头的`routing key` 都会被匹配到。包括china.news和china.weather
+- Queue2：绑定的是`#.news` ，因此凡是以 `.news`结尾的 `routing key` 都会被匹配。包括china.news和japan.news
+
+#### 6.3.3.1.消息发送
+
+案例需求：
+
+实现思路如下：
+
+1. 并利用@RabbitListener声明Exchange、Queue、RoutingKey
+
+2. 在consumer服务中，编写两个消费者方法，分别监听topic.queue1和topic.queue2
+
+3. 在publisher中编写测试方法，向itcast. topic发送消息
+
+
+
+<img src="04-RabbitMQ.assets/image-20210717170829229.png" alt="image-20210717170829229" style="zoom:50%;" />
+
+
+
+在publisher服务的SpringAmqpTest类中添加测试方法：
+
+```java
+/**
+     * topicExchange
+     */
+@Test
+public void testSendTopicExchange() {
+    // 交换机名称
+    String exchangeName = "itcast.topic";
+    // 消息
+    String message = "喜报！孙悟空大战哥斯拉，胜!";
+    // 发送消息
+    rabbitTemplate.convertAndSend(exchangeName, "china.news", message);
+}
+```
+
+#### 6.3.3.2.消息接收
+
+在consumer服务的SpringRabbitListener中添加方法：
+
+```java
+@RabbitListener(bindings = @QueueBinding(
+    value = @Queue(name = "topic.queue1"),
+    exchange = @Exchange(name = "itcast.topic", type = ExchangeTypes.TOPIC),
+    key = "china.#"
+))
+public void listenTopicQueue1(String msg){
+    System.out.println("消费者接收到topic.queue1的消息：【" + msg + "】");
+}
+
+
+@RabbitListener(bindings = @QueueBinding(
+    value = @Queue(name = "topic.queue2"),
+    exchange = @Exchange(name = "itcast.topic", type = ExchangeTypes.TOPIC),
+    key = "#.news"
+))
+public void listenTopicQueue2(String msg){
+    System.out.println("消费者接收到topic.queue2的消息：【" + msg + "】");
+}
+```
+
+运行结果
+
+```
+消费者接收到topic.queve1的消息：【喜报！孙悟空大战哥斯拉，胜!】
+消费者接收到topic.queve2的消息：【喜报！孙悟空大战哥斯拉，胜!】
+```
+
+#### 6.3.3.3.总结
+
+**Direct交换机与Topic交换机的差异**
+
+- Topic交换机接收的消息RoutingKey必须是多个单词，以 `**.**` 分割
+- Topic交换机与队列绑定时的bindingKey可以指定通配符
+- `#`：代表0个或多个词
+- `*`：代表1个词
+
+## 6.4.消息转换器
+
+之前说过，Spring会把你发送的消息序列化为字节发送给MQ，接收消息的时候，还会把字节反序列化为Java对象。
+
+![image-20200525170410401](04-RabbitMQ.assets/image-20200525170410401.png)
+
+只不过，默认情况下Spring采用的序列化方式是JDK序列化。众所周知，JDK序列化存在下列问题：
+
+- 数据体积过大
+- 有安全漏洞
+- 可读性差
+
+### 6.4.1.测试默认转换器
+
+我们修改消息发送的代码，发送一个Map对象：
+
+```java
+@Test
+public void testSendMap() throws InterruptedException {
+    // 准备消息
+    Map<String,Object> msg = new HashMap<>();
+    msg.put("name", "Jack");
+    msg.put("age", 21);
+    // 发送消息
+    rabbitTemplate.convertAndSend("simple.queue","", msg);
+}
+```
+
+停止consumer服务
+
+发送消息后查看控制台：
+
+![image-20210422232835363](04-RabbitMQ.assets/image-20210422232835363.png)
+
+### 6.4.2.配置JSON转换器
+
+显然，JDK序列化方式并不合适。我们希望消息体的体积更小、可读性更高，因此可以使用JSON方式来做序列化和反序列化。
+
+在publisher和consumer两个服务中都引入依赖：
+
+```xml
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-xml</artifactId>
+    <version>2.9.10</version>
+</dependency>
+```
+
+配置消息转换器。
+
+**在启动类中添加一个Bean即可：**
+
+```java
+@Bean
+public MessageConverter jsonMessageConverter(){
+    return new Jackson2JsonMessageConverter();
+}
+```
+
+```java
+@Test
+public void testSendObjectQueue() {
+    Map<String, Object> msg = new HashMap<>();
+    msg.put("name", "柳岩");
+    msg.put("age", 21);l
+    rabbitTemplate.convertAndSend( routingKey: "object.queue", msg);
+}
+```
+
+# 七、RabbitMQ整合SpringBoot:crossed_swords:
+
+## 7.1 SpringBoot整合RabbitMQ
 
  RabbitMQ的通讯方式使用发布订阅的方式
 
-### 6.1.1 创建SpringBoot工程
+### 7.1.1 创建SpringBoot工程
 
 <img src="04-RabbitMQ.assets/image-20231016153433340.png" alt="image-20231016153433340" style="zoom: 50%;" />
 
-### 6.1.2 导入依赖
+### 7.1.2 导入依赖
 
 ```xml
 <dependencies>
@@ -546,7 +1162,7 @@ channel.basicPublish("topic-exchange","fast.white.cat",null,"快白猫".getBytes
     </dependencies>
 ```
 
-### 6.1.3 编写配置文件
+### 7.1.3 编写配置文件
 
 ![image-20231016153619664](04-RabbitMQ.assets/image-20231016153619664.png)
 
@@ -564,7 +1180,9 @@ spring:
 
 <img src="04-RabbitMQ.assets/image-20231016155139332.png" alt="image-20231016155139332" style="zoom: 67%;" />
 
-### 6.1.4 消费者声明exchange、queue (也可以用注解的方法)
+### 7.1.4 消费者声明exchange、queue 
+
+注意: 可以用注解的方法
 
 ```java
 @Configuration
@@ -590,7 +1208,7 @@ public class RabbitMQConfig {
 }
 ```
 
-### 6.1.5 发布消息到RabbitMQ
+### 7.1.5 发布消息到RabbitMQ -发送MQ消息
 
 ```java
 import org.junit.jupiter.api.Test;
@@ -611,19 +1229,16 @@ public class TestBootRabbitMQ {
         // 发送消息  参数 交换机, key
         rabbitTemplate.convertAndSend("boot-exchange","yellow.zgq.xj","周被洗脚仙人跳！！！");
     }
+    
+    @Test
+    void contextLoads() {
+        rabbitTemplate.convertAndSend("boot-topic-exchange","slow.red.dog","红色大狼狗！！");
+    }
 
-}
-
-@Autowired
-private RabbitTemplate rabbitTemplate;
-
-@Test
-void contextLoads() {
-    rabbitTemplate.convertAndSend("boot-topic-exchange","slow.red.dog","红色大狼狗！！");
 }
 ```
 
-### 6.1.6 创建消费者监听消息
+### 7.1.6 创建消费者监听消息 -接收MQ消息
 
 ```java
 import cn.lfj.mq.listener
@@ -640,9 +1255,9 @@ public class Consumer {
 }
 ```
 
-## 6.2 手动Ack
+## 7.2 手动Ack
 
-### 6.2.1 添加配置文件
+### 7.2.1 添加配置文件
 
 ```yaml
 spring:
@@ -652,7 +1267,7 @@ spring:
         acknowledge-mode: manual
 ```
 
-### 6.2.2 手动ack
+### 7.2.2 手动ack
 
 ```java
 @RabbitListener(queues = "boot-queue")
@@ -664,31 +1279,15 @@ public void getMessage(String msg, Channel channel, Message message) throws IOEx
 }
 ```
 
-## 6.3 序列化
+# 八、RabbitMQ的其他操作
 
-![image-20231016162910528](04-RabbitMQ.assets/image-20231016162910528.png)
-
-
-
-![image-20231016162549836](04-RabbitMQ.assets/image-20231016162549836.png)
-
-
-
-![image-20231016162847720](04-RabbitMQ.assets/image-20231016162847720.png)
-
-![image-20231016162733109](04-RabbitMQ.assets/image-20231016162733109.png)
-
-
-
-# 七、RabbitMQ的其他操作
-
-## 7.1 消息的可靠性
+## 8.1 消息的可靠性
 
 RabbitMQ的事务：事务可以保证消息100%传递，可以通过事务的回滚去记录日志，后面定时再次发送当前消息。事务的操作，效率太低，加了事务操作后，比平时的操作效率至少要慢100倍。
 
 RabbitMQ除了事务，还提供了Confirm的确认机制，这个效率比事务高很多。
 
-### 7.1.1 普通Confirm方式
+### 8.1.1 普通Confirm方式
 
 
 
@@ -706,7 +1305,7 @@ if(channel.waitForConfirms()){
 }
 ```
 
-### 7.1.2 批量Confirm方式。
+### 8.1.2 批量Confirm方式。
 
 ```java
 //3.1 开启confirm
@@ -720,7 +1319,7 @@ for (int i = 0; i < 1000; i++) {
 channel.waitForConfirmsOrDie();     // 当你发送的全部消息，有一个失败的时候，就直接全部失败 抛出异常IOException
 ```
 
-### 7.1.3 异步Confirm方式。
+### 8.1.3 异步Confirm方式。
 
 ```java
 //3.1 开启confirm
@@ -747,9 +1346,7 @@ channel.addConfirmListener(new ConfirmListener() {
 
 ![img](04-RabbitMQ.assets/1638064532785-6c61fd8f-47e7-4043-ba88-3387921b7f7b.png)
 
-
-
-### 7.1.4 Return机制
+### 8.1.4 Return机制
 
 Confirm只能保证消息到达exchange，无法保证消息可以被exchange分发到指定queue。
 
@@ -779,13 +1376,9 @@ channel.addReturnListener(new ReturnListener() {
 channel.basicPublish("","HelloWorld",true,null,msg.getBytes());
 ```
 
+## 8.2 SpringBoot实现
 
-
-## 7.2 SpringBoot实现
-
-### 7.2.1 编写配置文件
-
-
+### 8.2.1 编写配置文件
 
 ```java
 spring:
@@ -794,9 +1387,7 @@ spring:
     publisher-returns: true
 ```
 
-### 7.2.2 开启Confirm和Return
-
-
+### 8.2.2 开启Confirm和Return
 
 ```java
 @Component
@@ -827,7 +1418,7 @@ public class PublisherConfirmAndReturnConfig implements RabbitTemplate.ConfirmCa
 }
 ```
 
-## 7.3 避免消息重复消费  (作业)
+## 8.3 避免消息重复消费  
 
 重复消费消息，会对非幂等行操作造成问题
 
@@ -894,11 +1485,9 @@ DefaultConsumer consume = new DefaultConsumer(channel){
 
 
 
-## 7.4 SpringBoot如何实现
+## 8.4 SpringBoot如何实现
 
-### 7.4.1 导入依赖
-
-
+### 8.4.1 导入依赖
 
 ```java
 <dependency>
@@ -907,7 +1496,7 @@ DefaultConsumer consume = new DefaultConsumer(channel){
 </dependency>
 ```
 
-### 7.4.2 编写配置文件
+### 8.4.2 编写配置文件
 
 ```java
 spring:
@@ -916,7 +1505,7 @@ spring:
     port: 6379
 ```
 
-### 7.4.3 修改生产者
+### 8.4.3 修改生产者
 
 ```java
 @Test
@@ -927,9 +1516,7 @@ void contextLoads() throws IOException {
 }
 ```
 
-
-
-### 7.4.4  修改消费者
+### 8.4.4  修改消费者
 
 ```
 @Autowired
@@ -957,4 +1544,3 @@ public void getMessage(String msg, Channel channel, Message message) throws IOEx
     }
 }
 ```
-

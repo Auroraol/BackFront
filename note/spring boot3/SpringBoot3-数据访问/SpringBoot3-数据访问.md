@@ -306,6 +306,7 @@ ptions选项作用大致如下：
 #### 更新配置
 
 ```properties
+#在较新的MySQL驱动版本中，使用com.mysql.cj.jdbc.Driver来代替com.mysql.jdbc.Driver作为数据库驱动的类名是推
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.datasource.type=com.zaxxer.hikari.HikariDataSource
 spring.datasource.url=jdbc:mysql://localhost:3306/mybatis
@@ -380,7 +381,7 @@ public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {...
     AdminService adminService;
 
 	void test11(){
-		// adminService中有很多方法
+		// adminService中有很多方法, 因为extends ServiceImpl<AdminMapper,Admin> 
         Admin admin = adminService.getById(13);
     }
 ```

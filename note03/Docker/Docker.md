@@ -1,4 +1,4 @@
-#  Docker虚拟化容器技术
+#   Docker虚拟化容器技术
 
 + Docker概述
 + Docker安装
@@ -34,7 +34,7 @@ CI\CD Jenkins
 
 哪个哥们又写死循环了，怎么这么卡：在多用户的操作系统下，会因为其他用户的操作失误影响到你自己编些的程序。
 
- ### 1.3 弹性伸缩 
+### 1.3 弹性伸缩
 
 淘宝在双11的时候，用户量暴增：需要很多很多的运维人员去增加部署的服务器，运维成本过高的问题。
 
@@ -44,7 +44,7 @@ CI\CD Jenkins
 
 | Docker的作者已经离开了维护Docker的团队                       |
 | ------------------------------------------------------------ |
-| ![image-20231027231415968](Docker.assets/image-20231027231415968.png) |
+| <img src="Docker.assets/image-20231027231415968.png" alt="image-20231027231415968" style="zoom:67%;" /> |
 
 ###  2.2 Docker的思想
 
@@ -53,11 +53,10 @@ CI\CD Jenkins
   + 运输的标准化：Docker有一个码头，所有上传的集装箱都放在了这个码头上，当谁需要某一个环境，就直接指派大海疼去搬运这个集装箱就可以了。
   + 命令的标准化：Docker提供了一些列的命令，帮助我们去获取集装箱等等操作。
   + 提供了REST的API：衍生出了很多的图形化界面，Rancher。
-
 + 隔离性：Docker在运行集装箱内的内容时，会在Linux的内核中，单独的开辟一片空间，这片空间不会影响到其他程序。 
 + 中央仓库|注册中心：超级码头，上面放的就是集装箱 
 + 镜像：就是集装箱 
-+ 容器：运行起来的镜像 
++ 容器：运行起来的镜像
 
 ### 2.3 Docker的作用
 
@@ -87,9 +86,13 @@ Docker :打包镜像发布测试,一键运行
 Docker是内核级别的虚拟化,可以再一个物理机上可以运行很多的容器实例!服务器的性能可以被压榨到极致。
 ```
 
+### 2.4 分层工作流程
+
+![image-20231103150650963](Docker.assets/image-20231103150650963.png)
+
 ##  三、Docker的安装
 
-![image-20231002190403275](Docker.assets/image-20231002190403275.png)
+<img src="Docker.assets/image-20231002190403275.png" alt="image-20231002190403275" style="zoom:67%;" />
 
 **镜像（image）:**
 
@@ -128,13 +131,13 @@ yum makacache fast
 yum -y install docker-ce
 ```
 
-**或者官方的一键安装方式：**
+### 官方的一键安装方式
 
 ```arduino
 curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
 ```
 
-**启动Docker并测试**
+### 启动Docker并测试
 
 ```shell
 # 启动Docker服务
@@ -194,48 +197,13 @@ systemctl restart docker
 
 ### 5.1 镜像命令
 
-#### 搜索镜像
-
-```shell
-sudo docker search 镜像名称
-```
-
-比如搜索Hadoop的镜像信息 docker search hadoop
-
-![image-20230308154908968](Docker.assets/f1922e38afa8e23443440683f11abc94.png)
-
-+ NAME:镜像名称
-+ DESCRIPTION:镜像说明
-+ STARS:点赞数量
-+ OFFICIAL:是否是官方的
-+ AUTOMATED：是否自动构建的
-
-**比如:  访问 Nginx 镜像库地址**
-
- https://hub.docker.com/_/nginx?tab=tags可以通过 Sort by 查看其他版本的 Nginx，默认是最新版本 nginx:latest。
-
-<img src="Docker.assets/image-20231004171527942.png" alt="image-20231004171527942" style="zoom:67%;" />
-
-可以找到其他你想要的版本
-
-<img src="Docker.assets/image-20231004171623676.png" alt="image-20231004171623676" style="zoom:67%;" />
-
-#### 拉取镜像
-
-```shell
-sudo docker pull 镜像名
-sudo docker pull 镜像名:Tag
-```
-
-<img src="Docker.assets/image-20231002210442940.png" alt="image-20231002210442940" style="zoom: 80%;" />
-
-#### 查看本地全部镜像
+#### 5.1.1 查看本地全部镜像
 
 ```shell
 sudo docker images
 ```
 
-![image-20230308154454634](Docker.assets/bd8687b93dbd03751961b1e43c44c5b2.png)
+![](Docker.assets/image-20231103122833212.png)
 
 + REPOSITORY：表示镜像的仓库源
 
@@ -249,37 +217,84 @@ sudo docker images
 
 注意：如果镜像后面不加TAG，默认使用latest的镜像
 
-#### 删除本地镜像
+#### 5.1.2 搜索镜像
+
+```shell
+sudo docker search 镜像名称
+```
+
+<img src="Docker.assets/image-20231103133136209.png" alt="image-20231103133136209" style="zoom:75%;" />
+
++ NAME:镜像名称
++ DESCRIPTION:镜像说明
++ STARS:点赞数量
++ OFFICIAL:是否是官方的
++ AUTOMATED：是否自动构建的
+
+**访问 Nginx 镜像库地址**
+
+ https://hub.docker.com/_/nginx?tab=tags可以通过 Sort by 查看其他版本的 Nginx，默认是最新版本 nginx:latest。
+
+<img src="Docker.assets/image-20231004171527942.png" alt="image-20231004171527942" style="zoom: 50%;" />
+
+可以找到其他你想要的版本
+
+<img src="Docker.assets/image-20231103122524916.png" alt="image-20231103122524916" style="zoom:67%;" />
+
+#### 5.1.3 拉取镜像
+
+```shell
+sudo docker pull 镜像名
+sudo docker pull 镜像名:Tag
+```
+
+![](Docker.assets/image-20231103150909696.png)
+
+如果不指定`tag`，则下载latest，相当于`docker pull java:latest`
+
+#### 5.1.4 删除本地镜像
 
 ```shell
 docker image rmi -f 镜像名/镜像ID         # 删除1个镜像
 docker image rmi -f 镜像名 镜像名         # 删除多个镜像
- docker rmi $(docker images -q)          # 删除所有镜像
+docker rmi $(docker images -q)           # 删除所有镜像
 ```
 
-![image-20230308170230613](Docker.assets/37043aee7c6768894b2d0c44a4304c06.png)
+<img src="Docker.assets/image-20231103122723069.png" alt="image-20231103122723069" style="zoom:80%;" />
 
-#### 镜像的导入导出
+#### 5.1.5 镜像的导入导出
 
- **保存镜像**
+#####  5.1.5.1 导出(保存)压缩包镜像
 
-将我们的镜像 保存为tar 压缩文件 这样方便镜像转移和保存 ,然后 可以在任何一台安装了docker的服务器上 加载这个镜像
+将我们的镜像保存为tar 压缩文件 这样方便镜像转移和保存 ,然后可以在任何一台安装了docker的服务器上加载这个镜像
 
 ```shell
 docker save 镜像名/镜像ID -o 镜像保存在哪个位置与名字
 ```
 
-  **加载镜像**
+例子
 
-任何装 docker 的地方加载镜像保存文件,使其恢复为一个镜像
+```shell
+docker save 4d6576293cb8 > e:\docker\rabbitmq.tar
+```
+
+##### 5.1.5.2 导入镜像
+
+加载镜像保存文件, 使其恢复为一个镜像
 
 ```shell
 docker load -i 镜像保存文件位置
 ```
 
-**修改镜像名称和版本**
+例子
 
+```shell
+docker load -i rabbitmq.tar
 ```
+
+##### 5.1.5.3 修改镜像名称和版本
+
+```shell
 docker tag 镜像id 新镜像名称:版本
 ```
 
@@ -298,7 +313,7 @@ docker tag 镜像id 新镜像名称:版本
 
 如果因为网络原因可以通过硬盘的方式传输镜像，虽然不规范，但是有效，但是这种方式导出的镜像名称和版本都是null，需要手动修改
 
-#### commit 更新镜像
+#### 5.1.6 commit 更新镜像
 
 ```shell
 docker commit 提交容器成为一个新的副本
@@ -353,7 +368,7 @@ docker stop 容器名/容器ID     # 停止全部容器
 docker stop $(docker ps -qa) # 删除指定容器
 ```
 
-删除(删除容器前，需要先停止容器)
+删除(需要先停止容器)
 
 ```shell
 #删除一个容器
@@ -364,7 +379,7 @@ docker rm -f 容器名/容器ID 容器名/容器ID 容器名/容器ID
 docker rm -f $(docker ps -aq)
 ```
 
-重启&启动
+重启&启动(需要先停止容器)
 
 ```shell
 docker restart 容器id        # 重启停止运行的容器
@@ -383,10 +398,12 @@ docker start 容器id          # 启动指定的容器
 
 ```shell
 # 简单操作
-docker run 镜像的标识|镜像名称[:tag]
+docker run 镜像的标识/镜像名称[:tag]
+```
 
+```shell
 # 常用的参数
-docker run -d -p 宿主机端口:容器端口 --name 容器名称 镜像的标识|镜像名称[:tag]
+docker run -d -p 宿主机端口:容器端口 --name 容器名称 镜像的标识/镜像名称[:tag]
 # -d：代表后台运行容器
 # -p 宿主机端口:容器端口：为了映射当前Linux的端口和容器的端口
 # --name 容器名称：指定容器的名称
@@ -394,9 +411,8 @@ docker run -d -p 宿主机端口:容器端口 --name 容器名称 镜像的标�
 docker run -d -p 8081:8080 --name tomcat b8
 ```
 
-运行的同时创建数据卷: 
-
 ```shell
+#运行的同时进入并创建数据卷
 docker run -it -d --name 要取的别名 -p 宿主机端口:容器端口 -v 宿主机文件存储位置:容器内文件位置 镜像名:Tag /bin/bash 
 
 -it 表示 与容器进行交互式启动
@@ -406,6 +422,10 @@ docker run -it -d --name 要取的别名 -p 宿主机端口:容器端口 -v 宿�
 -p 将容器的端口映射到宿主机上，通过宿主机访问内部端口
 -v 将容器内的指定文件夹挂载到宿主机对应位置
 ```
+
+docker run的流程:
+
+<img src="Docker.assets/image-20231103150737012.png" alt="image-20231103150737012" style="zoom:67%;" />
 
 #### 查看正在运行的容器
 
@@ -417,62 +437,72 @@ docker ps [-qa]
 # -q：只查看容器的标识
 ```
 
-![img](Docker.assets/a954baa77e0097150b1c74514921e11f.png)
+<img src="Docker.assets/a954baa77e0097150b1c74514921e11f.png" alt="img" style="zoom: 60%;" />
 
 #### 查看容器中进程信息 ps
 
 ```shell
-docker top 容器id
+docker top 容器id/容器的名称
 ```
 
-![image-20231002220025497](Docker.assets/image-20231002220025497.png)
+<img src="Docker.assets/image-20231002220025497.png" alt="image-20231002220025497" style="zoom:67%;" />
 
 #### 指定网络端口
 
 docker port 可以查看指定 （ID 或者名字）容器的某个确定端口映射到宿主机的端口号。
 
 ```shell
-:~$ docker port bf08b7f2cd89
-5000/tcp -> 0.0.0.0:5000
-:~$ docker port wizardly_chandrasekhar
-5000/tcp -> 0.0.0.0:5000
+docker port 容器id/容器的名称
 ```
+
+<img src="Docker.assets/image-20231103134719435.png" alt="image-20231103134719435" style="zoom: 80%;" />
 
 #### 查看容器日志
 
-查看容器日志，以查看容器运行的信息
+查看容器日志，以查看容器运行的信息。 查看完毕后，`ctrl+c`即可退出
 
 ```shell
-docker logs -f -t --tail number 容器id(容器名)
+docker logs -f -t --tail number 容器id/容器的名称
 
 -tf              # 显示日志
 -tf --tail number # 显示日志条数
+```
+
+例子
+
+```shell
 [root@kuangshen /]# docker logs -tf --tail 10 dce7b86171bf
 ```
 
-查看完毕后，`ctrl+c`即可退出
+#### 查看容器的元数据(信息)
 
-#### 查看镜像的元数据
+可以查看数据卷之类的东西
 
 ```shell
-docker inspect 容器id
+docker inspect 容器id/容器的名称
 ```
 
-![image-20231002220308497](Docker.assets/image-20231002220308497.png)
+<img src="Docker.assets/image-20231103134929608.png" style="zoom:67%;" />
+
+#### 查看容器使用情况
+
+```shell
+docker stats [OPTIONS] [CONTAINER...]
+```
 
 #### 进入容器内容部
 
 #####  exec
 
 ```shell
-docker exec -it 容器id bash  #或者docker exec -it 容器ID sh
+docker exec -it 容器id/容器的名称 /bin/bash  #或者docker exec -it 容器ID sh
 #退出容器：exit
 ```
 
 ##### attach
 
-```cobol
-sudo docker attach 容器ID/容器名
+```shell
+sudo docker attach 容器id/容器的名称
 ```
 
 ##### 区别
@@ -482,7 +512,7 @@ exit            # 直接停止容器,退出容器的交互式终端  //exec 如�
 Ctrl + p + q    # 容器不停止退出, 容器继续运行并保留端口映射配置
 ```
 
-![image-20231030111356549](Docker.assets/image-20231030111356549.png)
+<img src="Docker.assets/image-20231030111356549.png" alt="image-20231030111356549" style="zoom: 67%;" />
 
 #### 主机内容和容器内容相互拷贝(没用)
 
@@ -517,9 +547,7 @@ cat test.tar.gz | docker import - ubuntu2
 
 <img src="Docker.assets/image-20231002213731425.png" alt="image-20231002213731425" style="zoom:80%;" />
 
- 
-
-## 六、Docker应用 
+## 六、Docker应用
 
  [docker常用软件安装](https://blog.csdn.net/qq_43430759/article/details/126345572)
 
@@ -814,7 +842,7 @@ docker run -it -d --name my-container -p 8080:80 my-image:tag /bin/bash
 
 请根据您的需求和应用程序的要求替换示例中的值。确保宿主机端口未被占用，以及容器中正在运行的应用程序正在监听指定的容器端口
 
-![image-20231002231435742](Docker.assets/image-20231002231435742.png)
+<img src="Docker.assets/image-20231103150959442.png" style="zoom:67%;" />
 
 ### 网络端口映射
 
@@ -873,7 +901,7 @@ tomcat01 和 tomcat02 是公用的一个路由器，docker0。所有的容器不
 下面先创建一个新的 Docker 网络。
 
 ```shell
-$ docker network create -d bridge test-net
+[lee@localhost docker]$ docker network create -d bridge test-net
 ```
 
 并使用以下命令查询网络：
@@ -882,7 +910,7 @@ $ docker network create -d bridge test-net
 [lee@localhost docker]$ docker network ls
 ```
 
-![image-20231004165759645](Docker.assets/image-20231004165759645.png)
+<img src="Docker.assets/image-20231004165759645.png" alt="image-20231004165759645" style="zoom: 80%;" />
 
 参数说明：
 
@@ -918,8 +946,6 @@ docker exec -it test1 /bin/bash ping test2
 
 在 test1 容器输入以下命令：
 
-点击图片查看大图：
-
 <img src="Docker.assets/image-20231004170159129.png" alt="image-20231004170159129" style="zoom:75%;" />
 
 同理在 test2 容器也会成功连接到:(切换终端)
@@ -929,6 +955,8 @@ docker exec -it test2 /bin/bash
 ```
 
 <img src="Docker.assets/image-20231004170148238.png" alt="image-20231004170148238" style="zoom: 70%;" />
+
+测试结果都能ping通
 
 ## 九、Dockerfile自定义镜像【`重点`】
 
@@ -1662,11 +1690,15 @@ $ docker run -it --cpus=1 -m=2048m --pids-limit=1000 busybox sh
 + Docker Compose是一个工具，用于定义和运行多容器应用程序的工具；
 + Docker Compose通过yml文件定义多容器的docker应用；
 + Docker Compose通过一条命令根据yml文件的定义去创建或管理多容器；
-+ <img src="Docker.assets/image-20231002224038346-169646749658721.png" alt="image-20231002224038346" style="zoom: 67%;" />
++ <img src="Docker.assets/image-20231002224038346-169646749658721.png" alt="image-20231002224038346" style="zoom: 50%;" />
 
-#### 基本安装
+#### Docker Compose基本安装
 
 [Docker Compose介绍和安装](https://blog.csdn.net/juanxiaseng0838/article/details/127553225)
+
++ 独立安装的Compose，不论是V1还是V2版本，指令都是docker-compose（中间是短横线）
+
++ 插件安装的Compose，在V2版本，指令是docker compose（中间是空格），最新版的docker安装时会自动以插件的形式安装docker compose
 
 Docker Compose安装的最新的版本Docker Compose version v2.12.2，对于Mac和Windows安装好Docker以后，就已经安装好Docker Compose，不需要手动安装，这里的安装方式是基于Linux的Cnetos的，可以参考[官方网站](https://docs.docker.com/compose/install/)去安装。
 
@@ -1692,7 +1724,187 @@ Loading mirror speeds from cached hostfile
 Docker Compose version v2.12.2
 ```
 
+卸载
+
+```shell
+sudo rm /usr/local/bin/docker-compose
+```
+
 #### Docker Compose基本命令
+
+##### 一、up 
+
+```bash
+docker-compose up [options] [SERVICE...]
+```
+
+```shell
+docker compose -f docker-compose.yml up -d
+```
+
+默认情况，如果服务容器已经存在，`docker-compose up` 将会尝试停止容器，然后重新创建（保持使用 `volumes-from` 挂载的卷），以保证新启动的服务匹配 `docker-compose.yml` 文件的最新内容。如果用户不希望容器被停止并重新创建，可以使用 `docker-compose up --no-recreate`。这样将只会启动处于停止状态的容器，而忽略已经运行的服务。如果用户只想重新部署某个服务，可以使用 `docker-compose up --no-deps -d <SERVICE_NAME>` 来重新创建服务并后台停止旧服务，启动新服务，并不会影响到其所依赖的服务。
+
+**services** **可以选择只启动一个服务，默认启动所有的服务**
+
+**参数说明：**
+
+- **-d：**在后台运行服务容器。
+
+- **--no-color：** 不使用颜色来区分不同的服务的控制台输出。
+
+- **--no-deps：** 不启动服务所链接的容器。
+
+- **--force-recreate：** 强制重新创建容器，不能与 `--no-recreate` 同时使用。
+
+- **--no-recreate：** 如果容器已经存在了，则不重新创建，不能与 `--force-recreate` 同时使用。
+
+- **--no-build：** 不自动构建缺失的服务镜像。
+
+- **-t, --timeout TIMEOUT：** 停止容器时候的超时（默认为 10 秒）。
+
+##### 二、top
+
+```bash
+docker-compose top [SERVICE...]
+```
+
+查看服务容器中的进程
+
+**services** **可以选择只启动一个服务，默认启动所有的服务**
+
+##### 三、stop
+
+```bash
+docker-compose stop [options] [SERVICE...]
+```
+
+停止已经处于运行状态的容器，但不删除它
+
+**参数说明：**
+
+- **-t, --timeout TIMEOUT：** 停止容器时候的超时（默认为 10 秒）
+
+##### 四、start
+
+```bash
+docker-compose start [SERVICE...]
+```
+
+启动已经存在的服务容器。
+
+##### 五、scale
+
+```bash
+docker-compose scale [options] [SERVICE=NUM...]
+```
+
+设置指定服务运行的容器个数。
+
+```bash
+docker-compose scale web=3 job=2
+```
+
+**参数说明：**
+
+- **-t, --timeout TIMEOUT：** 停止容器时候的超时（默认为 10 秒）。
+
+#####  六、run
+
+```bash
+docker-compose run [options] [-p PORT...] [-e KEY=VAL...] SERVICE [COMMAND] [ARGS...]
+```
+
+在指定服务上执行一个命令。
+
+ **参数说明：**
+
+- **-d：** 后台运行容器。
+
+- **--name：** NAME 为容器指定一个名字。
+
+- **--entrypoint：** CMD 覆盖默认的容器启动指令。
+
+- **-e KEY=VAL：** 设置环境变量值，可多次使用选项来设置多个环境变量。
+
+- **-u, --user=""：** 指定运行容器的用户名或者 uid。
+
+- **--no-deps：** 不自动启动关联的服务容器。
+
+- **--rm：** 运行命令后自动删除容器，`d` 模式下将忽略。
+
+- **-p, --publish=[]：** 映射容器端口到本地主机。
+
+- **--service-ports：** 配置服务端口并映射到本地主机。
+
+- **-T：** 不分配伪 tty，意味着依赖 tty 的指令将无法运行。
+
+##### 七、down
+
+```bash
+docker-compose down
+```
+
+此命令将会停止 up 命令所启动的容器，并移除网络
+
+##### 八、images
+
+```bash
+docker-compose images
+```
+
+列出 Compose 文件中包含的镜像。
+
+##### 九、logs
+
+```bash
+docker-compose logs [options] [SERVICE...]
+```
+
+查看容器的日志
+
+**参数说明：**
+
+- **-f：**跟踪日志输出
+
+- **-t：**显示时间
+
+- **--tail="num"：**显示最后的多少行日志
+
+##### 十、ps
+
+```bash
+docker-compose ps [options] [SERVICE...]
+```
+
+列出项目中目前的所有容器。
+
+**参数说明：**
+
+- **-q：** 只打印容器的 ID 信息。
+
+##### 十一、restart
+
+```bash
+docker-compose restart [options] [SERVICE...]
+```
+
+重启服务
+
+##### 十二、rm
+
+```bash
+docker-compose rm [options] [SERVICE...]
+```
+
+删除容器
+
+ **参数说明：**
+
+- **-f, --force：** 强制直接删除，包括非停止状态的容器。一般尽量不要使用该选项。
+
+- **-v：** 删除容器所挂载的数据卷。
+
+##### 十三、help
 
 Docker Compose命令基本上和Docker相差不多，主要就是对Docker Compose生命周期控制、日志格式等相关命令，可以通过docker-compose --help进行帮助。
 
@@ -1749,7 +1961,7 @@ Run 'docker compose COMMAND --help' for more information on a command.
 docker compose -f docker-compose.yml up -d
 ```
 
-例子
+##### 十四、例子
 
 ```shell
 #构建建启动nignx容器

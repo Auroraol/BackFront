@@ -1,0 +1,25 @@
+server:
+  port: 8089
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/heima
+    username: root
+    password: 741106
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # mq
+  rabbitmq:
+    host: 192.168.200.134
+    port: 5672
+    username: admin
+    password: admin
+    virtual-host: /
+    
+logging:
+  level:
+    cn.itcast: debug
+  pattern:
+    dateformat: HH:mm:ss:SSS
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: cn.itcast.hotel.pojo

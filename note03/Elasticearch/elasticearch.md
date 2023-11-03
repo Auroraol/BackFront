@@ -218,7 +218,7 @@ primary shard （建立索引时一次设置，不能修改，默认5个）， r
 
 [各种版本部署:  ElasticSearch 7.7.0 安装部署 (yuque.com)](https://www.yuque.com/yanyulou-jxe2g/iz0eoq/bc0g2r)
 
-# ES基础语法:cat:
+# ES基础语法
 
 > 索引库就类似数据库表，mapping映射就类似表的结构。要向es中存储数据，必须先创建“库”和“表”
 
@@ -342,357 +342,7 @@ Mapping类似数据库中的schema的定义，作用如下
   - name.firstName；类型为字符串，但是不需要分词，因此是keyword；参与搜索，因此需要index为true；无需分词器
   - name.lastName；类型为字符串，但是不需要分词，因此是keyword；参与搜索，因此需要index为true；无需分词器
 
-## 索引库操作
 
-| method | URL                                             | remark              |
-| ------ | ----------------------------------------------- | ------------------- |
-| put    | localhost:9200/索引名称/类型名称/文档id         | 创建文档—指定文档ld |
-| GET    | localhost:9200/索引名称/类型名称/文档id         | 查询某条文档        |
-| POST   | localhost:9200/索引名称/类型名称                | 创建文档—随机文档ld |
-| POST   | localhost:9200/索引名称/类型名称/_              | 查询所有            |
-| POST   | localhost:9200/索引名称/类型名称/文档id/_update | 修改文档(部分修改)  |
-| DELETE | localhost:9200/索引名称/类型名称/文档id         | 删除文档            |
-
-### 创建索引库和映射
-
- **基本语法：**
-
-- 请求方式：PUT
-- 请求路径：/索引库名，可以自定义
-- 请求参数：mapping映射
-
-格式：
-
-```json
-PUT /索引库名称
-{
-  "mappings": {
-    "properties": {
-      "字段名":{
-        "type": "text",        // 可分词的文本
-        "analyzer": "ik_smart" // 分词器
-      },
-      "字段名2":{
-        "type": "keyword",   // 普通文本
-        "index": "false"     // 不参与倒排索引,不常用搜索
-      },
-      "字段名3":{
-        "properties": {
-          "子字段": {
-            "type": "keyword"
-          }
-        }
-      },
-      // ...略
-    }
-  }
-}
-```
-
-**示例**：
-
-```sh
-PUT /heima
-{
-  "mappings": {
-    "properties": {
-      "info":{
-        "type": "text",
-        "analyzer": "ik_smart"
-      },
-      "email":{
-        "type": "keyword",
-        "index": "falsae"
-      },
-      "name":{
-      	#嵌套
-        "properties": {
-          "firstName": {
-            "type": "keyword"
-          }
-        }
-      },
-      // ... 略
-    }
-  }
-}
-```
-
-### 查询索引库
-
-**基本语法**：
-
-- 请求方式：GET
-
-- 请求路径：/索引库名
-
-- 请求参数：无
-
-**格式**：
-
-```json
-GET /索引库名称
-```
-
-**示例**：
-
-![image-20231025225619625](elasticearch.assets/image-20231025225619625.png)
-
-### 修改索引库
-
-索引库**一旦创建，无法修改mapping**。
-
-虽然无法修改mapping中已有的字段，但是却允许添加新的字段到mapping中，因为不会对倒排索引产生影响。
-
-**语法说明**：
-
-```json
-PUT /索引库名/_mapping
-{
-  "properties": {
-    "新字段名":{
-      "type": "integer"
-    }
-  }
-}
-```
-
-**示例**：
-
-![image-20210720212357390](elasticearch.assets/image-20210720212357390.png)
-
-### 删除索引库
-
-**语法：**
-
-- 请求方式：DELETE
-
-- 请求路径：/索引库名
-
-- 请求参数：无
-
-**格式：**
-
-```
-DELETE /索引名称1,索引名称2,索引名称3...
-```
-
-在kibana中测试：
-
-![image-20210720212123420](elasticearch.assets/image-20210720212123420.png)
-
-### 总结
-
-- 创建索引库：PUT /索引库名
-- 查询索引库：GET /索引库名
-- 删除索引库：DELETE /索引库名
-- 添加字段：PUT /索引库名/_mapping
-
-## 文档操作
-
-### 新增文档
-
-**语法：**
-
-```json
-POST /索引库名/_doc/文档id(不指定默认自动生成id)
-{
-    "字段1": "值1",
-    "字段2": "值2",
-    "字段3": {
-        "子属性1": "值3",
-        "子属性2": "值4"
-    },
-    // ...
-}
-```
-
-**示例：**
-
-```json
-POST /heima/_doc/1
-{
-    "info": "程序员Java讲师",
-    "email": "zy@itcast.cn",
-    "name": {
-        "firstName": "云",
-        "lastName": "赵"
-    }
-}
-```
-
-**响应：**
-
-![image-20210720212933362](elasticearch.assets/image-20210720212933362.png)
-
-### 查询文档
-
-根据rest风格，新增是post，查询应该是get，不过查询一般都需要条件，这里我们把文档id带上。
-
-#### 查看文档(_id查询)
-
-**语法：**
-
-```json
-GET /{索引库名称}/_doc/{id}
-```
-
-**通过kibana查看数据：**
-
-```js
-GET /heima/_doc/1
-```
-
-**查看结果：**
-
-![image-20210720213345003](elasticearch.assets/image-20210720213345003.png)
-
-#### 查看文档(全部文档)
-
-**语法：**
-
-```json
-GET /{索引库名称}/_search
-```
-
-**示例**：
-
-```json
-GET  testindex/_search
-```
-
-查询结果
-
-```json
-{
-  "took" : 0,
-  "timed_out" : false,
-  "_shards" : {
-    "total" : 1,
-    "successful" : 1,
-    "skipped" : 0,
-    "failed" : 0
-  },
-  "hits" : {
-    "total" : {
-      "value" : 3,
-      "relation" : "eq"
-    },
-    "max_score" : 1.0,
-    "hits" : [
-      {
-        "_index" : "testindex",
-        "_type" : "_doc",
-        "_id" : "glbS2n0BgOyOsl0n-wMM",
-        "_score" : 1.0,
-        "_source" : {
-          "title" : "手机hhhh",
-          "content" : "啦啦啦啦啦啦啦啦啦啦啦啦啦啦",
-          "name" : "地界"
-        }
-      }
-      ...
-    ]
-  }
-}
-```
-
-###  删除文档
-
-删除使用DELETE请求，同样，需要根据id进行删除：
-
-**语法：**
-
-```json
-DELETE /{索引库名}/_doc/id值
-```
-
-**示例：**
-
-```json
-# 根据id删除数据
-DELETE /heima/_doc/1
-```
-
-**结果：**
-
-![image-20210720213634918](elasticearch.assets/image-20210720213634918.png)
-
-### 修改文档
-
-修改有两种方式：
-
-- 全量修改：直接覆盖原来的文档
-- 增量修改：修改文档中的部分字段
-
-#### 全量修改(全量字段修改)
-
-全量修改是覆盖原来的文档，其本质是：
-
-- 根据指定的id删除文档
-- 新增一个相同id的文档
-
-**注意**：本质是先根据id删除，再新增
-
-**语法：**
-
-```json
-PUT /{索引库名}/_doc/文档id
-{
-    "字段1": "值1",
-    "字段2": "值2",
-    // ... 略
-}
-```
-
-**示例：**
-
-```json
-PUT /heima/_doc/1
-{
-    "info": "黑马程序员高级Java讲师",
-    "email": "zy@itcast.cn",
-    "name": {
-        "firstName": "云",
-        "lastName": "赵"
-    }
-}
-```
-
-#### 增量修改(部分字段修改)
-
-增量修改:  只修改指定id匹配的文档中的部分字段。
-
-**语法：**
-
-```json
-POST /{索引库名}/_update/文档id
-{
-    "doc": {
-         "字段名": "新的值",
-    }
-}
-```
-
-**示例：**
-
-```json
-POST /heima/_update/1
-{
-  "doc": {
-    "email": "ZhaoYun@itcast.cn"
-  }
-}
-```
-
-### 总结
-
-- 创建文档：POST /{索引库名}/_doc/文档id   { json文档 }
-- 查询文档：GET /{索引库名}/_doc/文档id
-- 删除文档：DELETE /{索引库名}/_doc/文档id
-- 修改文档：
-  - 全量修改：PUT /{索引库名}/_doc/文档id { json文档 }
-  - 增量修改：POST /{索引库名}/_update/文档id { "doc": {字段}}
 
 ## 映射操作
 
@@ -784,6 +434,372 @@ PUT testindex/_mapping
 # analyzer：分词器，这里的 ik_max_word 即使用 ik 分词器
 ```
 
+# 索引库操作:cat:
+
+| method | URL                                             | remark              |
+| ------ | ----------------------------------------------- | ------------------- |
+| put    | localhost:9200/索引名称/类型名称/文档id         | 创建文档—指定文档ld |
+| GET    | localhost:9200/索引名称/类型名称/文档id         | 查询某条文档        |
+| POST   | localhost:9200/索引名称/类型名称                | 创建文档—随机文档ld |
+| POST   | localhost:9200/索引名称/类型名称/_              | 查询所有            |
+| POST   | localhost:9200/索引名称/类型名称/文档id/_update | 修改文档(部分修改)  |
+| DELETE | localhost:9200/索引名称/类型名称/文档id         | 删除文档            |
+
+## 创建索引库和映射
+
+ **基本语法：**
+
+- 请求方式：PUT
+- 请求路径：/索引库名，可以自定义
+- 请求参数：mapping映射
+
+格式：
+
+```json
+PUT /索引库名称
+{
+  "mappings": {
+    "properties": {
+      "字段名":{
+        "type": "text",        // 可分词的文本
+        "analyzer": "ik_smart" // 分词器
+      },
+      "字段名2":{
+        "type": "keyword",   // 普通文本
+        "index": "false"     // 不参与倒排索引,不常用搜索
+      },
+      "字段名3":{
+        "properties": {
+          "子字段": {
+            "type": "keyword"
+          }
+        }
+      },
+      // ...略
+    }
+  }
+}
+```
+
+**示例**：
+
+```sh
+PUT /heima
+{
+  "mappings": {
+    "properties": {
+      "info":{
+        "type": "text",
+        "analyzer": "ik_smart"
+      },
+      "email":{
+        "type": "keyword",
+        "index": "falsae"
+      },
+      "name":{
+      	#嵌套
+        "properties": {
+          "firstName": {
+            "type": "keyword"
+          }
+        }
+      },
+      // ... 略
+    }
+  }
+}
+```
+
+**创建成功,返回结果如下:**
+
+<img src="elasticearch.assets/image-20231102225733669.png" style="zoom:67%;" />
+
+## 查询索引库
+
+**基本语法**：
+
+- 请求方式：GET
+
+- 请求路径：/索引库名
+
+- 请求参数：无
+
+**格式**：
+
+```json
+GET /索引库名称
+```
+
+**示例**：
+
+![image-20231025225619625](elasticearch.assets/image-20231025225619625.png)
+
+## 查看全部索引库
+
+```json
+GET /_cat/indices?v
+```
+
+es 中会默认存在一个名为.kibana的索引,  .开头的索引库是自带的
+
+![image-20231102223907702](elasticearch.assets/image-20231102223907702.png)
+
+## 修改索引库
+
+索引库**一旦创建，无法修改mapping**。
+
+虽然无法修改mapping中已有的字段，但是却**允许添加新的字段到mapping中**，因为不会对倒排索引产生影响。
+
+**语法说明**：
+
+```json
+PUT /索引库名/_mapping
+{
+  "properties": {
+    "新字段名":{
+      "type": "integer"
+    }
+  }
+}
+```
+
+**示例**：
+
+![image-20210720212357390](elasticearch.assets/image-20210720212357390.png)
+
+## 删除索引库
+
+**语法：**
+
+- 请求方式：DELETE
+
+- 请求路径：/索引库名
+
+- 请求参数：无
+
+**格式：**
+
+```
+DELETE /索引名称1,索引名称2,索引名称3...
+```
+
+在kibana中测试：
+
+![image-20210720212123420](elasticearch.assets/image-20210720212123420.png)
+
+## 总结
+
+- 创建索引库：PUT /索引库名
+- 查询索引库：GET /索引库名
+- 删除索引库：DELETE /索引库名
+- 添加字段：PUT /索引库名/_mapping
+
+# 文档操作
+
+## 新增文档
+
+**语法：**
+
+```json
+POST /索引库名/_doc/文档id(不指定默认自动生成id)
+{
+    "字段1": "值1",
+    "字段2": "值2",
+    "字段3": {
+        "子属性1": "值3",
+        "子属性2": "值4"
+    },
+    // ...
+}
+```
+
+**示例：**
+
+```json
+POST /heima/_doc/1
+{
+    "info": "程序员Java讲师",
+    "email": "zy@itcast.cn",
+    "name": {
+        "firstName": "云",
+        "lastName": "赵"
+    }
+}
+```
+
+**响应：**
+
+![image-20210720212933362](elasticearch.assets/image-20210720212933362.png)
+
+## 查询文档
+
+根据rest风格，新增是post，查询应该是get，不过查询一般都需要条件，这里我们把文档id带上。
+
+### 查看文档(_id查询)
+
+**语法：**
+
+```json
+GET /{索引库名称}/_doc/{id}
+```
+
+**通过kibana查看数据：**
+
+```js
+GET /heima/_doc/1
+```
+
+**查看结果：**
+
+![image-20210720213345003](elasticearch.assets/image-20210720213345003.png)
+
+### 查看文档(全部文档)
+
+**语法：**
+
+```json
+GET /{索引库名称}/_search
+```
+
+**示例**：
+
+```json
+GET  testindex/_search
+```
+
+查询结果
+
+```json
+{
+  "took" : 0,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 3,
+      "relation" : "eq"
+    },
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "testindex",
+        "_type" : "_doc",
+        "_id" : "glbS2n0BgOyOsl0n-wMM",
+        "_score" : 1.0,
+        "_source" : {
+          "title" : "手机hhhh",
+          "content" : "啦啦啦啦啦啦啦啦啦啦啦啦啦啦",
+          "name" : "地界"
+        }
+      }
+      ...
+    ]
+  }
+}
+```
+
+##  删除文档
+
+删除使用DELETE请求，同样，需要根据id进行删除：
+
+**语法：**
+
+```json
+DELETE /{索引库名}/_doc/id值
+```
+
+**示例：**
+
+```json
+# 根据id删除数据
+DELETE /heima/_doc/1
+```
+
+**结果：**
+
+![image-20210720213634918](elasticearch.assets/image-20210720213634918.png)
+
+## 修改文档
+
+修改有两种方式：
+
+- 全量修改：直接覆盖原来的文档
+- 增量修改：修改文档中的部分字段
+
+### 全量修改(全量字段修改)
+
+全量修改是覆盖原来的文档，其本质是：
+
+- 根据指定的id删除文档
+- 新增一个相同id的文档
+
+**注意**：本质是先根据id删除，再新增
+
+**语法：**
+
+```json
+PUT /{索引库名}/_doc/文档id
+{
+    "字段1": "值1",
+    "字段2": "值2",
+    // ... 略
+}
+```
+
+**示例：**
+
+```json
+PUT /heima/_doc/1
+{
+    "info": "黑马程序员高级Java讲师",
+    "email": "zy@itcast.cn",
+    "name": {
+        "firstName": "云",
+        "lastName": "赵"
+    }
+}
+```
+
+### 增量修改(部分字段修改)
+
+增量修改:  只修改指定id匹配的文档中的部分字段。
+
+**语法：**
+
+```json
+POST /{索引库名}/_update/文档id
+{
+    "doc": {
+         "字段名": "新的值",
+    }
+}
+```
+
+**示例：**
+
+```json
+POST /heima/_update/1
+{
+  "doc": {
+    "email": "ZhaoYun@itcast.cn"
+  }
+}
+```
+
+## 总结
+
+- 创建文档：POST /{索引库名}/_doc/文档id   { json文档 }
+- 查询文档：GET /{索引库名}/_doc/文档id
+- 删除文档：DELETE /{索引库名}/_doc/文档id
+- 修改文档：
+  - 全量修改：PUT /{索引库名}/_doc/文档id { json文档 }
+  - 增量修改：POST /{索引库名}/_update/文档id { "doc": {字段}}
+
 # DSL查询文档
 
 ## 1.1 DSL查询分类
@@ -823,28 +839,6 @@ GET /indexName/_search
 }
 ```
 
-我们以查询所有为例，其中：
-
-- 查询类型为match_all
-- 没有查询条件
-
-```json
-// 查询所有
-GET /indexName/_search
-{
-  "query": {
-    "match_all": {
-    }
-  }
-}
-```
-
-其它查询无非就是**查询类型**、**查询条件**的变化。
-
-例子
-
-![image-20231031123257173](elasticearch.assets/image-20231031123257173.png)
-
 ## 1.2.全文检索查询
 
 ### 1.2.1.使用场景
@@ -864,11 +858,7 @@ GET /indexName/_search
 
 ![image-20210721165326938](elasticearch.assets/image-20210721165326938.png)
 
-
-
 因为是拿着词条去匹配，因此参与搜索的字段也必须是可分词的text类型的字段。
-
-
 
 ### 1.2.2.基本语法
 
@@ -906,13 +896,30 @@ GET /indexName/_search
 
 ### 1.2.3.示例
 
-match查询示例：
+**match查询示例：**
 
 ![image-20210721170455419](elasticearch.assets/image-20210721170455419.png)
 
 
 
-multi_match查询示例：
+**match_all查看所有示例：**
+
+```json
+// 查询所有
+GET /indexName/_search
+{
+  "query": {
+    "match_all": {
+    }
+  }
+}
+```
+
+其它查询无非就是**查询类型**、**查询条件**的变化。
+
+![image-20231031123257173](elasticearch.assets/image-20231031123257173.png)
+
+**multi_match查询示例：**
 
 ![image-20210721170720691](elasticearch.assets/image-20210721170720691.png)
 
@@ -1219,7 +1226,7 @@ function score query定义的三要素
 - 算分函数：如何计算function score
 - 加权方式：function score 与 query score如何运算
 
-### 1.5.3.布尔查询
+### 1.5.3.布尔查询:crossed_swords:
 
 布尔查询是一个或多个查询子句的组合，每一个子句就是一个**子查询**。子查询的组合方式有：
 
@@ -1453,10 +1460,6 @@ GET /hotel/_search
   - 缺点：会有额外内存消耗，并且搜索结果是非实时的
   - 场景：海量数据的获取和迁移。从ES7.1开始不推荐，建议用 after search方案。
 
-
-
-
-
 ## 2.3.高亮
 
 ### 2.3.1.高亮原理
@@ -1557,6 +1560,10 @@ CREATE TABLE `tb_hotel` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
+导入sql语句, 结果如下:
+
+<img src="elasticearch.assets/image-20231102183334739.png" alt="image-20231102183334739" style="zoom:67%;" />
+
 #### 4.0.2.导入项目
 
 然后导入课前资料提供的项目:
@@ -1652,7 +1659,7 @@ PUT /hotel
 
 <img src="elasticearch.assets/image-20210720222221516.png" alt="image-20210720222221516" style="zoom:80%;" />
 
-#### 4.0.4.初始化RestClient
+### 4.1. 初始化RestClient
 
 在elasticsearch提供的API中，与elasticsearch一切交互都封装在一个名为RestHighLevelClient的类中，必须先完成这个对象的初始化，建立与elasticsearch的连接。
 
@@ -1716,9 +1723,9 @@ public class HotelIndexTest {
 }
 ```
 
-### 4.1.创建索引库
+### 4.2.创建索引库
 
-#### 4.1.1.代码解读
+#### 4.2.1.代码解读
 
 创建索引库的API如下：
 
@@ -1730,7 +1737,7 @@ public class HotelIndexTest {
 - 2）添加请求参数，其实就是DSL的JSON参数部分。因为json字符串很长，这里是定义了静态字符串常量MAPPING_TEMPLATE，让代码看起来更加优雅。
 - 3）发送请求，client.indices()方法的返回值是IndicesClient类型，封装了所有与索引库操作有关的方法。
 
-### 4.1.2.完整示例
+#### 4.2.2.完整示例
 
 在hotel-demo的cn.itcast.hotel.constants包下，创建一个类，定义mapping映射的JSON字符串常量：
 
@@ -1804,7 +1811,11 @@ void createHotelIndex() throws IOException {
 }
 ```
 
-### 4.2.删除索引库
+测试
+
+![image-20231102184912471](elasticearch.assets/image-20231102184912471.png)
+
+### 4.3.删除索引库
 
 删除索引库的DSL语句非常简单：
 
@@ -1836,7 +1847,7 @@ void testDeleteHotelIndex() throws IOException {
 }
 ```
 
-### 4.3.判断索引库是否存在
+### 4.4.判断索引库是否存在
 
 判断索引库是否存在，本质就是查询，对应的DSL是：
 
@@ -1862,7 +1873,7 @@ void testExistsHotelIndex() throws IOException {
 }
 ```
 
-### 4.4.总结
+### 4.5.总结
 
 JavaRestClient操作elasticsearch的流程基本类似。核心是client.indices()方法来获取索引库的操作对象。
 
@@ -1872,8 +1883,6 @@ JavaRestClient操作elasticsearch的流程基本类似。核心是client.indices
 - 创建XxxIndexRequest。XXX是Create、Get、Delete
 - 准备DSL（ Create时需要，其它是无参）
 - 发送请求。调用RestHighLevelClient#indices().xxx()方法，xxx是create、exists、delete
-
-
 
 ## RestClient操作文档
 
@@ -2096,6 +2105,8 @@ void testGetDocumentById() throws IOException {
     System.out.println(hotelDoc);
 }
 ```
+
+![image-20231102191941246](elasticearch.assets/image-20231102191941246.png)
 
 ### 5.3.删除文档
 
@@ -2401,7 +2412,23 @@ void testMatch() throws IOException {
 
 ![image-20210721220305140](elasticearch.assets/image-20210721220305140.png) 
 
-### 3.4.布尔查询
+### 3.4. 算分函数查询
+
+```java
+//查询构造器
+// 2.算分函数查询
+FunctionScoreQueryBuilder functionScoreQuery = QueryBuilders.functionScoreQuery(
+    boolQuery, // 原始查询，boolQuery
+    new FunctionScoreQueryBuilder.FilterFunctionBuilder[]{ // function数组
+        new FunctionScoreQueryBuilder.FilterFunctionBuilder(
+            QueryBuilders.termQuery("isAD", true), // 过滤条件
+            ScoreFunctionBuilders.weightFactorFunction(10) // 算分函数
+        )
+    }
+);
+```
+
+### 3.5.复合(布尔)查询
 
 布尔查询是用must、must_not、filter等方式组合其它查询，代码示例如下：
 
@@ -2433,8 +2460,6 @@ void testBool() throws IOException {
 }
 ```
 
-
-
 ### 3.5.排序、分页
 
 搜索结果的排序和分页是与query同级的参数，因此同样是使用request.source()来设置。
@@ -2456,7 +2481,10 @@ void testPageAndSort() throws IOException {
     request.source().query(QueryBuilders.matchAllQuery());
   
     // 2.2.排序 sort
-    request.source().sort("price", SortOrder.ASC);
+    request.source().sort("price", SortOrder.ASC);   // 价格排序
+    /* request.source().sort(SortBuilders.geoDistanceSort("location", newGeoPoint(location)).order(SortOrder.ASC).unit(DistanceUnit.KILOMETERS)
+	);
+    */
     // 2.3.分页 from、size
     request.source().from((page - 1) * size).size(5);
     
@@ -2468,14 +2496,37 @@ void testPageAndSort() throws IOException {
 }
 ```
 
-### 3.6.高亮
+响应数据
+
+```java
+SearchHits searchHits = response.getHits();
+// 4.1.总条数
+long total = searchHits.getTotalHits().value;
+// 4.2.获取文档数组
+SearchHit[] hits = searchHits.getHits();
+// 4.3.遍历
+List<HotelDoc> hotels = new ArrayList<>(hits.length);
+for (SearchHit hit : hits) {
+    // 4.4.获取source
+    String json = hit.getSourceAsString();
+    /*
+            ............
+            */
+    // 距离排序得到时，会保存具体的距离值 // getSortValues拿到
+    Object[] sortValues = hit.getSortValues();
+}
+```
+
+
+
+### 3.7.高亮
 
 高亮的代码与之前代码差异较大，有两点：
 
 - 查询的DSL：其中除了查询条件，还需要添加高亮条件，同样是与query同级。
 - 结果解析：结果除了要解析_source文档数据，还要解析高亮结果
 
-#### 3.6.1.高亮请求构建
+#### 3.7.1.高亮请求构建
 
 高亮请求的构建API如下：
 
@@ -2504,7 +2555,7 @@ void testHighlight() throws IOException {
 }
 ```
 
-#### 3.6.2.高亮结果解析
+#### 3.7.2.高亮结果解析
 
 高亮的结果与查询的文档结果默认是分离的，并不在一起。
 
@@ -2555,13 +2606,11 @@ private void handleResponse(SearchResponse response) {
 }
 ```
 
-![image-20231031141834951](elasticearch.assets/image-20231031141834951.png)
+![](elasticearch.assets/image-20231102192908719.png)
 
 
 
-# 4.黑马旅游案例
-
-下面，我们通过黑马旅游的案例来实战演练下之前学习的知识。
+# 黑马旅游案例
 
 我们实现四部分功能：
 
@@ -2570,21 +2619,15 @@ private void handleResponse(SearchResponse response) {
 - 我周边的酒店
 - 酒店竞价排名
 
-
-
 启动我们提供的hotel-demo项目，其默认端口是8089，访问http://localhost:8090，就能看到项目页面了：
 
 ![image-20210721223159598](elasticearch.assets/image-20210721223159598.png)
-
-
-
-
 
 ## 4.1.酒店搜索和分页
 
 案例需求：实现黑马旅游的酒店搜索功能，完成关键字搜索和分页
 
-### 4.1.1.需求分析
+### 4.1.1. 需求分析
 
 在项目的首页，有一个大大的搜索框，还有分页按钮：
 
@@ -2597,8 +2640,6 @@ private void handleResponse(SearchResponse response) {
 请求参数如下：
 
 ![image-20210721224112708](elasticearch.assets/image-20210721224112708.png)
-
-
 
 由此可以知道，我们这个请求的信息如下：
 
@@ -2613,17 +2654,13 @@ private void handleResponse(SearchResponse response) {
   - `total`：总条数
   - `List<HotelDoc>`：当前页的数据
 
-
-
 因此，我们实现业务的流程如下：
 
 - 步骤一：定义实体类，接收请求参数的JSON对象
 - 步骤二：编写controller，接收页面的请求
 - 步骤三：编写业务实现，利用RestHighLevelClient实现搜索、分页
 
-
-
-### 4.1.2.定义实体类
+### 4.1.2.定义请求响应实体类
 
 实体类有两个，一个是前端的请求参数实体，一个是服务端应该返回的响应结果实体。
 
@@ -2640,7 +2677,9 @@ private void handleResponse(SearchResponse response) {
 }
 ```
 
-因此，我们在`cn.itcast.hotel.pojo`包下定义一个实体类：
+所以在`cn.itcast.hotel.pojo`包下定义一个实体类：
+
+**RequestParams类**      
 
 ```java
 package cn.itcast.hotel.pojo;
@@ -2656,8 +2695,6 @@ public class RequestParams {
 }
 ```
 
-
-
 2）返回值
 
 分页查询，需要返回分页结果PageResult，包含两个属性：
@@ -2666,6 +2703,8 @@ public class RequestParams {
 - `List<HotelDoc>`：当前页的数据
 
 因此，我们在`cn.itcast.hotel.pojo`中定义返回结果：
+
+**PageResult类**
 
 ```java
 package cn.itcast.hotel.pojo;
@@ -2689,8 +2728,6 @@ public class PageResult {
 }
 ```
 
-
-
 ### 4.1.3.定义controller
 
 定义一个HotelController，声明查询接口，满足下列要求：
@@ -2702,9 +2739,9 @@ public class PageResult {
   - `Long total`：总条数
   - `List<HotelDoc> hotels`：酒店数据
 
-
-
 因此，我们在`cn.itcast.hotel.web`中定义HotelController：
+
+**HotelController类**
 
 ```java
 @RestController
@@ -2721,8 +2758,6 @@ public class HotelController {
 }
 ```
 
-
-
 ### 4.1.4.实现搜索业务
 
 我们在controller调用了IHotelService，并没有实现该方法，因此下面我们就在IHotelService中定义方法，并且去实现业务逻辑。
@@ -2738,22 +2773,18 @@ public class HotelController {
 PageResult search(RequestParams params);
 ```
 
-
-
 2）实现搜索业务，肯定离不开RestHighLevelClient，我们需要把它注册到Spring中作为一个Bean。在`cn.itcast.hotel`中的`HotelDemoApplication`中声明这个Bean：
+
+在项目主类中定义
 
 ```java
 @Bean
 public RestHighLevelClient client(){
     return  new RestHighLevelClient(RestClient.builder(
-        HttpHost.create("http://192.168.150.101:9200")
+        HttpHost.create("http://192.168.200.134:9200")
     ));
 }
 ```
-
-
-
-
 
 3）在`cn.itcast.hotel.service.impl`中的`HotelService`中实现search方法：
 
@@ -2809,10 +2840,6 @@ private PageResult handleResponse(SearchResponse response) {
 }
 ```
 
-
-
-
-
 ## 4.2.酒店结果过滤
 
 需求：添加品牌、城市、星级、价格等过滤功能
@@ -2861,8 +2888,6 @@ public class RequestParams {
 }
 ```
 
-
-
 ### 4.2.3.修改搜索业务
 
 在HotelService的search方法中，只有一个地方需要修改：requet.source().query( ... )其中的查询条件。
@@ -2878,8 +2903,6 @@ public class RequestParams {
 
 - 关键字搜索放到must中，参与算分
 - 其它过滤条件放到filter中，不参与算分
-
-
 
 因为条件构建的逻辑比较复杂，这里先封装为一个函数：
 
@@ -2929,7 +2952,7 @@ private void buildBasicQuery(RequestParams params, SearchRequest request) {
 
 
 
-## 4.3.我周边的酒店
+## 4.3.周边的酒店
 
 需求：我附近的酒店
 
@@ -3075,8 +3098,6 @@ public PageResult search(RequestParams params) {
 
 发现确实可以实现对我附近酒店的排序，不过并没有看到酒店到底距离我多远，这该怎么办？
 
-
-
 排序完成后，页面还要获取我附近每个酒店的具体**距离**值，这个值在响应结果中是独立的：
 
 ![image-20210722095648542](elasticearch.assets/image-20210722095648542.png)
@@ -3149,7 +3170,7 @@ public class HotelDoc {
 
 
 
-## 4.4.酒店竞价排名
+## 4.4.酒店竞价排名(自定义排名)
 
 需求：让指定的酒店在搜索结果中排名置顶
 
@@ -3161,19 +3182,13 @@ public class HotelDoc {
 
 页面会给指定的酒店添加**广告**标记。
 
-
-
 那怎样才能让指定的酒店排名置顶呢？
-
-
 
 我们之前学习过的function_score查询可以影响算分，算分高了，自然排名也就高了。而function_score包含3个要素：
 
 - 过滤条件：哪些文档要加分
 - 算分函数：如何计算function score
 - 加权方式：function score 与 query score如何运算
-
-
 
 这里的需求是：让**指定酒店**排名靠前。因此我们需要给这些酒店添加一个标记，这样在过滤条件中就可以**根据这个标记来判断，是否要提高算分**。
 
@@ -3188,8 +3203,6 @@ public class HotelDoc {
 - 算分函数：我们可以用最简单暴力的weight，固定加权值
 - 加权方式：可以用默认的相乘，大大提高算分
 
-
-
 因此，业务的实现步骤包括：
 
 1. 给HotelDoc类添加isAD字段，Boolean类型
@@ -3197,8 +3210,6 @@ public class HotelDoc {
 2. 挑选几个你喜欢的酒店，给它的文档数据添加isAD字段，值为true
 
 3. 修改search方法，添加function score功能，给isAD值为true的酒店增加权重
-
-
 
 ### 4.4.2.修改HotelDoc实体
 
@@ -3316,13 +3327,1357 @@ private void buildBasicQuery(RequestParams params, SearchRequest request) {
 }
 ```
 
+# 数据聚合(分组+聚合函数):crossed_swords:
+
+**[聚合（](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)[aggregations](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)[）](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)**可以让我们极其方便的实现对数据的统计、分析、运算。例如：
+
+- 什么品牌的手机最受欢迎？
+- 这些手机的平均价格、最高价格、最低价格？
+- 这些手机每月的销售情况如何？
+
+实现这些统计功能的比数据库的sql要方便的多，而且查询速度非常快，可以实现近实时搜索效果。
+
+## 1.1.聚合的种类
+
+聚合常见的有三类：
+
+- **桶（Bucket）**聚合：用来对文档做分组
+  - TermAggregation：按照文档字段值分组，例如按照品牌值分组、按照国家分组
+  - Date Histogram：按照日期阶梯分组，例如一周为一组，或者一月为一组
+
+- **度量（Metric）**聚合：用以计算一些值，比如：最大值、最小值、平均值等
+  - Avg：求平均值
+  - Max：求最大值
+  - Min：求最小值
+  - Stats：同时求max、min、avg、sum等
+- **管道（pipeline）**聚合：其它聚合的结果为基础做聚合
+
+> **注意：**参加聚合的字段必须是keyword、日期、数值、布尔类型
+
+## 1.2.DSL实现聚合
+
+现在，我们要统计所有数据中的酒店品牌有几种，其实就是按照品牌对数据分组。此时可以根据酒店品牌的名称做聚合，也就是Bucket聚合。
+
+### 1.2.1.Bucket 分组
+
+语法如下：
+
+```json
+GET /hotel/_search
+{
+  "size": 0,  // 设置size为0，结果中不包含文档，只包含聚合结果
+  "aggs": { // 定义聚合
+    "brandAgg": { //给聚合起个名字
+      "terms": { // 聚合的类型，按照品牌值聚合，所以选择term
+        "field": "brand", // 参与聚合的字段
+        "size": 20 // 希望获取的聚合结果数量
+      }
+    }
+  }
+}
+```
+
+结果如图：
+
+<img src="elasticearch.assets/image-20210723171948228.png" alt="image-20210723171948228" style="zoom: 67%;" />
+
+#### 1.2.1.1 分组结果排序
+
+默认情况下，Bucket聚合会统计Bucket内的文档数量，记为_count，并且按照_count降序排序。 排序方式ASC、DESC
+
+我们可以指定order属性，自定义聚合的排序方式：
+
+```json
+GET /hotel/_search
+{
+  "size":0,
+  "aggs":{
+    "brandAgg": {
+    "terms": {
+        "field": "brand",
+        //排序
+        "order": {
+          "_count": "DESC"  //按照_count降序排列
+        },
+        "size":20
+      }
+    }
+  }
+}
+```
+
+<img src="elasticearch.assets/image-20231102205433836.png" alt="image-20231102205433836" style="zoom:67%;" />
+
+#### 1.2.1.1 限定聚合范围
+
+默认情况下，Bucket聚合是对索引库的所有文档做聚合，但真实场景下，用户会输入搜索条件，因此聚合必须是对搜索结果聚合。那么聚合必须添加限定条件。
+
+限定要聚合的文档范围，只要添加query条件(**及DSL查询文档的方法**)即可：
+
+```json
+GET /hotel/_search
+{
+  "query": {
+    "range": {
+      "price": {
+        "lte": 200 // 只对200元以下的文档聚合
+      }
+    }
+  }, 
+  "size": 0, 
+  "aggs": {
+    "brandAgg": {
+      "terms": {
+        "field": "brand",
+        "size": 20
+      }
+    }
+  }
+}
+```
+
+这次，聚合得到的品牌明显变少了：
+
+![image-20210723172404836](elasticearch.assets/image-20210723172404836.png)
 
 
 
+### 1.2.2 Metric聚合语法
+
+对桶内的酒店做运算，获取每个品牌的用户评分的min、max、avg等值。
+
+可以获取min、max、avg、 stats(包括min、max、avg) 结果。
+
+语法如下：
+
+```json
+GET /hotel/_search
+{
+  "size": 0, 
+  "aggs": {
+    "brandAgg": { 
+      "terms": { 
+        "field": "brand", 
+        "size": 20
+      },
+      //Metric聚合
+      "aggs": { // 是brands聚合的子聚合，也就是分组后对每组分别计算
+        "score_stats": { // 聚合名称
+          "stats": { // 聚合类型，这里stats可以计算min、max、avg等
+            "field": "score" // 聚合字段，这里是score
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+这次的score_stats聚合是在brandAgg的聚合内部嵌套的子聚合。因为我们需要在每个桶分别计算。
+
+可以给聚合结果做个排序，例如按照每个桶的酒店平均分做排序：
+
+![image-20210723172917636](elasticearch.assets/image-20210723172917636.png)
+
+### 1.2.3 小结
+
+aggs代表聚合，与query同级，此时query的作用是？
+
+- 限定聚合的的文档范围
+
+聚合必须的三要素：
+
+- 聚合名称
+- 聚合类型
+- 聚合字段
+
+聚合可配置属性有：
+
+- size：指定聚合结果数量
+- order：指定聚合结果排序方式
+- field：指定聚合字段
+
+## 1.3 续-黑马旅游案例
+
+RestAPI实现聚合
+
+### 1.3.1.API语法
+
+聚合条件与query条件同级别，因此需要使用request.source()来指定聚合条件。
+
+聚合条件的语法：
+
+![image-20210723173057733](elasticearch.assets/image-20210723173057733.png)
+
+聚合的结果也与查询结果不同，API也比较特殊。同样是JSON逐层解析：
+
+![image-20210723173215728](elasticearch.assets/image-20210723173215728.png)
+
+### 1.3.2.业务需求
+
+需求：**搜索页面的品牌、城市等信息不应该是在页面写死**，而是通过聚合索引库中的酒店数据得来的：
+
+![image-20210723192605566](elasticearch.assets/image-20210723192605566.png)
+
+分析：
+
+目前，页面的城市列表、星级列表、品牌列表都是写死的，并不会随着搜索结果的变化而变化。但是用户搜索条件改变时，搜索结果会跟着变化。
+
+例如：用户搜索“东方明珠”，那搜索的酒店肯定是在上海东方明珠附近，因此，城市只能是上海，此时城市列表中就不应该显示北京、深圳、杭州这些信息了。
+
+也就是说，搜索结果中包含哪些城市，页面就应该列出哪些城市；搜索结果中包含哪些品牌，页面就应该列出哪些品牌。
+
+如何得知搜索结果中包含哪些品牌？如何得知搜索结果中包含哪些城市？
+
+使用聚合功能，利用Bucket聚合，对搜索结果中的文档基于品牌分组、基于城市分组，就能得知包含哪些品牌、哪些城市了。
+
+因为是对搜索结果聚合，因此聚合是**限定范围的聚合**，也就是说聚合的限定条件跟搜索文档的条件一致。
+
+查看浏览器可以发现，前端其实已经发出了这样的一个请求：
+
+![image-20210723193730799](elasticearch.assets/image-20210723193730799.png)
+
+请求**参数与搜索文档的参数完全一致**。
+
+返回值类型就是页面要展示的最终结果：
+
+![image-20210723203915982](elasticearch.assets/image-20210723203915982.png)
+
+结果是一个Map结构：
+
+- key是字符串，城市、星级、品牌、价格
+- value是集合，例如多个城市的名称
+
+### 1.3.3.业务实现
+
+在`cn.itcast.hotel.web`包的`HotelController`中添加一个方法，遵循下面的要求：
+
+- 请求方式：`POST`
+- 请求路径：`/hotel/filters`
+- 请求参数：`RequestParams`，与搜索文档的参数一致
+- 返回值类型：`Map<String, List<String>>`
+
+代码：
+
+```java
+    @PostMapping("filters")
+    public Map<String, List<String>> getFilters(@RequestBody RequestParams params){
+        return hotelService.getFilters(params);
+    }
+```
+
+这里调用了IHotelService中的getFilters方法，尚未实现。
+
+在`cn.itcast.hotel.service.IHotelService`中定义新方法：
+
+```java
+Map<String, List<String>> filters(RequestParams params);
+```
+
+在`cn.itcast.hotel.service.impl.HotelService`中实现该方法：
+
+```java
+@Override
+	public Map<String, List<String>> getFilters(RequestParams params) {
+		try {
+			// 1.准备请求
+			SearchRequest request = new SearchRequest("hotel");
+			// 2.请求参数
+			// 2.1.query
+			buildBasicQuery(params, request); //设置查询条件
+			// 2.2.size
+			request.source().size(0);
+			// 2.3.聚合
+			buildAggregations(request); //设置聚合查询条件
+			// 3.发出请求
+			SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+			
+			// 4.解析结果
+			Aggregations aggregations = response.getAggregations();
+			Map<String, List<String>> filters = new HashMap<>(3);
+			// 4.1.解析品牌
+			List<String> brandList = getAggregationByName(aggregations, "brandAgg");
+			filters.put("brand", brandList);
+			// 4.1.解析品牌
+			List<String> cityList = getAggregationByName(aggregations, "cityAgg");
+			filters.put("city", cityList);
+			// 4.1.解析品牌
+			List<String> starList = getAggregationByName(aggregations, "starAgg");
+			filters.put("starName", starList);
+
+			return filters;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 根据聚合名称获取聚合结果
+	 *
+	 * @param aggregations
+	 * @param aggName
+	 * @return
+	 */
+	private List<String> getAggregationByName(Aggregations aggregations, String aggName) {
+		// 4.1.根据聚合名称，获取聚合结果
+		Terms terms = aggregations.get(aggName);
+		// 4.2.获取buckets
+		List<? extends Terms.Bucket> buckets = terms.getBuckets();
+		// 4.3.遍历
+		List<String> list = new ArrayList<>(buckets.size());
+		for (Terms.Bucket bucket : buckets) {
+			String brandName = bucket.getKeyAsString();
+			list.add(brandName);
+		}
+		return list;
+	}
+
+	/**
+	 * 聚合查询构造器
+	 */
+	private void buildAggregations(SearchRequest request) {
+		request.source().aggregation(
+				// 用于根据名称获取聚合结果
+				AggregationBuilders.terms("brandAgg").field("brand").size(100));
+		request.source().aggregation(
+				AggregationBuilders.terms("cityAgg").field("city").size(100));
+		request.source().aggregation(
+				AggregationBuilders.terms("starAgg").field("starName").size(100));
+	}
+```
+
+# 自动补全:crossed_swords:
+
+当用户在搜索框输入字符时，我们应该提示出与该字符有关的搜索项，如图：
+
+![image-20210723204936367](elasticearch.assets/image-20210723204936367.png)
+
+这种根据用户输入的字母，提示完整词条的功能，就是自动补全了。
+
+因为需要根据拼音字母来推断，因此要用到拼音分词功能。
+
+## 2.1.拼音分词器插件
+
+要实现根据字母做补全，就必须对文档按照拼音分词。在GitHub上恰好有elasticsearch的拼音分词插件。地址：https://github.com/medcl/elasticsearch-analysis-pinyin
+
+![image-20210723205932746](elasticearch.assets/image-20210723205932746.png)
+
+课前资料中也提供了拼音分词器的安装包：
+
+![image-20210723205722303](elasticearch.assets/image-20210723205722303.png) 
+
+安装方式与IK分词器一样，分三步：
+
+​	①解压
+
+​	②上传到虚拟机中，elasticsearch的plugin目录
+
+​	③重启elasticsearch
+
+​	④测试
+
+详细安装步骤可以参考IK分词器的安装过程。
+
+测试用法如下：
+
+```json
+POST /_analyze
+{
+ "text": "如家酒店还不错",
+ "analyzer": "pinyin"
+}
+```
+
+结果：
+
+<img src="elasticearch.assets/image-20210723210126506.png" alt="image-20210723210126506" style="zoom:67%;" /> 
+
+## 2.2.自定义分词器:crossed_swords:
+
+默认的拼音分词器会将每个汉字单独分为拼音，而我们希望的是每个词条形成一组拼音，需要对拼音分词器做个性化定制，形成自定义分词器。
+
+elasticsearch中分词器（analyzer）的组成包含三部分：
+
+- character filters：在tokenizer之前对文本进行处理。例如删除字符、替换字符
+- tokenizer：将文本按照一定的规则切割成词条（term）。例如keyword，就是不分词；还有ik_smart
+- tokenizer filter：将tokenizer输出的词条做进一步处理。例如大小写转换、同义词处理、拼音处理等
+
+文档分词时会依次由这三部分来处理文档：
+
+![image-20210723210427878](elasticearch.assets/image-20210723210427878.png)
+
+![image-20231031182813759](elasticearch.assets/image-20231031182813759.png)
+
+**声明自定义分词器的语法如下：**
+
+```json
+PUT /test
+{
+  "settings": {
+    "analysis": {
+      "analyzer": { // 自定义分词器
+        "my_analyzer": {  // 分词器名称
+          "tokenizer": "ik_max_word",  //IK分词器--中文分词
+          "filter": "py" // 拼音分词器,转成拼音
+        }
+      },
+      "filter": { // 自定义tokenizer filter
+        "py": { // 过滤器名称
+          "type": "pinyin", // 过滤器类型，这里是pinyin
+		  "keep_full_pinyin": false,
+          "keep_joined_full_pinyin": true,
+          "keep_original": true,
+          "limit_first_letter_length": 16,
+          "remove_duplicated_term": true,
+          "none_chinese_pinyin_tokenize": false
+        }
+      }
+    }
+  },
+    
+  // mappings数据类型
+  "mappings": {
+    "properties": {
+      "name": {
+        "type": "text",
+        "analyzer": "my_analyzer",      //  非搜索时用分词器
+        "search_analyzer": "ik_smart"   //  搜索时用, 不用拼音
+      }
+    }
+  }
+}
+```
+
+测试：
+
+![image-20210723211829150](elasticearch.assets/image-20210723211829150.png)
+
+总结：
+
+使用拼音分词器:
+
+- ①下载pinyin分词器
+
+- ②解压并放到elasticsearch的plugin目录
+
+- ③重启即可
+
+自定义分词器:
+
+- ①创建索引库时，在settings中配置，可以包含三部分
+
+- ②character filter
+
+- ③tokenizer
+
+- ④filter
+
+拼音分词器注意事项？
+
+- 为了避免搜索到同音字，搜索时不要使用拼音分词器
+
+## 2.3.自动补全查询
+
+elasticsearch提供了[Completion Suggester](https://www.elastic.co/guide/en/elasticsearch/reference/7.6/search-suggesters.html)查询来实现自动补全功能。这个查询会匹配以用户输入内容开头的词条并返回。为了提高补全查询的效率，对于文档中字段的类型有一些约束：
+
+- 参与补全查询的字段必须是completion类型。
+
+- 字段的内容一般是用来补全的多个词条形成的数组。
+
+比如，一个这样的索引库：
+
+```json
+# 创建索引库
+PUT test
+{
+  "mappings": {
+    "properties":{
+      "title":{
+        "type": "completion"    //补全
+        }
+      }
+    }
+}
+```
+
+然后插入下面的数据：
+
+```json
+// 示例数据
+POST test/_doc
+{
+"title": ["Sony", "WH-1000XM3"]
+}
+POST test/_doc
+{
+"title": ["SK-II", "PITERA"]
+}
+POST test/_doc
+{
+"title": ["Nintendo", "switch"]
+}
+```
+
+查询的DSL语句如下：
+
+```json
+// 自动补全查询
+GET /test/_search
+{
+  "suggest": {
+    "title_suggest":{
+    "text": "s",      // 关键字 //参与补全
+    "completion": {
+      "field": "title", // 补全查询的字段
+      "skip_duplicates":true, // 跳过重复的
+      "size": 10   // 获取前10条结果
+      }
+    }
+  }
+}
+```
+
+<img src="elasticearch.assets/image-20231102224303262.png" alt="image-20231102224303262" style="zoom:67%;" />
+
+# 续-黑马旅游案例
+
+## 2.4.实现酒店搜索框自动补全
+
+现在，我们的hotel索引库还没有设置拼音分词器，需要修改索引库中的配置。但是我们知道索引库是无法修改的，只能删除然后重新创建。
+
+另外，我们需要添加一个字段，用来做自动补全，将brand、suggestion、city等都放进去，作为自动补全的提示。
+
+因此，总结一下，我们需要做的事情包括：
+
+1. 修改hotel索引库结构，设置自定义拼音分词器
+
+2. 修改索引库的name、all字段，使用自定义分词器
+
+3. 索引库添加一个新字段suggestion，类型为completion类型，使用自定义的分词器
+
+4. **给HotelDoc类添加suggestion字段，内容包含brand、business**
+
+5. 重新导入数据到hotel库
+
+### 2.4.1.修改酒店映射结构
+
+代码如下：
+
+```json
+// 酒店数据索引库
+PUT /hotel
+{
+    // 配置拼音分词器
+  "settings": {
+    "analysis": {
+      "analyzer": {
+         // 自定义分词器1 -- 全文检索
+        "text_anlyzer": {
+          "tokenizer": "ik_max_word",
+          "filter": "py"
+        },
+         // 自定义分词器2 -- 自动补全
+        "completion_analyzer": {
+          "tokenizer": "keyword",  // 表示不分词
+          "filter": "py"            // 拼音分词器,转成拼音
+        }
+      },
+      "filter": {
+        "py": {
+          "type": "pinyin",
+          "keep_full_pinyin": false,
+          "keep_joined_full_pinyin": true,
+          "keep_original": true,
+          "limit_first_letter_length": 16,
+          "remove_duplicated_term": true,
+          "none_chinese_pinyin_tokenize": false
+        }
+      }
+    }
+  },
+  
+  // mapping映射属性
+  "mappings": {
+    "properties": {
+      "id":{
+        "type": "keyword"
+      },
+      "name":{
+        "type": "text",
+        "analyzer": "text_anlyzer",    // 非搜索时用分词器
+        "search_analyzer": "ik_smart", // 搜索时用, 不用拼音, 依然用ik_smart
+        "copy_to": "all"
+      },
+      "address":{
+        "type": "keyword",
+        "index": false
+      },
+      "price":{
+        "type": "integer"
+      },
+      "score":{
+        "type": "integer"
+      },
+      "brand":{
+        "type": "keyword",
+        "copy_to": "all"
+      },
+      "city":{
+        "type": "keyword"
+      },
+      "starName":{
+        "type": "keyword"
+      },
+      "business":{
+        "type": "keyword",
+        "copy_to": "all"
+      },
+      "location":{
+        "type": "geo_point"
+      },
+      "pic":{
+        "type": "keyword",
+        "index": false
+      },
+      "all":{
+        "type": "text",
+        "analyzer": "text_anlyzer",
+        "search_analyzer": "ik_smart"
+      },
+        // 用来做自动补全的
+      "suggestion":{
+          "type": "completion",   //自动补全
+          "analyzer": "completion_analyzer"
+      }
+    }
+  }
+}
+```
+
+### 2.4.2.修改HotelDoc实体
+
+HotelDoc中要添加一个字段，用来做自动补全，内容可以是酒店品牌、城市、商圈等信息。按照自动补全字段的要求，最好是这些字段的数组。
+
+**因此我们在HotelDoc中添加一个suggestion字段，类型为`List<String>`，然后将brand、city、business等信息放到里面。**如果出现brand、city、business相关信息就可以自动补全
+
+代码如下：
+
+```java
+package cn.itcast.hotel.pojo;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+public class HotelDoc {
+    private Long id;
+    private String name;
+    private String address;
+    private Integer price;
+    private Integer score;
+    private String brand;
+    private String city;
+    private String starName;
+    private String business;
+    private String location;
+    private String pic;
+    private Object distance;
+    private Boolean isAD;
+    private List<String> suggestion;
+
+    public HotelDoc(Hotel hotel) {
+        this.id = hotel.getId();
+        this.name = hotel.getName();
+        this.address = hotel.getAddress();
+        this.price = hotel.getPrice();
+        this.score = hotel.getScore();
+        this.brand = hotel.getBrand();
+        this.city = hotel.getCity();
+        this.starName = hotel.getStarName();
+        this.business = hotel.getBusiness();
+        this.location = hotel.getLatitude() + ", " + hotel.getLongitude();
+        this.pic = hotel.getPic();
+        // 组装suggestion
+        if(this.business.contains("/")){
+            // business有多个值，需要切割
+            String[] arr = this.business.split("/");
+            // 添加元素
+            this.suggestion = new ArrayList<>();
+            this.suggestion.add(this.brand);
+            Collections.addAll(this.suggestion, arr);
+        }else {
+            this.suggestion = Arrays.asList(this.brand, this.business);
+        }
+    }
+}
+```
+
+### 2.4.3.重新导入
+
+重新执行之前编写的导入数据功能，可以看到新的酒店数据中包含了suggestion：
+
+```json
+// 查询所有
+GET /indexName/_search
+{
+  "query": {
+    "match_all": {
+    }
+  }
+}
+```
+
+<img src="elasticearch.assets/image-20210723213546183.png" alt="image-20210723213546183" style="zoom:67%;" />
+
+### 2.4.4.自动补全查询的JavaAPI
+
+示例：
+
+![image-20210723213759922](elasticearch.assets/image-20210723213759922.png)
+
+而自动补全的结果也比较特殊，解析的代码如下：
+
+![](elasticearch.assets/image-20231103110026588.png)
+
+### 2.4.5.实现搜索框自动补全
+
+**前端:**查看前端页面，可以发现当我们在输入框键入时，前端会发起ajax请求：
+
+![image-20210723214021062](elasticearch.assets/image-20210723214021062.png)
+
+返回值是补全词条的集合，类型为`List<String>`
+
+1）在`cn.itcast.hotel.web`包下的`HotelController`中添加新接口，接收新的请求：
+
+```java
+@GetMapping("suggestion")
+public List<String> getSuggestions(@RequestParam("key") String prefix) {
+    return hotelService.getSuggestions(prefix);
+}
+```
+
+2）在`cn.itcast.hotel.service`包下的`IhotelService`中添加方法：
+
+```java
+List<String> getSuggestions(String prefix);
+```
+
+3）在`cn.itcast.hotel.service.impl.HotelService`中实现该方法：
+
+```java
+@Override
+public List<String> getSuggestions(String prefix) {
+    try {
+        // 1.准备Request
+        SearchRequest request = new SearchRequest("hotel");
+        // 2.准备DSL
+        request.source().suggest(new SuggestBuilder().addSuggestion(
+            "suggestions",
+            SuggestBuilders.completionSuggestion("suggestion")
+            .prefix(prefix)
+            .skipDuplicates(true)
+            .size(10)
+        ));
+        // 3.发起请求
+        SearchResponse response = client.search(request, RequestOptions.DEFAULT);
+        // 4.解析结果
+        Suggest suggest = response.getSuggest();
+        // 4.1.根据补全查询名称，获取补全结果
+        CompletionSuggestion suggestions = suggest.getSuggestion("suggestions");
+        // 4.2.获取options
+        List<CompletionSuggestion.Entry.Option> options = suggestions.getOptions();
+        // 4.3.遍历
+        List<String> list = new ArrayList<>(options.size());
+        for (CompletionSuggestion.Entry.Option option : options) {
+            String text = option.getText().toString();
+            list.add(text);
+        }
+        return list;
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+}
+```
+
+# elasticsearch与mysql数据同步[重要]:crossed_swords:
+
+elasticsearch中的酒店数据来自于mysql数据库，因此mysql数据发生改变时，elasticsearch也必须跟着改变，这个就是elasticsearch与mysql之间的**数据同步**
+
+代码见: [elasticsearch与mysql数据同步](cdm C:\Users\16658\Documents\GitHub\java_note\note03\Elasticearch\code\elasticsearch与mysql数据同步)
+
+## 3.1.数据同步方案
+
+常见的数据同步方案有三种：
+
+- 同步调用
+- 异步通知(推荐)
+- 监听binlog
+
+### 3.1.1.同步调用
+
+方案一：同步调用
+
+![image-20210723214931869](elasticearch.assets/image-20210723214931869.png)
+
+基本步骤如下：
+
+- hotel-demo对外提供接口，用来修改elasticsearch中的数据
+- 酒店管理服务在完成数据库操作后，直接调用hotel-demo提供的接口，
+
+### 3.1.2.异步通知
+
+方案二：异步通知
+
+![image-20210723215140735](elasticearch.assets/image-20210723215140735.png)
+
+流程如下：
+
+- hotel-admin对mysql数据库数据完成增、删、改后，发送MQ消息
+- hotel-demo监听MQ，接收到消息后完成elasticsearch数据修改
+
+### 3.1.3.监听binlog
+
+方案三：监听binlog
+
+![image-20210723215518541](elasticearch.assets/image-20210723215518541.png)
+
+流程如下：
+
+- 给mysql开启binlog功能
+- mysql完成增、删、改操作都会记录在binlog中
+- hotel-demo基于canal监听binlog变化，实时更新elasticsearch中的内容
+
+### 3.1.4.选择
+
+方式一：同步调用
+
+- 优点：实现简单，粗暴
+- 缺点：业务耦合度高
+
+方式二：异步通知
+
+- 优点：低耦合，实现难度一般
+- 缺点：依赖mq的可靠性
+
+方式三：监听binlog
+
+- 优点：完全解除服务间耦合
+- 缺点：开启binlog增加数据库负担、实现复杂度高
+
+## 3.2.实现数据同步
+
+![image-20231103164939194](elasticearch.assets/image-20231103164939194.png)
+
+### 3.2.1.导入demo
+
+导入课前资料提供的hotel-admin项目：
+
+![image-20210723220237930](elasticearch.assets/image-20210723220237930.png)
+
+运行后，访问 http://localhost:8099
+
+![image-20210723220354464](elasticearch.assets/image-20210723220354464.png)
+
+其中包含了酒店的CRUD功能：
+
+<img src="elasticearch.assets/image-20210723220511090.png" alt="image-20210723220511090" style="zoom:67%;" />
+
+### 3.2.2.声明交换机、队列
+
+MQ结构如图：
+
+![image-20210723215850307](elasticearch.assets/image-20210723215850307.png)
+
+#### 1）引入依赖
+
+在hotel-admin、hotel-demo中引入rabbitmq的依赖：
+
+```xml
+<!--amqp-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp</artifactId>
+</dependency>
+```
+
+#### 2）声明交换机、队列名称常量
+
+在hotel-admin和hotel-demo中的`cn.itcast.hotel.constatnts`包下新建一个类`MqConstants`：
+
+**定义常量**
+
+```java
+package cn.itcast.hotel.constatnts;
+
+    public class MqConstants {
+      /**
+     * 交换机
+     */
+    public final static String EXCHANGE_NAME = "hotel.topic";
+    /**
+     * 监听新增和修改的队列
+     */
+    public final static String INSERT_QUEUE_NAME = "hotel.insert.queue";
+    /**
+     * 监听删除的队列
+     */
+    public final static String DELETE_QUEUE_NAME = "hotel.delete.queue";
+    /**
+     * 新增或修改的RoutingKey
+     */
+    public final static String INSERT_KEY = "hotel.insert";
+    /**
+     * 删除的RoutingKey
+     */
+    public final static String DELETE_KEY = "hotel.delete";
+}
+```
+
+### 3.2.3 hotel-demo中声明队列交换机
+
+在hotel-demo中，定义配置类，声明队列、交换机：
+
+```java
+package cn.itcast.hotel.config;
+
+import cn.itcast.hotel.constants.MqConstants;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class MqConfig {
+    //1. 创建exchange - topic 交换机
+    @Bean
+    public TopicExchange topicExchange(){
+        //TopicExchange 交换机类型
+        return new TopicExchange(MqConstants.HOTEL_EXCHANGE, true, false);
+    }
+
+    //2. 创建queue
+    @Bean
+    public Queue insertQueue(){
+        return new Queue(MqConstants.HOTEL_INSERT_QUEUE, true);
+    }
+
+    @Bean
+    public Queue deleteQueue(){
+        return new Queue(MqConstants.HOTEL_DELETE_QUEUE, true);
+    }
+
+    //3. 绑定在一起
+    @Bean
+    public Binding insertQueueBinding(){
+        return BindingBuilder.bind(insertQueue()).to(topicExchange()).with(MqConstants.HOTEL_INSERT_KEY);
+    }
+
+    @Bean
+    public Binding deleteQueueBinding(){
+        return BindingBuilder.bind(deleteQueue()).to(topicExchange()).with(MqConstants.HOTEL_DELETE_KEY);
+    }
+}
+```
+
+### 3.2.4. hotel-admin中发送MQ消息
+
+**在hotel-admin中的增、删、改业务中分别发送MQ消息：**
+
+```java
+package cn.itcast.hotel.web;
+
+import cn.itcast.hotel.constants.HotelMqConstants;
+import cn.itcast.hotel.pojo.Hotel;
+import cn.itcast.hotel.pojo.PageResult;
+import cn.itcast.hotel.service.IHotelService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.InvalidParameterException;
+
+@RestController
+@RequestMapping("hotel")
+public class HotelController {
+
+    @Autowired
+    private IHotelService hotelService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @GetMapping("/{id}")
+    public Hotel queryById(@PathVariable("id") Long id){
+        return hotelService.getById(id);
+    }
+
+    @GetMapping("/list")
+    public PageResult hotelList(
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "size", defaultValue = "1") Integer size
+    ){
+        Page<Hotel> result = hotelService.page(new Page<>(page, size));
+
+        return new PageResult(result.getTotal(), result.getRecords());
+    }
+
+    @PostMapping
+    public void saveHotel(@RequestBody Hotel hotel){
+        // 新增酒店
+        hotelService.save(hotel);
+        // 发送MQ消息
+        rabbitTemplate.convertAndSend(HotelMqConstants.EXCHANGE_NAME, HotelMqConstants.INSERT_KEY, hotel.getId());
+    }
+
+    @PutMapping()
+    public void updateById(@RequestBody Hotel hotel){
+        if (hotel.getId() == null) {
+            throw new InvalidParameterException("id不能为空");
+        }
+        hotelService.updateById(hotel);
+
+        // 发送MQ消息
+        rabbitTemplate.convertAndSend(HotelMqConstants.EXCHANGE_NAME, HotelMqConstants.INSERT_KEY, hotel.getId());
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable("id") Long id) {
+        hotelService.removeById(id);
+
+        // 发送MQ消息
+        rabbitTemplate.convertAndSend(HotelMqConstants.EXCHANGE_NAME, HotelMqConstants.DELETE_KEY, id);
+    }
+}
+
+```
+
+<img src="elasticearch.assets/image-20210723221843816.png" alt="image-20210723221843816" style="zoom: 43%;" />
+
+测试:   访问mq网站 [RabbitMQ Management](http://192.168.200.134:15672/#/queues)
+
+<img src="elasticearch.assets/image-20231103162927951.png" alt="image-20231103162927951" style="zoom:67%;" />
+
+### 3.2.5.hotel-demo中接收MQ消息
+
+hotel-demo接收到MQ消息要做的事情包括：
+
+- 新增消息：根据传递的hotel的id查询hotel信息，然后新增一条数据到索引库
+- 删除消息：根据传递的hotel的id删除索引库中的一条数据
+
+1）首先在hotel-demo的`cn.itcast.hotel.service`包下的`IHotelService`中新增新增、删除业务
+
+```java
+void deleteById(Long id);
+
+void insertById(Long id);
+```
+
+2）给hotel-demo中的`cn.itcast.hotel.service.impl`包下的**HotelService中实现业务：**
+
+```java
+@Override
+public void deleteById(Long id) {
+    try {
+        // 1.准备Request
+        DeleteRequest request = new DeleteRequest("hotel", id.toString());
+        // 2.发送请求
+        client.delete(request, RequestOptions.DEFAULT);
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+}
+
+@Override
+public void insertById(Long id) {
+    try {
+        // 0.根据id查询酒店数据
+        Hotel hotel = getById(id);
+        // 转换为文档类型
+        HotelDoc hotelDoc = new HotelDoc(hotel);
+
+        // 1.准备Request对象
+        IndexRequest request = new IndexRequest("hotel").id(hotel.getId().toString());
+        // 2.准备Json文档
+        request.source(JSON.toJSONString(hotelDoc), XContentType.JSON);
+        // 3.发送请求
+        client.index(request, RequestOptions.DEFAULT);
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+}
+```
+
+3）编写监听器
+
+在hotel-demo中的`cn.itcast.hotel.mq`包新增一个类：
+
+```java
+package cn.itcast.hotel.mq;
+
+import cn.itcast.hotel.constants.MqConstants;
+import cn.itcast.hotel.service.IHotelService;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+@Component
+public class HotelListener {
+
+    @Autowired
+    private IHotelService hotelService;
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = HotelMqConstants.INSERT_QUEUE_NAME),
+            exchange = @Exchange(name = HotelMqConstants.EXCHANGE_NAME, type = ExchangeTypes.TOPIC),
+            key = HotelMqConstants.INSERT_KEY
+    ))
+    public void listenHotelInsert(Long hotelId){
+        // 新增
+        hotelService.saveById(hotelId);
+    }
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = HotelMqConstants.DELETE_QUEUE_NAME),
+            exchange = @Exchange(name = HotelMqConstants.EXCHANGE_NAME, type = ExchangeTypes.TOPIC),
+            key = HotelMqConstants.DELETE_KEY
+    ))
+    public void listenHotelDelete(Long hotelId){
+        // 删除
+        hotelService.deleteById(hotelId);
+    }
+}
+```
+
+**测试**
+
+![image-20231103164948772](elasticearch.assets/image-20231103164948772.png)
+
+**修改**
+
+![image-20231103163225851](elasticearch.assets/image-20231103163225851.png)
+
+**做出相应改变**
+
+![image-20231103163240655](elasticearch.assets/image-20231103163240655.png)
 
 
 
+# 集群:crossed_swords:
 
+单机的elasticsearch做数据存储，必然面临两个问题：海量数据存储问题、单点故障问题。
+
+- 海量数据存储问题：将索引库从逻辑上拆分为N个分片（shard），存储到多个节点
+- 单点故障问题：将分片数据在不同节点备份（replica ）
+
+**ES集群相关概念**:
+
+* 集群（cluster）：一组拥有共同的 cluster name 的 节点。
+
+* <font color="red">节点（node)</font>   ：集群中的一个 Elasticearch 实例
+
+* <font color="red">分片（shard）</font>：索引可以被拆分为不同的部分进行存储，称为分片。在集群环境下，一个索引的不同分片可以拆分到不同的节点中
+
+  解决问题：数据量太大，单点存储量有限的问题。
+
+  ![image-20200104124440086](elasticearch.assets/image-20200104124440086-5602723.png)
+
+  > 此处，我们把数据分成3片：shard0、shard1、shard2
+
+* 主分片（Primary shard）：相对于副本分片的定义。
+
+* 副本分片（Replica shard）每个主分片可以有一个或者多个副本，数据和主分片一样。
+
+  ​	
+
+数据备份可以保证高可用，但是每个分片备份一份，所需要的节点数量就会翻一倍，成本实在是太高了！
+
+为了在高可用和成本间寻求平衡，我们可以这样做：
+
+- 首先对数据分片，存储到不同节点
+- 然后对每个分片进行备份，放到对方节点，完成互相备份
+
+这样可以大大减少所需要的服务节点数量，如图，我们以3分片，每个分片备份一份为例：
+
+![image-20200104124551912](elasticearch.assets/image-20200104124551912.png)
+
+现在，每个分片都有1个备份，存储在3个节点：
+
+- node0：保存了分片0和1
+- node1：保存了分片0和2
+- node2：保存了分片1和2
+
+## 4.1.搭建ES集群
+
+参考课前资料的文档：
+
+![image-20210723222732427](elasticearch.assets/image-20210723222732427.png) 
+
+其中的第四章节：
+
+![image-20210723222812619](elasticearch.assets/image-20210723222812619.png) 
+
+## 4.2.集群脑裂问题
+
+### 4.2.1.集群职责划分
+
+elasticsearch中集群节点有不同的职责划分：
+
+![image-20210723223008967](elasticearch.assets/image-20210723223008967.png)
+
+**默认情况下，集群中的任何一个节点都同时具备上述四种角色。**
+
+但是真实的集群一定要将集群职责分离：
+
+- master节点：对CPU要求高，但是内存要求第
+- data节点：对CPU和内存要求都高
+- coordinating节点：对网络带宽、CPU要求高
+
+职责分离可以让我们根据不同节点的需求分配不同的硬件去部署。而且避免业务之间的互相干扰。
+
+**一个典型的es集群职责划分如图：**
+
+![image-20210723223629142](elasticearch.assets/image-20210723223629142.png)
+
+### 4.2.2.脑裂问题
+
+> 脑裂是因为集群中的节点失联导致的
+
+例如一个集群中，主节点与其它节点失联：
+
+![image-20210723223804995](elasticearch.assets/image-20210723223804995.png)
+
+此时，node2和node3认为node1宕机，就会重新选主：
+
+![image-20210723223845754](elasticearch.assets/image-20210723223845754.png)
+
+当node3当选后，集群继续对外提供服务，node2和node3自成集群，node1自成集群，两个集群数据不同步，出现数据差异。
+
+当网络恢复后，因为集群中有两个master节点，集群状态的不一致，出现脑裂的情况：
+
+![image-20210723224000555](elasticearch.assets/image-20210723224000555.png)
+
+
+
+解决脑裂的方案是，要求选票超过 ( eligible节点数量 + 1 ）/ 2 才能当选为主，因此eligible节点数量最好是奇数。对应配置项是discovery.zen.minimum_master_nodes，**在es7.0以后，已经成为默认配置，因此一般不会发生脑裂问题**
+
+例如：3个节点形成的集群，选票必须超过 （3 + 1） / 2 ，也就是2票。node3得到node2和node3的选票，当选为主。node1只有自己1票，没有当选。集群中依然只有1个主节点，没有出现脑裂。
+
+### 4.2.3.小结
+
+master eligible节点的作用是什么？
+
+- 参与集群选主
+- 主节点可以管理集群状态、管理分片信息、处理创建和删除索引库的请求
+
+data节点的作用是什么？
+
+- 数据的CRUD
+
+coordinator节点的作用是什么？
+
+- 路由请求到其它节点
+
+- 合并查询到的结果，返回给用户
+
+## 4.3.集群分布式存储
+
+当新增文档时，应该保存到不同分片，保证数据均衡，那么coordinating node如何确定数据该存储到哪个分片呢？
+
+### 4.3.1.分片存储测试
+
+插入三条数据：
+
+<img src="elasticearch.assets/image-20210723225006058.png" alt="image-20210723225006058" style="zoom:67%;" />
+
+
+
+<img src="elasticearch.assets/image-20210723225034637.png" alt="image-20210723225034637" style="zoom:67%;" />
+
+
+
+<img src="elasticearch.assets/image-20210723225112029.png" alt="image-20210723225112029" style="zoom: 60%;" />
+
+
+
+测试可以看到，三条数据分别在不同分片：
+
+<img src="elasticearch.assets/image-20210723225227928.png" alt="image-20210723225227928" style="zoom:67%;" />
+
+结果：
+
+<img src="elasticearch.assets/image-20210723225342120.png" alt="image-20210723225342120" style="zoom:67%;" />
+
+### 4.3.2.分片存储原理:crossed_swords:
+
+elasticsearch会通过hash算法来计算文档应该存储到哪个分片：
+
+![image-20210723224354904](elasticearch.assets/image-20210723224354904.png)
+
+说明：
+
+- _routing默认是文档的id
+- 算法与分片数量有关，**因此索引库一旦创建，分片数量不能修改！**
+
+**新增文档的流程如下：**
+
+![image-20210723225436084](elasticearch.assets/image-20210723225436084.png)
+
+解读：
+
+- 1）新增一个id=1的文档
+- 2）对id做hash运算，假如得到的是2，则应该存储到shard-2
+- 3）shard-2的主分片在node3节点，将数据路由到node3
+- 4）保存文档
+- 5）同步给shard-2的副本replica-2，在node2节点
+- 6）返回结果给coordinating-node节点
+
+## 4.4.集群分布式查询
+
+elasticsearch的查询分成两个阶段：
+
+- scatter phase：分散阶段，coordinating node(请求方)会把请求分发到每一个分片
+
+- gather phase：聚集阶段，coordinating node(请求方)汇总data node的搜索结果，并处理为最终结果集返回给用户
+
+
+
+<img src="elasticearch.assets/image-20210723225809848.png" alt="image-20210723225809848" style="zoom:67%;" />
+
+## 4.5.集群故障转移
+
+集群的master节点会监控集群中的节点状态，如果发现有节点宕机，会立即将宕机节点的分片数据迁移到其它节点，确保数据安全，这个叫做故障转移。
+
+1）例如一个集群结构如图：
+
+![image-20210723225945963](elasticearch.assets/image-20210723225945963.png)
+
+现在，node1是主节点，其它两个节点是从节点。
+
+2）突然，node1发生了故障：
+
+![image-20210723230020574](elasticearch.assets/image-20210723230020574.png)
+
+宕机后的第一件事，需要重新选主，例如选中了node2：
+
+![image-20210723230055974](elasticearch.assets/image-20210723230055974.png)
+
+node2成为主节点后，会检测集群监控状态，发现：shard-1、shard-0没有副本节点。因此需要将node1上的数据迁移到node2、node3：
+
+![image-20210723230216642](elasticearch.assets/image-20210723230216642.png)
+
+故障转移：
+
++ master宕机后，EligibleMaster选举为新的主节点。
+
++ master节点监控分片、节点状态，将故障节点上的分片转移到正常节点，确保数据安全。
 
 
 
