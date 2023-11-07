@@ -2350,13 +2350,7 @@ list. insertBefore(js,ee); //在list节点中（list是父节点），在ee节�
   </head>
   ```
 
-也可以使用其它网站的CDN:
-
-  ```js
-  <head>
-  <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
-  </head>
-  ```
+关键：独立的js文件不需要引用任何jquery.js文件，只需要在相应的html网页中引用jquery.js和.js文件，jquery文件引用必须在.js文件之前。<font color =red>js文件中没有引入jquery，一样可以用jquery的，就是在html中引入jquery，但是顺序一定不能错，一定是先引入jquery，再引入js文件。</font>
 
 ### 选择器
 
