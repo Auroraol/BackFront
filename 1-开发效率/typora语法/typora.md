@@ -233,7 +233,7 @@ ______________________________
 快捷键: Ctrl+Shift+I
 ```
 
-> <img src="typora.assets/ffd0b02b62b8799a69d21fd99d5735ab.png" alt="pic1" style="zoom: 50%;" />
+> <img src="https://raw.githubusercontent.com/Auroraol/Drawing-bed/main/img/202311081327794.png" alt="pic1" style="zoom: 50%;" />
 
 ## Typora的快捷键
 
@@ -617,3 +617,22 @@ ______________________________
 | 🔹 `:small_blue_diamond:`             | 🔸 `:small_orange_diamond:`       | 🔺 `:small_red_triangle:`        |
 | 🔻 `:small_red_triangle_down:`        |                                  |                                 |
 
+
+
+# 配置
+
+**用本地图片配置**
+
+![image-20231108130806195](https://raw.githubusercontent.com/Auroraol/Drawing-bed/main/img/202311081308260.png)
+
+**用上传图片配置**
+
+![image-20231108130301768](https://raw.githubusercontent.com/Auroraol/Drawing-bed/main/img/202311081303844.png)
+
+**建议使用本地图片配置,手动上传图片**
+
+![image-20231108132511454](https://raw.githubusercontent.com/Auroraol/Drawing-bed/main/img/202311081327795.png)
+
+**手动上传所有本地图片:**
+
+![image-20231108132659843](https://raw.githubusercontent.com/Auroraol/Drawing-bed/main/img/202311081327796.png)
