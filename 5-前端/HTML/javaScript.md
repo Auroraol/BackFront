@@ -3957,3 +3957,43 @@ btn.onclick = function () {
 }
 </script>
 ```
+
+
+
+
+
+```
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>判断闰年</title>
+    <script type="text/javascript">
+        function is_leapyear(){
+            var year = document.getElementById('year').value;
+            if (parseInt(year)!=NaN && year>0) {
+                if (year % 4== 0 && year % 100 !== 0 || year % 400 == 0) {
+                    alert(year + '年是闰年')
+                } else {
+                    alert(year + '年不是闰年')
+                }
+            } else {
+                alert('输入有误，请重新输入！')
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>判断闰年</h1>
+    <form>
+        <p>
+            <label>年份：</label>
+            <input type="text" id="year">
+        </p>
+        <input type="button" onclick="is_leapyear()" value="提交">
+    </form>
+</body>
+</html>
+```
+

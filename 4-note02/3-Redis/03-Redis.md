@@ -735,7 +735,7 @@ $\textcolor{green}{它的底层实际上就是个双向链表，对两端的作�
 
 ==删除N个值等于v1的元素==
 
-从left往right删除2个值等于v1的元素，返回的值为实际删除的数量
+从left往right删除2个值等于v1的元素，返回的值为实际删除的数量  remove移除
 
 LREM list3 0 值，表示删除全部给定的值，$\textcolor{red}{零个就是全部值}$
 
@@ -4662,8 +4662,6 @@ spring.redis.1ettuce.pool.max-idle=8
 spring.redis.lettuce.pool.min-idle=0
 ```
 
-主启动
-
 业务类
 
 - 配置类(解决RedisTemplate使用的是JDK序列化方式（默认）惹的祸)
@@ -5262,7 +5260,7 @@ Value:
 
 补充:  在将一个对象序列化成一个字符串，怎么保证字符串反序列化成对象的类型:   Jackson通过 Default Typing，会在字符串多冗余一个类型，这样反序列化就知道具体的类型了。**使用GenericJackson2JsonRedisSerializer序列化方式，String类型、对象、对象数组、JSONObject、JSONArray序列化和反序列化都没有问题，value值序列化后多了@class属性，反序列化的对象的类型就可以从这里获取到。@class属性完美解决了反序列化后的对象类型，所以实际项目中，目前很多采用 GenericJackson2JsonRedisSerializer序列化方式。**
 
-#### jackson2JsonRedisSerializer
+##### jackson2JsonRedisSerializer
 
 org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 
