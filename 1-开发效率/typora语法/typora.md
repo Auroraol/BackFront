@@ -636,3 +636,10 @@ ______________________________
 **手动上传所有本地图片:**
 
 ![image-20231108132659843](https://raw.githubusercontent.com/Auroraol/Drawing-bed/main/img/202311081327796.png)
+
+# 嵌入 CodePen 网页
+
+打开你想要嵌入的 CodePen 网页，点击右下角的 **Embed** > **iframe**，复制 **Copy & Paste Code** 下的代码即可
+
+![img](typora.assets/f0f1d0460f7049eab7a42e761364ede1tplv-jbbdkfciu3-image00.image)
+

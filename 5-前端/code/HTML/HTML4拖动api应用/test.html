@@ -1,0 +1,53 @@
+<template>
+    <ul class="list">
+      <li class="item" draggable="true" @dragstart="dragstart" @dragend="dragend" @dragenter="dragenter" @dragleave="dragleave">项目1</li>
+      <li class="item" draggable="true" @dragstart="dragstart" @dragend="dragend" @dragenter="dragenter" @dragleave="dragleave">项目2</li>
+      <li class="item" draggable="true" @dragstart="dragstart" @dragend="dragend" @dragenter="dragenter" @dragleave="dragleave">项目3</li>
+      <li class="item" draggable="true" @dragstart="dragstart" @dragend="dragend" @dragenter="dragenter" @dragleave="dragleave">项目4</li>
+      <li class="item" draggable="true" @dragstart="dragstart" @dragend="dragend" @dragenter="dragenter" @dragleave="dragleave">项目5</li>
+      <li class="item" draggable="true" @dragstart="dragstart" @dragend="dragend" @dragenter="dragenter" @dragleave="dragleave">项目6</li>
+      <li class="item" draggable="true" @dragstart="dragstart" @dragend="dragend" @dragenter="dragenter" @dragleave="dragleave">项目7</li>
+    </ul>
+    </template>
+    
+    <script>
+    document.ondragover = function(e){e.preventDefault()}
+    document.ondrop = function(e){e.preventDefault()}
+    export default {
+      data() {
+        return {
+          dragElement: null,
+          lock: true
+        }
+      },
+      methods: {
+        // 源对象
+        dragstart(e) {
+          // 记录当前拖动的元素
+          this.dragElement = e.target
+          e.target.style.backgroundColor = '#f8f8f8'
+        },
+        dragend(e) {
+          e.preventDefault()
+          e.target.style.backgroundColor = '#fff' // 拖放结束还原拖动元素的背景
+        },
+        // 目标对象
+        dragenter(e) {
+          if(this.dragElement !== e.target){
+            e.target.parentNode.insertBefore(this.dragElement, e.target) // 把拖动元素添加到当前元素的前面
+          }
+        },
+        dragleave(e) {
+          if(this.dragElement !== e.target){
+            // 当前元素时最后一个元素
+            if(this.lock && (e.target === e.target.parentNode.lastElementChild || e.target === e.target.parentNode.lastChild)) {
+              e.target.parentNode.appendChild(this.dragElement) // 把拖动元素添加最后面
+              this.lock = false
+            } else {
+              this.lock = true
+            }
+          }
+        },
+      }
+    }
+    </script>

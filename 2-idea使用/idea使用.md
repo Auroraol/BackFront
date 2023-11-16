@@ -38,7 +38,18 @@
 
 ![img](idea使用.assets/1005434-20220428105535985-203093428.png)
 
+# 导入jar包
 
+![image-20231116220232995](idea%E4%BD%BF%E7%94%A8.assets/image-20231116220232995.png)
+
+
+# 普通项目转为maven项目
+
+![image-20231116224844533](idea%E4%BD%BF%E7%94%A8.assets/image-20231116224844533.png)
+
+会自动创建项目结构
+
+![image-20231116225208631](idea%E4%BD%BF%E7%94%A8.assets/image-20231116225208631.png)
 
 # IDEA的日常快捷键
 
