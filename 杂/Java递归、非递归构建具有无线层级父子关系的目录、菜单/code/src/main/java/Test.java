@@ -193,58 +193,8 @@ public class Test {
 		return childrenList;
 	}
 
-	//非递归实现
-	private static void method_2() {
-
-		//获取模拟数据库的数据
-		List<Person> dataList = getData(false);
-
-		//将List转化为Map，其中id为key，对象为value
-		Map<Integer, Person> personMap = dataList.stream().collect(Collectors.toMap(Person::getId, Function.identity()));
-
-		//重新构建List
-		List<Person> list = new ArrayList<>();
-
-		//原List遍历
-		for (Person person : dataList) {
-
-			//获取当前对象的父级id
-			Integer parentId = person.getParentId();
-
-			//获取该父级id，对应的Person对象
-			Person parentPerson = personMap.get(parentId);
-
-			//父级对象为空，表明parentPerson为顶级父级对象，直接将其放入list：本循环运行完后，list的大小其实就是顶级父级的个数
-			if (parentPerson == null) {
-				list.add(person);
-			} else {
-
-				//获取父级对象的子节点
-				List<Person> children = parentPerson.getChildren();
-
-				//孩子节点为空，则初始化孩子节点，并将当前节点插入到父节点的孩子节点中
-				if (Objects.isNull(children) || children.isEmpty()) {
-
-					//初始化孩子节点
-					List<Person> tempList = new ArrayList<>();
-					tempList.add(person);
-
-					//添加到孩子节点
-					parentPerson.setChildren(tempList);
-				} else {
-					//孩子节点不为空，直接把当前节点插入到父级节点的子节点中
-					children.add(person);
-				}
-			}
-		}
-
-		System.out.println(list);
-		System.out.println("最后构建的菜单树为：*************************");
-		System.out.println(JSON.toJSONString(list));
-	}
-
-
-	public static void main(String[] args) {
+	// 递归
+	private static void method_1() {
 		//模仿数据库中查询出来的数据
 		List<Person> dataIsSort = getData(true);
 		List<Person> dataNoSort = getData(false);
@@ -269,6 +219,82 @@ public class Test {
 		System.out.println("不排序后的JSON:************************************************************************");
 		System.out.println(JSON.toJSONString(parentListNoSort));
 
-//		method_2();
+	}
+
+	//非递归实现
+	private static void method_2() {
+
+		//获取模拟数据库的数据
+//		List<Person> dataList = getData(false);  //存放数据: Person p9 = new Person(9, 2, "子2_9");
+		List<Person> dataList = getData( true);  //存放数据: Person p9 = new Person(9, 2, "子2_9");
+
+		//将List转化为Map，其中id为key，对象为value  比如:
+		Map<Integer, Person> personMap = dataList.stream().collect(Collectors.toMap(Person::getId, person -> person));
+		//System.out.println(personMap);
+		/*
+		 * {1=Test$Person@7ba4f24f, 2=Test$Person@3b9a45b3, 3=Test$Person@7699a589,
+		 * 4=Test$Person@58372a00, 5=Test$Person@4dd8dc3, 6=Test$Person@6d03e736,
+		 * 7=Test$Person@568db2f2, 8=Test$Person@378bf509, 9=Test$Person@5fd0d5ae,
+		 * 10=Test$Person@2d98a335, 11=Test$Person@16b98e56, 12=Test$Person@7ef20235,
+		 * 13=Test$Person@27d6c5e0, 14=Test$Person@4f3f5b24, 15=Test$Person@15aeb7ab,
+		 * 16=Test$Person@7b23ec81, 17=Test$Person@6acbcfc0, 18=Test$Person@5f184fc6,
+		 * 19=Test$Person@3feba861, 20=Test$Person@5b480cf9, 21=Test$Person@6f496d9f,
+		 * 22=Test$Person@723279cf, 23=Test$Person@10f87f48, 24=Test$Person@b4c966a}
+		 *
+		 */
+
+		//重新构建List
+		List<Person> list = new ArrayList<>();
+
+		//原List遍历
+		for (Person person : dataList) {
+
+			//获取当前对象的父级id
+			Integer parentId = person.getParentId();
+
+			//获取该父级id，对应的Person对象
+			Person parentPerson = personMap.get(parentId);
+
+			//父级对象为空，表明parentPerson为顶级父级对象，直接将其放入list：本循环运行完后，list的大小其实就是顶级父级的个数
+			if (parentPerson == null) {
+				list.add(person);
+			} else {
+
+				//获取父级对象的子节点
+				List<Person> children = parentPerson.getChildren();  //属性
+				/*
+				// java中默认是用引用. 相当于children修改同时会改变parentPerson.getChildren()这个属性
+				   这个方式很少见, 一般情况下会,写一些操作属性的方法
+				   比如这里 可以在类中定义一个方法
+				   public void addChildren(person person) {
+				   		this.children.add(person);
+				   }
+				*/
+
+				//孩子节点为空，则初始化孩子节点，并将当前节点插入到父节点的孩子节点中
+				if (Objects.isNull(children) || children.isEmpty()) {
+
+					//初始化孩子节点
+					List<Person> tempList = new ArrayList<>();
+					tempList.add(person);
+
+					//添加到孩子节点
+					parentPerson.setChildren(tempList);
+				} else {
+					//孩子节点不为空，直接把当前节点插入到父级节点的子节点中
+					children.add(person);  //这个方式并不好理解
+				}
+			}
+		}
+
+		System.out.println(list);
+		System.out.println("最后构建的菜单树为：*************************");
+		System.out.println(JSON.toJSONString(list));
+	}
+
+	// 非递归
+	public static void main(String[] args) {
+		//method_1();
+		method_2();
 	}
 }

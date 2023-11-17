@@ -66,7 +66,7 @@ class City {
 
 
 //二、去重
-class ListUtil {
+class ListUtil_distinct {
 
 //	public static List<String> list = Arrays.asList("1","2","2","3","3","4","4","5","6","7","8");
 	public static List<String> list = new ArrayList<String>(Arrays.asList("1","2","2","3","3","4","4","5","6","7","8"));
@@ -85,15 +85,15 @@ class ListUtil {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(ListUtil.distinctElements(list));
-		System.out.println(ListUtil.getNoDuplicateElements(list));
-		System.out.println(ListUtil.getDuplicateElements(list));
-		System.out.println(ListUtil.getDuplicateElementsForObject(cities));
-		System.out.println(ListUtil.getNoDuplicateElementsForObject(cities));
-		System.out.println(ListUtil.getElementsAfterDuplicate(cities));
-		System.out.println(ListUtil.getDuplicateObject(cities));
-		System.out.println(ListUtil.getNoDuplicateObject(cities));
-		System.out.println(ListUtil.distinctObject(cities));
+		System.out.println(ListUtil_distinct.distinctElements(list));
+		System.out.println(ListUtil_distinct.getNoDuplicateElements(list));
+		System.out.println(ListUtil_distinct.getDuplicateElements(list));
+		System.out.println(ListUtil_distinct.getDuplicateElementsForObject(cities));
+		System.out.println(ListUtil_distinct.getNoDuplicateElementsForObject(cities));
+		System.out.println(ListUtil_distinct.getElementsAfterDuplicate(cities));
+		System.out.println(ListUtil_distinct.getDuplicateObject(cities));
+		System.out.println(ListUtil_distinct.getNoDuplicateObject(cities));
+		System.out.println(ListUtil_distinct.distinctObject(cities));
 	}
 
 	/**-----------基础数据类型--------------*/
@@ -363,7 +363,7 @@ class ListUtil_sum {
 }
 
 //五、List对象转换
-class ObjectSwitch{
+class ListUtil_ObjectSwitch {
 	public static List<City> cities = null;
 	public static Map<String,Integer> cityMap = null;
 	static {
@@ -441,7 +441,8 @@ class ObjectSwitch{
 		k=武汉,v=武汉
 		k=深圳,v=深圳
 		*/
-		//
+		//  Function.identity() 是函数返回输入参数本身
+		//  city -> city 作为Lambda表达式
 		//转换成map的时候，可能出现key一样的情况，如果不指定一个覆盖规则，上面的代码是会报错的。转成map的时候，最好使用下面的方式
 		Map<Integer, City> map3 = list.stream().collect(Collectors.toMap(City::getTotal, Function.identity(), (k1,k2)->k1));
 		map3.forEach((k, v) -> System.out.println("k=" + k + ", v=" + v));
@@ -485,7 +486,7 @@ class ObjectSwitch{
 }
 
 //六、遍历
-class each_Test{
+class ListUtil_each {
 	// 遍历Collection集合
 	public static <T> void eachCollection(){
 		ArrayList<String> list = new ArrayList<String>();
