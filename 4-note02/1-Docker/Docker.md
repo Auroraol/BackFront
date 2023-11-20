@@ -16,7 +16,7 @@
 
 CI\CD Jenkins
 
-##  一、引言 
+##  一、引言
 
 ### 1.1 环境不一致
 
@@ -90,6 +90,40 @@ Docker是内核级别的虚拟化,可以再一个物理机上可以运行很多�
 
 ![image-20231103150650963](Docker.assets/image-20231103150650963.png)
 
+### 2.5 Docker 与虚拟机的区别
+
+|               **传统虚拟机**               |                          **Docker**                          |
+| :----------------------------------------: | :----------------------------------------------------------: |
+|     依赖物理CPU和内存，是硬件级别的。      | 在操作系统上，利用操作系统的containerization（集装箱化）技术，可以在虚拟机上运行。 |
+|     一般都是指操作系统镜像，比较复杂。     |  docker开源而且轻量，成为“容器”，单个容器适合部署少量应用。  |
+|            使用快照来保存状态。            |   引入了类似源代码管理机制，将容器的快照历史版本一一记录。   |
+| 在构建系统的时候较为复杂，需要大量的人力。 | docker可以通过Dockfile来构建整个容器，重启和构建速度很快，更重要的是Dockfile可以手动编写，这样应用程序开发人员可以通过发布Dockfile来指导系统环境和依赖，这样对于持续交付十分有利。 |
+
+传统虚拟机与Docker的区别图：
+
+![image-20231120135330488](Docker.assets/image-20231120135330488.png)
+
+###  2.6  依赖的相关技术
+
+#### Namespaces 命名空间
+
+- PID（Process ID） 进程隔离
+- NET（Network） 管理网络接口
+- IPC（InterProcess Communication） 管理跨进程通信的访问
+- MNT（Mount） 管理挂载点
+- UTS（Unix Timesharing System） 隔离内核和版本标识
+
+#### Control Groups 控制组
+
+Control Groups 用来分配资源，此技术来源于 Google，在2007年整合进 Linux Kernel 2.6.24 。
+
+Control Groups 有以下作用：
+
+- 资源限制
+- 优先级设定
+- 资源计量
+- 资源控制
+
 ##  三、Docker的安装
 
 <img src="Docker.assets/image-20231002190403275.png" alt="image-20231002190403275" style="zoom:67%;" />
@@ -160,7 +194,7 @@ docker run hello-world
 
 ![image-20231002195531945](Docker.assets/image-20231002195531945.png)
 
-## 四、Docker的中央仓库【重点】
+## 四、Docker的中央仓库
 
 + Docker官方的中央仓库：这个仓库是镜像最全的，但是下载速度较慢。 https://hub.docker.com/ 
 
@@ -190,6 +224,84 @@ systemctl restart docker
 **使用**
 
 ![image-20231002200422844](Docker.assets/image-20231002200422844.png)
+
+### 阿里云私有镜像仓
+
+地址: [https://cr.console.aliyun.com/cn-shenzhen/instances/repositories](https://cr.console.aliyun.com/cn-shenzhen/instances/repositories)
+
+过程很简单, 首先申请开通阿里云私有镜像仓, 然后使用此账号登录即可, 比如:
+
+```bash
+$ docker login --username=xxx@qq.com registry.cn-shenzhen.aliyuncs.com
+```
+
+然后创建一个命名空间:<br />![image-20231120150831219](Docker.assets/image-20231120150831219.png)
+
+将本地的镜像重新打标签并上传即可, 比如:
+
+```bash
+docker tag [ImageId] registry.cn-shenzhen.aliyuncs.com/quanzaiyu/kubernetes-dashboard-amd64:[镜像版本号]
+docker push registry.cn-shenzhen.aliyuncs.com/quanzaiyu/kubernetes-dashboard-amd64:[镜像版本号]
+```
+
+同时, 还可以使用镜像加速服务:<br />![](https://cdn.nlark.com/yuque/0/2020/png/2213540/1601124512869-e9f51832-6d7a-46e8-bbcb-55d9526f643e.png#align=left&display=inline&height=762&originHeight=762&originWidth=1912&size=0&status=done&style=none&width=1912)
+
+上传到私有仓库的镜像:<br />![](https://cdn.nlark.com/yuque/0/2020/png/2213540/1601124520702-5f5e1d1a-43f7-4931-8675-3e2632ce5f90.png#align=left&display=inline&height=762&originHeight=762&originWidth=1912&size=0&status=done&style=none&width=1912)
+
+### Registry
+
+#### Docker 注册服务器
+
+下载 registry 镜像, 并创建容器
+
+```bash
+$ docker pull registry # 下载Docker注册服务器镜像
+$ docker run -d \
+  -p 5000:5000 \
+  --name server-registry \
+  -v /tmp/registry:/tmp/registry \
+  registry # 运行Docker注册服务器
+```
+
+#### 将私有仓库上传到Docker注册服务器
+
+首先，得对需要上传的镜像打标签，并指定Docker注册服务器的地址
+
+```bash
+docker tag centos:latest localhost:5000/centos:1.0
+```
+
+然后，将打了标签的镜像上传到Docker注册服务器：
+
+```bash
+$ docker push localhost:5000/centos:1.0
+The push refers to a repository [localhost:5000/centos]
+f972d139738d: Pushed
+1.0: digest: sha256:dc29e2bcceac52af0f01300402f5e756cc8c44a310867f6b94f5f7271d4f3fec size: 529
+```
+
+注意，这里由于是在一台机子上演示的，所以意义不大，通常我们会在另一台机器上开一个Docker注册服务器。将镜像上传到另一个机器上, 这里的 localhost:5000 就是另一台机器的镜像仓库地址。
+
+#### 拉取私有仓库镜像
+
+```bash
+$ docker pull localhost:5000/centos:1.0
+Trying to pull repository localhost:5000/centos ...
+1.0: Pulling from localhost:5000/centos
+Digest: sha256:dc29e2bcceac52af0f01300402f5e756cc8c44a310867f6b94f5f7271d4f3fec
+Status: Image is up to date for localhost:5000/centos:1.0
+
+# 如果没有指定标签，而指定镜像又没有latest标签，则报错
+$ docker pull localhost:5000/centos
+Using default tag: latest
+Trying to pull repository localhost:5000/centos ...
+Pulling repository localhost:5000/centos
+Error: image centos:latest not found
+```
+
+### Harbor
+
+- [Harbor仓库介绍与搭建过程](https://blog.51cto.com/11093860/2117805)
 
 ##  五、常用命令 :cat:
 
@@ -700,6 +812,140 @@ character_set_server = utf8
 ![image-20231003232433654](Docker.assets/image-20231003232433654.png)
 远程操作，这里使用datagrip
 
+### 四 Vue应用
+
+首先创建一个 Vue 应用, 然后打包:
+
+```bash
+$ npm run build
+```
+
+打包后, 会生成 /dist 目录, 这是构建产物
+
+创建 `default.conf`:
+
+```bash
+server {
+    listen       80;
+    server_name  localhost;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   html;
+    }
+}
+```
+
+创建 Dockerfile:
+
+```dockerfile
+FROM hub.c.163.com/library/nginx
+
+MAINTAINER quanzaiyu
+
+RUN rm /etc/nginx/conf.d/default.conf
+
+ADD default.conf /etc/nginx/conf.d/
+
+COPY dist/ /usr/share/nginx/html/
+```
+
+注意, 因为引用的基础容器为nginx, 因此这里不需要暴露任何端口
+
+打包构建为 Docker 镜像:
+
+```bash
+$ docker build -t "731734107/vue-test" .
+```
+
+以上步骤, 结合 Jenkins 会更加容易, 注意, 打包vue是在docker外部完成的, 需要的只是其构建产物
+
+运行测试:
+
+```bash
+$ docker run -p 8088:80 731734107/vue-test
+```
+
+将容器中的80端口映射到宿主机的8088端口, 在宿主机中使用 [http://localhost:8088](http://localhost:8088) 即可访问
+
+推送到 Docker Hub
+
+```bash
+$ docker push 731734107/vue-test
+```
+
+### 五  Koa 应用
+
+首先创建一个简单的 Koa 应用:
+
+`app.js`
+
+```javascript
+const Koa = require('koa');
+const app = new Koa();
+const path = require('path');
+const route = require('koa-route');
+const staticFiles = require('koa-static');
+
+const main = staticFiles(path.join(__dirname, 'public'));
+console.log(path.join(__dirname, 'public'));
+
+app.use(route.get('/public', main));
+app.use(route.get('/', ctx => {
+  ctx.response.body = 'Welcome'
+}));
+app.listen(3000);
+```
+
+创建 Dockerfile:
+
+```bash
+FROM node:lts-alpine
+MAINTAINER quanzaiyu
+
+ADD . /app/
+WORKDIR /app
+
+RUN npm config set sass_binary_site https://npm.taobao.org/mirrors/node-sass/
+RUN npm config set phantomjs_cdnurl https://npm.taobao.org/mirrors/phantomjs/
+RUN npm config set electron_mirror https://npm.taobao.org/mirrors/electron/
+RUN npm config set chromedriver_cdnurl https://cdn.npm.taobao.org/dist/chromedriver
+RUN npm install
+RUN npm rebuild node-sass --force
+
+ENV HOST 0.0.0.0
+ENV PORT 3000
+
+EXPOSE 3000
+
+CMD ["node", "app"]
+```
+
+打包构建为 Docker 镜像:
+
+```bash
+$ docker build -t "731734107/test-koa" .
+```
+
+运行测试:
+
+```bash
+$ docker run -p 8080:3000 731734107/test-koa
+```
+
+将容器中的3000端口映射到宿主机的8080端口, 在宿主机中使用 [http://localhost:8080](http://localhost:8080) 即可访问
+
+推送到 Docker Hub
+
+```bash
+$ docker push 731734107/test-koa
+```
+
 ### 附：防火墙开放端口方法
 
 如果是阿里云或华为云之类的ESC服务器，还需要去控制台配置安全组规则。
@@ -754,7 +1000,7 @@ docker volume ls
 docker volume rm 数据卷名称
 ```
 
-#### 7.5 容器映射数据卷[重点]
+#### 7.5 容器映射数据卷:crossed_swords:
 
 映射有两种方式：
 
@@ -782,7 +1028,18 @@ docker run -d --name <容器名称> -v <宿主机目录>:<容器内目标目录>
 docker run -d -p 8081:8080 --name tomcat -v /opt/tocmat:/usr/local/tomcat/webapps/ROOT b8
 ```
 
-#### 7.6 通过Dockerfile挂载(推荐)
+#### 7.6 指定访问权限
+
+```bash
+$ docker run --name server -v ~/data_volume:/data:ro -it ubuntu /bin/bash
+```
+
+在创建容器的时候，可以在数据卷映射参数后面加上访问权限，比如上面的 `ro`，是只读权限。
+
+- `ro` read only
+- `rw` read write
+
+#### 7.7 通过Dockerfile挂载(推荐)
 
 **编写dockerfile**
 
@@ -804,19 +1061,126 @@ docker build -f dockerfile路径 -t 镜像名称[:tag] .
 
 ![image-20231003230305737](Docker.assets/image-20231003230305737.png)
 
-#### 7.7 数据卷容器
+#### 7.8 数据卷容器
 
 ==容器之间配置信息的传递,数据卷容器的生命周期一直持续到没有容器使用为止。但是一旦持久化到了本地，这个时候，本地的数据是不会删除的==
 
-![image-20231003230910597](Docker.assets/image-20231003230910597.png)
+<img src="Docker.assets/image-20231120141840852.png" alt="image-20231120141840852" style="zoom: 50%;" />
 
+挂载数据卷容器的方法：
 
+```bash
+$ docker run --volumes-from [CONTAINER NAME]
+```
 
-<img src="Docker.assets/image-20231003231411163.png" alt="image-20231003231411163"  />
++ 通过数据卷容器，可以在不暴露宿主机映射目录的情况下，使用已知容器创建的数据卷。
 
-<img src="Docker.assets/image-20231003231555770.png" alt="image-20231003231555770"  />
++ 数据卷的生命周期一直持续到没有容器使用它为止。
 
-例子
+##### 数据卷备份还原
+
+通过以下命令进行数据卷备份：
+
+```bash
+docker run \
+  --volumes-from [CONTAINER NAME] \
+  -v $(pwd):/backup \
+  ubuntu \
+  tar cvf /backup/backup.tar [CONTAINER DATA VOLUME]
+```
+
+<img src="https://cdn.nlark.com/yuque/0/2020/png/2213540/1601027463441-5987bbab-dde4-4bde-99b4-73caf2573bac.png#align=left&display=inline&height=315&originHeight=315&originWidth=570&size=0&status=done&style=none&width=570" style="zoom: 80%;" />
+
+示例：
+
+```bash
+$ docker run \
+	--name ubuntu_backup
+  --volumes-from container_from \
+  -v ~/backup:/backup \
+  ubuntu \
+  tar cvf /backup/backup.tar /data_volume
+```
+
+对以上命令的解释：
+
+1. 使用ubuntu镜像创建一个容器，取名为ubuntu_backup
+2. 从container_from容器中所有的数据卷挂载到ubuntu_backup容器中(假设数据卷为`/data_volume`)
+3. 将ubuntu_backup容器中的`/backup`目录挂载到宿主机中的`~/backup`目录
+4. 使用ubuntu_backup容器中的 `tar cvf` 命令将数据卷目录 `/data_volume` 打包到 `/backup/backup.tar`，达到备份的目的
+5. 在宿主机中的`~/backup`下即可看到此tar文件
+
+同样地，使用 `tar xvf` 命令以相同的格式还原一个数据卷：
+
+```bash
+$ docker run \
+  --volumes-from [CONTAINER NAME] \
+  -v $(pwd):/backup \
+  ubuntu \
+  tar xvf /backup/backup.tar [CONTAINER DATA VOLUME]
+```
+
+参考：[Backup, restore, or migrate data volumes](https://docs.docker.com/storage/volumes/#backup-restore-or-migrate-data-volumes)
+
+###### 数据卷容器实例1
+
+1. 拉一个centos的容器镜像
+
+```bash
+docker pull centos
+```
+
+2. 然后运行这个镜像并创建一个数据卷挂载到/mydata
+
+```bash
+docker run -it -v /data:/mydata --name mycentos centos
+```
+
+3. 再运行一个容器，在这两个容器中使用--volumes-from来挂载mycentos容器中的数据卷
+
+```bash
+docker run -it --volumes-from mycentos --name soncentos1 centos
+docker run -it --volumes-from mycentos --name soncentos2 centos
+```
+
+此时，容器soncentos1和soncentos2都挂载同一个数据卷到相同的/mydata 目录。三个容器任何一方在该目录下的写入数据，其他容器都可以看到。
+
+###### 数据卷容器实例2
+
+下面以jenkins为例，示例数据卷容器的创建。
+
+1. 创建一个jenkins容器
+
+```bash
+docker run --name jenkins -p 50000:50000 -p 8080:8080 -v /datas/jenkins_home:/var/jenkins_home jenkinsci/blueocean
+```
+
+2. 创建数据卷容器
+
+```bash
+[root@97e52c9ad535 /]# docker run -it --name jenkins-data --volumes-from jenkins centos
+[root@97e52c9ad535 /]# cd /var
+[root@97e52c9ad535 var]# ls
+adm    crash  empty  games   jenkins_home  lib    lock  mail  opt       run    tmp
+cache  db     ftp    gopher  kerberos      local  log   nis   preserve  spool  yp   
+[root@97e52c9ad535 var]# exit
+```
+
+3. 数据备份
+
+```bash
+docker run --volumes-from jenkins-data -v /buckup:/home centos tar cvf /home/jenkins.tar /var/jenkins_home
+```
+
+例子1
+
+<img src="Docker.assets/image-20231003231411163.png" alt="image-20231003231411163" style="zoom: 74%;" />
+
+<img src="Docker.assets/image-20231003231555770.png" alt="image-20231003231555770" style="zoom: 67%;" />
+
+##### 数据同步
+
+![image-20231120142656336](Docker.assets/image-20231120142656336.png)
 
 ![image-20231003231909315](Docker.assets/image-20231003231909315.png)
 
@@ -1054,6 +1418,18 @@ docker build 指令用来编译Dockerfile文件，默认的情况下 docker buil
 #### 9.4.3 DockerFile指令
 
 <img src="Docker.assets/image-20231003234256240.png" alt="image-20231003234256240" style="zoom:80%;" />
+
+##### FROM
+
+指定基础镜像。
+
+```
+FROM [image] # 使用 latest 版本
+FROM [image:tag] # 使用指定版本
+```
+
+- 必须是已经存在的基础镜像
+- 必须是第一条非注释指令
 
 ##### COPY
 
@@ -1337,7 +1713,7 @@ HEALTHCHECK [选项] CMD <命令> : 这边 CMD 后面跟随的命令使用，可
 
 ![image-20231004145827943](Docker.assets/image-20231004145827943.png)
 
-#### 9.4.5 发布镜像
+### 9.5 发布镜像
 
 ##### Docker Hub官网发布
 
@@ -1345,6 +1721,95 @@ HEALTHCHECK [选项] CMD <命令> : 这边 CMD 后面跟随的命令使用，可
 
 1、地址 https://hub.docker.com/注册的账号
 2、在服务器上提交镜像
+
+###### 登录 dockerHub
+
+上传镜像之前，需要先登录docker：
+
+```bash
+$ docker login -u [user] -p [password]
+```
+
+######  将容器保存为镜像
+
+```bash
+$ docker commit [options] [container] [image:tag]
+
+# 例如
+$ docker commit -m "change" -a "quanzaiyu" server 731734107/test
+```
+
+以上命令, 将容器 server 以 quanzaiyu 为作者提交, 并保存为镜像 731734107/test
+
+选项:
+
+- `-m` `--message` 提交内容
+- `-a` `--author` 作者
+
+###### 给已有的镜像打标签
+
+使用tag命令可以将镜像打标签：
+
+```bash
+$ docker tag [image:tag] [repo]/[image:tag]
+
+# 例如
+$ docker tag centos 731734107/test
+```
+
+###### 上传镜像
+
+```bash
+$ docker push 731734107/test
+```
+
+:::info
+需要上传的镜像名需要以自己的用户名开头
+:::
+
+搜索镜像，发现已经有咯:
+
+```bash
+$ docker search 731734107
+INDEX       NAME                       DESCRIPTION   STARS     OFFICIAL   AUTOMATED
+docker.io   docker.io/731734107/test                 0
+```
+
+###### 查看容器文件的变动
+
+```bash
+$ docker diff [container]
+```
+
+可以看到文件的变更情况，其中：
+
+- A 添加的文件
+- C 修改的文件
+- D 删除的文件
+
+###### **退出**
+
+退出 docker hub 可以使用以下命令：
+
+```plain
+$ docker logout
+```
+
+##### 阿里云镜像服务发布
+
+> 阿里云镜像服务上
+
+1、登录阿里云
+2、找到容器镜像服务
+3、创建命名空间
+
+<img src="Docker.assets/image-20231004152911221.png" alt="image-20231004152911221" style="zoom:83%;" />
+
+![image-20231004152417681](Docker.assets/image-20231004152417681.png)
+
+
+
+##### 例子
 
 **登录**
 
@@ -1370,27 +1835,28 @@ b5577f344233: Preparing
 bdcb94365850: Preparing
 ```
 
-**退出**
+### 9.5 镜像构建:crossed_swords:
 
-退出 docker hub 可以使用以下命令：
+命令格式：
 
-```plain
-$ docker logout
+```bash
+docker build -f Dockerfile -t imageName    # 使用Dockerfile进行镜像构建
+docker build -f Dockerfile -t imageName .  # . 用于路径参数传递，标识当前路径
 ```
 
-##### 阿里云镜像服务发布
+可以在 docker build 命令中使用 -f 标志指向文件系统中任何位置的 Dockerfile, 加上 -t 为构建的镜像打标签
 
-> 阿里云镜像服务上
+```bash
+docker build -t '731734107/test' -f /path/to/a/Dockerfile # 以指定路径的Dockerfile进行构建
+```
 
-1、登录阿里云
-2、找到容器镜像服务
-3、创建命名空间
+如果 Docker 文件就在当前目录，则不需要显式指定Dockerfile的路径：
 
-<img src="Docker.assets/image-20231004152911221.png" alt="image-20231004152911221" style="zoom:83%;" />
+```bash
+docker build -t "731734107/test" .
+```
 
-![image-20231004152417681](Docker.assets/image-20231004152417681.png)
-
-### 9.5 Spring Boot + Docker实战
+### 9.6 Spring Boot + Docker实战
 
 **java**
 
@@ -2827,3 +3293,22 @@ services:
 | 根据标签修改发布版本                                         |
 | ------------------------------------------------------------ |
 | ![image-20231027231907394](Docker.assets/image-20231027231907394.png) |
+
+#  参考
+
+ * [📃 Docker Compose的使用](%F0%9F%93%83%20Docker%20Compose%E7%9A%84%E4%BD%BF%E7%94%A8.md)
+ * [📃 常见错误解决方案](%F0%9F%93%83%20%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.md)
+ * [📃 深入阅读：Docker网络](%F0%9F%93%83%20%E6%B7%B1%E5%85%A5%E9%98%85%E8%AF%BB%EF%BC%9ADocker%E7%BD%91%E7%BB%9C.md)
+
+
+
+
+
+
+
+
+
+
+
+
+

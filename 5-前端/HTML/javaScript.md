@@ -1566,8 +1566,6 @@ now. toGMTString()
 'Sat, 04 Jan 2020 02:49:35 GMT"
 ```
 
-
-
 # json
 
 ## JSON的两种结构
@@ -1591,7 +1589,7 @@ var user = {
 var jsonuser = JSON.stringify(user); 
 //输出为{"name" : "qinjiang"，"age":3,"sex" :"男"}
 //json字符串转化为对象参数为json 字符串
-var obj = JSON. parse(' {"name":"qinjiang" , "age" :3,"sex":"男"}');
+var obj = JSON.parse(' {"name":"qinjiang" , "age" :3,"sex":"男"}');
 //输出为{name:"qingjiang",age:3,sex:"男"}
 ```
 
@@ -1941,12 +1939,195 @@ List<Student> studentList = JsonConvert.DeserializeObject<List<Student>>(inputJs
             }
 ```
 
-
-
 ### 总结
 
 在客户端，读写json对象可以使用”.”操作符或”["key”]”，json字符串转换为json对象使用eval()函数。
 在服务端，由.net对象转换json字符串优先使用JsonConvert对象的SerializeObject方法，定制输出json字符串使用LINQ to JSON。由json字符串转换为.net对象优先使用JsonConvert对象的DeserializeObject方法，然后也可以使用LINQ to JSON。
+
+# 箭头函数:crossed_swords:
+
+## 1. 箭头函数引入
+
+es6 新增了使用胖箭头（=>）语法定义函数表达式的能力，很大程度上，箭头函数实例化的函数对象与正式的函数表达式创建的函数对象行为是相同的。
+
++ 任何可以使用函数表达式的地方，都可以使用箭头函数
+
++ ```
+  语法:  (参数) => { 函数体 }
+  ```
+
+```javascript
+// 普通函数
+let sum = function(a, b) {
+	return a + b;
+}
+
+// 箭头函数
+let sum1 = (a, b) => {
+	return a + b;
+}
+```
+
+## 2. 箭头函数的用法
+
+### 1. 省略包含参数的小括号
+
+如果只有一个参数，那也可以不用括号。只有没有参数，或者多个参数的情况下，才需要使用括号：
+
+```javascript
+// 有效
+let sum = (x) => {
+	return x;
+};
+// 有效
+let sum1 = x => {
+	return x;
+};
+// 没有参数需要括号
+let sum2 = () => {
+	return 1;
+};
+// 有多个参数需要括号
+let sum3 = (a, b) => {
+	return a + b;
+};
+```
+
+### 2. 省略包含函数体的大括号
+
+箭头函数也可以不用大括号，但这样会改变函数的行为。使用大括号就说明包含“函数体”，可以在一个函数中包含多条语句，跟常规的函数一样。
+
+- 省略大括号箭头后面就只能有一行代码；
+- 省略大括号会隐式返回这行代码的值；
+- 省略大括号不能写return。
+
+```javascript
+// 有效
+let sum = (a, b) => {
+	return a + b;
+};
+// 有效
+let sum1 = (a, b) => a + b; // 相当于 return a + b;
+// 无效的写法
+let sum2 = (a, b) => return a + b;
+```
+
+### 3. 嵌入函数
+
+箭头函数简洁的语法非常适合嵌入函数的场景：
+
+```javascript
+let arr = [1, 2, 3, 4, 5];
+arr.map(val => val * 2); // [2, 4, 6, 8, 10]
+```
+
+## 3. 箭头函数不能使用arguments
+
+如果函数是使用箭头语法定义的，那么传给函数的参数将不能使用 arguments 关键字访问：
+
+```javascript
+// 普通函数
+let sum = function() {
+	return arguments.length;
+}
+sum(1, 2, 3); // 3
+
+// 箭头函数
+let sum1 = () => {
+	return arguments.length;
+}
+
+sum1(1, 2); // Uncaught ReferenceError: arguments is not defined
+```
+
+虽然箭头函数中没有 arguments 对象，但可以在包装函数中把它提供给箭头函数：
+
+```javascript
+function foo() {
+	let bar = () => {
+		console.log(arguments.length);
+	}
+	bar(); 
+}
+foo(5, 5, 5);  // 3
+```
+
+## 4. 箭头函数中this 指向
+
+```javascript
+let num = 11;
+const obj1 = {
+	num: 22,
+	fn1: function() {
+		let num = 33;
+		const obj2 = {
+			num: 44,
+			fn2: () => {
+				console.log(this.num);
+			}
+		}
+		obj2.fn2();
+	}
+}
+obj1.fn1(); // 22
+```
+
+fn2中得到的结果为：22
+
+原因箭头函数没有this，箭头函数的this是继承父执行上下文里面的this ，这里箭头函数的执行上下文是函数fn1()，所以它就继承了fn1()的this，obj1调用的fn1，所以fn1的this指向obj1， 所以obj1.num 为 22。
+注意：简单对象（非函数）是没有执行上下文的！
+
+如果fn1也是个箭头函数呢？
+
+```javascript
+let num = 11; // 
+const obj1 = {
+	num: 22,
+	fn1: () => {
+		let num = 33;
+		const obj2 = {
+			num: 44,
+			fn2: () => {
+				console.log(this.num);
+			}
+		}
+		obj2.fn2();
+	}
+}
+obj1.fn1(); //undefined 因为fn1也是一个箭头函数，所以它就只能继续向上找也就是window了
+```
+
+将let改成var后：
+
+```javascript
+var num = 11; // 
+const obj1 = {
+	num: 22,
+	fn1: () => {
+		let num = 33;
+		const obj2 = {
+			num: 44,
+			fn2: () => {
+				console.log(this.num);
+			}
+		}
+		obj2.fn2();
+	}
+} 
+obj1.fn1();   //此时结果为window.num => 11
+```
+
+原因:  
+
++ var和let声明变量的一个区别：使用 let 在全局作用域中声明的变量不会成为 window 对象的属性，var 声明的变量则会(不过，let 声明仍然是在全局作用域中发生的，相应变量会在页面的生命周期内存续，所以使用window访问会为undefined)：
+
+```javascript
+var a = 1;
+window.a; // 1
+
+let b = 1;
+window.b; // undefined
+```
 
 # 面向对象编程
 
