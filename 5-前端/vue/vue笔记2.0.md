@@ -87,6 +87,8 @@ $ vue ui -p 3000
 
 <img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231120230752338.png" alt="image-20231120230752338" style="zoom:80%;" />
 
+可以用idea或者vscode启动, 个人建议使用vscode
+
 示例:  注意这是vue2.0的项目结构, 跟vue create创建vue3.0有区别
 
 | 项目目录及各目录介绍如下：                                   |
@@ -109,11 +111,185 @@ $ vue ui -p 3000
 1. 使用vue inspect > output.js可以查看到Vue脚手架的默认配置。
 2. 使用vue.config.js可以对脚手架进行个性化定制，详情见：https://cli.vuejs.org/zh
 
+## 补充
+
+Vue组件间的参数传递
+
+------
+
+#### 11.1 idea中安装Vue插件
+
+在idea中下载vue插件
+
+
+
+![img](vue%E7%AC%94%E8%AE%B0.assets/1646014031373-51ea51b2-4e36-4171-884b-28d88c39db05.png)
+
+
+
+在idea中配置，让idea能够操作.vue文件
+
+
+
+​	![img](vue%E7%AC%94%E8%AE%B0.assets/1646014047515-c6e14a10-eb82-47cb-889f-d61fd1fe52af.png)
+
+
+
+#### 11.2 在项目中创建子组件
+
+
+
+创建子组件Content组件
+
+
+
+```html
+<template>
+    <div>
+      商品列表...
+      {{MyTitle}}
+      <button type="button" @click="btnfn('hello java')">点我</button>
+    </div>
+</template>
+
+<script>
+    export default {
+        name: "Content.vue",
+        props:{
+          'MyTitle':{
+            type:String,
+            required:true,
+            default:'XX'
+          },
+          'btnfn':{
+            type:Function
+          }
+        }
+    }
+</script>
+
+<style scoped>
+
+</style>
+```
+
+
+
+#### 11.3 注册子组件
+
+
+
+在main.js中注册子组件
+
+
+
+```javascript
+import Vue from 'vue'
+import App from './App.vue'
+//引入Content
+import Content from './components/Content'
+
+
+//全局注册组件
+Vue.component('MyContent',Content);
+
+new Vue({
+  el: '#app',
+  render: h => h(App)
+})
+```
+
+
+
+#### 11.4 在App.vue中使用组件并传递参数
+
+
+
+```html
+<template>
+  <div id="app">
+		<MyContent :MyTitle="msg"  :btnfn="FCfn" ></MyContent>
+  </div>
+</template>
+
+<script>
+  import MHeader from './components/Header'
+export default {
+  name: 'app',
+  data(){
+    return {
+      msg:'hello vue!!'
+    }
+  },
+  components:{
+    "MHeader":MHeader
+  },
+  methods:{
+    FCfn:function(m){//hello java
+      this.msg = m;
+    }
+  }
+
+}
+</script>
+<style>
+
+</style>
+```
+
+
+
+#### 11.5 父传子
+
+
+
+通过子组件的props部分，来指明明接收的参数，父组件通过在标签中写明参数的键值对来传递参数。
+
+ 
+
+​	props是表示一个组件的参数部分，那么props的写法有两种：
+
+ 
+
+​		1）props:[参数列表]
+
+ 
+
+​		比如： props:['MyProp1','MyProp2',...]
+
+ 
+
+​		2）props:{参数名1:{type:String,required:true,default:'XX'},参数名2:{...}}
+
+
+
+![img](vue%E7%AC%94%E8%AE%B0.assets/1646014085293-42216296-d847-4d34-b634-cfe5bdcc2c27.png)
+
+![img](vue%E7%AC%94%E8%AE%B0.assets/1646014101808-4645cc39-799e-4e20-aba4-c52635cf878a.png)
+
+
+
+
+
+#### 11.6 子传父
+
+
+
+子传父的过程十分复杂，下列图解中已经配上了详细的步骤。
+
+
+
+![img](vue%E7%AC%94%E8%AE%B0.assets/1646014114070-217acd4b-3f7d-4373-9b70-0c46d929422a.png)
+
+
+
+![img](vue%E7%AC%94%E8%AE%B0.assets/1646014123006-822f11ee-c90b-454d-bff5-92bfbc8f82b8.png)
+
 # Vue2
 
 Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进式框架。与其它大型框架不同的是，Vue 被设计为可以自底向上逐层应用。Vue 的核心库只关注视图层，不仅易于上手，还便于与第三方库或既有项目整合。另一方面，当与现代化的工具链以及各种支持类库结合使用时，Vue 也完全能够为复杂的单页应用提供驱动。
 
-## 模板语法
+## 模板语法({{}})
 
 + 容器和vue实例是一对一关系
 + 真实开发中只有一个Vue实例，并且会配合着组件一起使用
@@ -220,9 +396,11 @@ Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进
 
 <img src="vue%E7%AC%94%E8%AE%B0.assets/image-20231117212512366.png" alt="image-20231117212512366" style="zoom:67%;" />
 
-## 属性
+## Options API(选项式API)
 
-### data属性
+### 属性
+
+#### data属性
 
 ```html
 <!DOCTYPE html>
@@ -285,11 +463,11 @@ Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进
 </html>
 ```
 
-### 计算属性
+#### 计算属性
 
-#### 计算属性与方法的区别
+##### 计算属性与方法的区别
 
-##### 方法
+###### 方法
 
 ```html
 <!DOCTYPE html>
@@ -329,7 +507,7 @@ Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进
 </html>
 ```
 
-##### 计算属性
+###### 计算属性
 
 <font color=red>当所依赖的数据发生变化时, 就会随之调用</font>
 
@@ -417,11 +595,11 @@ Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进
 
 注意：methods 和 computed 里不能重名
 
-### 监视属性
+#### 监视属性
 
 <font color=red>当监视的数据发生变化时, 就会随之调用</font>
 
-#### 基本使用
+##### 基本使用
 
 ```html
 <!DOCTYPE html>
@@ -494,7 +672,7 @@ Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进
 
 ![image-20231120210638273](vue%E7%AC%94%E8%AE%B0.assets/image-20231120210638273.png)
 
-#### 深度监视
+##### 深度监视
 
 ```html
 <!DOCTYPE html>
@@ -571,7 +749,7 @@ Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进
 				}, 
 				//监视多级结构中所有属性的变化
 				numbers:{
-					deep:true,
+					deep:true,        // 深度监视
 					handler(){
 						console.log('numbers改变了')
 					}
@@ -582,7 +760,51 @@ Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进
 </html>
 ```
 
+### 方法
+
+通过methods定义方法
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>姓名案例_methods实现</title>
+		<!-- 引入Vue -->
+		<script type="text/javascript" src="../js/vue.js"></script>
+	</head>
+	<body>
+		<!-- 准备好一个容器-->
+		<div id="root">
+			姓：<input type="text" v-model="firstName"> <br/><br/>
+			名：<input type="text" v-model="lastName"> <br/><br/>
+			全名：<span>{{fullName()}}</span>
+		</div>
+	</body>
+
+	<script type="text/javascript">
+		Vue.config.productionTip = false //阻止 vue 在启动时生成生产提示。
+
+		new Vue({
+			el:'#root',
+			data:{
+				firstName:'张',
+				lastName:'三'
+			},
+			methods: {
+				fullName(){
+					console.log('@---fullName')
+					return this.firstName + '-' + this.lastName
+				}
+			},
+		})
+	</script>
+</html>
+```
+
 ## 动态数据绑定
+
+<font color=red>可以用于设置元素的任何属性</font>
 
 ### 单向数据绑定(:)
 
@@ -769,6 +991,42 @@ data: {
 
 这样写只会渲染数组中最后一个被浏览器支持的值。在本例中，如果浏览器支持不带浏览器前缀的 flexbox，那么就只会渲染 `display: flex`。
 
+#### 总结:crossed_swords:
+
+1. **`class` 和 `style` 属性：** 用于动态设置元素的类和样式。
+
+   ```vue
+   <div :class="{ active: isActive, 'text-danger': hasError }" :style="{ fontSize: fontSize + 'px' }">
+       <!-- 内容 -->
+   </div>
+   ```
+
+2. **表单相关属性：** 用于处理表单元素的值和状态。
+
+   ```vue
+   <input type="text" :value="message" @input="updateMessage">
+   <input type="checkbox" :checked="isChecked" @change="toggleChecked">
+   ```
+
+3. **`disabled` 属性：** 用于禁用或启用按钮等元素。
+
+   ```vue
+   <button :disabled="isButtonDisabled">点击我</button>
+   ```
+
+4. **其他属性：**<font color = red> 可以用于设置元素的任何属性</font>。
+
+   ```vue
+   <img :src="imageUrl" alt="A dynamic image">
+   <a :href="url">动态链接</a>
+   ```
+
+5. **自定义属性：** 用于设置自定义属性。
+
+   ```vue
+   <div :data-custom="customData">自定义属性</div>
+   ```
+
 #### 综合代码
 
 ```html
@@ -894,7 +1152,6 @@ data: {
    + v-mode:value="xxx" 
    + v-model="xxx"   (推荐)
 2. 特点：数据不仅能从data 流向页面，还能从页面流向data
-
 3. v-model的三个修饰符：
    + lazy：失去焦点再收集数据
    + number：输入字符串转为有效的数字
@@ -908,6 +1165,169 @@ data: {
      + 配置input的value属性:
        + (1)v-model的初始值是非数组，那么收集的就是布尔值（勾选 or 未勾选，是布尔值）
        + (2)v-model的初始值是数组，那么收集的的就是value 
+
+#### 文本框
+
+```html
+<!-- 文本框 -->
+<input v-model="message1" placeholder="edit me">
+<p>Message is: {{ message1 }}</p>
+
+<!-- 文本域 -->
+<textarea v-model="message2" placeholder="add multiple lines"></textarea>
+<p>Message is: {{ message2 }}</p>
+```
+
+```javascript
+new Vue({
+  el: '#app',
+  data: {
+    message1: '',
+    message2: ''
+  }
+})
+```
+
+<img src="https://cdn.nlark.com/yuque/0/2020/gif/2213540/1607593484728-d57b6c81-0b00-43ae-bf7e-47ecfe63fab2.gif#align=left&display=inline&height=186&originHeight=186&originWidth=250&size=45262&status=done&style=none&width=250" alt="GIF.gif" style="zoom:80%;" />
+
+#### 单选框
+
+对于单选框的选项，`v-model` 绑定的值通常是静态字符串：
+
+```html
+<!-- 单选框 -->
+<div id="radio-group">
+  <input type="radio" id="one" value="One" v-model="picked">
+  <label for="one">One</label>
+  <br>
+  <input type="radio" id="two" value="Two" v-model="picked">
+  <label for="two">Two</label>
+  <br>
+  <span>Picked: {{ picked }}</span>
+</div>
+```
+
+```javascript
+new Vue({
+  el: '#app',
+  data: {
+    picked: ''
+  }
+})
+```
+
+当选中第一个按钮时，`vm.picked === One`，当选中第二个按钮时，`vm.picked === Twe`![GIF.gif](https://cdn.nlark.com/yuque/0/2020/gif/2213540/1607593565659-746afcb9-618b-43fd-8aed-d0c645036a8e.gif#align=left&display=inline&height=80&originHeight=80&originWidth=157&size=3227&status=done&style=none&width=157)
+
+#### 复选框
+
+对于复选框的选项，`v-model` 绑定的值通常是静态字符串，也可以是布尔值：
+
+```html
+<!-- 单个复选框，绑定到布尔值 -->
+<input type="checkbox" id="checkbox" v-model="checked">
+<label for="checkbox">checked: {{ checked }}</label>
+
+<!-- 多个复选框，绑定到同一个数组 -->
+<div id='checkbox-group'>
+  <input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
+  <label for="jack">Jack</label>
+  <input type="checkbox" id="john" value="John" v-model="checkedNames">
+  <label for="john">John</label>
+  <input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
+  <label for="mike">Mike</label>
+  <br>
+  <span>Checked names: {{ checkedNames }}</span>
+</div>
+```
+
+```javascript
+new Vue({
+  el: '#app',
+  data: {
+    checked: false,
+    checkedNames: []
+  }
+})
+```
+
+![GIF](vue%E7%AC%94%E8%AE%B02.0.assets/GIF.gif)
+
+##### true-value 和 false-value
+
+```html
+<input
+  type="checkbox"
+  v-model="toggle"
+  true-value="yes"
+  false-value="no"
+>
+```
+
+```javascript
+// 当选中时
+vm.toggle === 'yes'
+// 当没有选中时
+vm.toggle === 'no'
+```
+
+![GIF (1)](vue%E7%AC%94%E8%AE%B02.0.assets/GIF%20(1).gif)
+这里的 `true-value` 和 `false-value` 特性并不会影响输入控件的 `value` 特性，因为浏览器在提交表单时并不会包含未被选中的复选框。如果要确保表单中这两个值中的一个能够被提交，(比如“yes”或“no”)，请换用单选按钮。
+
+#### 选择框
+
+对于选择框的选项，`v-model` 绑定的值通常是静态字符串：
+
+```html
+<!-- 选择框: 单选 -->
+<div id="select-option">
+  <select v-model="selected1">
+    <option disabled value="">请选择</option>
+    <option>A</option>
+    <option>B</option>
+    <option>C</option>
+  </select>
+  <span>Selected: {{ selected1 }}</span>
+</div>
+
+<!-- 选择框: 多选 -->
+<div id="select-option-multiple">
+  <select v-model="selected2" multiple style="width: 50px;">
+    <option>A</option>
+    <option>B</option>
+    <option>C</option>
+  </select>
+  <br>
+  <span>Selected: {{ selected2 }}</span>
+</div>
+
+<!-- 选择框: 用 v-for 渲染的动态选项 -->
+<select v-model="selected3">
+  <option v-for="option in options" :value="option.value">
+    {{ option.text }}
+  </option>
+</select>
+<span>Selected: {{ selected3 }}</span>
+```
+
+```javascript
+new Vue({
+  el: '#app',
+  data: {
+    selected1: '',
+    selected2: [],
+    selected3: 'A',
+    options: [
+      { text: 'One', value: 'A' },
+      { text: 'Two', value: 'B' },
+      { text: 'Three', value: 'C' }
+    ]
+  }
+})
+```
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/GIF%20(2).gif" alt="GIF (2)" style="zoom: 80%;" />
+
+如果 `v-model` 表达式的初始值未能匹配任何选项，`<select>` 元素将被渲染为“未选中”状态。在 iOS 中，这会使用户无法选择第一个选项。因为这样的情况下，iOS 不会触发 change 事件。因此，更推荐像上面这样提供一个值为空的禁用选项。
 
 #### 综合代码
 
@@ -992,6 +1412,93 @@ data: {
 
 + 使用 `methods` 定义方法对事件进行处理
 + 在调用方法的时候传入一个 `$event`，这就是事件对象
+
+示例： 
+
+```html
+<div id="example-1">
+  <button @click="counter += 1">Add 1</button>
+  <button @click="counter -= 1">Sub 1</button>
+  <p>Counter: {{ counter }}</p>
+</div>
+```
+
+```javascript
+var example1 = new Vue({
+  el: '#example-1',
+  data: {
+    counter: 0
+  }
+})
+```
+
+
+
+### 常见的 Vue 事件
+
+在 Vue.js 中，你可以使用各种事件来监听 DOM 元素上发生的各种交互动作。以下是一些常见的 Vue 事件：
+
+1. **`@click`：** 监听点击事件。
+
+   ```
+   <button @click="handleClick">点击我</button>
+   ```
+
+2. **`@input`：** 监听输入事件，通常用于表单元素。
+
+   ```
+   <input type="text" @input="handleInput">
+   ```
+
+3. **`@change`：** 监听元素值变化事件，常用于 `<select>` 元素。
+
+   ```
+   <select @change="handleChange">
+       <!-- options here -->
+   </select>
+   ```
+
+4. **`@submit`：** 监听表单提交事件。
+
+   ```
+   code<form @submit="handleSubmit">
+       <!-- form elements here -->
+   </form>
+   ```
+
+5. **`@mouseover` 和 `@mouseout`：** 监听鼠标移入和移出事件。
+
+   ```
+   <div @mouseover="handleMouseOver" @mouseout="handleMouseOut">鼠标悬停</div>
+   ```
+
+6. **`@keydown` 和 `@keyup`：** 监听键盘按下和弹起事件。
+
+   ```
+   <input type="text" @keydown="handleKeyDown" @keyup="handleKeyUp">
+   ```
+
+7. **`@focus` 和 `@blur`：** 监听元素获取焦点和失去焦点事件。
+
+   ```
+   <input type="text" @focus="handleFocus" @blur="handleBlur">
+   ```
+
+8. **自定义事件：** 除了上述内置事件外，你还可以使用 `$emit` 来触发和监听自定义事件。
+
+   ```
+   <my-component @custom-event="handleCustomEvent"></my-component>
+   ```
+
+   在组件内部：
+
+   ```
+   javascriptCopy codemethods: {
+       triggerCustomEvent() {
+           this.$emit('custom-event', eventData);
+       }
+   }
+   ```
 
 ### 基本使用
 
@@ -2496,7 +3003,7 @@ new Vue({
 })
 ```
 
-#### 六、综合代码
+#### 七、综合代码
 
 ```html
 <!DOCTYPE html>
@@ -2695,19 +3202,11 @@ Vue的组件化设计思想借鉴了Java的面向对象思想。Java认为万物
 </html>
 ```
 
-
-
 ###  组件的本地注册
-
-
 
 vue的全局注册，也就意味着在页面的任意一个被vue绑定过的div中，都可以使用全局注册了的vue组件。
 
- 
-
 但是，如果是对vue组件进行本地注册，那么在其他被vue绑定的div中，不能使用该组件。
-
-
 
 ```html
 <!DOCTYPE html>
@@ -2762,15 +3261,9 @@ vue的全局注册，也就意味着在页面的任意一个被vue绑定过的di
 
 这是一个完整的Vue组件。该组件包含了三个部分：template（html视图层内容）、script（Model层）、style（CSS样式）。这样封装好的组件可以被复用，也可以作为其他组件的组成部分而被封装——Java的面向对象再次体现。
 
- 
-
 -  **特点1： template标签内，必须有且只能有一个根标签。** 
 -  **特点2： componet中注册的组件中的data，必须是函数的形式。**
    如下： 
-
- 
-
-
 
 ```html
 data:function(){
@@ -2779,8 +3272,6 @@ title:"hello vue"
 } 
 }
 ```
-
-
 
 ###  组件的生命周期
 
@@ -2877,215 +3368,287 @@ vm的一生(vm的生命周期)：
 | ------------------------------------------------------------ |
 | ![img](vue%E7%AC%94%E8%AE%B0.assets/1646013757802-713c7e4d-740d-440d-a470-4630bd03666b.png) |
 
-## Vue组件间的参数传递
+## 分析脚手架:crossed_swords:
 
-------
-
-#### 11.1 idea中安装Vue插件
-
-在idea中下载vue插件
-
-
-
-![img](vue%E7%AC%94%E8%AE%B0.assets/1646014031373-51ea51b2-4e36-4171-884b-28d88c39db05.png)
-
-
-
-在idea中配置，让idea能够操作.vue文件
-
-
-
-​	![img](vue%E7%AC%94%E8%AE%B0.assets/1646014047515-c6e14a10-eb82-47cb-889f-d61fd1fe52af.png)
-
-
-
-#### 11.2 在项目中创建子组件
-
-
-
-创建子组件Content组件
-
-
+index.html
 
 ```html
-<template>
-    <div>
-      商品列表...
-      {{MyTitle}}
-      <button type="button" @click="btnfn('hello java')">点我</button>
-    </div>
-</template>
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+		<!-- 针对IE浏览器的一个特殊配置，含义是让IE浏览器以最高的渲染级别渲染页面 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!-- 开启移动端的理想视口 -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+		<!-- 配置页签图标 -->
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+		<!-- 引入第三方样式 -->
+		<link rel="stylesheet" href="<%= BASE_URL %>css/bootstrap.css">          
+		<!-- 配置网页标题 -->
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+		<!-- 当浏览器不支持js时noscript中的元素就会被渲染 -->
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+		<!-- 容器 -->
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
 
-<script>
-    export default {
-        name: "Content.vue",
-        props:{
-          'MyTitle':{
-            type:String,
-            required:true,
-            default:'XX'
-          },
-          'btnfn':{
-            type:Function
-          }
-        }
-    }
-</script>
-
-<style scoped>
-
-</style>
 ```
 
+package.json: 应用包配置文件
 
+![image-20231121090938792](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231121090938792.png)
 
-#### 11.3 注册子组件
+mian.js
 
-
-
-在main.js中注册子组件
-
-
-
-```javascript
+```js
+/* 
+	该文件是整个项目的入口文件
+*/
+//引入Vue
 import Vue from 'vue'
+//引入App组件，它是所有组件的父组件
 import App from './App.vue'
-//引入Content
-import Content from './components/Content'
+//关闭vue的生产提示
+Vue.config.productionTip = false
 
+/* 
+	关于不同版本的Vue：
+	
+		1.vue.js与vue.runtime.xxx.js的区别：
+				(1).vue.js是完整版的Vue，包含：核心功能+模板解析器。
+				(2).vue.runtime.xxx.js是运行版的Vue，只包含：核心功能；没有模板解析器。
 
-//全局注册组件
-Vue.component('MyContent',Content);
+		2.因为vue.runtime.xxx.js没有模板解析器，所以不能使用template配置项，需要使用
+			render函数接收到的createElement函数去指定具体内容。
+*/
 
+//创建Vue实例对象---vm
 new Vue({
-  el: '#app',
-  render: h => h(App)
+	el:'#app',
+	//render函数完成了这个功能：将App组件放入容器中
+  render: h => h(App),
+	// render:q=> q('h1','你好啊')
+
+	// template:`<h1>你好啊</h1>`,
+	// components:{App},
 })
 ```
 
+App.vue
 
-
-#### 11.4 在App.vue中使用组件并传递参数
-
-
-
-```html
+```vue
 <template>
-  <div id="app">
-		<MyContent :MyTitle="msg"  :btnfn="FCfn" ></MyContent>
-  </div>
+	<div>
+		<img src="./assets/logo.png" alt="logo">
+		<School></School>
+		<Student></Student>
+	</div>
 </template>
 
 <script>
-  import MHeader from './components/Header'
-export default {
-  name: 'app',
-  data(){
-    return {
-      msg:'hello vue!!'
-    }
-  },
-  components:{
-    "MHeader":MHeader
-  },
-  methods:{
-    FCfn:function(m){//hello java
-      this.msg = m;
-    }
-  }
+	//引入组件
+	import School from './components/School'          // 引入组件
+	import Student from './components/Student'
 
-}
+	export default {
+		name:'App',
+		components:{      // 引入组件
+			School,
+			Student
+		}
+	}
 </script>
-<style>
+```
 
+School.vue组件
+
+```vue
+<template>
+	<div class="demo">
+		<h2>学校名称：{{name}}</h2>
+		<h2>学校地址：{{address}}</h2>
+		<button @click="showName">点我提示学校名</button>	
+	</div>
+</template>
+
+<script>
+	 export default {
+		name:'School',
+		data(){
+			return {
+				name:'尚硅谷',
+				address:'北京昌平'
+			}
+		},
+		methods: {
+			showName(){
+				alert(this.name)
+			}
+		},
+	}
+</script>
+
+<style>
+	.demo{
+		background-color: orange;
+	}
 </style>
 ```
 
+Student.vue组件
 
+```vue
+<template>
+	<div>
+		<h2>学生姓名：{{name}}</h2>
+		<h2>学生年龄：{{age}}</h2>
+	</div>
+</template>
 
-#### 11.5 父传子
-
-
-
-通过子组件的props部分，来指明明接收的参数，父组件通过在标签中写明参数的键值对来传递参数。
-
- 
-
-​	props是表示一个组件的参数部分，那么props的写法有两种：
-
- 
-
-​		1）props:[参数列表]
-
- 
-
-​		比如： props:['MyProp1','MyProp2',...]
-
- 
-
-​		2）props:{参数名1:{type:String,required:true,default:'XX'},参数名2:{...}}
-
-
-
-![img](vue%E7%AC%94%E8%AE%B0.assets/1646014085293-42216296-d847-4d34-b634-cfe5bdcc2c27.png)
-
-![img](vue%E7%AC%94%E8%AE%B0.assets/1646014101808-4645cc39-799e-4e20-aba4-c52635cf878a.png)
-
-
-
-
-
-#### 11.6 子传父
-
-
-
-子传父的过程十分复杂，下列图解中已经配上了详细的步骤。
-
-
-
-![img](vue%E7%AC%94%E8%AE%B0.assets/1646014114070-217acd4b-3f7d-4373-9b70-0c46d929422a.png)
-
-
-
-![img](vue%E7%AC%94%E8%AE%B0.assets/1646014123006-822f11ee-c90b-454d-bff5-92bfbc8f82b8.png)
+<script>
+	 export default {
+		name:'Student',
+		data(){
+			return {
+				name:'张三',
+				age:18
+			}
+		}
+	}
+</script>
+```
 
 ## ref 属性
 
-1. 被用来给元素或子组件注册引用信息（id的替代者）
-2. 应用在html标签上获取的是真实DOM元素，应用在组件标签上是组件实例对象（vc）
+1. 被用来给元素或子组件注册引用信息（id=xxx的替代者）
+2. 应用在html标签上**获取的是真实DOM元素**，应用在组件标签上是组件实例对象（vc）
 3. 使用方式：
    1. 打标识：```<h1 ref="xxx">.....</h1>``` 或 ```<School ref="xxx"></School>```
    2. 获取：```this.$refs.xxx```
 
-## props 配置[组件传参]
+index.html
 
-1. 功能：让组件接收外部传过来的数据
+```html
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+		<!-- 针对IE浏览器的一个特殊配置，含义是让IE浏览器以最高的渲染级别渲染页面 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!-- 开启移动端的理想视口 -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+		<!-- 配置页签图标 -->
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+		<!-- 引入第三方样式 -->
+		<link rel="stylesheet" href="<%= BASE_URL %>css/bootstrap.css">          
+		<!-- 配置网页标题 -->
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+		<!-- 当浏览器不支持js时noscript中的元素就会被渲染 -->
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+		<!-- 容器 -->
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
 
-2. 传递数据：```<Demo name="xxx"/>```
+```
 
-3. 接收数据：
+package.json: 应用包配置文件
 
-   1. 第一种方式（只接收）：```props:['name'] ```
+![image-20231121090938792](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231121090938792.png)
 
-   2. 第二种方式（限制类型）：```props:{name:String}```
+main.js
 
-   3. 第三种方式（限制类型、限制必要性、指定默认值）：
+```js
+// 引入Vue
+import Vue from 'vue'
+// 引入App
+import App from './App.vue'
+// 关闭Vue的生产提示
+Vue.config.productionTip = false
 
-      ```js
-      props:{
-      	name:{
-      	type:String, //类型
-      	required:true, //必要性
-      	default:'老王' //默认值
-      	}
-      }
-      ```
+//创建vm
+new Vue({
+	el:'#app',
+	render: h => h(App)
+})
+```
 
-   > 备注：props是只读的，Vue底层会监测你对props的修改，如果进行了修改，就会发出警告，若业务需求确实需要修改，那么请复制props的内容到data中一份，然后去修改data中的数据。
+App.vue
 
+```vue
+<template>
+	<div>
+		<h1 v-text="msg" ref="title"></h1>
+		<button ref="btn" @click="showDOM">点我输出上方的DOM元素</button>
+		<School ref="sch"/>  //ref标签: 获取的是真实DOM元素
+	</div>
+</template>
 
+<script>
+	//引入School组件
+	import School from './components/School'
 
+	export default {
+		name:'App', //组件名称
+		components:{School},
+		data() {
+			return {
+				msg:'欢迎学习Vue！'
+			}
+		},
+		methods: {
+			showDOM(){
+				console.log(this.$refs.title) //真实DOM元素
+				console.log(this.$refs.btn) //真实DOM元素
+				console.log(this.$refs.sch) //School组件的实例对象（vc）
+			}
+		},
+	}
+</script>
+```
 
+School.vue
+
+```vue
+<template>
+	<div class="school">
+		<h2>学校名称：{{name}}</h2>
+		<h2>学校地址：{{address}}</h2>
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'School', //组件名称
+		data() {
+			return {
+				name:'尚硅谷',
+				address:'北京·昌平'
+			}
+		},
+	}
+</script>
+
+<style>
+	.school{
+		background-color: gray;
+	}
+</style>
+```
+
+![image-20231121090150379](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231121090150379.png)
 
 ## mixin 混入[公共部分]
 
@@ -3107,6 +3670,393 @@ export default {
 
    ​	全局混入：```Vue.mixin(xxx)```
    ​	局部混入：```mixins:['xxx']	```
+
+混入 (mixins) 是一种分发 Vue 组件中可复用功能的非常灵活的方式。混入对象可以包含任意组件选项。当组件使用混入对象时，所有混入对象的选项将被混入该组件本身的选项。
+
+### 一、在全局中混入
+
+如下例，为自定义的选项 `myOption` 注入一个处理器。
+
+```html
+<div id="app"></div>
+```
+
+```javascript
+Vue.mixin({
+  created: function () {
+    var myOption = this.$options.myOption
+    if (myOption) {
+      console.log(myOption)
+    }
+  }
+})
+
+new Vue({
+  template: `<h1>Hello world</h1>`,
+  el: '#app',
+  myOption: 'hello!'
+})
+
+// => "hello!"
+```
+
+:::warning
+谨慎使用全局混入对象，因为会影响到每个单独创建的 Vue 实例 (包括第三方模板)。
+:::
+
+### 二、在组件中混入
+
+#### 在全局组件中混入
+
+使用 `Vue.extend` 混入一个可复用的组件选项。
+
+```javascript
+new Vue({
+	template: `<h1>Hello world</h1>`,
+  el: '#app'
+})
+
+// 定义一个混入对象
+var myMixin = {
+  created: function () {
+    this.hello()
+  },
+  methods: {
+    hello: function () {
+      console.log('hello from mixin!')
+    }
+  }
+}
+
+// 定义一个使用混入对象的组件
+var Component = Vue.extend({
+  mixins: [myMixin]
+})
+
+var component = new Component()
+Vue.component('componentTest', component)
+```
+
+```html
+<script src="//unpkg.com/vue/dist/vue.js"></script>
+
+<div id="app">
+  <componentTest></componentTest>
+</div>
+```
+
+#### 在Vue组件中混入
+
+使用 mixins 混入一个可复用的组件选项。
+
+```html
+<template>
+  <div>
+    <p>hello</p>
+  </div>
+</template>
+
+<script>
+let myMixin = {
+  created: function () {
+    this.hello()
+  },
+  methods: {
+    hello: function () {
+      console.log('hello from mixin!')
+    }
+  }
+}
+
+export default {
+  mixins: [myMixin]
+}
+</script>
+```
+
+### 三、选项合并
+
+mixin 中，如果有跟组件同名的选项，数据对象在内部会进行浅合并 (一层属性深度)，在和组件的数据发生冲突时以组件数据优先。
+
+```html
+<div id="app"></div>
+```
+
+```javascript
+var mixin = {
+  data () {
+    return {
+      message: 'hello',
+      foo: 'abc'
+    }
+  }
+}
+
+new Vue({
+  template: `<h1>Hello world</h1>`,
+  el: '#app',
+  mixins: [mixin],
+  data () {
+    return {
+      message: 'goodbye',
+      bar: 'def'
+    }
+  },
+  created: function () {
+    console.log(this.$data)
+    // => { message: "goodbye", foo: "abc", bar: "def" }
+  }
+})
+```
+
+如上例，在 mixin 和组件中都存在 data 选项，内部同时存在 message 属性，将以组件中的优先，组件中不存在 foo，则使用 mixin 中的属性。
+
+同名钩子函数将混合为一个数组，因此都将被调用。另外，混入对象的钩子将在组件自身钩子之前调用。
+
+```javascript
+var mixin = {
+  created: function () {
+    console.log('混入对象的钩子被调用')
+  }
+}
+
+new Vue({
+  mixins: [mixin],
+  created: function () {
+    console.log('组件钩子被调用')
+  }
+})
+
+// => "混入对象的钩子被调用"
+// => "组件钩子被调用"
+```
+
+值为对象的选项，例如 methods, components 和 directives，将被混合为同一个对象。两个对象键名冲突时，取组件对象的键值对。
+
+```javascript
+var mixin = {
+  methods: {
+    foo: function () {
+      console.log('foo')
+    },
+    conflicting: function () {
+      console.log('from mixin')
+    }
+  }
+}
+
+var vm = new Vue({
+  mixins: [mixin],
+  methods: {
+    bar: function () {
+      console.log('bar')
+    },
+    conflicting: function () {
+      console.log('from self')
+    }
+  }
+})
+
+vm.foo() // => "foo"
+vm.bar() // => "bar"
+vm.conflicting() // => "from self"
+```
+
+如果是 `Vue.extend()` 也将使用同样的策略进行合并。
+
+### 示例
+
+项目结构:
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231121210150297.png" alt="image-20231121210150297" style="zoom:80%;" />
+
+mixin.js
+
+```js
+export const hunhe = {
+	methods: {
+		showName(){
+			alert(this.name)
+		}
+	},
+	mounted() {
+		console.log('你好啊！')
+	},
+}
+
+export const hunhe2 = {
+	data() {
+		return {
+			x:100,
+			y:200
+		}
+	},
+}
+```
+
+mian.js
+
+```js
+//引入Vue
+import Vue from 'vue'
+//引入App
+import App from './App.vue' 
+import {hunhe,hunhe2} from './mixin'           //
+//关闭Vue的生产提示
+Vue.config.productionTip = false
+
+Vue.mixin(hunhe)                              // 全局引入
+Vue.mixin(hunhe2)                             //
+
+
+//创建vm
+new Vue({
+	el:'#app',
+	render: h => h(App)
+})
+```
+
+App.vue
+
+```vue
+<template>
+	<div>
+		<School/>
+		<hr>
+		<Student/>
+	</div>
+</template>
+
+<script>
+	import School from './components/School'
+	import Student from './components/Student'
+
+	export default {
+		name:'App',
+		components:{School,Student}
+	}
+</script>
+```
+
+School.vue
+
+```vue
+<template>
+	<div>
+		<h2 @click="showName">学校名称：{{name}}</h2>
+		<h2>学校地址：{{address}}</h2>
+	</div>
+</template>
+
+<script>
+	// import {hunhe,hunhe2} from '../mixin'    	//局部引入
+
+	export default {
+		name:'School',
+		data() {
+			return {
+				name:'尚硅谷',
+				address:'北京',
+				x:666
+			}
+		},
+		// mixins:[hunhe,hunhe2],                  //局部引入
+	}
+</script>
+```
+
+Student.vue
+
+```vue
+<template>
+	<div>
+		<h2 @click="showName">学生姓名：{{name}}</h2>
+		<h2>学生性别：{{sex}}</h2>
+	</div>
+</template>
+
+<script>
+	// import {hunhe,hunhe2} from '../mixin'
+
+	export default {
+		name:'Student',
+		data() {
+			return {
+				name:'张三',
+				sex:'男'
+			}
+		},
+		// mixins:[hunhe,hunhe2]
+	}
+</script>
+```
+
+![](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231121132705355.png)
+
+## 过滤器
+
+Vue.js 允许你自定义过滤器，可被用于一些常见的文本格式化。过滤器可以用在两个地方：双花括号插值和 v-bind 表达式 (后者从 2.1.0+ 开始支持)。过滤器应该被添加在 JavaScript 表达式的尾部，由“管道”符号指示。
+
+```html
+<!-- 在双花括号中 -->
+{{ message | capitalize }}
+
+<!-- 在 `v-bind` 中 -->
+<div v-bind:id="rawId | formatId"></div>
+```
+
+### 一、全局过滤器
+
+定义一个全局过滤器很简单，只需要导出一个方法即可。
+
+使用的时候很简单，只需要在入口文件全局引入此过滤器即可，使用 `Vue.filter(key, value)` 引入。
+
+比如，PHP后端返回的时间戳精确到秒，而JS中的时间戳是用毫秒表示，则可以定义一个转换时间戳的全局过滤器:
+
+`main.js`
+
+```javascript
+import Vue from 'vue'
+Vue.filter('millisecond', (value) => {
+  if (!value) return ''
+  value = value.toString()
+  return value.charAt(0).toUpperCase() + value.slice(1)
+})
+```
+
+在需要使用的组件使用：
+
+```html
+<div>
+  {{1516101106 | millisecond}}
+</div>
+```
+
+### 二、组件过滤器
+
+组件过滤器更简单，只需在对应组件中定义 `filters` 即可，不过只针对本组件有效。
+
+比如定义一个首字母大写的过滤器：
+
+```javascript
+export default {
+  filters: {
+    capitalize: function (value) {
+      if (!value) return ''
+      value = value.toString()
+      return value.charAt(0).toUpperCase() + value.slice(1)
+    }
+  }
+}
+```
+
+同样，使用方法一致：
+
+```html
+<div>
+  {{'hello' | capitalize}}
+</div>
+```
 
 ## 插件
 
@@ -3135,32 +4085,582 @@ export default {
 
 4. 使用插件：```Vue.use()```
 
+项目结构:
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231121210107734.png" alt="image-20231121210107734" style="zoom:80%;" />
+
+plugins.js
+
+```js
+export default {
+	install(Vue,x,y,z){
+		console.log(x,y,z)
+		//全局过滤器
+		Vue.filter('mySlice',function(value){
+			return value.slice(0,4)
+		})
+
+		//自定义定义全局指令
+		Vue.directive('fbind',{
+			//指令与元素成功绑定时（一上来）
+			bind(element,binding){
+				element.value = binding.value
+			},
+			//指令所在元素被插入页面时
+			inserted(element,binding){
+				element.focus()
+			},
+			//指令所在的模板被重新解析时
+			update(element,binding){
+				element.value = binding.value
+			}
+		})
+
+		//定义混入
+		Vue.mixin({
+			data() {
+				return {
+					x:100,
+					y:200
+				}
+			},
+		})
+
+		//给Vue原型上添加一个方法（vm和vc就都能用了）
+		Vue.prototype.hello = ()=>{alert('你好啊')}
+	}
+}
+```
+
+main.js
+
+```js
+//引入Vue
+import Vue from 'vue'
+//引入App
+import App from './App.vue'
+//引入插件
+import plugins from './plugins'              //----------------
+//关闭Vue的生产提示
+Vue.config.productionTip = false
+
+//应用（使用）插件
+Vue.use(plugins,1,2,3)          // -------------------
+//创建vm
+new Vue({
+	el:'#app',
+	render: h => h(App)
+})
+```
+
+```vue
+<template>
+	<div>
+		<School/>
+		<hr>
+		<Student/>
+	</div>
+</template>
+
+<script>
+	import School from './components/School'
+	import Student from './components/Student'
+
+	export default {
+		name:'App',
+		components:{School,Student}
+	}
+</script>
+```
+
+```vue
+<template>
+	<div>
+		<h2>学校名称：{{name | mySlice}}</h2> <!-- 在模板中使用 'mySlice' 过滤器 -->
+		<h2>学校地址：{{address}}</h2>
+		<button @click="test">点我测试一个hello方法</button>
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'School',
+		data() {
+			return {
+				name:'尚硅谷atguigu',
+				address:'北京',
+			}
+		},
+		methods: {
+			test(){
+				this.hello()
+			}
+		},
+	}
+</script>
+```
+
+```vue
+<template>
+	<div>
+		<h2>学生姓名：{{name}}</h2>
+		<h2>学生性别：{{sex}}</h2>
+		<input type="text" v-fbind:value="name">    //使用插件中的fbind
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'Student',
+		data() {
+			return {
+				name:'张三',
+				sex:'男'
+			}
+		},
+	}
+</script>
+```
+
+
+
 ## scoped样式
 
 1. 作用：让样式在局部生效，防止冲突。
-2. 写法：```<style scoped>```
+2. 写法：```<style scoped> 替换 <style>```
+
+```vue
+<template>
+	<div class="demo">
+		<h2 class="title">学校名称：{{name}}</h2>
+		<h2>学校地址：{{address}}</h2>
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'School',
+		data() {
+			return {
+				name:'尚硅谷atguigu',
+				address:'北京',
+			}
+		}
+	}
+</script>
+
+// 使用 style scoped
+<style scoped>
+	.demo{
+		background-color: skyblue;
+	}
+</style>
+```
+
+## 组件间通信:crossed_swords:
+
+### 方式1: props配置项
+
+适用于 <strong style="color:red">父组件 ===> 子组件</strong> 
+
+#### props 配置项[组件传参]
+
+1. 功能：让组件接收外部传过来的数据
+
+2. 传递数据：```<Demo name="xxx"/>```
+
+3. 接收数据：
+
+   1. 第一种方式（只接收）：```props:['name'] ```
+
+   2. 第二种方式（限制类型）：```props:{name:String}```
+
+   3. 第三种方式（限制类型、限制必要性、指定默认值）：
+
+      ```js
+      props:{
+      	name:{
+      	type:String, //类型
+      	required:true, //必要性
+      	default:'老王' //默认值
+      	}
+      }
+      ```
+
+   注意：props是只读的，Vue底层会监测你对props的修改，如果进行了修改，就会发出警告，若业务需求确实需要修改，那么请复制props的内容到data中一份，然后去修改data中的数据。props优先接受
+
+main.js
+
+```js
+//引入Vue
+import Vue from 'vue'
+//引入App
+import App from './App.vue'
+//关闭Vue的生产提示
+Vue.config.productionTip = false
+
+//创建vm
+new Vue({
+	el:'#app',
+	render: h => h(App)
+})
+```
+
+App.vue
+
+```vue
+<template>
+	<div>
+		<Student name="李四" sex="女" :age="100"/>    
+        <!-- 传参 -->
+		<!-- <MyList :todos="todos" :checkTodo="checkTodo" :deleteTodo="deleteTodo"/> -->
+	</div>
+</template>
+
+<script>
+	import Student from './components/Student'
+
+	export default {
+		name:'App',
+		components:{Student}
+	}
+</script>
+```
+
+School.vue
+
+```vue
+<template>
+	<div>
+		<h1>{{msg}}</h1>
+		<h2>学生姓名：{{name}}</h2>
+		<h2>学生性别：{{sex}}</h2>
+		<h2>学生年龄：{{myAge+1}}</h2>
+		<button @click="updateAge">尝试修改收到的年龄</button>
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'Student',
+		data() {
+			console.log(this)
+			return {
+				msg:'我是一个尚硅谷的学生',
+				myAge:this.age
+			}
+		},
+		methods: {
+			updateAge(){
+				this.myAge++
+			}
+		},
+		//简单声明接收
+		// props:['name','age','sex'] 
+
+		//接收的同时对数据进行类型限制
+		/* props:{
+			name:String,
+			age:Number,
+			sex:String
+		} */
+
+		//
+		//接收的同时对数据：进行类型限制+默认值的指定+必要性的限制
+		props:{
+			name:{
+				type:String, //name的类型是字符串
+				required:true, //name是必要的
+			},
+			age:{
+				type:Number,
+				default:99 //默认值
+			},
+			sex:{
+				type:String,
+				required:true  //sex是必要的
+			}
+		}
+	}
+</script>
+```
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231121091826366.png" alt="image-20231121091826366" style="zoom:67%;" />
+
+#### TodoList案例[传参应用]
+
+项目结构:
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231121210237497.png" alt="image-20231121210237497" style="zoom:80%;" />
+
+App.vue
+
+```vue
+<template>
+	<div id="root">
+		<div class="todo-container">
+			<div class="todo-wrap">
+				<MyHeader :addTodo="addTodo"/>  //传递的是函数
+				<MyList :todos="todos" :checkTodo="checkTodo" :deleteTodo="deleteTodo"/>
+				<MyFooter :todos="todos" :checkAllTodo="checkAllTodo" :clearAllTodo="clearAllTodo"/>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+	import MyHeader from './components/MyHeader'
+	import MyList from './components/MyList'
+	import MyFooter from './components/MyFooter.vue'
+
+	export default {
+		name:'App',
+		components:{MyHeader,MyList,MyFooter},        // 引入组件
+		data() {
+			// 数据
+			return {
+				// 属性  // 父类属性子类可以使用
+				//由于todos是MyHeader组件和MyFooter组件都在使用，所以放在App中（状态提升）
+				todos:[
+					{id:'001',title:'抽烟',done:true},
+					{id:'002',title:'喝酒',done:false},
+					{id:'003',title:'开车',done:true}
+				]
+			}
+		},
+		methods: {
+
+			// 对属性的操作(方法)
+
+			//添加一个todo   // 添加一个任务
+			addTodo(todoObj){
+				// 给属性添加新增(往前)
+				this.todos.unshift(todoObj)
+			},
+
+			//勾选or取消勾选一个todo
+			checkTodo(id){
+				this.todos.forEach((todo)=>{
+					if(todo.id === id) todo.done = !todo.done
+				})
+			},
+			//删除一个todo
+			deleteTodo(id){
+				this.todos = this.todos.filter( todo => todo.id !== id )
+			},
+			//全选or取消全选
+			checkAllTodo(done){
+				this.todos.forEach((todo)=>{
+					todo.done = done
+				})
+			},
+			//清除所有已经完成的todo
+			clearAllTodo(){
+				this.todos = this.todos.filter((todo)=>{
+					return !todo.done
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+	/*base*/
+	body {
+		background: #fff;
+	}
+	.btn {
+		display: inline-block;
+		padding: 4px 12px;
+		margin-bottom: 0;
+		font-size: 14px;
+		line-height: 20px;
+		text-align: center;
+		vertical-align: middle;
+		cursor: pointer;
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+		border-radius: 4px;
+	}
+	.btn-danger {
+		color: #fff;
+		background-color: #da4f49;
+		border: 1px solid #bd362f;
+	}
+	.btn-danger:hover {
+		color: #fff;
+		background-color: #bd362f;
+	}
+	.btn:focus {
+		outline: none;
+	}
+	.todo-container {
+		width: 600px;
+		margin: 0 auto;
+	}
+	.todo-container .todo-wrap {
+		padding: 10px;
+		border: 1px solid #ddd;
+		border-radius: 5px;
+	}
+</style>
+
+```
+
+
+
+```vue
+<template>
+	<ul class="todo-main">
+		<MyItem 
+			v-for="todoObj in todos" :key="todoObj.id" 
+			:todo="todoObj" 
+			:checkTodo="checkTodo"
+			:deleteTodo="deleteTodo"
+		/>
+	</ul>
+</template>
+
+<script>
+	import MyItem from './MyItem'
+
+	export default {
+		name:'MyList',
+		components:{MyItem},
+		//声明接收App传递过来的数据，其中todos是自己用的，checkTodo和deleteTodo是给子组件MyItem用的
+		props:['todos','checkTodo','deleteTodo']
+	}
+</script>
+
+<style scoped>
+	/*main*/
+	.todo-main {
+		margin-left: 0px;
+		border: 1px solid #ddd;
+		border-radius: 2px;
+		padding: 0px;
+	}
+
+	.todo-empty {
+		height: 40px;
+		line-height: 40px;
+		border: 1px solid #ddd;
+		border-radius: 2px;
+		padding-left: 5px;
+		margin-top: 10px;
+	}
+</style>
+```
 
 
 
 
 
+### 方式2: 插槽
 
+1. 作用：让父组件可以向子组件指定位置插入html结构，也是一种组件间通信的方式，适用于 <strong style="color:red">父组件 ===> 子组件</strong> 
 
-## 组件间通信
+2. 分类：默认插槽、具名插槽、作用域插槽
 
-### 方式1: 组件的自定义事件[类似信号]
+3. 使用方式：
+
+   + 默认插槽：
+
+     ```vue
+     父组件中：
+             <Category>
+                <div>html结构1</div>
+             </Category>
+     子组件中：
+             <template>
+                 <div>
+                    <!-- 定义插槽 -->
+                    <slot>插槽默认内容...</slot>
+                 </div>
+             </template>
+     ```
+
+   + 具名插槽：
+
+     ```vue
+     父组件中：
+             <Category>
+                 <template slot="center">
+                   <div>html结构1</div>
+                 </template>
+     
+                 <template v-slot:footer>
+                    <div>html结构2</div>
+                 </template>
+             </Category>
+     子组件中：
+             <template>
+                 <div>
+                    <!-- 定义插槽 -->
+                    <slot name="center">插槽默认内容...</slot>
+                    <slot name="footer">插槽默认内容...</slot>
+                 </div>
+             </template>
+     ```
+
+   + 作用域插槽:
+
+     理解：<span style="color:red">数据在组件的自身，但根据数据生成的结构需要组件的使用者来决定。</span>（games数据在Category组件中，但使用数据所遍历出来的结构由App组件决定）
+
+     ```vue
+     父组件中：
+     		<Category>
+     			<template scope="scopeData">
+     				<!-- 生成的是ul列表 -->
+     				<ul>
+     					<li v-for="g in scopeData.games" :key="g">{{g}}</li>
+     				</ul>
+     			</template>
+     		</Category>
+     
+     		<Category>
+     			<template slot-scope="scopeData">
+     				<!-- 生成的是h4标题 -->
+     				<h4 v-for="g in scopeData.games" :key="g">{{g}}</h4>
+     			</template>
+     		</Category>
+     
+     子组件中：
+             <template>
+                 <div>
+                     <slot :games="games"></slot>
+                 </div>
+             </template>
+     		
+             <script>
+                 export default {
+                     name:'Category',
+                     props:['title'],
+                     //数据在子组件自身
+                     data() {
+                         return {
+                             games:['红色警戒','穿越火线','劲舞团','超级玛丽']
+                         }
+                     },
+                 }
+             </script>
+     ```
+
+### 方式3: 组件的自定义事件[类似信号]
 
 1. 一种组件间通信的方式，适用于：<strong style="color:red">子组件 ===> 父组件</strong>
-
 2. 使用场景：A是父组件，B是子组件，B想给A传数据，那么就要在A中给B绑定自定义事件(<span style="color:red">事件的回调在A中</span>）
 
-### 方式2: 全局事件总线
+
+
+### 方式4: 全局事件总线
 
 1. 一种组件间通信的方式，适用于<span style="color:red">任意组件间通信</span>。适用于：<strong style="color:red">子组件 ===> 父组件</strong>
 
 2. 安装全局事件总线：
 
-### 方式3: 消息订阅与发布
+
+
+### 方式5: 消息订阅与发布
 
 1.   一种组件间通信的方式，适用于<span style="color:red">任意组件间通信</span>。适用于：<strong style="color:red">子组件 ===> 父组件</strong>
 
@@ -3172,52 +4672,3240 @@ export default {
 
      3. 接收数据：A组件想接收数据，则在A组件中订阅消息，订阅的<span style="color:red">回调留在A组件自身</span>
 
-### 方式4: 插槽
-
-1. 作用：让父组件可以向子组件指定位置插入html结构，也是一种组件间通信的方式，适用于 <strong style="color:red">父组件 ===> 子组件</strong> 
-2. 分类：默认插槽、具名插槽、作用域插槽
-
-
-
-
-
-
-
-
-
-
-
 ## 过度与动画
 
+Vue 在插入、更新或者移除 DOM 时，提供多种不同方式的应用过渡效果。
+
+包括以下工具：
+
+- 在 CSS 过渡和动画中自动应用 class
+- 可以配合使用第三方 CSS 动画库，如 Animate.css
+- 在过渡钩子函数中使用 JavaScript 直接操作 DOM
+- 可以配合使用第三方 JavaScript 动画库，如 Velocity.js
+
+<a name="kkOvs"></a>
+
+### 一、过渡的不同阶段
+
+在进入/离开的过渡中，会有 6 个 class 切换。
+
+1. `v-enter`：定义进入过渡的开始状态。在元素被插入时生效，在下一个帧移除。
+2. `v-enter-active`：定义过渡的状态。在元素整个过渡过程中作用，在元素被插入时生效，在 `transition/animation` 完成之后移除。这个类可以被用来定义过渡的过程时间，延迟和曲线函数。
+3. `v-enter-to`: **2.1.8版及以上** 定义进入过渡的结束状态。在元素被插入一帧后生效 (与此同时 `v-enter` 被删除)，在 `transition/animation` 完成之后移除。
+4. `v-leave`: 定义离开过渡的开始状态。在离开过渡被触发时生效，在下一个帧移除。
+5. `v-leave-active`：定义过渡的状态。在元素整个过渡过程中作用，在离开过渡被触发后立即生效，在 `transition/animation` 完成之后移除。这个类可以被用来定义过渡的过程时间，延迟和曲线函数。
+6. `v-leave-to`: **2.1.8版及以上** 定义离开过渡的结束状态。在离开过渡被触发一帧后生效 (与此同时 `v-leave` 被删除)，在 `transition/animation` 完成之后移除。
+
+![transition.png](vue%E7%AC%94%E8%AE%B02.0.assets/1607650428670-3c31177b-5983-4aa3-8596-84ab0611b3fe.png%23align=left&display=inline&height=600&originHeight=600&originWidth=1200&size=11706&status=done&style=none&width=1200)<br />对于这些在 `enter/leave` 过渡中切换的类名，`v-` 是这些类名的前缀。使用 `<transition name="my-transition">` 可以重置前缀，比如 `v-enter` 替换为 `my-transition-enter`。
+
+示例：
+
+```vue
+<template lang="pug">
+div
+  button(v-on:click="show = !show") Toggle
+  transition(name="fade")
+    p(v-if="show") hello
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      show: true
+    }
+  }
+}
+</script>
+
+<style>
+/* 过渡过程 */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s, margin-left 1s;
+}
+/* 过渡的进入开始状态和离开结束状态相同 */
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  margin-left: 20px;
+}
+/* 过渡的进入结束状态和离开开始状态相同 */
+.fade-enter-to, .fade-leave {
+  opacity: 1;
+  margin-left: 0;
+}
+</style>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/jOMVmGW)
+
+<a name="R3c0b"></a>
+
+### 二、自定义过渡的类名
+
+我们可以通过以下属性来自定义过渡类名：
+
+- `enter-class`
+- `enter-active-class`
+- `enter-to-class` (2.1.8+)
+- `leave-class`
+- `leave-active-class`
+- `leave-to-class` (2.1.8+)
+
+> 注意：自定义过渡类名的优先级高于普通的类名(name)。
 
 
-## Vue-router 路由
+比如：
+
+```html
+<template lang="pug">
+div
+  button(v-on:click="show = !show") Toggle
+  transition(
+    name="slide"
+    enter-active-class="fade-enter-active"
+    leave-active-class="fade-leave-active"
+    enter-class="fade-enter"
+    enter-to-class="fade-enter-to"
+    leave-class="fade-leave"
+    leave-to-class="fade-leave-to"
+  )
+    p(v-if="show") hello
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      show: true
+    }
+  }
+}
+</script>
+
+<style>
+/* 过渡过程 */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s, margin-left 1s;
+}
+/* 过渡的进入开始状态和离开结束状态相同 */
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  margin-left: 20px;
+}
+/* 过渡的进入结束状态和离开开始状态相同 */
+.fade-enter-to, .fade-leave {
+  opacity: 1;
+  margin-left: 0;
+}
 
 
+/* 以下过渡不会生效 */
+.slide-enter-active {
+  transition: all .3s ease;
+}
+.slide-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-enter, .slide-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
+}
+</style>
+```
+
+上例，虽然定义了 transition 的 name 属性，但使用了自定义过渡类名，将会覆盖 name 定义的过渡效果。
+
+<a name="4xDKj"></a>
+
+### 三、过渡钩子
+
+可以在属性中声明 JavaScript 钩子：
+
+```html
+<transition
+  v-on:before-enter="beforeEnter"
+  v-on:enter="enter"
+  v-on:after-enter="afterEnter"
+  v-on:enter-cancelled="enterCancelled"
+
+  v-on:before-leave="beforeLeave"
+  v-on:leave="leave"
+  v-on:after-leave="afterLeave"
+  v-on:leave-cancelled="leaveCancelled"
+>
+  <!-- ... -->
+</transition>
+```
+
+```javascript
+export default {
+  methods: {
+    beforeEnter: function (el) { },
+    enter: function (el, done) { done() },
+    afterEnter: function (el) { },
+    enterCancelled: function (el) { },
+
+    beforeLeave: function (el) { },
+    leave: function (el, done) { done() },
+    afterLeave: function (el) { },
+    leaveCancelled: function (el) { }
+  }
+}
+```
+
+这些钩子函数可以结合 CSS `transitions/animations` 使用，也可以单独使用。
+
+当只用 JavaScript 过渡的时候，**在 enter 和 leave 中，回调函数 done 是必须的** 。否则，它们会被同步调用，过渡会立即完成。
+
+推荐对于仅使用 JavaScript 过渡的元素添加 `v-bind:css="false"`，Vue 会跳过 CSS 的检测。这也可以避免过渡过程中 CSS 的影响。
+
+<a name="eb292ea2"></a>
+
+### 四、CSS 动画
+
+CSS 动画用法同 CSS 过渡，区别是在动画中 `v-enter` 类名在节点插入 DOM 后不会立即删除，而是在 `animationend` 事件触发时删除。
+
+```vue
+<template lang="pug">
+div
+  button(@click="show = !show") Toggle show
+  transition(name="bounce")
+    p(v-if="show") Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris facilisis enim libero, at lacinia diam fermentum id. Pellentesque habitant morbi tristique senectus et netus.
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      show: true
+    }
+  }
+}
+</script>
+
+<style>
+.bounce-enter-active {
+  animation: bounce-in .5s;
+}
+.bounce-leave-active {
+  animation: bounce-in .5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+</style>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/eYdBEBw)
+
+<a name="aef9y"></a>
+
+### 五、与第三方 css 动画库结合
+
+这对于 Vue 的过渡系统和其他第三方 CSS 动画库，如 [Animate.css](https://daneden.github.io/animate.css/) 结合使用十分有用。
+
+示例：<br />首先在 `index.html` 的head中添加：
+
+```vue
+<link href="https://cdn.jsdelivr.net/npm/animate.css@3.5.1" rel="stylesheet" type="text/css">
+```
+
+在Vue组件中引入：
+
+```vue
+<template lang="pug">
+div
+  button(@click="show = !show") Toggle render
+  transition(enter-active-class="animated bounce" leave-active-class="animated bounceOutRight")
+    p(v-if="show") hello
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      show: true
+    }
+  }
+}
+</script>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/rNMWzyB)
+
+<a name="EPHGA"></a>
+
+### 六、与第三方 js 动画库结合
+
+下面看一个使用 [Velocity.js](http://shouce.jb51.net/velocity/index.html) 的简单例子。
+
+第一种方式是在 `index.html` 中引入：
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.3/velocity.min.js"></script>
+```
+
+然后在Vue组件中通过 `window.Velocity` 拿到 `Velocity` 对象：
+
+```javascript
+const Velocity = window.Velocity
+```
+
+第二种方式是直接在依赖中安装：
+
+```bash
+yarn add velocity-animate
+```
+
+然后在组件中引入：
+
+```vue
+<template lang="pug">
+div
+  button(@click="show = !show") Toggle
+  transition(
+    @before-enter="beforeEnter"
+    @enter="enter"
+    @leave="leave"
+    :css="false"
+  )
+    p(v-if="show") Demo
+</template>
+
+<script>
+const Velocity = window.Velocity
+export default {
+  data() {
+    return {
+      show: true
+    }
+  },
+  methods: {
+    beforeEnter (el) {
+      el.style.opacity = 0
+      el.style.transformOrigin = 'left'
+    },
+    enter (el, done) {
+      Velocity(el, { opacity: 1, marginLeft: '2em', color: '#f00' }, { duration: 300 })
+      Velocity(el, { opacity: 1, marginLeft: 0, fontSize: '1em', color: '#000' }, { complete: done })
+    },
+    leave (el, done) {
+      Velocity(el, { translateX: '15px', rotateZ: '50deg' }, { duration: 600 })
+      Velocity(el, { rotateZ: '100deg' }, { loop: 2 })
+      Velocity(el, {
+        rotateZ: '45deg',
+        translateY: '30px',
+        translateX: '30px',
+        opacity: 0
+      }, { complete: done })
+    }
+  }
+}
+</script>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/NWRbaKV)
+
+<a name="ccd22449"></a>
+
+### 七、初始渲染的过渡
+
+可以通过 `appear` 特性设置节点在初始渲染的过渡。
+
+```html
+<transition appear>
+  <!-- ... -->
+</transition>
+```
+
+这里默认和进入/离开过渡一样，同样也可以自定义 CSS 类名。
+
+```html
+<transition
+  appear
+  appear-class="custom-appear-class"
+  appear-to-class="custom-appear-to-class" (2.1.8+)
+  appear-active-class="custom-appear-active-class"
+>
+  <!-- ... -->
+</transition>
+```
+
+自定义 JavaScript 钩子：
+
+```html
+<transition
+  appear
+  v-on:before-appear="customBeforeAppearHook"
+  v-on:appear="customAppearHook"
+  v-on:after-appear="customAfterAppearHook"
+  v-on:appear-cancelled="customAppearCancelledHook"
+>
+  <!-- ... -->
+</transition>
+```
+
+使用 `animate.css` 的示例：
+
+```vue
+<template lang="pug">
+div
+  button(@click="show = !show") Toggle render
+  transition(appear enter-active-class="animated bounce" leave-active-class="animated bounceOutRight")
+    p(v-if="show") hello
+</template>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/rNMWGmy)
+
+参考：[https://vuejs.org/v2/guide/transitions.html#Transitions-on-Initial-Render](https://vuejs.org/v2/guide/transitions.html#Transitions-on-Initial-Render)
+
+<a name="984b023a"></a>
+
+### 八、过渡持续时间
+
+在很多情况下，Vue 可以自动得出过渡效果的完成时机。默认情况下，Vue 会等待其在过渡效果的根元素的第一个 `transitionend` 或 `animationend` 事件。然而也可以不这样设定——比如，我们可以拥有一个精心编排的一序列过渡效果，其中一些嵌套的内部元素相比于过渡效果的根元素有延迟的或更长的过渡效果。
+
+在这种情况下你可以用 `<transition>` 组件上的 `duration` 属性定制一个显性的过渡持续时间 (以毫秒计)：
+
+```html
+<transition :duration="1000">...</transition>
+```
+
+你也可以定制进入和移出的持续时间：
+
+```html
+<transition :duration="{ enter: 500, leave: 800 }">...</transition>
+```
+
+参考：[https://vuejs.org/v2/guide/transitions.html#Explicit-Transition-Durations](https://vuejs.org/v2/guide/transitions.html#Explicit-Transition-Durations)
+
+<a name="9f55a8bb"></a>
+
+### 九、多元素的过渡模式
+
+首先看一个例子，将一个按钮的状态切换应用到元素过渡:
+
+```vue
+<template lang="pug">
+transition(name="fade")
+  button(v-bind:key="docState" @click="btnChange")
+    | {{ buttonMessage }}
+</template>
+
+<script>
+export default {
+  data () {
+    return {
+      docState: 'edited'
+    }
+  },
+  methods: {
+    btnChange () {
+      switch (this.docState) {
+        case 'saved':
+          this.docState = 'edited'
+          break
+        case 'edited':
+          this.docState = 'editing'
+          break
+        case 'editing':
+          this.docState = 'saved'
+          break
+      }
+    }
+  },
+  computed: {
+    buttonMessage() {
+      switch (this.docState) {
+        case 'saved': return 'Edit'
+        case 'edited': return 'Save'
+        case 'editing': return 'Cancel'
+        default: return ''
+      }
+    }
+  }
+}
+</script>
+
+<style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+</style=>
+```
+
+效果如下：<br />![GIF.gif](vue%E7%AC%94%E8%AE%B02.0.assets/1607670027722-73c39731-77ab-419e-af35-93edd7cc2d67.gif%23align=left&display=inline&height=35&originHeight=35&originWidth=229&size=10924&status=done&style=none&width=229)
+
+可以看到，在切换按钮状态的时候，会出现两个动画: 上一个按钮 (状态改变之前的按钮) 的移除过渡 和 下一个按钮 (状态改变之后的按钮) 的进入过渡。但是，这有一个问题，由于两个过渡是同时执行的，会看到在上一个按钮未移除之前下一个按钮就已经出现，有一段时间是两个按钮共存的状态。
+
+为了解决上述问题，引入了**过渡模式**的概念。
+
+同时生效的进入和离开的过渡不能满足所有要求，所以 Vue 提供了 **过渡模式**
+
+- `in-out`：新元素先进行过渡，完成之后当前元素过渡离开。
+- `out-in`：当前元素先进行过渡，完成之后新元素过渡进入。
+
+改进后的代码如下:
+
+```vue
+<template lang="pug">
+transition(name="fade" mode="out-in")
+  button(v-bind:key="docState" @click="btnChange")
+    | {{ buttonMessage }}
+</template>
+```
+
+效果如下：<br />![GIF.gif](vue%E7%AC%94%E8%AE%B02.0.assets/1607670092818-ab6069f6-bab8-4bd5-b892-77ebdcc9022b.gif%23align=left&display=inline&height=40&originHeight=40&originWidth=229&size=10399&status=done&style=none&width=229)
+
+参考：[https://vuejs.org/v2/guide/transitions.html#Transitioning-Between-Elements](https://vuejs.org/v2/guide/transitions.html#Transitioning-Between-Elements)
+
+<a name="42NFT"></a>
+
+### 十、多组件过渡
+
+多个组件的过渡简单很多 - 我们不需要使用 `key` 特性。我们只需要使用动态组件，配合着过渡模式：
+
+```vue
+<template lang="pug">
+div
+  input#A(type="radio" name="component" @change="view='v-a'")
+  label(for="A") A
+  input#B(type="radio" name="component" @change="view='v-b'")
+  label(for="B") B
+  transition(name="component-fade" mode="out-in")
+    component(v-bind:is="view")
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      view: 'v-a'
+    }
+  },
+  components: {
+    'v-a': {
+      template: '<div>Component A</div>'
+    },
+    'v-b': {
+      template: '<div>Component B</div>'
+    }
+  }
+}
+</script>
+
+<style>
+.component-fade-enter-active, .component-fade-leave-active {
+  transition: opacity .3s ease;
+}
+.component-fade-enter, .component-fade-leave-to {
+  opacity: 0;
+}
+</style>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/poENWGe)
+
+参考：[https://vuejs.org/v2/guide/transitions.html#Transitioning-Between-Components](https://vuejs.org/v2/guide/transitions.html#Transitioning-Between-Components)
+
+<a name="xqA1p"></a>
+
+### 十一、**动态过渡**
+
+在 Vue 中即使是过渡也是数据驱动的！动态过渡最基本的例子是通过 `name` 特性来绑定动态值。
+
+当你想用 Vue 的过渡系统来定义的 CSS 过渡/动画 在不同过渡间切换会非常有用。
+
+所有的过渡特性都是动态绑定。它不仅是简单的特性，通过事件的钩子函数方法，可以在获取到相应上下文数据。这意味着，可以根据组件的状态通过 JavaScript 过渡设置不同的过渡效果。
+
+```vue
+<template lang="pug">
+div
+  span Fade In:
+  input(type="range" v-model="fadeInDuration" min="0" :max="maxFadeDuration")
+  span Fade Out:
+  input(type="range" v-model="fadeOutDuration" min="0" :max="maxFadeDuration")
+  transition(
+    :css="false"
+    @before-enter="beforeEnter"
+    @enter="enter"
+    @leave="leave"
+  )
+    p(v-if="show") hello
+  button(
+    v-if="stop"
+    @click="stop = false; show = false"
+  ) Start animating
+  button(v-else @click="stop = true") Stop it!
+</template>
+
+<script>
+import Velocity from 'velocity-animate'
+export default {
+  data() {
+    return {
+      show: true,
+      fadeInDuration: 1000,
+      fadeOutDuration: 1000,
+      maxFadeDuration: 1500,
+      stop: true
+    }
+  },
+  methods: {
+    beforeEnter: function (el) {
+      el.style.opacity = 0
+    },
+    enter: function (el, done) {
+      var vm = this
+      Velocity(el,
+        { opacity: 1 },
+        {
+          duration: this.fadeInDuration,
+          complete: function () {
+            done()
+            if (!vm.stop) vm.show = false
+          }
+        }
+      )
+    },
+    leave: function (el, done) {
+      var vm = this
+      Velocity(el,
+        { opacity: 0 },
+        {
+          duration: this.fadeOutDuration,
+          complete: function () {
+            done()
+            vm.show = true
+          }
+        }
+      )
+    }
+  }
+}
+</script>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/yLaVPPK)
+
+参考：[https://vuejs.org/v2/guide/transitions.html#Dynamic-Transitions](https://vuejs.org/v2/guide/transitions.html#Dynamic-Transitions)
+
+<a name="rFN5S"></a>
+
+### 十二、过渡组件
+
+过渡可以通过 Vue 的组件系统实现复用。要创建一个可复用过渡组件，你需要做的就是将 `<transition>` 或者 `<transition-group>` 作为根组件，然后将任何子组件放置在其中就可以了。
+
+举例：<br />`TransitionComponent.vue` 
+
+```vue
+<template lang="pug">
+transition(name="fade")
+  slot
+</template>
+
+<script>
+export default {
+}
+</script>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s, margin-left 1s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  margin-left: 20px;
+}
+.fade-enter-to, .fade-leave {
+  opacity: 1;
+  margin-left: 0;
+}
+</style>
+```
+
+引入过渡组件：
+
+```vue
+<template lang="pug">
+div
+  button(@click="show = !show") {{show ? '隐藏' : '显示'}}
+  TransitionComponent
+    p(v-if="show") hello
+</template>
+
+<script>
+import TransitionComponent from './components/TransitionComponent'
+export default {
+  components: {
+    TransitionComponent
+  },
+  data() {
+    return {
+      show: true
+    }
+  }
+}
+</script>
+```
+
+---
+
+将其改写为函数式组件会更加合理：
+
+```javascript
+import Velocity from 'velocity-animate'
+
+export default {
+  functional: true,
+  render: function (createElement, context) {
+    var data = {
+      props: {
+        name: 'fade',
+        mode: 'out-in'
+      },
+      on: {
+        beforeEnter (el) {
+          el.style.opacity = 0
+          el.style.transformOrigin = 'left'
+        },
+        enter (el, done) {
+          Velocity(el, { opacity: 1, marginLeft: '2em', color: '#f00' }, { duration: 300 })
+          Velocity(el, { opacity: 1, marginLeft: 0, fontSize: '1em', color: '#000' }, { complete: done })
+        },
+        leave (el, done) {
+          Velocity(el, { translateX: '15px', rotateZ: '50deg' }, { duration: 600 })
+          Velocity(el, { rotateZ: '100deg' }, { loop: 2 })
+          Velocity(el, {
+            rotateZ: '45deg',
+            translateY: '30px',
+            translateX: '30px',
+            opacity: 0
+          }, { complete: done })
+        }
+      }
+    }
+    return createElement('transition', data, context.children)
+  }
+}
+```
+
+引入过渡组件：
+
+```vue
+<template lang="pug">
+div
+  button(@click="show = !show") {{show ? '隐藏' : '显示'}}
+  TransitionComponent
+    p(v-if="show") hello
+</template>
+
+<script>
+import TransitionComponent from './components/TransitionComponent.js'
+// import Velocity from 'velocity-animate'
+export default {
+  components: {
+    TransitionComponent
+  },
+  data() {
+    return {
+      show: true
+    }
+  }
+}
+</script>
+```
+
+:::info
+详细的项目参看：
+:::
+:::info
+[https://codesandbox.io/s/transitioncomponent-yeqgc?file=/src/components/TransitionComponent.js](https://codesandbox.io/s/transitioncomponent-yeqgc?file=/src/components/TransitionComponent.js)
+:::
+
+参考：[https://vuejs.org/v2/guide/transitions.html#Reusable-Transitions](https://vuejs.org/v2/guide/transitions.html#Reusable-Transitions)
+
+### 十三、列表过滤
+
+在使用 `v-for` 的场景中，可以使用 `<transition-group>` 组件进行列表过渡。
+
+- 不同于 `<transition>`，它会以一个真实元素呈现：默认为一个 `<span>`。可以通过 `tag` 特性更换为其他元素。
+- 同 `<transition>`，需要指定 `name` 属性以添加过渡效果。
+- 内部元素 **总是需要** 提供唯一的 `key` 属性值
+
+<a name="4WMwW"></a>
+
+#### transition-group
+
+以下示例，展示了 `transition-group` 的基础用法：
+
+```vue
+<template lang="pug">
+div
+  button(v-on:click="add") Add
+  button(v-on:click="remove") Remove
+  transition-group(name="list" tag="p")
+    span.list-item(v-for="item in items" :key="item") {{ item }}
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      items: [1,2,3,4,5,6,7,8,9],
+      nextNum: 10
+    }
+  },
+  methods: {
+    randomIndex () {
+      return Math.floor(Math.random() * this.items.length)
+    },
+    add () {
+      this.items.splice(this.randomIndex(), 0, this.nextNum++)
+    },
+    remove () {
+      this.items.splice(this.randomIndex(), 1)
+    },
+  }
+}
+</script>
+
+<style scoped>
+.list-item {
+  display: inline-block;
+  margin-right: 10px;
+}
+.list-enter-active, .list-leave-active {
+  transition: all 1s;
+}
+.list-enter, .list-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+</style>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/BaLpvKZ)
+
+<a name="OrL2N"></a>
+
+#### v-move
+
+`<transition-group>` 组件还有一个特殊之处。不仅可以进入和离开动画，还可以改变定位。要使用这个新功能只需了解新增的 **v-move 特性**，它会在元素的改变定位的过程中应用。像之前的类名一样，可以通过 `name` 属性来自定义前缀，也可以通过 `move-class` 属性手动设置。
+
+`v-move` 对于设置过渡的切换时机和过渡曲线非常有用，只需在 name 指定的类名加上 move 后缀即可，下例结合 [lodash](https://www.lodashjs.com/) 使用。
+
+```vue
+<template lang="pug">
+div
+  button(@click="shuffle") Shuffle
+  transition-group(name="flip-list" tag="ul")
+    li(v-for="item in items" :key="item") {{ item }}
+</template>
+
+<script>
+import _ from 'lodash'
+export default {
+  data() {
+    return {
+      items: [1,2,3,4,5,6,7,8,9]
+    }
+  },
+  methods: {
+    shuffle () {
+      this.items = _.shuffle(this.items)
+    }
+  }
+}
+</script>
+
+<style scoped>
+.flip-list-move {
+  transition: transform 1s;
+}
+</style>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/gOwgZLm)<br />Vue 内部使用了一个叫 [FLIP](https://aerotwist.com/blog/flip-your-animations/) 简单的动画队列，使用 transforms 将元素从之前的位置平滑过渡新的位置。
 
 
+需要注意的是使用 FLIP 过渡的元素不能设置为 `display: inline` 。作为替代方案，可以设置为 `display: inline-block` 或者放置于 flex 中
 
+
+<a name="8t5mx"></a>
+
+#### 更多示例
+
+<a name="VMMJX"></a>
+
+##### 列表常用方法
+
+```vue
+<template lang="pug">
+div
+  button(@click="shuffle") Shuffle
+  button(@click="ascSort") AscSort
+  button(@click="descSort") DescSort
+  button(@click="add") Add
+  button(@click="remove") Remove
+  transition-group(name="list-complete" tag="p")
+    span.list-complete-item(v-for="item in items" :key="item") {{ item }}
+</template>
+
+<script>
+import _ from 'lodash'
+export default {
+  data() {
+    return {
+      items: [1,2,3,4,5,6,7,8,9],
+      nextNum: 10
+    }
+  },
+  methods: {
+    randomIndex () {
+      return Math.floor(Math.random() * this.items.length)
+    },
+    add () {
+      this.items.splice(this.randomIndex(), 0, this.nextNum++)
+    },
+    remove () {
+      this.items.splice(this.randomIndex(), 1)
+    },
+    shuffle () {
+      this.items = _.shuffle(this.items)
+    },
+    ascSort () {
+      this.items.sort((a, b) => a - b)
+    },
+    descSort () {
+      this.items.sort((a, b) => b - a)
+    }
+  }
+}
+</script>
+
+<style scoped>
+.list-complete-item {
+  transition: all 1s;
+  display: inline-block;
+  margin-right: 10px;
+}
+.list-complete-enter, .list-complete-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.list-complete-leave-active {
+  position: absolute;
+}
+</style>
+```
+
+[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/XWjpoRQ)
+
+<a name="7g4HR"></a>
+
+##### 二维列表
+
+```vue
+<template lang="pug">
+div
+  button(@click="shuffle") Shuffle
+  br
+  transition-group.container(name="cell" tag="div")
+    .cell(v-for="cell in cells" :key="cell.id") {{ cell.number }}
+</template>
+
+<script>
+import _ from 'lodash'
+export default {
+  data() {
+    return {
+      cells: Array.apply(null, { length: 81 })
+        .map(($, index) => {
+          return {
+            id: index,
+            number: index % 9 + 1
+          }
+        })
+    }
+  },
+  methods: {
+    shuffle () {
+      this.cells = _.shuffle(this.cells)
+    }
+  }
+}
+</script>
+
+<style scoped>
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  width: 238px;
+  margin-top: 10px;
+}
+.cell {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 25px;
+  height: 25px;
+  border: 1px solid #aaa;
+  margin-right: -1px;
+  margin-bottom: -1px;
+}
+.cell:nth-child(3n) {
+  margin-right: 0;
+}
+.cell:nth-child(27n) {
+  margin-bottom: 0;
+}
+.cell-move {
+  transition: transform 1s;
+}
+</style>
+```
+
+[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/PoGWXOK)
+
+<a name="ODxlT"></a>
+
+##### 列表过滤
+
+```vue
+<template lang="pug">
+div
+  input(v-model="query")
+  transition-group(
+    name="staggered-fade" tag="ul" :css="false"
+    @before-enter="beforeEnter"
+    @enter="enter"
+    @leave="leave"
+  )
+    li(v-for="(item, index) in computedList" :key="item.msg" :data-index="index") {{ item.msg }}
+</template>
+
+<script>
+import Velocity from 'velocity-animate'
+export default {
+  data() {
+    return {
+      query: '',
+      list: [
+        { msg: 'Bruce Lee' },
+        { msg: 'Jackie Chan' },
+        { msg: 'Chuck Norris' },
+        { msg: 'Jet Li' },
+        { msg: 'Kung Fury' }
+      ]
+    }
+  },
+  computed: {
+    computedList () {
+      return this.list.filter((item) => {
+        return item.msg.toLowerCase().indexOf(this.query.toLowerCase()) !== -1
+      })
+    }
+  },
+  methods: {
+    beforeEnter (el) {
+      el.style.opacity = 0
+      el.style.height = 0
+    },
+    enter (el, done) {
+      var delay = el.dataset.index * 150
+      setTimeout(() => {
+        Velocity(
+          el,
+          { opacity: 1, height: '1.6em' },
+          { complete: done }
+        )
+      }, delay)
+    },
+    leave (el, done) {
+      var delay = el.dataset.index * 150
+      setTimeout(() => {
+        Velocity(
+          el,
+          { opacity: 0, height: 0 },
+          { complete: done }
+        )
+      }, delay)
+    }
+  }
+}
+</script>
+```
+
+以上，在 HTML 中定义了 data-index，在 js 中可以使用 el.dataset.index 取得。<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/mdrRajw)
+
+### 十四、状态过滤
+
+Vue 的过渡系统提供了非常多简单的方法设置进入、离开和列表的动效。那么对于数据元素本身的动效呢，比如：
+
+- 数字和运算
+- 颜色的显示
+- SVG 节点的位置
+- 元素的大小和其他的属性
+
+所有的原始数字都被事先存储起来，可以直接转换到数字。做到这一步，我们就可以结合 Vue 的响应式和组件系统，使用第三方库来实现切换元素的过渡状态。
+
+本文使用到的一些库：
+
+- [gsap](https://www.npmjs.com/package/gsap)
+- [color-js](https://www.npmjs.com/package/color-js)
+- [tween.js](https://www.npmjs.com/package/tween.js)
+- [@tweenjs/tween.js](https://www.npmjs.com/package/@tweenjs/tween.js)
+
+<a name="fDCyA"></a>
+
+#### 一、数字过渡
+
+<a name="cQo19"></a>
+
+##### 示例一：使用Tween
+
+在 `index.html` 中引入Tween：
+
+```vue
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.3.5/Tween.min.js"></script>
+```
+
+或者安装：
+
+```bash
+yarn add tween.js
+```
+
+以下示例，在修改数字的时候，会产生过渡效果。
+
+```vue
+<template lang="pug">
+div
+  input(v-model.number="number" type="number" step="20")
+  p {{ animatedNumber }}
+</template>
+
+<script>
+import TWEEN from 'tween.js'
+export default {
+  data() {
+    return {
+      number: 0,
+      animatedNumber: 0
+    }
+  },
+  watch: {
+    number (newValue, oldValue) {
+      var vm = this
+      function animate () {
+        if (TWEEN.update()) {
+          requestAnimationFrame(animate)
+        }
+      }
+
+      new TWEEN.Tween({ tweeningNumber: oldValue })
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .to({ tweeningNumber: newValue }, 500)
+        .onUpdate(function () {
+          vm.animatedNumber = this.tweeningNumber.toFixed(0)
+        })
+        .start()
+
+      animate()
+    }
+  }
+}
+</script>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/OJRWoBQ)
+
+<a name="EC4OI"></a>
+
+##### 示例二：使用GSAP
+
+在 `index.html` 中引入：
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
+```
+
+或者安装：
+
+```bash
+yarn add gsap
+```
+
+以下示例，在修改数字的时候，会产生过渡效果。
+
+```vue
+<template lang="pug">
+div
+  input(v-model.number="number" type="number" step="20")
+  p {{ animatedNumber }}
+</template>
+
+<script>
+import gsap from 'gsap'
+export default {
+  data() {
+    return {
+      number: 0,
+      tweenedNumber: 0
+    }
+  },
+  computed: {
+    animatedNumber: function() {
+      return this.tweenedNumber.toFixed(0);
+    }
+  },
+  watch: {
+    number (newValue) {
+      gsap.to(this.$data, { duration: 0.5, tweenedNumber: newValue });
+    }
+  }
+}
+</script>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/ExgZezV)
+
+<a name="WW6tN"></a>
+
+##### 示例三：数学计算
+
+以下示例，在修改数字的时候，会产生过渡效果。
+
+```vue
+<template lang="pug">
+div
+  input(v-model.number="firstNumber" type="number" step="20")
+  span +
+  input(v-model.number="secondNumber" type="number" step="20")
+  span = {{ result }}
+  p
+    animated-integer(:value="firstNumber")
+    span +
+    animated-integer(:value="secondNumber")
+    span =
+    animated-integer(:value="result")
+</template>
+
+<script>
+import TWEEN from 'tween.js'
+export default {
+  components: {
+    'animated-integer':  {
+      template: '<span>{{ tweeningValue }}</span>',
+      props: {
+        value: {
+          type: Number,
+          required: true
+        }
+      },
+      data () {
+        return {
+          tweeningValue: 0
+        }
+      },
+      watch: {
+        value (newValue, oldValue) {
+          this.tween(oldValue, newValue)
+        }
+      },
+      mounted () {
+        this.tween(0, this.value)
+      },
+      methods: {
+        tween (startValue, endValue) {
+          let vm = this
+          function animate () {
+            if (TWEEN.update()) {
+              requestAnimationFrame(animate)
+            }
+          }
+
+          new TWEEN.Tween({ tweeningValue: startValue })
+            .to({ tweeningValue: endValue }, 500)
+            .onUpdate(function () {
+              vm.tweeningValue = this.tweeningValue.toFixed(0)
+            })
+            .start()
+
+          animate()
+        }
+      }
+    }
+  },
+  data() {
+    return {
+      firstNumber: 20,
+      secondNumber: 40
+    }
+  },
+  computed: {
+    result() {
+      return this.firstNumber + this.secondNumber
+    }
+  }
+}
+</script>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/eYdgQqL)
+
+<a name="adZFZ"></a>
+
+#### **二、颜色过渡**
+
+在 `index.html` 中引入Tween：
+
+```vue
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.3.5/Tween.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/color-js/1.0.1/color.min.js"></script>
+```
+
+引入：
+
+```javascript
+const TWEEN = window.TWEEN
+const Color = window.net.brehaut.Color
+```
+
+或者安装：
+
+```bash
+yarn add tween.js
+yarn add color-js
+```
+
+以下示例，在修改颜色色值的时候，会产生过渡效果。
+
+```vue
+<template lang="pug">
+div
+  #box
+    input(v-model="colorQuery" placeholder="Enter a color" @input="updateColor(null)")
+    button(style="backgroundColor: red; color: white" @click="updateColor('#f00')") 红色
+    button(style="backgroundColor: green; color: white" @click="updateColor('#0f0')") 绿色
+    button(style="backgroundColor: blue; color: white" @click="updateColor('#00f')") 蓝色
+  #box
+    p Preview:
+    div.preview(:style="{ backgroundColor: tweenedCSSColor }")
+    p(:style="{ color: tweenedCSSColor }") {{ tweenedCSSColor }}
+</template>
+
+<script>
+import TWEEN from 'tween.js'
+import Color from 'color-js'
+
+// const TWEEN = window.TWEEN
+// const Color = window.net.brehaut.Color
+
+export default {
+  data() {
+    return {
+      colorQuery: '',
+      color: {
+        red: 0,
+        green: 0,
+        blue: 0,
+        alpha: 1
+      },
+      tweenedColor: {}
+    }
+  },
+  created: function () {
+    this.tweenedColor = Object.assign({}, this.color)
+  },
+  watch: {
+    color: function () {
+      function animate () {
+        if (TWEEN.update()) {
+          requestAnimationFrame(animate)
+        }
+      }
+
+      new TWEEN.Tween(this.tweenedColor)
+        .to(this.color, 750)
+        .start()
+
+      animate()
+    }
+  },
+  computed: {
+    tweenedCSSColor: function () {
+      return new Color({
+        red: this.tweenedColor.red,
+        green: this.tweenedColor.green,
+        blue: this.tweenedColor.blue,
+        alpha: this.tweenedColor.alpha
+      }).toCSS()
+    }
+  },
+  methods: {
+    updateColor (color) {
+      if (color) {
+        this.colorQuery = color
+      }
+      this.color = new Color(this.colorQuery).toRGB()
+    }
+  }
+}
+</script>
+
+<style scoped>
+#box {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.preview {
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+</style>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/LYRxgEW)
+
+<a name="S3Vve"></a>
+
+#### **三、SVG过渡**
+
+下面的示例依赖于 `TweenLite`，可以在 `index.html` 中引入：
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.5/TweenLite.min.js"></script>
+```
+
+也可以从 `gsap` 中引入：
+
+```javascript
+import TweenLite from 'gsap'
+```
+
+完整的示例如下：
+
+```vue
+<template lang="pug">
+div
+  svg(width="200" height="200")
+    polygon(:points="points")
+    circle(cx="100" cy="100" r="90")
+  div
+    label Sides: {{ sides }}
+    input(type="range" min="3" max="500" v-model.number="sides")
+  div
+    label Minimum Radius: {{ minRadius }}%
+    input(type="range" min="0" max="90" v-model.number="minRadius")
+  div
+    label Update Interval: {{ updateInterval }} milliseconds
+    input(type="range" min="10" max="2000" v-model.number="updateInterval")
+</template>
+
+<script>
+import TweenLite from 'gsap'
+export default {
+  data: function () {
+    var defaultSides = 10
+    var stats = Array.apply(null, { length: defaultSides })
+      .map(function () { return 100 })
+    return {
+      stats: stats,
+      points: generatePoints(stats),
+      sides: defaultSides,
+      minRadius: 50,
+      interval: null,
+      updateInterval: 500
+    }
+  },
+  watch: {
+    sides: function (newSides, oldSides) {
+      var sidesDifference = newSides - oldSides
+      if (sidesDifference > 0) {
+        for (var i = 1; i <= sidesDifference; i++) {
+          this.stats.push(this.newRandomValue())
+        }
+      } else {
+        var absoluteSidesDifference = Math.abs(sidesDifference)
+        for (let i = 1; i <= absoluteSidesDifference; i++) {
+          this.stats.shift()
+        }
+      }
+    },
+    stats: function (newStats) {
+      TweenLite.to(
+        this.$data,
+        this.updateInterval / 1000,
+        { points: generatePoints(newStats) }
+      )
+    },
+    updateInterval: function () {
+      this.resetInterval()
+    }
+  },
+  mounted: function () {
+    this.resetInterval()
+  },
+  methods: {
+    randomizeStats: function () {
+      var vm = this
+      this.stats = this.stats.map(function () {
+        return vm.newRandomValue()
+      })
+    },
+    newRandomValue: function () {
+      return Math.ceil(this.minRadius + Math.random() * (100 - this.minRadius))
+    },
+    resetInterval: function () {
+      var vm = this
+      clearInterval(this.interval)
+      this.randomizeStats()
+      this.interval = setInterval(function () {
+        vm.randomizeStats()
+      }, this.updateInterval)
+    }
+  }
+
+}
+
+function valueToPoint (value, index, total) {
+  var x     = 0
+  var y     = -value * 0.9
+  var angle = Math.PI * 2 / total * index
+  var cos   = Math.cos(angle)
+  var sin   = Math.sin(angle)
+  var tx    = x * cos - y * sin + 100
+  var ty    = x * sin + y * cos + 100
+  return { x: tx, y: ty }
+}
+
+function generatePoints (stats) {
+  var total = stats.length
+  return stats.map(function (stat, index) {
+    var point = valueToPoint(stat, index, total)
+    return point.x + ',' + point.y
+  }).join(' ')
+}
+</script>
+
+<style scoped>
+#box {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+svg {
+  display: block;
+}
+polygon {
+  fill: #41b883;
+}
+circle {
+  fill: transparent;
+  stroke: #35495e;
+}
+input[type="range"] {
+  display: block;
+  width: 100%;
+  margin-bottom: 15px;
+}
+</style>
+```
+
+效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/XWjpxaj)
+
+## vue脚手架配置代理
+
+### 方法一
+
+​	在vue.config.js中添加如下配置：
+
+```js
+devServer:{
+  proxy:"http://localhost:5000"
+}
+```
+
+说明：
+
+1. 优点：配置简单，请求资源时直接发给前端（8080）即可。
+2. 缺点：不能配置多个代理，不能灵活的控制请求是否走代理。
+3. 工作方式：若按照上述配置代理，当请求了前端不存在的资源时，那么该请求会转发给服务器 （优先匹配前端资源）
+
+### 方法二(推荐)
+
+​	编写vue.config.js配置具体代理规则：
+
+```js
+module.exports = {
+	devServer: {
+      proxy: {
+      '/api1': {// 匹配所有以 '/api1'开头的请求路径
+        target: 'http://localhost:5000',// 代理目标的基础路径
+        changeOrigin: true,
+        pathRewrite: {'^/api1': ''}   // 前缀,必须写
+      },
+      '/api2': {// 匹配所有以 '/api2'开头的请求路径
+        target: 'http://localhost:5001',// 代理目标的基础路径
+        changeOrigin: true,
+        pathRewrite: {'^/api2': ''}
+      }
+    }
+  }
+}
+/*
+   changeOrigin设置为true时，服务器收到的请求头中的host为：localhost:5000
+   changeOrigin设置为false时，服务器收到的请求头中的host为：localhost:8080
+   changeOrigin默认值为true
+*/
+```
+
+说明：
+
+1. 优点：可以配置多个代理，且可以灵活的控制请求是否走代理。
+2. 缺点：配置略微繁琐，请求资源时必须加前缀。
+
+## 路由
+
+1. 理解： 一个路由（route）就是一组映射关系（key - value），多个路由需要路由器（router）进行管理。
+2. 前端路由：key是路径，value是组件。
+
+### 1.基本使用
+
+1. 安装vue-router，命令：```npm i vue-router```
+
+2. 应用插件：```Vue.use(VueRouter)```
+
+3. 编写router配置项:
+
+   ```js
+   //引入VueRouter
+   import VueRouter from 'vue-router'
+   //引入Luyou 组件
+   import About from '../components/About'
+   import Home from '../components/Home'
+   
+   //创建router实例对象，去管理一组一组的路由规则
+   const router = new VueRouter({
+   	routes:[
+   		{
+   			path:'/about',
+   			component:About
+   		},
+   		{
+   			path:'/home',
+   			component:Home
+   		}
+   	]
+   })
+   
+   //暴露router
+   export default router
+   ```
+
+4. 实现切换（active-class可配置高亮样式）
+
+   ```vue
+   <router-link active-class="active" to="/about">About</router-link>
+   ```
+
+5. 指定展示位置
+
+   ```vue
+   <router-view></router-view>
+   ```
+
+### 2.几个注意点
+
+1. 路由组件通常存放在```pages```文件夹，一般组件通常存放在```components```文件夹。
+2. 通过切换，“隐藏”了的路由组件，默认是被销毁掉的，需要的时候再去挂载。
+3. 每个组件都有自己的```$route```属性，里面存储着自己的路由信息。
+4. 整个应用只有一个router，可以通过组件的```$router```属性获取到。
+
+### 3.多级路由（多级路由）
+
+1. 配置路由规则，使用children配置项：
+
+   ```js
+   routes:[
+   	{
+   		path:'/about',
+   		component:About,
+   	},
+   	{
+   		path:'/home',
+   		component:Home,
+   		children:[ //通过children配置子级路由
+   			{
+   				path:'news', //此处一定不要写：/news
+   				component:News
+   			},
+   			{
+   				path:'message',//此处一定不要写：/message
+   				component:Message
+   			}
+   		]
+   	}
+   ]
+   ```
+
+2. 跳转（要写完整路径）：
+
+   ```vue
+   <router-link to="/home/news">News</router-link>
+   ```
+
+### 4.路由的query参数
+
+1. 传递参数
+
+   ```vue
+   <!-- 跳转并携带query参数，to的字符串写法 -->
+   <router-link :to="/home/message/detail?id=666&title=你好">跳转</router-link>
+   				
+   <!-- 跳转并携带query参数，to的对象写法 -->
+   <router-link 
+   	:to="{
+   		path:'/home/message/detail',
+   		query:{
+   		   id:666,
+               title:'你好'
+   		}
+   	}"
+   >跳转</router-link>
+   ```
+
+2. 接收参数：
+
+   ```js
+   $route.query.id
+   $route.query.title
+   ```
+
+### 5.命名路由
+
+1. 作用：可以简化路由的跳转。
+
+2. 如何使用
+
+   1. 给路由命名：
+
+      ```js
+      {
+      	path:'/demo',
+      	component:Demo,
+      	children:[
+      		{
+      			path:'test',
+      			component:Test,
+      			children:[
+      				{
+                            name:'hello' //给路由命名
+      					path:'welcome',
+      					component:Hello,
+      				}
+      			]
+      		}
+      	]
+      }
+      ```
+
+   2. 简化跳转：
+
+      ```vue
+      <!--简化前，需要写完整的路径 -->
+      <router-link to="/demo/test/welcome">跳转</router-link>
+      
+      <!--简化后，直接通过名字跳转 -->
+      <router-link :to="{name:'hello'}">跳转</router-link>
+      
+      <!--简化写法配合传递参数 -->
+      <router-link 
+      	:to="{
+      		name:'hello',
+      		query:{
+      		   id:666,
+                  title:'你好'
+      		}
+      	}"
+      >跳转</router-link>
+      ```
+
+### 6.路由的params参数
+
+1. 配置路由，声明接收params参数
+
+   ```js
+   {
+   	path:'/home',
+   	component:Home,
+   	children:[
+   		{
+   			path:'news',
+   			component:News
+   		},
+   		{
+   			component:Message,
+   			children:[
+   				{
+   					name:'xiangqing',
+   					path:'detail/:id/:title', //使用占位符声明接收params参数
+   					component:Detail
+   				}
+   			]
+   		}
+   	]
+   }
+   ```
+
+2. 传递参数
+
+   ```vue
+   <!-- 跳转并携带params参数，to的字符串写法 -->
+   <router-link :to="/home/message/detail/666/你好">跳转</router-link>
+   				
+   <!-- 跳转并携带params参数，to的对象写法 -->
+   <router-link 
+   	:to="{
+   		name:'xiangqing',
+   		params:{
+   		   id:666,
+               title:'你好'
+   		}
+   	}"
+   >跳转</router-link>
+   ```
+
+   > 特别注意：路由携带params参数时，若使用to的对象写法，则不能使用path配置项，必须使用name配置！
+
+3. 接收参数：
+
+   ```js
+   $route.params.id
+   $route.params.title
+   ```
+
+### 7.路由的props配置
+
+​	作用：让路由组件更方便的收到参数
+
+```js
+{
+	name:'xiangqing',
+	path:'detail/:id',
+	component:Detail,
+
+	//第一种写法：props值为对象，该对象中所有的key-value的组合最终都会通过props传给Detail组件
+	// props:{a:900}
+
+	//第二种写法：props值为布尔值，布尔值为true，则把路由收到的所有params参数通过props传给Detail组件
+	// props:true
+	
+	//第三种写法：props值为函数，该函数返回的对象中每一组key-value都会通过props传给Detail组件
+	props(route){
+		return {
+			id:route.query.id,
+			title:route.query.title
+		}
+	}
+}
+```
+
+### 8.```<router-link>```的replace属性
+
+1. 作用：控制路由跳转时操作浏览器历史记录的模式
+2. 浏览器的历史记录有两种写入方式：分别为```push```和```replace```，```push```是追加历史记录，```replace```是替换当前记录。路由跳转时候默认为```push```
+3. 如何开启```replace```模式：```<router-link replace .......>News</router-link>```
+
+### 9.编程式路由导航
+
+1. 作用：不借助```<router-link> ```实现路由跳转，让路由跳转更加灵活
+
+2. 具体编码：
+
+   ```js
+   //$router的两个API
+   this.$router.push({
+   	name:'xiangqing',
+   		params:{
+   			id:xxx,
+   			title:xxx
+   		}
+   })
+   
+   this.$router.replace({
+   	name:'xiangqing',
+   		params:{
+   			id:xxx,
+   			title:xxx
+   		}
+   })
+   this.$router.forward() //前进
+   this.$router.back() //后退
+   this.$router.go() //可前进也可后退
+   ```
+
+### 10.缓存路由组件
+
+1. 作用：让不展示的路由组件保持挂载，不被销毁。
+
+2. 具体编码：
+
+   ```vue
+   <keep-alive include="News"> 
+       <router-view></router-view>
+   </keep-alive>
+   ```
+
+### 11.两个新的生命周期钩子
+
+1. 作用：路由组件所独有的两个钩子，用于捕获路由组件的激活状态。
+2. 具体名字：
+   1. ```activated```路由组件被激活时触发。
+   2. ```deactivated```路由组件失活时触发。
+
+### 12.路由守卫
+
+1. 作用：对路由进行权限控制(登录后才能看)
+
+2. 分类：全局守卫、独享守卫、组件内守卫
+
+3. 全局守卫:
+
+   ```js
+   //全局前置守卫：初始化时执行、每次路由切换前执行
+   router.beforeEach((to,from,next)=>{
+   	console.log('beforeEach',to,from)
+   	if(to.meta.isAuth){ //判断当前路由是否需要进行权限控制
+   		if(localStorage.getItem('school') === 'atguigu'){ //权限控制的具体规则
+   			next() //放行
+   		}else{
+   			alert('暂无权限查看')
+   			// next({name:'guanyu'})
+   		}
+   	}else{
+   		next() //放行
+   	}
+   })
+   
+   //全局后置守卫：初始化时执行、每次路由切换后执行
+   router.afterEach((to,from)=>{
+   	console.log('afterEach',to,from)
+   	if(to.meta.title){ 
+   		document.title = to.meta.title //修改网页的title
+   	}else{
+   		document.title = 'vue_test'
+   	}
+   })
+   ```
+
+4. 独享守卫:
+
+   ```js
+   beforeEnter(to,from,next){
+   	console.log('beforeEnter',to,from)
+   	if(to.meta.isAuth){ //判断当前路由是否需要进行权限控制
+   		if(localStorage.getItem('school') === 'atguigu'){
+   			next()
+   		}else{
+   			alert('暂无权限查看')
+   			// next({name:'guanyu'})
+   		}
+   	}else{
+   		next()
+   	}
+   }
+   ```
+
+5. 组件内守卫：
+
+   ```js
+   //进入守卫：通过路由规则，进入该组件时被调用
+   beforeRouteEnter (to, from, next) {
+   },
+   //离开守卫：通过路由规则，离开该组件时被调用
+   beforeRouteLeave (to, from, next) {
+   }
+   ```
+
+### 13.路由器的两种工作模式
+
+1. 对于一个url来说，什么是hash值？—— #及其后面的内容就是hash值。
+2. hash值不会包含在 HTTP 请求中，即：hash值不会带给服务器。
+3. hash模式：
+   1. 地址中永远带着#号，不美观 。
+   2. 若以后将地址通过第三方手机app分享，若app校验严格，则地址会被标记为不合法。
+   3. 兼容性较好。
+4. history模式：
+   1. 地址干净，美观 。
+   2. 兼容性和hash模式相比略差。
+   3. 应用部署上线时需要后端人员支持，解决刷新页面服务端404的问题。
 
 
 ## 使用Axios发送请求
+
+#### 13.2 为什么要使用 Axios
+
+
+
+由于 Vue.js 是一个 视图层框架 并且作者（尤雨溪）严格准守 SoC （关注度分离原则），所以 Vue.js 并不包含 AJAX 的通信功能，为了解决通信问题，作者单独开发了一个名为 vue-resource 的插件，不过在进入 2.0 版本以后停止了对该插件的维护并推荐了 Axios 框架
+
+
+
+#### 13.3 Axios的使用
+
+
+
+##### 13.3.1 安装vue axios
+
+
+
+```bash
+npm install --save axios vue-axios
+```
+
+
+
+##### 13.3.2 在main.js中引入
+
+
+
+在项目中使用axios模块
+
+
+
+```javascript
+import Vue from 'vue'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
+
+Vue.use(VueAxios, axios)
+```
+
+
+
+##### 13.3.3 发送ajax请求
+
+
+
+```javascript
+<template>
+  <div id="app">
+    <div style="width:50%" class="container">
+      <div>
+        <h3>Regist</h3>
+        <h5>Email</h5>
+        <input type="text" class="form-control" v-model="mail" /><br />
+        {{mail}}
+        <h5>Password</h5>
+        <input type="password" class="form-control" v-model="password" /><br />
+        {{password}}
+        <h5>Gender</h5>
+        <input type="radio" name="gender" v-model="gender" value="female" />男
+        <input type="radio" name="gender" v-model="gender" value="male" />女<br />
+        <h5>Hobby</h5>
+        <input type="checkbox" name="hobby" v-model="hobby" value="music">音乐
+        <input type="checkbox" name="hobby" v-model="hobby" value="movie">电影
+        <input type="checkbox" name="hobby" v-model="hobby" value="sport">运动
+        <br/>
+        <button type="button" class="btn btn-success" @click="registfn">注册</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import MHeader from './components/Header'
+export default {
+  name: 'app',
+  data(){
+    return {
+      mail:'',
+      password:'',
+      gender:'',
+      hobby:''
+    }
+
+  },
+  methods:{
+    registfn:function(){
+
+      this.axios({
+        method:'get',
+        url:'http://localhost:8090/regist?mail='+this.mail+'&password='+this.password,
+
+      }).then(function (response) {
+        console.log(response.data)
+      });
+    }
+  }
+}
+</script>
+```
+
+
+
+##### 13.3.4 服务端解决跨域问题
+
+
+
+```xml
+<mvc:cors>  
+    <mvc:mapping path="/"
+        allowed-origins="*"
+        allowed-methods="POST, GET, OPTIONS, DELETE, PUT,PATCH"
+        allowed-headers="Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
+        allow-credentials="true" />
+</mvc:cors>
+```
+
+
+
+在spring-mvc.xml中加入上述这一段。其中，allowed-origins指的是允许的访问源的域名，"*"表示任何人都可以访问，也可以指明具体的域名
+
+
+
+##### 13.3.5 解决axios无法传递data中的参数问题
+
+
+
+原因：默认情况下发送axios时请求头中的内容类型为： （后端没有使用@RequestBody）
+
+
+
+```xml
+Content-Type:application/json;charset=UTF-8
+```
+
+
+
+而实际服务端需要的是：
+
+
+
+```html
+Content-Type:application/x-www-form-urlencoded
+```
+
+
+
+因此，使用axios的qs内置库中的方法进行内容类型的转换。
+
+
+
+```javascript
+import Qs from 'qs'
+
+this.axios({
+	method:'post',
+	url:'http://localhost:8081/regist',
+	transformRequest: [function (data) {
+		return Qs.stringify(data)
+	}],
+	data:{
+		email:this.email
+	}
+})
+.then(function (response) {
+	alert(response.data.message)
+});
+```
+
+
+
+## Vue实战项目：Webpack登录验证后路由至列表页
+
+------
+
+| 对项目进行中的内容进行调整，结构如下：                       |
+| ------------------------------------------------------------ |
+| ![img](vue%E7%AC%94%E8%AE%B02.0.assets/1646014279806-f0138da8-93ea-4eb3-97bf-1a9d07905999.png) |
+
+
+
+各部分内容：
+
+
+
+#### 14.1 router路由模块： index.js（路由配置表）
+
+
+
+```javascript
+import Vue from 'vue'
+import Router from 'vue-router'
+
+import Login from '../views/Login'
+import Home from '../views/Home'
+
+
+
+// 安装路由
+Vue.use(Router);
+
+// 配置路由
+export default new Router({
+  routes: [
+    {
+      // 路由路径
+      path: '/Login',
+      // 路由名称
+      name: 'Login',
+      // 跳转到组件
+      component: Login
+    },
+    {
+      path:'/Home',
+      name:'Home',
+      component:Home
+    }
+  ]
+});
+```
+
+
+
+#### 14.2 使用Element-UI组件库
+
+
+
+##### 14.2.1 安装
+
+
+
+在项目文件夹内使用命令来安装element-ui模块
+
+
+
+```html
+npm i element-ui -S
+```
+
+
+
+##### 14.2.2 使用
+
+
+
+在vue项目中引入element-ui并使用。在 main.js 中写入以下内容：
+
+
+
+```javascript
+import Vue from 'vue';
+import ElementUI from 'element-ui'; //加入
+import 'element-ui/lib/theme-chalk/index.css';//加入
+import App from './App.vue';
+
+Vue.use(ElementUI);//加入
+
+new Vue({
+  el: '#app',
+  render: h => h(App)
+});
+```
+
+##### 14.2.3 在Element-UI组件库中查找组件
+
+| 在官方组件库中，根据需求找到组件，然后在项目中使用。         |
+| ------------------------------------------------------------ |
+| ![img](vue%E7%AC%94%E8%AE%B02.0.assets/1646014318854-8782e08d-396b-42b4-820a-c01eefe7a4b2.png) |
+
+#### 14.3 编写登录组件：Login.vue
+
+```html
+<template>
+    <div class="login-box">
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <h3>欢迎登录</h3>
+        <el-form-item label="用户名" prop="name">
+          <el-input v-model="form.name" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input type="password" v-model="form.password" placeholder="请输入密码"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSubmit('form')">登录</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+</template>
+
+<script>
+export default {
+    name: "Login",
+    data(){
+      return{
+        form:{
+          name:'',
+          password:''
+        },
+        rules:{
+          name:[
+            { required: true, message: '请输入用户名', trigger: 'blur' },
+            { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+          ],
+          password:[
+            { required: true, message: '请输入密码', trigger: 'blur' },
+            { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+          ]
+        }
+      }
+
+    },
+    methods:{
+      onSubmit(formName){
+        this.$refs[formName].validate((valid) => {
+          var vm = this;
+          if (valid) {
+            // 发送axios请求
+            this.axios({
+              method:'post',
+              url:'http://localhost:8090/login',
+              data:{
+                name:vm.form.name,
+                password:vm.form.password
+              }
+            }).then(function(resp){
+              // console.log(resp.data)
+              if(resp.data.errno==0){
+
+                //登录成功，要向vuex中存放user对象
+                var user  = resp.data.data;
+                vm.$store.dispatch('asyncUpdateUser', user);
+                vm.$message({
+                  message: '登录成功',
+                  type: 'success'
+                });
+                setTimeout(function(){
+                  vm.$router.push("/Home")
+                },2000)
+              }else{
+                vm.$message.error('用户名或密码错误');
+              }
+            })
+
+          } else {
+            this.$message.error('用户名或密码格式错误');
+            return false;
+          }
+        });
+      }
+    }
+}
+</script>
+
+<style scoped>
+  .login-box{
+    width: 500px;
+    height: 300px;
+    border: 1px solid #DCDFE6;
+    margin: 150px auto;
+    padding: 20px 50px 20px 30px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 20px #DCDFE6;
+  }
+</style>
+```
+
+输入的用户名和密码，通过Axios请求去后端做校验，若校验成功则路由至Home组件。
+
+| 登录页面的展示效果：（Element UI）                           |
+| ------------------------------------------------------------ |
+| ![img](vue%E7%AC%94%E8%AE%B02.0.assets/1646014337833-bd075be6-69f6-4ca5-a0fa-1f7cf715f19a.png) |
+
+#### 14.4 编写入口js：main.js
+
+```javascript
+import Vue from 'vue'
+import App from './App'
+import VueRouter from 'vue-router'
+// 导入上面创建的路由配置表
+import router from './router'
+
+// 导入ElementUI模块
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+import axios from 'axios'
+import VueAxios from 'vue-axios'
+
+Vue.use(VueRouter);
+
+// 使用ElementUI模块
+Vue.use(ElementUI);
+// 使用Axios （vue中实现ajax功能的组件）
+Vue.use(VueAxios, axios)
+
+
+
+Vue.config.productionTip = false
+
+/* eslint-disable no-new */
+new Vue({
+  el: '#app',
+  // 配置路由
+  router,
+  render: h => h(App)
+})
+```
 
 
 
 # Vuex
 
+## Vuex 3
 
+Vuex 是一个专为 Vue.js 应用程序开发的状态管理模式。它采用集中式存储管理应用的所有组件的状态，并以相应的规则保证状态以一种可预测的方式发生变化。
 
+每一个 Vuex 应用的核心就是 store（仓库）。“store”基本上就是一个容器，它包含着你的应用中大部分的状态 (state)。Vuex 和单纯的全局对象有以下两点不同：
 
+Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相应地得到高效更新。
 
+你不能直接改变 store 中的状态。改变 store 中的状态的唯一途径就是显式地提交 (commit) mutation。这样使得我们可以方便地跟踪每一个状态的变化，从而让我们能够实现一些工具帮助我们更好地了解我们的应用。
 
+- [vuex 中文文档](https://vuex.vuejs.org/zh/)
+
+<a name="e655a410"></a>
+
+### 一、安装与使用
+
+```bash
+$ yarn add vuex
+```
+
+简单使用：
+
+```javascript
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+const store = new Vuex.Store({
+  state: {
+    count: 0
+  }
+})
+
+const app = new Vue({
+  el: '#app',
+  // 把 store 对象提供给 “store” 选项，这可以把 store 的实例注入所有的子组件, 使用 app.$store (组件中使用 this.$store)调用
+  store,
+  template: `<div>{{ count }}</div>`,
+  computed: {
+    count () {
+      return store.state.count
+    }
+  }
+})
+```
+
+### 二、状态管理模式
+
+Vuex 状态管理示意图：
+
+![image-20231121204636343](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231121204636343.png)
+
+<a name="0d354fbc"></a>
+
+### 二、State
+
+state 保存了程序需要运行时的所有状态, 遵循以下原则：
+
+- 单一状态树：每个应用将仅仅包含一个 store 实例
+
+<a name="cc5468f5"></a>
+
+### 在组件中使用
+
+```javascript
+computed: {
+  count () {
+    return store.state.count
+  }
+}
+```
+
+<a name="mapState"></a>
+
+### mapState
+
+当一个组件需要获取多个状态时候，将这些状态都声明为计算属性会有些重复和冗余。为了解决这个问题，可以使用 `mapState` 辅助函数帮助我们生成计算属性。
+
+**对象语法**
+
+```javascript
+// 在单独构建的版本中辅助函数为 Vuex.mapState
+import { mapState } from 'vuex'
+
+// ...
+
+computed: mapState({
+  // 箭头函数可使代码更简练
+  count: state => state.count,
+
+  // 传字符串参数 'count' 等同于 `state => state.count`
+  countAlias: 'count',
+
+  // 为了能够使用 `this` 获取局部状态，必须使用常规函数
+  countPlusLocalState (state) {
+    return state.count + this.localCount
+  }
+})
+```
+
+**数组语法**<br />当映射的计算属性的名称与 state 的子节点名称相同时，我们也可以给 `mapState` 传一个字符串数组。
+
+```javascript
+computed: mapState([
+  // 映射 this.count 为 store.state.count
+  'count'
+])
+```
+
+**对象展开运算符**<br />事实上，computed 不只包含 state 中的属性，还应包含其他计算属性，此时可以使用 ES6 的展开运算符。
+
+```javascript
+computed: {
+  // 使用对象展开运算符将此对象混入到外部对象中
+  ...mapState({
+    count: state => state.count
+  }),
+  localComputed () { return this.otherData }
+}
+```
+
+<a name="a967149b"></a>
+
+### 三、Getter
+
+有时候我们需要从 store 中的 state 中派生出一些状态，这时，可以使用 getter，getter 实际上相当于 state 的计算属性。
+
+如果在组件中使用计算属性，像这样：
+
+```javascript
+computed: {
+  doneTodosCount () {
+    return this.$store.state.todos.filter(todo => todo.done).length
+  }
+}
+```
+
+写起来比较繁琐，而且如果很多组件都需要使用这样的状态，每个组件都得重新定义一下。
+
+改用 getter 写起来就非常方便，它接受一个 state 参数：
+
+```javascript
+const store = new Vuex.Store({
+  state: {
+    todos: [
+      { id: 1, text: '...', done: true },
+      { id: 2, text: '...', done: false }
+    ]
+  },
+  getters: {
+    doneTodos: state => {
+      return state.todos.filter(todo => todo.done)
+    }
+  }
+})
+```
+
+Getter 也可以接受其他 getters 作为第二个参数：
+
+```javascript
+const store = new Vuex.Store({
+  // ...
+  getters: {
+    doneTodosCount: (state, getters) => {
+      return getters.doneTodos.length
+    }
+  }
+})
+```
+
+也可以通过让 getter 返回一个函数，来实现给 getter 传参。这对 store 里的数组进行查询时非常有用。
+
+```javascript
+getters: {
+  // ...
+  getTodoById: (state) => (id) => {
+    return state.todos.find(todo => todo.id === id)
+  }
+}
+store.getters.getTodoById(2) // -> { id: 2, text: '...', done: false }
+```
+
+<a name="33cad330"></a>
+
+### 在组件中使用
+
+在组件中只需要在计算属性中引入这些 getter 即可。
+
+```javascript
+computed: {
+  doneTodosCount () {
+    return this.$store.getters.doneTodosCount
+  }
+}
+```
+
+<a name="mapGetters"></a>
+
+### mapGetters
+
+`mapGetters` 辅助函数可以将 store 中的 getter 映射到局部计算属性。
+
+**数组语法**
+
+```javascript
+import { mapGetters } from 'vuex'
+
+export default {
+  // ...
+  computed: {
+    // 使用对象展开运算符将 getter 混入 computed 对象中
+    ...mapGetters([
+      'doneTodosCount',
+      'anotherGetter',
+      // ...
+    ])
+  }
+}
+```
+
+**对象语法**<br />如果你想将一个 getter 属性另取一个名字，使用对象形式：
+
+```javascript
+mapGetters({
+  // 映射 `this.doneCount` 为 `store.getters.doneTodosCount`
+  doneCount: 'doneTodosCount'
+})
+```
+
+<a name="20b16040"></a>
+
+### 四、Mutation
+
+更改 Vuex 的 store 中的状态的唯一方法是提交 mutation。Vuex 中的 mutation 非常类似于事件：每个 mutation 都有一个字符串的 **事件类型 (type)** 和 一个 **回调函数 (handler)**。这个回调函数就是我们实际进行状态更改的地方，并且它会接受 state 作为第一个参数：
+
+```javascript
+const store = new Vuex.Store({
+  state: {
+    count: 1
+  },
+  mutations: {
+    increment (state) {
+      // 变更状态
+      state.count++
+    }
+  }
+})
+```
+
+不能直接调用一个 mutation handler。这个选项更像是事件注册：“当触发一个类型为 `increment` 的 mutation 时，调用此函数。”要唤醒一个 mutation handler，你需要以相应的 type 调用 **store.commit** 方法：
+
+```javascript
+store.commit('increment')
+```
+
+Mutation 必须是同步函数。
+
+<a name="2cff5dfb"></a>
+
+### 提交载荷 (Payload)
+
+可以向 `store.commit` 传入额外的参数，即 mutation 的 **载荷（payload）**：
+
+```javascript
+const store = new Vuex.Store({
+  state: {
+    count: 1
+  },
+  mutations: {
+    increment (state, n) {
+      state.count += n
+    }
+  }
+})
+
+store.commit('increment', 10)
+```
+
+在大多数情况下，载荷应该是一个对象，这样可以包含多个字段并且记录的 mutation 会更易读：
+
+```javascript
+const store = new Vuex.Store({
+  // ...
+  mutations: {
+    increment (state, payload) {
+      state.count += payload.amount
+    }
+  }
+})
+
+store.commit('increment', {
+  amount: 10
+})
+```
+
+<a name="1967513a"></a>
+
+### 对象风格的提交方式
+
+提交 mutation 的另一种方式是直接使用包含 `type` 属性的对象：
+
+```javascript
+store.commit({
+  type: 'increment',
+  amount: 10
+})
+```
+
+当使用对象风格的提交方式，整个对象都作为载荷传给 mutation 函数，因此 handler 保持不变：
+
+```javascript
+mutations: {
+  increment (state, payload) {
+    state.count += payload.amount
+  }
+}
+```
+
+<a name="f5d76687"></a>
+
+### 使用常量替代 Mutation 事件类型
+
+使用常量替代 mutation 事件类型在各种 Flux 实现中是很常见的模式。这样可以使 linter 之类的工具发挥作用，同时把这些常量放在单独的文件中可以让你的代码合作者对整个 app 包含的 mutation 一目了然：
+
+```javascript
+// mutation-types.js
+export const SOME_MUTATION = 'SOME_MUTATION'
+
+// store.js
+import Vuex from 'vuex'
+import { SOME_MUTATION } from './mutation-types'
+
+const store = new Vuex.Store({
+  state: { ... },
+  mutations: {
+    // 我们可以使用 ES2015 风格的计算属性命名功能来使用一个常量作为函数名
+    [SOME_MUTATION] (state) {
+      // mutate state
+    }
+  }
+})
+```
+
+<a name="mapMutations"></a>
+
+### mapMutations
+
+可以在组件中使用 `this.$store.commit('xxx')` 提交 mutation，或者使用 `mapMutations` 辅助函数将组件中的 methods 映射为 `store.commit` 调用（需要在根节点注入 `store`）。
+
+```javascript
+import { mapMutations } from 'vuex'
+
+export default {
+  // ...
+  methods: {
+    ...mapMutations([
+      'increment', // 将 `this.increment()` 映射为 `this.$store.commit('increment')`
+
+      // `mapMutations` 也支持载荷：
+      'incrementBy' // 将 `this.incrementBy(amount)` 映射为 `this.$store.commit('incrementBy', amount)`
+    ]),
+    ...mapMutations({
+      add: 'increment' // 将 `this.add()` 映射为 `this.$store.commit('increment')`
+    })
+  }
+}
+```
+
+注意，在 beforeCreate 的时候还不能获取到 methods 里面的方法。
+
+<a name="464752d6"></a>
+
+### 五、Action
+
+Action 类似于 mutation，不同在于：
+
+- Action 提交的是 mutation，而不是直接变更状态。
+- Action 可以包含任意异步操作。
+
+让我们来注册一个简单的 action：
+
+```javascript
+const store = new Vuex.Store({
+  state: {
+    count: 0
+  },
+  mutations: {
+    increment (state) {
+      state.count++
+    }
+  },
+  actions: {
+    increment (context) {
+      context.commit('increment')
+    }
+  }
+})
+```
+
+Action 函数接受一个与 store 实例具有相同方法和属性的 context 对象，因此可以调用 `context.commit` 提交一个 mutation，通过 `context.state` 和 `context.getters` 来获取 state 和 getters。
+
+<a name="f9829ba9"></a>
+
+### 参数解构
+
+实际应用当中，可以使用 [参数解构](https://github.com/lukehoban/es6features#destructuring) 来简化代码（特别是我们需要调用 `commit` 很多次的时候）：
+
+```javascript
+actions: {
+  increment ({ commit }) {
+    commit('increment')
+  }
+}
+```
+
+<a name="2fa34eb6"></a>
+
+### 分发 Action
+
+Action 通过 `store.dispatch` 方法触发：
+
+```javascript
+store.dispatch('increment')
+```
+
+Actions 支持同样的载荷方式和对象方式进行分发：
+
+```javascript
+// 以载荷形式分发
+store.dispatch('incrementAsync', {
+  amount: 10
+})
+
+// 以对象形式分发
+store.dispatch({
+  type: 'incrementAsync',
+  amount: 10
+})
+```
+
+<a name="iQRTl"></a>
+
+### 提交载荷 (Payload)
+
+同样的，action 支持传递载荷，可以通过第二参数接收载荷，比如一个购物车结算的 action：
+
+```javascript
+actions: {
+  checkout ({ commit, state }, products) {
+    // 把当前购物车的物品备份起来
+    const savedCartItems = [...state.cart.added]
+    // 发出结账请求，然后乐观地清空购物车
+    commit(types.CHECKOUT_REQUEST)
+    // 购物 API 接受一个成功回调和一个失败回调
+    shop.buyProducts(
+      products,
+      // 成功操作
+      () => commit(types.CHECKOUT_SUCCESS),
+      // 失败操作
+      () => commit(types.CHECKOUT_FAILURE, savedCartItems)
+    )
+  }
+}
+```
+
+注意这里正在进行一系列的异步操作，并且通过提交 mutation 来记录 action 产生的副作用（即状态变更）。
+
+<a name="mapActions"></a>
+
+### mapActions
+
+在组件中可以使用 `this.$store.dispatch('xxx')` 分发 action，也可以使用 `mapActions` 辅助函数将组件的 methods 映射为 `store.dispatch` 调用（需要先在根节点注入 `store`）。
+
+```javascript
+import { mapActions } from 'vuex'
+
+export default {
+  // ...
+  methods: {
+    ...mapActions([
+      'increment', // 将 `this.increment()` 映射为 `this.$store.dispatch('increment')`
+      // `mapActions` 也支持载荷：
+      'incrementBy' // 将 `this.incrementBy(amount)` 映射为 `this.$store.dispatch('incrementBy', amount)`
+    ]),
+    ...mapActions({
+      add: 'increment' // 将 `this.add()` 映射为 `this.$store.dispatch('increment')`
+    })
+  }
+}
+```
+
+<a name="683d24bc"></a>
+
+### 组合 Action
+
+Action 通常是异步的，那么我们如何才能组合多个 action，以处理更加复杂的异步流程？
+
+首先，需要明白 `store.dispatch` 可以处理被触发的 action 的处理函数返回的 Promise，并且 `store.dispatch` 仍旧返回 Promise：
+
+```javascript
+actions: {
+  actionA ({ commit }) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        commit('someMutation')
+        resolve()
+      }, 1000)
+    })
+  }
+}
+```
+
+这时就可以这样调用：
+
+```javascript
+store.dispatch('actionA').then(() => {
+  // ...
+})
+```
+
+在另外一个 action 中也可以：
+
+```javascript
+actions: {
+  // ...
+  actionB ({ dispatch, commit }) {
+    return dispatch('actionA').then(() => {
+      commit('someOtherMutation')
+    })
+  }
+}
+```
+
+如果我们利用 [async / await](https://tc39.github.io/ecmascript-asyncawait/)，我们可以如下组合 action：
+
+```javascript
+// 假设 getData() 和 getOtherData() 返回的是 Promise
+
+actions: {
+  async actionA ({ commit }) {
+    commit('gotData', await getData())
+  },
+  async actionB ({ dispatch, commit }) {
+    await dispatch('actionA') // 等待 actionA 完成
+    commit('gotOtherData', await getOtherData())
+  }
+}
+```
+
+<a name="34fc4207"></a>
+
+### 六、Module
+
+由于使用单一状态树，应用的所有状态会集中到一个比较大的对象。当应用变得非常复杂时，store 对象就有可能变得相当臃肿。
+
+为了解决以上问题，Vuex 允许我们将 store 分割成**模块（module）**。每个模块拥有自己的 state、mutation、action、getter、甚至是嵌套子模块——从上至下进行同样方式的分割：
+
+```javascript
+const moduleA = {
+  state: { ... },
+  mutations: { ... },
+  actions: { ... },
+  getters: { ... }
+}
+
+const moduleB = {
+  state: { ... },
+  mutations: { ... },
+  actions: { ... }
+}
+
+const store = new Vuex.Store({
+  modules: {
+    a: moduleA,
+    b: moduleB
+  }
+})
+
+store.state.a // -> moduleA 的状态
+store.state.b // -> moduleB 的状态
+```
+
+<a name="5faeb6da"></a>
+
+### 模块的局部状态
+
+对于模块内部的 mutation 和 getter，接收的第一个参数是**模块的局部状态对象**。
+
+```javascript
+const moduleA = {
+  state: { count: 0 },
+  mutations: {
+    increment (state) {
+      // 这里的 `state` 对象是模块的局部状态
+      state.count++
+    }
+  },
+
+  getters: {
+    doubleCount (state) {
+      return state.count * 2
+    }
+  }
+}
+```
+
+同样，对于模块内部的 action，局部状态通过 `context.state` 暴露出来，根节点状态则为 `context.rootState`：
+
+```javascript
+const moduleA = {
+  // ...
+  actions: {
+    incrementIfOddOnRootSum ({ state, commit, rootState }) {
+      if ((state.count + rootState.count) % 2 === 1) {
+        commit('increment')
+      }
+    }
+  }
+}
+```
+
+对于模块内部的 getter，根节点状态会作为第三个参数暴露出来：
+
+```javascript
+const moduleA = {
+  // ...
+  getters: {
+    sumWithRootCount (state, getters, rootState) {
+      return state.count + rootState.count
+    }
+  }
+}
+```
+
+<a name="11d878fa"></a>
+
+### 七、命名空间
+
+默认情况下，模块内部的 action、mutation 和 getter 是注册在**全局命名空间**的——这样使得多个模块能够对同一 mutation 或 action 作出响应。
+
+如果希望你的模块具有更高的封装度和复用性，你可以通过添加 `namespaced: true` 的方式使其成为命名空间模块。当模块被注册后，它的所有 getter、action 及 mutation 都会自动根据模块注册的路径调整命名。例如：
+
+```javascript
+const store = new Vuex.Store({
+  modules: {
+    account: {
+      namespaced: true,
+
+      // 模块内容（module assets）
+      state: { ... }, // 模块内的状态已经是嵌套的了，使用 `namespaced` 属性不会对其产生影响
+      getters: {
+        isAdmin () { ... } // -> getters['account/isAdmin']
+      },
+      actions: {
+        login () { ... } // -> dispatch('account/login')
+      },
+      mutations: {
+        login () { ... } // -> commit('account/login')
+      },
+
+      // 嵌套模块
+      modules: {
+        // 继承父模块的命名空间
+        myPage: {
+          state: { ... },
+          getters: {
+            profile () { ... } // -> getters['account/profile']
+          }
+        },
+
+        // 进一步嵌套命名空间
+        posts: {
+          namespaced: true,
+
+          state: { ... },
+          getters: {
+            popular () { ... } // -> getters['account/posts/popular']
+          }
+        }
+      }
+    }
+  }
+})
+```
+
+启用了命名空间的 getter 和 action 会收到局部化的 `getter`，`dispatch` 和 `commit`。换言之，你在使用模块内容（module assets）时不需要在同一模块内额外添加空间名前缀。更改 `namespaced` 属性后不需要修改模块内的代码。
+
+<a name="96763f0a"></a>
+
+### 在命名空间模块内访问全局内容（Global Assets）
+
+如果你希望使用全局 state 和 getter，`rootState` 和 `rootGetter` 会作为第三和第四参数传入 getter，也会通过 `context` 对象的属性传入 action。
+
+若需要在全局命名空间内分发 action 或提交 mutation，将 `{ root: true }` 作为第三参数传给 `dispatch` 或 `commit`即可。
+
+```javascript
+modules: {
+  foo: {
+    namespaced: true,
+
+    getters: {
+      // 在这个模块的 getter 中，`getters` 被局部化了
+      // 你可以使用 getter 的第四个参数来调用 `rootGetters`
+      someGetter (state, getters, rootState, rootGetters) {
+        getters.someOtherGetter // -> 'foo/someOtherGetter'
+        rootGetters.someOtherGetter // -> 'someOtherGetter'
+      },
+      someOtherGetter: state => { ... }
+    },
+
+    actions: {
+      // 在这个模块中， dispatch 和 commit 也被局部化了
+      // 他们可以接受 `root` 属性以访问根 dispatch 或 commit
+      someAction ({ dispatch, commit, getters, rootGetters }) {
+        getters.someGetter // -> 'foo/someGetter'
+        rootGetters.someGetter // -> 'someGetter'
+
+        dispatch('someOtherAction') // -> 'foo/someOtherAction'
+        dispatch('someOtherAction', null, { root: true }) // -> 'someOtherAction'
+
+        commit('someMutation') // -> 'foo/someMutation'
+        commit('someMutation', null, { root: true }) // -> 'someMutation'
+      },
+      someOtherAction (ctx, payload) { ... }
+    }
+  }
+}
+```
+
+<a name="19351008"></a>
+
+### 带命名空间的绑定函数
+
+当使用 `mapState`, `mapGetters`, `mapActions` 和 `mapMutations` 这些函数来绑定命名空间模块时，写起来可能比较繁琐：
+
+```javascript
+computed: {
+  ...mapState({
+    a: state => state.some.nested.module.a,
+    b: state => state.some.nested.module.b
+  })
+},
+methods: {
+  ...mapActions([
+    'some/nested/module/foo',
+    'some/nested/module/bar'
+  ])
+}
+```
+
+对于这种情况，你可以将模块的空间名称字符串作为第一个参数传递给上述函数，这样所有绑定都会自动将该模块作为上下文。于是上面的例子可以简化为：
+
+```javascript
+computed: {
+  ...mapState('some/nested/module', {
+    a: state => state.a,
+    b: state => state.b
+  })
+},
+methods: {
+  ...mapActions('some/nested/module', [
+    'foo',
+    'bar'
+  ])
+}
+```
+
+而且，你可以通过使用 `createNamespacedHelpers` 创建基于某个命名空间辅助函数。它返回一个对象，对象里有新的绑定在给定命名空间值上的组件绑定辅助函数：
+
+```javascript
+import { createNamespacedHelpers } from 'vuex'
+
+const { mapState, mapActions } = createNamespacedHelpers('some/nested/module')
+
+export default {
+  computed: {
+    // 在 `some/nested/module` 中查找
+    ...mapState({
+      a: state => state.a,
+      b: state => state.b
+    })
+  },
+  methods: {
+    // 在 `some/nested/module` 中查找
+    ...mapActions([
+      'foo',
+      'bar'
+    ])
+  }
+}
+```
+
+##  Vuex 4
+
+官网：[https://next.vuex.vuejs.org/](https://next.vuex.vuejs.org/)
+
+在Composition API中，Vuex状态管理暴露了一个 `useStore` 方法，可以直接获取到 `this.$store` 的引用：
+
+```vue
+<template>
+ <div>{{state.name}}</div>
+ <button @click="setData">设置数据</button>
+</template>
+
+<script>
+import { useStore } from 'vuex'
+
+export default {
+  setup() {
+    const { state, commit, dispatch } = useStore()
+
+    function setData() {
+      commit('SET_DATA', "Hello world")
+    }
+
+    return {
+      state,
+      setData
+    }
+  },
+}
+</script>
+```
+
+以后就再也不用 `this.$store.commit` 、 `this.$store.dispatch` 地用了，很爽是不是。
 
 # vue3
 
-### 常用 Composition API
+## Composition API (组合式API)
 
 官方文档: https://v3.cn.vuejs.org/guide/composition-api-introduction.html
 
-## 1.setup函数
+### 1.setup函数
+
+#### 基本使用
 
 1. 理解：Vue3.0中一个新的配置项，值为一个函数。
 2. setup是所有<strong style="color:#DD5145">Composition API（组合API）</strong><i style="color:gray;font-weight:bold">“ 表演的舞台 ”</i>。
@@ -3232,17 +7920,234 @@ export default {
       - 如果有重名, setup优先。
    2. **setup不能是一个async函数**，因为返回值不再是return的对象, 而是promise, 模板看不到return对象中的属性。（后期也可以返回一个Promise实例，但需要Suspense和异步组件的配合）
 
-##  2.ref函数
+示例：
 
-- 作用: 定义一个响应式的数据
+```vue
+<template>
+ <div>count: {{count}}</div>
+ <div>double: {{double}}</div>
+ <button @click="add">+1</button>
+ <button @click="subtract">-1</button>
+</template>
+
+<script>
+import { ref, reactive, computed, onMounted } from 'vue'
+
+export default {
+  setup() {
+    let count = ref(0)
+    let double = computed(() => count.value * 2)
+
+    function add() {
+      count.value += 1
+    }
+    function subtract() {
+      count.value -= 1
+    }
+
+    onMounted(() => { console.log('onMounted') })
+
+    return {
+      add,
+      subtract,
+      count,
+      double,
+    }
+  },
+}
+</script>
+```
+
+在Composition API中，通过setup函数暴露一些属性和方法，达到数据响应、生命周期Hook、计算属性的目的。简而言之，它只是一个将属性和函数返回到模板的函数，我们在这里声明所有响应性属性、计算属性、观察者、方法、和生命周期 hook，然后将它们返回，以便可以在模板中使用它们。我们不从 setup 函数返回的内容在模板中将会变得不可用。
+
+**注意点:**
+
+- setup执行的时机
+  - 在beforeCreate之前执行一次，this是undefined。
+- setup的参数
+  - props：值为对象，包含：组件外部传递过来，且组件内部声明接收了的属性。
+  - context：上下文对象
+    - attrs: 值为对象，包含：组件外部传递过来，但没有在props配置中声明的属性, 相当于 ```this.$attrs```。
+    - slots: 收到的插槽内容, 相当于 ```this.$slots```。
+    - emit: 分发自定义事件的函数, 相当于 ```this.$emit```。
+
+#### setup的参数
+
+##### props
+
+setup支持接收参数，第一个参数是props，接收来自父组件的传值。
+
+组件 `HelloWorld` ：
+
+```vue
+<template>
+  <h1>{{ msg }}</h1>
+</template>
+
+<script>
+import { watchEffect } from 'vue'
+export default {
+  name: 'HelloWorld',
+  props: {
+    msg: String
+  },
+  setup(props) {
+    watchEffect(() => {
+      console.log(props.msg)
+    })
+  }
+}
+</script>
+```
+
+`props` 是响应式的，作为参数传递到setup，watchEffect可以监听到props的变化。
+
+在父组件中：
+
+```vue
+<template>
+<HelloWorld :msg="msg"></HelloWorld>
+<button @click="setData">设置数据</button>
+</template>
+
+<script>
+import HelloWorld from '../components/HelloWorld.vue'
+
+export default {
+  components: { HelloWorld },
+  setup() {
+    let msg = ref('Hello xiaoyu')
+    function setData() {
+      msg.value = 'Hello world'
+    }
+
+    return {
+      msg,
+      setData
+    }
+  },
+}
+</script>
+```
+
+点击按钮，修改父组件中的msg，对应子组件中的数据也会得到修改，并触发watchEffect。![GIF (3)](vue%E7%AC%94%E8%AE%B02.0.assets/GIF%20(3).gif)
+
+值得注意的是，子组件中的**props不能直接解构**，否则会使watchEffect失效，使其失去响应性：
+
+```javascript
+  setup({msg}) {
+    watchEffect(() => {
+      console.log(msg)
+    })
+  }
+```
+
+##### context
+
+第二个参数提供了一个上下文对象，从原来 2.x 中 `this` 选择性地暴露了一些 property。
+
+```javascript
+const MyComponent = {
+  setup(props, context) {
+    context.attrs
+    context.slots
+    context.emit
+  },
+}
+```
+
+`attrs` 和 `slots` 都是内部组件实例上对应项的代理，可以确保在更新后仍然是最新值。所以可以解构，无需担心后面访问到过期的值：
+
+```javascript
+const MyComponent = {
+  setup(props, { attrs }) {
+    // 一个可能之后回调用的签名
+    function onClick() {
+      console.log(attrs.foo) // 一定是最新的引用，没有丢失响应性
+    }
+  },
+}
+```
+
+出于一些原因将 `props` 作为第一个参数，而不是包含在上下文中：
+
+- 组件使用 `props` 的场景更多，有时候甚至只使用 `props`
+- 将 `props` 独立出来作为第一个参数，可以让 TypeScript 对 `props` 单独做类型推导，不会和上下文中的其他属性相混淆。这也使得 `setup` 、 `render` 和其他使用了 TSX 的函数式组件的签名保持一致。
+
+### 4.Vue3.0中的更删改查操作
+
+#### vue2.x的响应式
+
+- 实现原理：
+
+  - 对象类型：通过```Object.defineProperty()```对属性的读取、修改进行拦截（数据劫持）。
+
+  - 数组类型：通过重写更新数组的一系列方法来实现拦截。（对数组的变更方法进行了包裹）。
+
+    ```js
+    Object.defineProperty(data, 'count', {
+        get () {}, 
+        set () {}
+    })
+    ```
+
+- 存在问题：
+
+  - 新增属性、删除属性, 界面不会更新。
+  - 直接通过下标修改数组, 界面不会自动更新。
+
+#### Vue3.0的响应式
+
++ 解决:
+  - 新增属性、删除属性, 界面不会更新。
+  - 直接通过下标修改数组, 界面不会自动更新。
+
+- 实现原理: 
+
+  - 通过Proxy（代理）:  拦截对象中任意属性的变化, 包括：属性值的读写、属性的添加、属性的删除等。
+
+  - 通过Reflect（反射）:  对源对象的属性进行操作。
+
+  - MDN文档中描述的Proxy与Reflect：
+
+    - Proxy：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
+
+    - Reflect：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect
+
+      ```js
+      new Proxy(data, {
+      	// 拦截读取属性值
+          get (target, prop) {
+          	return Reflect.get(target, prop)
+          },
+          // 拦截设置属性值或添加新属性
+          set (target, prop, value) {
+          	return Reflect.set(target, prop, value)
+          },
+          // 拦截删除属性
+          deleteProperty (target, prop) {
+          	return Reflect.deleteProperty(target, prop)
+          }
+      })
+      
+      proxy.name = 'tom'   
+      ```
+
+###  5. 属性
+
+#### 1.data属性
+
+#####  ref函数
+
+- 作用: 定义一个<strong style="color:#DD5145">基本类型</strong>响应式的数据
 - 语法: ```const xxx = ref(initValue)``` 
-  - 创建一个包含响应式数据的<strong style="color:#DD5145">引用对象（reference对象，简称ref对象）</strong>。
+  - 创建一个包含响应式数据的<strong style="color:#DD5145">引用对象（reference对象，简称ref对象）</strong>
   - JS中操作数据： ```xxx.value```
   - 模板中读取数据: 不需要.value，直接：```<div>{{xxx}}</div>```
 - 备注：
-  - 接收的数据可以是：基本类型、也可以是对象类型。
-  - 基本类型的数据：响应式依然是靠``Object.defineProperty()``的```get```与```set```完成的。
-  - 对象类型的数据：内部 <i style="color:gray;font-weight:bold">“ 求助 ”</i> 了Vue3.0中的一个新函数—— ```reactive```函数。
+  - 接收的数据可以是：基本类型、也可以是对象类型
+  - 基本类型的数据：响应式依然是靠``Object.defineProperty()``的```get```与```set```完成的
+  - 对象类型的数据：内部 <i style="color:gray;font-weight:bold">“ 求助 ”</i> 了Vue3.0中的一个新函数—— ```reactive```函数
 
 ```vue
 <template>
@@ -3296,14 +8201,12 @@ export default {
 </script>
 ```
 
-
-
-## 3.reactive函数
+##### reactive函数
 
 - 作用: 定义一个<strong style="color:#DD5145">对象类型</strong>的响应式数据（基本类型不要用它，要用```ref```函数）
 - 语法：```const 代理对象= reactive(源对象)```接收一个对象（或数组），返回一个<strong style="color:#DD5145">代理对象（Proxy的实例对象，简称proxy对象）</strong>
-- reactive定义的响应式数据是“深层次的”。
-- 内部基于 ES6 的 Proxy 实现，通过代理对象操作源对象内部数据进行操作。
+- 备注：
+  + 内部基于 ES6 的 Proxy 实现，通过代理对象操作源对象内部数据进行操作
 
 ```vue
 <template>
@@ -3364,7 +8267,7 @@ export default {
 </script>
 ```
 
-## 5.reactive对比ref
+**reactive对比ref**
 
 -  从定义数据角度对比：
    -  ref用来定义：<strong style="color:#DD5145">基本类型数据</strong>。
@@ -3377,109 +8280,61 @@ export default {
    -  ref定义的数据：操作数据<strong style="color:#DD5145">需要</strong>```.value```，读取数据时模板中直接读取<strong style="color:#DD5145">不需要</strong>```.value```。
    -  reactive定义的数据：操作数据与读取数据：<strong style="color:#DD5145">均不需要</strong>```.value```。
 
-## 4.Vue3.0中的更删改查操作
-
-### vue2.x的响应式
-
-- 实现原理：
-
-  - 对象类型：通过```Object.defineProperty()```对属性的读取、修改进行拦截（数据劫持）。
-
-  - 数组类型：通过重写更新数组的一系列方法来实现拦截。（对数组的变更方法进行了包裹）。
-
-    ```js
-    Object.defineProperty(data, 'count', {
-        get () {}, 
-        set () {}
-    })
-    ```
-
-- 存在问题：
-
-  - 新增属性、删除属性, 界面不会更新。
-  - 直接通过下标修改数组, 界面不会自动更新。
-
-### Vue3.0的响应式
-
-+ 解决:
-  - 新增属性、删除属性, 界面不会更新。
-  - 直接通过下标修改数组, 界面不会自动更新。
-
-- 实现原理: 
-
-  - 通过Proxy（代理）:  拦截对象中任意属性的变化, 包括：属性值的读写、属性的添加、属性的删除等。
-
-  - 通过Reflect（反射）:  对源对象的属性进行操作。
-
-  - MDN文档中描述的Proxy与Reflect：
-
-    - Proxy：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
-
-    - Reflect：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect
-
-      ```js
-      new Proxy(data, {
-      	// 拦截读取属性值
-          get (target, prop) {
-          	return Reflect.get(target, prop)
-          },
-          // 拦截设置属性值或添加新属性
-          set (target, prop, value) {
-          	return Reflect.set(target, prop, value)
-          },
-          // 拦截删除属性
-          deleteProperty (target, prop) {
-          	return Reflect.deleteProperty(target, prop)
-          }
-      })
-      
-      proxy.name = 'tom'   
-      ```
-
-## 6.setup的两个注意点
-
-- setup执行的时机
-  - 在beforeCreate之前执行一次，this是undefined。
-
-- setup的参数
-  - props：值为对象，包含：组件外部传递过来，且组件内部声明接收了的属性。
-  - context：上下文对象
-    - attrs: 值为对象，包含：组件外部传递过来，但没有在props配置中声明的属性, 相当于 ```this.$attrs```。
-    - slots: 收到的插槽内容, 相当于 ```this.$slots```。
-    - emit: 分发自定义事件的函数, 相当于 ```this.$emit```。
-
-## 7.计算属性与监视
-
-### 1.computed函数
+#### 2.计算属性(computed函数)
 
 - 与Vue2.x中computed配置功能一致
 
 - 写法
 
-  ```js
-  import {computed} from 'vue'
+  ```vue
+  <template>
+  	<h1>一个人的信息</h1>
+  	姓：<input type="text" v-model="person.firstName">
+  	<br>
+  	名：<input type="text" v-model="person.lastName">
+  	<br>
+  	<span>全名：{{person.fullName}}</span>
+  	<br>
+  	全名：<input type="text" v-model="person.fullName">
+  </template>
   
-  setup(){
-      ...
-  	//计算属性——简写
-      let fullName = computed(()=>{
-          return person.firstName + '-' + person.lastName
-      })
-      //计算属性——完整
-      let fullName = computed({
-          get(){
-              return person.firstName + '-' + person.lastName
-          },
-          set(value){
-              const nameArr = value.split('-')
-              person.firstName = nameArr[0]
-              person.lastName = nameArr[1]
-          }
-      })
-  }
+  <script>
+  	import {reactive,computed} from 'vue'
+  	export default {
+  		name: 'Demo',
+  		setup(){
+  			//数据
+  			let person = reactive({
+  				firstName:'张',
+  				lastName:'三'
+  			})
+  			//计算属性——简写（没有考虑计算属性被修改的情况）
+  			/* person.fullName = computed(()=>{
+  				return person.firstName + '-' + person.lastName
+  			}) */
+  
+  			//计算属性——完整写法（考虑读和写）
+  			person.fullName = computed({
+  				get(){
+  					return person.firstName + '-' + person.lastName
+  				},
+  				set(value){
+  					const nameArr = value.split('-')
+  					person.firstName = nameArr[0]
+  					person.lastName = nameArr[1]
+  				}
+  			})
+  
+  			//返回一个对象（常用）
+  			return {
+  				person
+  			}
+  		}
+  	}
+  </script>
   ```
 
-### 2.watch函数
+#### 3.监视属性(watch函数)
 
 - 与Vue2.x中watch配置功能一致
 
@@ -3501,7 +8356,7 @@ export default {
   
   /* 情况三：监视reactive定义的响应式数据
   			若watch监视的是reactive定义的响应式数据，则无法正确获得oldValue！！
-  			若watch监视的是reactive定义的响应式数据，则强制开启了深度监视 
+  			若watch监视的是reactive定义的响应式数据，则强制开启了深度监视, 默认就开启了
   */
   watch(person,(newValue,oldValue)=>{
   	console.log('person变化了',newValue,oldValue)
@@ -3523,7 +8378,92 @@ export default {
   },{deep:true}) //此处由于监视的是reactive素定义的对象中的某个属性，所以deep配置有效
   ```
 
-### 3.watchEffect函数
+示例:
+
+```vue
+<template>
+	<h2>当前求和为：{{sum}}</h2>
+	<button @click="sum++">点我+1</button>
+	<hr>
+	<h2>当前的信息为：{{msg}}</h2>
+	<button @click="msg+='！'">修改信息</button>
+	<hr>
+	<h2>姓名：{{person.name}}</h2>
+	<h2>年龄：{{person.age}}</h2>
+	<h2>薪资：{{person.job.j1.salary}}K</h2>
+	<button @click="person.name+='~'">修改姓名</button>
+	<button @click="person.age++">增长年龄</button>
+	<button @click="person.job.j1.salary++">涨薪</button>
+</template>
+
+<script>
+	import {ref,reactive,watch} from 'vue'
+	export default {
+		name: 'Demo',
+		setup(){
+			//数据
+			let sum = ref(0)
+			let msg = ref('你好啊')
+			let person = reactive({
+				name:'张三',
+				age:18,
+				job:{
+					j1:{
+						salary:20
+					}
+				}
+			})
+
+			//情况一：监视ref所定义的一个响应式数据
+			/* watch(sum,(newValue,oldValue)=>{
+				console.log('sum变了',newValue,oldValue)
+			},{immediate:true}) */
+
+			//情况二：监视ref所定义的多个响应式数据
+			/* watch([sum,msg],(newValue,oldValue)=>{
+				console.log('sum或msg变了',newValue,oldValue)
+			},{immediate:true}) */
+
+
+			/* 
+				情况三：监视reactive所定义的一个响应式数据的全部属性
+						1.注意：此处无法正确的获取oldValue
+						2.注意：强制开启了深度监视（deep配置无效,默认就开启了）
+			*/
+			/* watch(person,(newValue,oldValue)=>{
+				console.log('person变化了',newValue,oldValue)
+			},{deep:false}) //此处的deep配置无效 */
+
+			//情况四：监视reactive所定义的一个响应式数据中的某个属性
+			/* watch(()=>person.name,(newValue,oldValue)=>{
+				console.log('person的name变化了',newValue,oldValue)
+			})  */
+
+			//情况五：监视reactive所定义的一个响应式数据中的某些属性
+			/* watch([()=>person.name,()=>person.age],(newValue,oldValue)=>{
+				console.log('person的name或age变化了',newValue,oldValue)
+			})  */
+
+			//特殊情况
+			/* watch(()=>person.job,(newValue,oldValue)=>{
+				console.log('person的job变化了',newValue,oldValue)
+			},{deep:true}) //此处由于监视的是reactive素定义的对象中的某个属性，所以deep配置有效 */
+
+
+			//返回一个对象（常用）
+			return {
+				sum,
+				msg,
+				person
+			}
+		}
+	}
+</script>
+```
+
+#### 3.watchEffect函数(同时监听多个属性)
+
+> 类似计算属性,同时监听多个属性
 
 - watch的套路是：**既要指明监视的属性，也要指明监视的回调。**
 
@@ -3543,13 +8483,81 @@ export default {
   })
   ```
 
-## 8.生命周期
+示例:
+
+```vue
+<template>
+	<h2>当前求和为：{{sum}}</h2>
+	<button @click="sum++">点我+1</button>
+	<hr>
+	<h2>当前的信息为：{{msg}}</h2>
+	<button @click="msg+='！'">修改信息</button>
+	<hr>
+	<h2>姓名：{{person.name}}</h2>
+	<h2>年龄：{{person.age}}</h2>
+	<h2>薪资：{{person.job.j1.salary}}K</h2>
+	<button @click="person.name+='~'">修改姓名</button>
+	<button @click="person.age++">增长年龄</button>
+	<button @click="person.job.j1.salary++">涨薪</button>
+</template>
+/*
+- watch的套路是： 既要指明监视的属性，也要指明监视的回调。
+
+- watchEffect的套路是：不用指明监视哪个属性，监视的回调中用到哪个属性，那就监视哪个属性。
+
+- watchEffect有点像computed：
+
+  - 但computed注重的计算出来的值（回调函数的返回值），所以必须要写返回值。
+  - 而watchEffect更注重的是过程（回调函数的函数体），所以不用写返回值。
+ */
+<script>
+	import {ref,reactive,watch,watchEffect} from 'vue'
+	export default {
+		name: 'Demo',
+		setup(){
+			//数据
+			let sum = ref(0)
+			let msg = ref('你好啊')
+			let person = reactive({
+				name:'张三',
+				age:18,
+				job:{
+					j1:{
+						salary:20
+					}
+				}
+			})
+
+			//监视
+			/* watch(sum,(newValue,oldValue)=>{
+				console.log('sum的值变化了',newValue,oldValue)
+			},{immediate:true}) */
+            
+			// 表示 sum.value 和 person.job.j1.salary变了都走这个逻辑
+			watchEffect(()=>{
+				const x1 = sum.value
+				const x2 = person.job.j1.salary
+				console.log('watchEffect所指定的回调执行了')
+			})
+
+			//返回一个对象（常用）
+			return {
+				sum,
+				msg,
+				person
+			}
+		}
+	}
+</script>
+```
+
+### 6.生命周期
 
 - Vue3.0中可以继续使用Vue2.x中的生命周期钩子，但有有两个被更名：
   - ```beforeDestroy```改名为 ```beforeUnmount```
   - ```destroyed```改名为 ```unmounted```
 - Vue3.0也提供了 Composition API 形式的生命周期钩子，与Vue2.x中钩子对应关系如下：
-  - `beforeCreate`===>`setup()`
+  - `beforeCreate` ===> `setup()`
   - `created`=======>`setup()`
   - `beforeMount` ===>`onBeforeMount`
   - `mounted`=======>`onMounted`
@@ -3558,11 +8566,29 @@ export default {
   - `beforeUnmount` ==>`onBeforeUnmount`
   - `unmounted` =====>`onUnmounted`
 
-## 9.自定义hook函数
+**新增的钩子函数**
 
-- 什么是hook？—— 本质是一个函数，把setup函数中使用的Composition API进行了封装。
+除了和 2.x 生命周期等效项之外，组合式 API 还提供了以下调试钩子函数：
 
-- 类似于vue2.x中的mixin。(把公有部分单独写)
+- `onRenderTracked`
+- `onRenderTriggered`
+
+两个钩子函数都接收一个 `DebuggerEvent`，与 `watchEffect` 参数选项中的 `onTrack` 和 `onTrigger` 类似：
+
+```javascript
+export default {
+  onRenderTriggered(e) {
+    debugger
+    // 检查哪个依赖性导致组件重新渲染
+  },
+}
+```
+
+## 自定义hook函数
+
+- 本质是一个函数，把setup函数中使用的Composition API进行了封装。
+
+- **类似于vue2.x中的mixin**。(把公有部分单独写)
 
 - 自定义hook的优势: 复用代码, 让setup中的逻辑更清楚易懂。
 
@@ -3597,7 +8623,7 @@ export default function (){
 
 
 
-## 10.toRef
+## toRef
 
 - 作用：创建一个 ref 对象，其value值指向另一个对象中的某个属性。(**相当于引用**)
 - 语法：```const name = toRef(person,'name')```
@@ -3631,12 +8657,17 @@ salary:toRef(person.job.j1,'salary'),
 }
 ```
 
+## 组件间通信:crossed_swords:
 
 
 
-# 三、其它 Composition API
 
-## 1.shallowReactive 与 shallowRef
+
+
+
+## 其它 Composition API
+
+### 1.shallowReactive 与 shallowRef
 
 - shallowReactive：只处理对象最外层属性的响应式（浅响应式）。只考虑第一层数据的响应式
 - shallowRef：只处理基本数据类型的响应式, 不进行对象的响应式处理。
@@ -3644,7 +8675,7 @@ salary:toRef(person.job.j1,'salary'),
   -  如果有一个对象数据，结构比较深, 但变化时只是外层属性变化 ===> shallowReactive。
   -  如果有一个对象数据，后续功能不会修改该对象中的属性，而是生新的对象来替换 ===> shallowRef。
 
-## 2.readonly 与 shallowReadonly
+### 2.readonly 与 shallowReadonly
 
 - readonly: 让一个响应式数据变为只读的（深只读）。(相当于const)
 - shallowReadonly：让一个响应式数据变为只读的（浅只读）。
@@ -3702,7 +8733,7 @@ salary:toRef(person.job.j1,'salary'),
 
 ```
 
-## 3.toRaw 与 markRaw
+### 3.toRaw 与 markRaw
 
 **响应式对象转为普通对象**
 
@@ -3796,7 +8827,7 @@ salary:toRef(person.job.j1,'salary'),
 
 
 
-## 4.customRef
+### 4.customRef
 
 - 作用：创建一个自定义的 ref，并对其依赖项跟踪和更新触发进行显式控制。
 
@@ -3843,11 +8874,8 @@ salary:toRef(person.job.j1,'salary'),
   </script>
   ```
 
-  
 
-## 5.provide 与 inject
-
-<img src="vue%E7%AC%94%E8%AE%B02.0.assets/components_provide.png" style="width:300px" />
+### 5.pr3ovide 与 inject
 
 - 作用：实现<strong style="color:#DD5145">祖与后代组件间</strong>通信
 
@@ -3879,7 +8907,7 @@ salary:toRef(person.job.j1,'salary'),
      }
      ```
 
-## 6.判断是否是响应式数据api
+### 6.判断是否是响应式数据api
 
 - isRef: 检查一个值是否为一个 ref 对象
 - isReactive: 检查一个对象是否是由 `reactive` 创建的响应式代理
@@ -3922,9 +8950,9 @@ salary:toRef(person.job.j1,'salary'),
 
 
 
-# 四、Composition API 的优势
+## 四、Composition API 的优势
 
-## 1.Options API 存在的问题
+### 1.Options API 存在的问题
 
 使用传统OptionsAPI中，新增或者修改一个需求，就需要分别在data，methods，computed里修改 。
 
@@ -3973,7 +9001,7 @@ salary:toRef(person.job.j1,'salary'),
 
 
 
-## 2.Composition API 的优势
+### 2.Composition API 的优势
 
 我们可以更加优雅的组织我们的代码，函数。让相关功能的代码更加有序的组织在一起。
 
@@ -4018,17 +9046,17 @@ salary:toRef(person.job.j1,'salary'),
 
 
 
-# 五、新的组件
+## 五、新的组件
 
-## 1.Fragment
+### 1.Fragment
 
 - 在Vue2中: 组件必须有一个根标签
 - 在Vue3中: 组件可以没有根标签, 内部会将多个标签包含在一个Fragment虚拟元素中
 - 好处: 减少标签层级, 减小内存占用
 
-## 2.Teleport
+### 2.Teleport
 
-- 什么是Teleport？—— `Teleport` 是一种能够将我们的<strong style="color:#DD5145">组件html结构</strong>移动到指定位置的技术。
+-  `Teleport` 是一种能够将我们的<strong style="color:#DD5145">组件html结构</strong>移动到指定位置的技术。
 
   ```vue
   <teleport to="移动位置">
@@ -4041,7 +9069,143 @@ salary:toRef(person.job.j1,'salary'),
   </teleport>
   ```
 
-## 3.Suspense
+#### 概述
+
+在实际开发中，可能会遇到这样一个问题：某个组件包含在一个容器中，其宽高依赖于容器的宽高。而实际情况并不需要依赖于父容器，而是依赖于更高层级的容器。
+
+先看一个容器：
+
+```vue
+<template>
+<div class="box">
+  <TeleportView></TeleportView>
+</div>
+</template>
+
+<script setup>
+import TeleportView from '../components/TeleportView.vue'
+</script>
+
+<style lang="stylus">
+.box {
+  width: 400px;
+  height: 100px;
+  position: relative;
+}
+</style>
+```
+
+一个名为 `.box` 的容器包裹着一个名为 `TeleportView` 的组件，并且 `.box` 设置为相对定位，含有宽高。
+
+#### 不使用Teleport
+
+以下为子组件`TeleportView`的内容，这个示例下没有使用 `Teleport` ：
+
+```vue
+<template>
+  <button @click="modalOpen = true">
+      Open full screen modal!
+  </button>
+
+  <div v-if="modalOpen" class="modal">
+    <div>
+      I'm a modal!
+      <button @click="modalOpen = false">
+        Close
+    	</button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+ref: modalOpen = false
+</script>
+
+<style>
+.modal {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-color: rgba(0,0,0,.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  width: 300px;
+  height: 300px;
+  padding: 5px;
+}
+</style>
+```
+
+从效果可以看到， `.box` 的宽高限制了`TeleportView`的显示范围：
+
+![GIF (4)](vue%E7%AC%94%E8%AE%B02.0.assets/GIF%20(4).gif)
+
+#### 使用Teleport
+
+使用了Teleport的版本如下：
+
+```vue
+<template>
+  <button @click="modalOpen = true">
+      Open full screen modal!
+  </button>
+
+  <teleport to="body">
+    <div v-if="modalOpen" class="modal">
+      <div>
+        I'm a modal!
+        <button @click="modalOpen = false">
+          Close
+        </button>
+      </div>
+    </div>
+  </teleport>
+</template>
+
+<script setup>
+ref: modalOpen = false
+</script>
+
+<style>
+.modal {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-color: rgba(0,0,0,.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  width: 300px;
+  height: 300px;
+  padding: 5px;
+}
+</style>
+```
+
+以上，将模态框用 `teleport` 包裹，并将其附着于 `body` 。
+
+效果如下：
+
+![GIF (5)](vue%E7%AC%94%E8%AE%B02.0.assets/GIF%20(5).gif)在CodePen中查看效果：[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/MWjeOBd)
+
+### 3.Suspense
 
 - 等待异步组件时渲染一些额外内容，让应用有更好的用户体验
 
@@ -4149,9 +9313,9 @@ salary:toRef(person.job.j1,'salary'),
 
 
 
-# 六、其他
+## 六、其他
 
-## 1.全局API的转移
+### 1.全局API的转移
 
 - Vue 2.x 有许多全局 API 和配置。
 
@@ -4186,7 +9350,7 @@ salary:toRef(person.job.j1,'salary'),
     | Vue.use                   | app.use                                     |
     | Vue.prototype             | app.config.globalProperties                 |
 
-## 2.其他改变
+### 2.其他改变
 
 - data选项应始终被声明为一个函数。
 
@@ -4247,3 +9411,164 @@ salary:toRef(person.job.j1,'salary'),
   > 过滤器虽然这看起来很方便，但它需要一个自定义语法，打破大括号内表达式是 “只是 JavaScript” 的假设，这不仅有学习成本，而且有实现成本！建议用方法调用或计算属性去替换过滤器。
 
 - ......
+
+
+
+
+
+## RFC搜集.md
+
+本文搜集了一些非常不错的RFC，有可能实现了，也有可能没有实现，大部分在本文编写时还未实现，以官方RFC为主：[Vue RFCs](https://github.com/vuejs/rfcs)。
+<a name="JknjD"></a>
+
+### style-variables
+
+可以在css中使用js变量，方便通过js动态修改样式。
+
+[第一阶段的提案](https://github.com/vuejs/rfcs/blob/style-vars/active-rfcs/0000-sfc-style-variables.md)：
+
+```vue
+<template>
+  <div class="text">hello</div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      color: 'red'
+    }
+  }
+}
+</script>
+
+<style vars="{ color }">
+.text {
+  color: var(--color);
+}
+</style>
+```
+
+[第二阶段的提案](https://github.com/vuejs/rfcs/blob/style-vars-2/active-rfcs/0000-sfc-style-variables.md)：State-driven CSS Variable Injection in `<style>`
+
+```vue
+<template>
+  <div class="text">hello</div>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        color: 'red',
+        font: {
+          size: '2em',
+        },
+      }
+    },
+  }
+</script>
+
+<style>
+  .text {
+    color: v-bind(color);
+
+    /* expressions (wrap in quotes) */
+    font-size: v-bind('font.size');
+  }
+</style>
+```
+
+<a name="FHZfz"></a>
+
+### script setup & ref sugar
+
+将setup暴露到script级别，直接暴露顶级变量，不需要写 `export default` ，减少代码量。
+
+```vue
+<script setup>
+// imported components are also directly usable in template
+import Foo from './Foo.vue'
+import { ref } from 'vue'
+
+// write Composition API code just like in a normal setup()
+// but no need to manually return everything
+const count = ref(0)
+const inc = () => { count.value++ }
+</script>
+
+<template>
+  <Foo :count="count" @click="inc" />
+</template>
+```
+
+ref语法糖示例：
+
+```vue
+<script setup>
+// declaring a variable that compiles to a ref
+ref: count = 1
+
+function inc() {
+  // the variable can be used like a plain value
+  count++
+}
+
+// access the raw ref object by prefixing with $
+console.log($count.value)
+</script>
+
+<template>
+  <button @click="inc">{{ count }}</button>
+</template>
+```
+
+详见：
+
+- [script-setup](https://github.com/vuejs/rfcs/blob/script-setup/active-rfcs/0000-script-setup.md)
+- [sfc-script-setup](https://github.com/vuejs/rfcs/blob/sfc-improvements/active-rfcs/0000-sfc-script-setup.md)
+- [New script setup and ref sugar](https://github.com/vuejs/rfcs/pull/222)
+- [SFC Improvements](https://github.com/vuejs/rfcs/pull/182)
+- [New `<script setup>` and ref sugar implementation](https://github.com/vuejs/vue-next/pull/2532)
+- [Reactivity Transform · Discussion #369 · vuejs/rfcs](https://github.com/vuejs/rfcs/discussions/369)
+
+<a name="UeCDN"></a>
+
+### deep selectors in style scoped
+
+以前在Vue中使用 `/deep/` 也可做穿透选择器，在Vue3中增强了这一特性，包括如下选择器：
+
+```vue
+<style scoped>
+/* deep selectors */
+::v-deep(.foo) {}
+/* shorthand */
+:deep(.foo) {}
+
+/* targeting slot content */
+::v-slotted(.foo) {}
+/* shorthand */
+:slotted(.foo) {}
+
+/* one-off global rule */
+::v-global(.foo) {}
+/* shorthand */
+:global(.foo) {}
+</style>
+```
+
+详见：
+
+- [scoped-styles-changes](https://github.com/vuejs/rfcs/blob/master/active-rfcs/0023-scoped-styles-changes.md)
+
+### props sugar
+
+参考：
+
+- [prop sugar](https://github.com/vuejs/rfcs/issues/229)
+
+### vite：Pug support
+
+参考：
+
+- [Pug support](

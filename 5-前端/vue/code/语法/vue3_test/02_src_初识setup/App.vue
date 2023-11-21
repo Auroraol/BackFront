@@ -14,7 +14,6 @@
 	<br>
 	<br>
 	<button @click="test2">测试一下在Vue3的setup配置中去读取Vue2中的数据、方法</button>
-
 </template>
 
 <script>

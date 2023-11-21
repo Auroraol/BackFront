@@ -268,6 +268,7 @@ vue中的属性可以用即定义不用事先定义好
 	
 	4. 提供数据：```pubsub.publish('xxx',数据)```
 	
+
 ## nextTick
 
 1. 语法：```this.$nextTick(回调函数)```
