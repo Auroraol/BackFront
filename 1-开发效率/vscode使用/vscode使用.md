@@ -132,3 +132,17 @@
 | Shift + F11       | 跳过当前[函数](https://www.zhihu.com/search?q=函数&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A3164638122})( 下一步/上一步) |
 | Ctrl + Shift + D  | 显示调试                                                     |
 | Ctrl + K Ctrl + I | 显示悬停（显示光标悬停的内容）                               |
+
+
+
+
+
+# 选择语言模式
+
+自己设置的是alt + q
+
+![img](vscode%E4%BD%BF%E7%94%A8.assets/2425050-20210827005755826-2028596742.png)
+
+使用
+
+![img](vscode%E4%BD%BF%E7%94%A8.assets/2425050-20210827010113446-1979732276.png)
