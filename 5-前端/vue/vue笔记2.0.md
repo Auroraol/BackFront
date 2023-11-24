@@ -42,6 +42,29 @@ npm run serve
 
 <img src="vue%E7%AC%94%E8%AE%B0.assets/image-20231120154346809.png" alt="image-20231120154346809" style="zoom:80%;" />
 
+**vue-cli创建vue3项目结构**
+
+```
+wms-web
+├─ 
+├─ babel.config.js
+├─ jsconfig.json
+├─ package-lock.json
+├─ package.json
+├─ public
+│  ├─ favicon.ico
+│  └─ index.html
+├─ README.md
+├─ src
+│  ├─ App.vue
+│  ├─ assets
+│  │  └─ logo.png
+│  ├─ components
+│  │  └─ HelloWorld.vue
+│  └─ main.js
+└─ vue.config.js
+```
+
 ## 2.使用 vite 创建
 
 官方文档：https://v3.cn.vuejs.org/guide/installation.html#vite
@@ -52,7 +75,8 @@ vite官网：https://vitejs.cn
 - 优势如下：
   - 开发环境中，无需打包操作，可快速的冷启动。
   - 轻量快速的热重载（HMR）。
-  - 真正的按需编译，不再等待整个应用编译完成。
+  - 真正的按需编译，不再等待整个应用编译完成
+-  **vite.config.js  需要手动添加**
 
 ```bash
 ## 创建工程
@@ -63,6 +87,63 @@ cd <project-name>
 npm install
 ## 运行
 npm run dev
+```
+
+方式2
+
+```bash
+npm init vite@latest <project-name> -- --template vue
+## 进入工程目录
+cd <project-name>
+## 安装依赖
+npm install
+## 运行
+npm run dev
+```
+
+区别:
+
+1. **`npm init vite@latest <project-name> -- --template vue`**
+
+   这个命令使用 Vite 的特定版本（latest）来初始化一个项目，并使用 Vue 模板。通过 `-- --template vue` 部分，你指定了使用 Vue 模板进行项目初始化。这样创建的项目将包括 Vue.js 框架，并且配置为使用 Vite 构建工具。
+
+   ```
+   bashCopy code
+   npm init vite@latest <project-name> -- --template vue
+   ```
+
+2. **`npm init vite-app <project-name>`**
+
+   这个命令使用 Vite 提供的官方应用程序模板来初始化一个项目。这个模板提供了一个完整的 Vue.js 应用程序结构，包括一些默认的配置和示例文件。通过这个命令创建的项目也使用 Vite 构建工具。
+
+   ```
+   bashCopy code
+   npm init vite-app <project-name>
+   ```
+
+**总结：**
+
+- `npm init vite@latest <project-name> -- --template vue` 允许你指定 Vite 的版本并选择 Vue 模板，提供更多的灵活性。
+- `npm init vite-app <project-name>` 使用 Vite 提供的官方应用程序模板，提供了一个更快速的创建 Vue 项目的方式，适合那些不需要太多自定义配置的场景。
+
+**vite创建vue3项目结构**
+
+```
+wms-web
+├─ .gitignore
+├─ index.html
+├─ package-lock.json
+├─ package.json
+├─ public
+│  └─ favicon.ico
+└─ src
+   ├─ App.vue
+   ├─ assets
+   │  └─ logo.png
+   ├─ components
+   │  └─ HelloWorld.vue
+   ├─ index.css
+   └─ main.js
 ```
 
 **支持可视化操作**
@@ -3447,7 +3528,7 @@ App.vue
 <template>
 	<div>
 		<img src="./assets/logo.png" alt="logo">
-		<School></School>
+		<School></School>          //使用组件
 		<Student></Student>
 	</div>
 </template>
@@ -4267,7 +4348,7 @@ new Vue({
 
 1. 功能：让组件接收外部传过来的数据
 
-2. 传递数据：```<Demo name="xxx"/>```
+2. 传递数据：```<Demo 子属性name="xxx"/>```
 
 3. 接收数据：
 
@@ -4393,7 +4474,7 @@ School.vue
 
 <img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231121210237497.png" alt="image-20231121210237497" style="zoom:80%;" />
 
-App.vue
+**App.vue**
 
 ```vue
 <template>
@@ -4506,7 +4587,7 @@ App.vue
 
 ```
 
-
+**MyList.vue**
 
 ```vue
 <template>
@@ -4551,9 +4632,235 @@ App.vue
 </style>
 ```
 
+**MyItem.vue**
 
+```vue
+<template>
+	<li>
+		<label>
+			//  :checked 数据绑定 + @change 事件监听
+			<input type="checkbox" :checked="todo.done" @change="handleCheck(todo.id)"/>
+			<span>{{todo.title}}</span>
+		</label>
+		<button class="btn btn-danger" @click="handleDelete(todo.id)">删除</button>
+	</li>
+</template>
 
+<script>
+	export default {
+		name:'MyItem',
 
+		//声明接收todo、checkTodo、deleteTodo  // 组件参数
+		props:['todo','checkTodo','deleteTodo'],
+		// 方法
+		methods: {
+			//勾选or取消勾选
+			handleCheck(id){
+				//通知App组件将对应的todo对象的done值取反
+				this.checkTodo(id)
+			},
+			//删除
+			handleDelete(id){
+				if(confirm('确定删除吗？')){
+					//通知App组件将对应的todo对象删除
+					this.deleteTodo(id)
+				}
+			}
+		},
+	}
+</script>
+
+<style scoped>
+	/*item*/
+	li {
+		list-style: none;
+		height: 36px;
+		line-height: 36px;
+		padding: 0 5px;
+		border-bottom: 1px solid #ddd;
+	}
+
+	li label {
+		float: left;
+		cursor: pointer;
+	}
+
+	li label li input {
+		vertical-align: middle;
+		margin-right: 6px;
+		position: relative;
+		top: -1px;
+	}
+
+	li button {
+		float: right;
+		display: none;
+		margin-top: 3px;
+	}
+
+	li:before {
+		content: initial;
+	}
+
+	li:last-child {
+		border-bottom: none;
+	}
+
+	li:hover{
+		background-color: #ddd;
+	}
+	
+	li:hover button{
+		display: block;
+	}
+</style>
+```
+
+**MyHeader.vue**
+
+```vue
+// 导航栏
+<template>
+	<div class="todo-header">
+		<input type="text" placeholder="请输入你的任务名称，按回车键确认" v-model="title" @keyup.enter="add"/>
+	</div>
+</template>
+
+<script>
+	import {nanoid} from 'nanoid'        //使用nanoid()函数
+	export default {
+		name:'MyHeader',
+		//接收从App传递过来的addTodo  // 这个addTodo是传递的一个函数
+		props:['addTodo'],
+		data() {
+			return {
+				//收集用户输入的title
+				title:''
+			}
+		},
+		methods: {
+			add(){
+				//校验数据
+				if(!this.title.trim()) return alert('输入不能为空')
+				//将用户的输入包装成一个todo对象
+				const todoObj = {id:nanoid(), title:this.title, done:false}   //id:nanoid()得到全球唯一id
+				//通知App组件去添加一个todo对象
+				this.addTodo(todoObj)
+				//清空输入
+				this.title = ''
+			}
+		},
+	}
+</script>
+
+<style scoped>
+	/*header*/
+	.todo-header input {
+		width: 560px;
+		height: 28px;
+		font-size: 14px;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		padding: 4px 7px;
+	}
+
+	.todo-header input:focus {
+		outline: none;
+		border-color: rgba(82, 168, 236, 0.8);
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+	}
+</style>
+```
+
+**MyFooter.vue**
+
+```vue
+<template>
+	<div class="todo-footer" v-show="total">
+		<label>
+			<!-- <input type="checkbox" :checked="isAll" @change="checkAll"/> -->
+			<input type="checkbox" v-model="isAll"/>
+		</label>
+		<span>
+			<span>已完成{{doneTotal}}</span> / 全部{{total}}
+		</span>
+		<button class="btn btn-danger" @click="clearAll">清除已完成任务</button>
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'MyFooter',
+		props:['todos','checkAllTodo','clearAllTodo'],
+		// 计算属性
+		computed: {
+			//总数
+			total(){
+				return this.todos.length
+			},
+			//已完成数
+			doneTotal(){
+				//此处使用reduce方法做条件统计
+				/* const x = this.todos.reduce((pre,current)=>{
+					console.log('@',pre,current)
+					return pre + (current.done ? 1 : 0)
+				},0) */
+				//简写
+				return this.todos.reduce((pre,todo)=> pre + (todo.done ? 1 : 0) ,0)
+			},
+
+			//控制全选框
+			isAll:{
+				//全选框是否勾选
+				get(){
+					return this.doneTotal === this.total && this.total > 0
+				},
+				//isAll被修改时set被调用
+				set(value){
+					this.checkAllTodo(value)
+				}
+			}
+		},
+		methods: {
+			/* checkAll(e){
+				this.checkAllTodo(e.target.checked)
+			} */
+			//清空所有已完成
+			clearAll(){
+				this.clearAllTodo()
+			}
+		},
+	}
+</script>
+
+<style scoped>
+	/*footer*/
+	.todo-footer {
+		height: 40px;
+		line-height: 40px;
+		padding-left: 6px;
+		margin-top: 5px;
+	}
+
+	.todo-footer label {
+		display: inline-block;
+		margin-right: 20px;
+		cursor: pointer;
+	}
+
+	.todo-footer label input {
+		position: relative;
+		top: -1px;
+		vertical-align: middle;
+		margin-right: 5px;
+	}
+
+	.todo-footer button {
+		float: right;
+		margin-top: 5px;
+	}
+</style>
+```
 
 ### 方式2: 插槽
 
@@ -4584,11 +4891,11 @@ App.vue
      ```vue
      父组件中：
              <Category>
-                 <template slot="center">
+                 <template slot="center">       //1
                    <div>html结构1</div>
                  </template>
-     
-                 <template v-slot:footer>
+      
+                 <template v-slot:footer>      //2
                     <div>html结构2</div>
                  </template>
              </Category>
@@ -4596,8 +4903,8 @@ App.vue
              <template>
                  <div>
                     <!-- 定义插槽 -->
-                    <slot name="center">插槽默认内容...</slot>
-                    <slot name="footer">插槽默认内容...</slot>
+                    <slot name="center">插槽默认内容...</slot>  //1
+                    <slot name="footer">插槽默认内容...</slot>  //2
                  </div>
              </template>
      ```
@@ -4645,6 +4952,110 @@ App.vue
              </script>
      ```
 
+App.vue
+
+```vue
+<template>
+	<div class="container">
+		<Category title="美食" >
+			<!-- 图片放在 center中, 链接放在foot中-->
+			<img slot="center" src="https://s3.ax1x.com/2021/01/16/srJlq0.jpg" alt="">
+			<a slot="footer" href="http://www.atguigu.com">更多美食</a>
+		</Category>
+
+		<Category title="游戏" >
+			<ul slot="center">
+				<li v-for="(g,index) in games" :key="index">{{g}}</li>
+			</ul>
+			<div class="foot" slot="footer">
+				<a href="http://www.atguigu.com">单机游戏</a>
+				<a href="http://www.atguigu.com">网络游戏</a>
+			</div>
+		</Category>
+
+		<Category title="电影">
+			<video slot="center" controls src="http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"></video>
+			<!-- <template v-slot:footer>  省结构,指明槽 -->
+			<template v-slot:footer>
+				<div class="foot">
+					<a href="http://www.atguigu.com">经典</a>
+					<a href="http://www.atguigu.com">热门</a>
+					<a href="http://www.atguigu.com">推荐</a>
+				</div>
+				<h4>欢迎前来观影</h4>
+			</template>
+		</Category>
+	</div>
+</template>
+
+<script>
+	import Category from './components/Category'
+	export default {
+		name:'App',
+		components:{Category},
+		data() {
+			return {
+				foods:['火锅','烧烤','小龙虾','牛排'],
+				games:['红色警戒','穿越火线','劲舞团','超级玛丽'],
+				films:['《教父》','《拆弹专家》','《你好，李焕英》','《尚硅谷》']
+			}
+		},
+	}
+</script>
+
+<style scoped>
+	.container,.foot{
+		/* 横向对齐 */
+		display: flex;
+		justify-content: space-around;
+	}
+	h4{
+		text-align: center;
+	}
+</style>
+
+```
+
+Category.vue
+
+```vue
+<template>
+	<div class="category">
+		<h3>{{title}}分类</h3>
+		<!-- 定义一个插槽（挖个坑，等着组件的使用者进行填充） -->
+		<slot name="center">我是一些默认值，当使用者没有传递具体结构时，我会出现1</slot>
+		<slot name="footer">我是一些默认值，当使用者没有传递具体结构时，我会出现2</slot>
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'Category',
+		props:['title']
+	}
+</script>
+
+<style scoped>
+	.category{
+		background-color: skyblue;
+		width: 200px;
+		height: 300px;
+	}
+	h3{
+		text-align: center;
+		background-color: orange;
+	}
+	video{
+		width: 100%;
+	}
+	img{
+		width: 100%;
+	}
+</style>
+```
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231122200647002.png" alt="image-20231122200647002" style="zoom:67%;" />
+
 ### 方式3: 组件的自定义事件[类似信号]
 
 1. 一种组件间通信的方式，适用于：<strong style="color:red">子组件 ===> 父组件</strong>
@@ -4683,39 +5094,45 @@ App.vue
 
 1. 一种组件间通信的方式，适用于<span style="color:red">任意组件间通信</span>。适用于：<strong style="color:red">子组件 ===> 父组件</strong>
 
-2. 安装全局事件总线：
+2. 安装全局事件总线：main.js
 
-   ```vue
-   new Vue({
-   	......
-   	beforeCreate() {
-   		Vue.prototype.$bus = this //安装全局事件总线，$bus就是当前应用的vm
-   	},
-       ......
-   }) 
-   ```
+   + ```vue
+     new Vue({
+     	......
+     	beforeCreate() {
+     		Vue.prototype.$bus = this //安装全局事件总线，$bus就是当前应用的vm
+     	},
+         ......
+     }) 
+     ```
 
 3. 使用事件总线：
 
    1. 接收数据：A组件想接收数据，则在A组件中给$bus绑定自定义事件，事件的<span style="color:red">回调留在A组件自身。</span>
 
-      ```js
+      ```vue
       methods(){
         demo(data){......}
       }
       ......
       mounted() {
         this.$bus.$on('xxxx',this.demo)
-      }
+      }    
+      ..........
+      //取消订阅
+      beforeDestroy() {
+          this.$bus.$off('xxx')
+          pubsub.unsubscribe(this.pubId)
+      }    
       ```
 
-   2. 提供数据：```this.$bus.$emit('xxxx',数据)```
+   2. 提供数据：
 
-4. 最好在beforeDestroy钩子中，用$off去解绑<span style="color:red">当前组件所用到的</span>事件。
+      ```vue
+      this.$bus.$emit('xxxx',数据)
+      ```
 
-
-
-### 方式5: 消息订阅与发布
+### 方式5: 消息订阅与发布:crossed_swords:
 
 1. 一种组件间通信的方式，适用于<span style="color:red">任意组件间通信</span>。适用于：<strong style="color:red">子组件 ===> 父组件</strong>
 
@@ -4723,7 +5140,7 @@ App.vue
 
    1. 安装pubsub：```npm i pubsub-js```
 
-   2. 引入: ```import pubsub from 'pubsub-js'```
+   2. 使用需要引入: ```import pubsub from 'pubsub-js'```
 
    3. 接收数据：A组件想接收数据，则在A组件中订阅消息，订阅的<span style="color:red">回调留在A组件自身</span>
 
@@ -4733,17 +5150,21 @@ App.vue
       }
       ......
       mounted() {
-        this.pid = pubsub.subscribe('xxx',this.demo) //订阅消息
+        this.pid = pubsub.subscribe('xxx',this.demo) //订阅消息(接受)
       }
       ..........
       //取消订阅
       beforeDestroy() {
           this.$bus.$off('xxx')
           pubsub.unsubscribe(this.pubId)
-      },
+      }
       ```
 
-   4. 提供数据：```pubsub.publish('xxx',数据)```
+   4. 提供数据：
+   
+      ```vue
+      pubsub.publish('xxx',数据)
+      ```
 
 ## 过度与动画
 
@@ -4769,7 +5190,7 @@ Vue 在插入、更新或者移除 DOM 时，提供多种不同方式的应用�
 5. `v-leave-active`：定义过渡的状态。在元素整个过渡过程中作用，在离开过渡被触发后立即生效，在 `transition/animation` 完成之后移除。这个类可以被用来定义过渡的过程时间，延迟和曲线函数。
 6. `v-leave-to`: **2.1.8版及以上** 定义离开过渡的结束状态。在离开过渡被触发一帧后生效 (与此同时 `v-leave` 被删除)，在 `transition/animation` 完成之后移除。
 
-![transition.png](vue%E7%AC%94%E8%AE%B02.0.assets/1607650428670-3c31177b-5983-4aa3-8596-84ab0611b3fe.png%23align=left&display=inline&height=600&originHeight=600&originWidth=1200&size=11706&status=done&style=none&width=1200)<br />对于这些在 `enter/leave` 过渡中切换的类名，`v-` 是这些类名的前缀。使用 `<transition name="my-transition">` 可以重置前缀，比如 `v-enter` 替换为 `my-transition-enter`。
+对于这些在 `enter/leave` 过渡中切换的类名，`v-` 是这些类名的前缀。使用 `<transition name="my-transition">` 可以重置前缀，比如 `v-enter` 替换为 `my-transition-enter`。
 
 示例：
 
@@ -6445,6 +6866,93 @@ module.exports = {
    <router-link to="/home/news">News</router-link>
    ```
 
+示例
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231122200936282.png" alt="image-20231122200936282" style="zoom:67%;" />
+
+index.js 路由
+
+```js
+//该文件专门用于创建整个应用的路由器
+import VueRouter from 'vue-router'
+//引入组件
+import About from '../pages/About'
+import Home from '../pages/Home'
+import News from '../pages/News'
+import Message from '../pages/Message'
+
+//创建并暴露一个路由器
+export default new VueRouter({
+	routes:[
+		{
+			path:'/about',
+			component:About
+		},
+		// 多级路由
+		{
+			path:'/home',
+			component:Home,
+			// 
+			children:[
+				{
+					path:'news',  //此处一定不要写：/news
+					component:News,
+				},
+				{
+					path:'message',
+					component:Message,
+				}
+			]
+		}
+	]
+})
+
+```
+
+App.vue
+
+```vue
+<template>
+  <div>
+    <div class="row">
+      <Banner/>
+    </div>
+    <div class="row">
+      <div class="col-xs-2 col-xs-offset-2">
+        <div class="list-group">
+					<!-- 原始html中我们使用a标签实现页面的跳转 -->
+          <!-- <a class="list-group-item active" href="./about.html">About</a> -->
+          <!-- <a class="list-group-item" href="./home.html">Home</a> -->
+
+					<!-- Vue中借助router-link标签实现路由的切换 -->
+					<router-link class="list-group-item" active-class="active" to="/about">About</router-link>
+          <router-link class="list-group-item" active-class="active" to="/home">Home</router-link>
+        </div>
+      </div>
+      <div class="col-xs-6">
+        <div class="panel">
+          <div class="panel-body">
+						<!-- 指定组件的呈现位置 -->
+            <router-view></router-view>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+	import Banner from './components/Banner'
+	export default {
+		name:'App',
+		components:{Banner}
+	}
+</script>
+
+```
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231122201139356.png" alt="image-20231122201139356" style="zoom:67%;" />
+
 ### 4.路由的query参数
 
 1. 传递参数
@@ -6490,7 +6998,7 @@ module.exports = {
       			component:Test,
       			children:[
       				{
-                            name:'hello' //给路由命名
+                          name:'hello' //给路由命名
       					path:'welcome',
       					component:Hello,
       				}
@@ -6731,38 +7239,21 @@ module.exports = {
    2. 兼容性和hash模式相比略差。
    3. 应用部署上线时需要后端人员支持，解决刷新页面服务端404的问题。
 
-
 ## 使用Axios发送请求
 
-#### 13.2 为什么要使用 Axios
-
-
+### 使用 Axios
 
 由于 Vue.js 是一个 视图层框架 并且作者（尤雨溪）严格准守 SoC （关注度分离原则），所以 Vue.js 并不包含 AJAX 的通信功能，为了解决通信问题，作者单独开发了一个名为 vue-resource 的插件，不过在进入 2.0 版本以后停止了对该插件的维护并推荐了 Axios 框架
 
-
-
-#### 13.3 Axios的使用
-
-
-
-##### 13.3.1 安装vue axios
-
-
+#### 安装 vue axios
 
 ```bash
 npm install --save axios vue-axios
 ```
 
-
-
-##### 13.3.2 在main.js中引入
-
-
+#### main.js中引入
 
 在项目中使用axios模块
-
-
 
 ```javascript
 import Vue from 'vue'
@@ -6772,11 +7263,7 @@ import VueAxios from 'vue-axios'
 Vue.use(VueAxios, axios)
 ```
 
-
-
-##### 13.3.3 发送ajax请求
-
-
+####  发送ajax请求
 
 ```javascript
 <template>
@@ -6815,11 +7302,9 @@ export default {
       gender:'',
       hobby:''
     }
-
   },
   methods:{
     registfn:function(){
-
       this.axios({
         method:'get',
         url:'http://localhost:8090/regist?mail='+this.mail+'&password='+this.password,
@@ -6833,11 +7318,7 @@ export default {
 </script>
 ```
 
-
-
-##### 13.3.4 服务端解决跨域问题
-
-
+#### 服务端解决跨域问题
 
 ```xml
 <mvc:cors>  
@@ -6849,39 +7330,23 @@ export default {
 </mvc:cors>
 ```
 
-
-
 在spring-mvc.xml中加入上述这一段。其中，allowed-origins指的是允许的访问源的域名，"*"表示任何人都可以访问，也可以指明具体的域名
 
-
-
-##### 13.3.5 解决axios无法传递data中的参数问题
-
-
+#### 解决axios无法传递data中的参数问题
 
 原因：默认情况下发送axios时请求头中的内容类型为： （后端没有使用@RequestBody）
-
-
 
 ```xml
 Content-Type:application/json;charset=UTF-8
 ```
 
-
-
 而实际服务端需要的是：
-
-
 
 ```html
 Content-Type:application/x-www-form-urlencoded
 ```
 
-
-
 因此，使用axios的qs内置库中的方法进行内容类型的转换。
-
-
 
 ```javascript
 import Qs from 'qs'
@@ -6900,8 +7365,6 @@ this.axios({
 	alert(response.data.message)
 });
 ```
-
-
 
 ## Vue实战项目：Webpack登录验证后路由至列表页
 
@@ -7139,7 +7602,409 @@ new Vue({
 })
 ```
 
+## 第三方组件element-ui
 
+### 1、什么是element-ui？
+
+> element-ui是由饿了么前端团队推出的一套为开发者、设计师和产品经理准备的基于Vue.js 2.0的桌面组件库，而手机端有对应框架是 Mint UI 。整个ui风格简约，很实用，同时也极大的提高了开发者的效率，是一个非常受欢迎的组件库。
+
+[官网地址](https://element.eleme.cn/#/zh-CN)
+
+### 2、安装
+
+推荐使用npm安装方式
+
+```html
+npm install element-ui -save
+```
+
+### 3、引入
+
+全局引入，在vue入口main.js中增加内容如下
+
+```html
+import ElementUI from 'element-ui';
+
+
+
+import 'element-ui/lib/theme-chalk/index.css';
+
+
+
+
+
+
+
+Vue.use(ElementUI);
+```
+
+![img](vue%E7%AC%94%E8%AE%B02.0.assets/966ec276763d4b9593b4e822e7ae462d.png)
+
+局部引入，在指定的vue文件中引入所需要的组件或主题样式，如下
+
+```html
+ import '@/style/theme/element-variables.scss'
+
+
+
+ import { Message, MessageBox, Loading } from  'element-ui'
+
+
+
+    Vue.use(Loading.directive) 
+
+
+
+    Vue.prototype.$loading = Loading.service 
+
+
+
+    Vue.prototype.$msgbox = MessageBox 
+
+
+
+    Vue.prototype.$alert = MessageBox.alert 
+
+
+
+    Vue.prototype.$confirm = MessageBox.confirm 
+
+
+
+    Vue.prototype.$prompt = MessageBox.prompt 
+
+
+
+    Vue.prototype.$message = Message
+```
+
+### 4、使用element-ui
+
+打开官网，在组件里面选择要使用的代码直接cv大法
+
+![img](vue%E7%AC%94%E8%AE%B02.0.assets/aa17bf06f36d47ac9de8fec9190e4238.png)
+
+
+
+Hallow.vue代码
+
+```html
+<template>
+
+
+
+<div>
+
+
+
+    <el-table
+
+
+
+    :data="tableData"
+
+
+
+    style="width: 100%"
+
+
+
+    :row-class-name="tableRowClassName">
+
+
+
+    <el-table-column
+
+
+
+      prop="date"
+
+
+
+      label="日期"
+
+
+
+      width="180">
+
+
+
+    </el-table-column>
+
+
+
+    <el-table-column
+
+
+
+      prop="name"
+
+
+
+      label="姓名"
+
+
+
+      width="180">
+
+
+
+    </el-table-column>
+
+
+
+    <el-table-column
+
+
+
+      prop="address"
+
+
+
+      label="地址">
+
+
+
+    </el-table-column>
+
+
+
+  </el-table>
+
+
+
+  <i class="fa fa-camera-retro fa-lg"></i> fa-lg
+
+
+
+</div>
+
+
+
+</template>
+
+
+
+
+
+
+
+<!-- props 自定义属性,可以在外部使用自定义的名称，不需要导入的方式来进行套娃 -->
+
+
+
+<script>
+
+
+
+export default {
+
+
+
+    name: "Hello",
+
+
+
+    data: function(){
+
+
+
+        return {
+
+
+
+        tableData: [{
+
+
+
+          date: '2016-05-02',
+
+
+
+          name: '王小虎',
+
+
+
+          address: '上海市普陀区金沙江路 1518 弄',
+
+
+
+        }, {
+
+
+
+          date: '2016-05-04',
+
+
+
+          name: '王小虎',
+
+
+
+          address: '上海市普陀区金沙江路 1518 弄'
+
+
+
+        }, {
+
+
+
+          date: '2016-05-01',
+
+
+
+          name: '王小虎',
+
+
+
+          address: '上海市普陀区金沙江路 1518 弄',
+
+
+
+        }, {
+
+
+
+          date: '2016-05-03',
+
+
+
+          name: '王小虎',
+
+
+
+          address: '上海市普陀区金沙江路 1518 弄'
+
+
+
+        }]
+
+
+
+      }
+
+
+
+    },
+
+
+
+    methods: {
+
+
+
+      tableRowClassName({row, rowIndex}) {
+
+
+
+        if (rowIndex === 1) {
+
+
+
+          return 'warning-row';
+
+
+
+        } else if (rowIndex === 3) {
+
+
+
+          return 'success-row';
+
+
+
+        }
+
+
+
+        return '';
+
+
+
+      }
+
+
+
+    }
+
+
+
+}
+
+
+
+</script>
+
+
+
+
+
+
+
+<style>
+
+
+
+  .el-table .warning-row {
+
+
+
+    background: oldlace;
+
+
+
+  }
+
+
+
+
+
+
+
+  .el-table .success-row {
+
+
+
+    background: #f0f9eb;
+
+
+
+  }
+
+
+
+</style>
+```
+
+**效果**
+
+![img](vue%E7%AC%94%E8%AE%B02.0.assets/76a6009809f544a1ad8fa270237a2b6f.png)
+
+
+
+## 第三方图标库
+
+> **由于Element UI提供的字体图符较少，**一般会采用其他图表库，如著名的Font Awesome
+>
+> Font Awesome提供了675个可缩放的矢量图标，可以使用CSS所提供的所有特性对它们进行更改，包括大小、颜色、阴影或者其他任何支持的效果。
+>
+> **文档地址：**[Font Awesome，一套绝佳的图标字体库和CSS框架](http://fontawesome.dashgame.com/)
+>
+> **安装：**npm install font-awesome
+>
+> **使用：**import 'font-awesome/css/font-awesome.min.css'
+
+![img](vue%E7%AC%94%E8%AE%B02.0.assets/31af853d2a5f4769a5aa9b790cd4617b.png)
+
+**这里我是用了这行代码**
+
+```html
+  <i class="fa fa-camera-retro fa-lg"></i>
+```
+
+**页面效果**
+
+![img](vue%E7%AC%94%E8%AE%B02.0.assets/9711d29814564d51afbbbaa1c5b9c189.png)
 
 # Vuex
 
@@ -7972,6 +8837,122 @@ export default {
 
 # vue3
 
+## 分析脚手架
+
+mian.js
+
+```js
+//引入的不再是Vue构造函数了，引入的是一个名为createApp的工厂函数
+import { createApp } from 'vue'
+import App from './App.vue'
+
+//创建应用实例对象——app(类似于之前Vue2中的vm，但app比vm更“轻”)
+const app = createApp(App)
+
+//挂载
+app.mount('#app')
+
+```
+
+App.vue
+
+```vue
+<template>
+	<!-- Vue3组件中的模板结构可以没有根标签 -->
+	<img alt="Vue logo" src="./assets/logo.png">
+	<HelloWorld msg="Welcome to Your Vue.js App"/>
+</template>
+
+<script>
+	import HelloWorld from './components/HelloWorld.vue'
+
+	export default {
+		name: 'App',
+		components: {
+			HelloWorld
+		}
+	}
+</script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>
+
+```
+
+HelloWorld.vue
+
+```vue
+<template>
+  <div class="hello">
+    <h1>{{ msg }}</h1>
+    <p>
+      For a guide and recipes on how to configure / customize this project,<br>
+      check out the
+      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
+    </p>
+    <h3>Installed CLI Plugins</h3>
+    <ul>
+      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
+      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
+    </ul>
+    <h3>Essential Links</h3>
+    <ul>
+      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
+      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
+      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
+      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
+      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
+    </ul>
+    <h3>Ecosystem</h3>
+    <ul>
+      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
+      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
+      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
+      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
+      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
+    </ul>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'HelloWorld',
+  props: {
+    msg: String
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+h3 {
+  margin: 40px 0 0;
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+li {
+  display: inline-block;
+  margin: 0 10px;
+}
+a {
+  color: #42b983;
+}
+</style>
+
+```
+
+
+
 ## Composition API (组合式API)
 
 官方文档: https://v3.cn.vuejs.org/guide/composition-api-introduction.html
@@ -8061,6 +9042,7 @@ setup支持接收参数，第一个参数是props，接收来自父组件的传�
 import { watchEffect } from 'vue'
 export default {
   name: 'HelloWorld',
+    //参数
   props: {
     msg: String
   },
@@ -8730,13 +9712,11 @@ salary:toRef(person.job.j1,'salary'),
 }
 ```
 
-## 组件间通信:crossed_swords:
+## 组件间通信
 
+### props + setup的参数
 
-
-
-
-
+setup支持接收参数，第一个参数是props，接收来自父组件的传值。
 
 ## 其它 Composition API
 
@@ -9642,6 +10622,1208 @@ console.log($count.value)
 
 ### vite：Pug support
 
+# script setup语法糖:crossed_swords:
+
+它是 Vue3 的一个新语法糖，在 `setup` 函数中，所有 ES 模块导出都被认为是暴露给上下文的值，并包含在 setup() 返回对象中。相对之前的写法，语法更简单。
+
+## BEFORE
+
+```vue
+<script>
+import { defineComponent } from 'vue'
+export default defineComponent({
+  setup(props, context) {
+    // 在这里声明数据，或者编写函数并在这里执行它
+    return {
+      // 需要给 `<template />` 用的数据或函数，在这里 `return` 出去
+    }
+  },
+})
+</script>
+```
+
+## NOW
+
+```vue
+<script setup>
+...
+</script>
+```
+
+### 一、推荐使用箭头函数
+
+```js
+// 普通函数
+let sum = function(a, b) {
+	return a + b;
+}
+
+// 箭头函数
+let sum1 = (a, b) => {
+	return a + b;
+}
+```
+
+### 二、自动注册属性和方法, 无需返回，直接使用
+
+例子1
+
+```vue
+<template>
+<div>{{count}}</div>
+<button @click="inc">增加</button>
+<button @click="dec">减少</button>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+const count = ref(0)
+const inc = () => { count.value++ }
+const dec = () => { count.value-- }
+</script>
+```
+
+例子2
+
+```vue
+<template>
+  <div class="home">
+    值：{{flag }}
+    <button @click="change">修改值</button>
+  </div>
+</template>
+ 
+<!-- 只需要在script上添加setup -->
+<script lang="ts" setup>
+    import { ref } from 'vue';
+    <!-- flag变量不需要在 return出去了 -->
+    let flag=ref("啦啊啦啦啦啦")
+    <!-- 函数也可以直接引用,不用在return中返回 -->
+    let change=() => {
+        flag.value='略略略略略略略略'
+    }
+</script>
+```
+
 参考：
 
-- [Pug support](
+- [sfc-script-setup](https://github.com/vuejs/rfcs/blob/sfc-improvements/active-rfcs/0000-sfc-script-setup.md)
+- [New script setup and ref sugar](https://github.com/vuejs/rfcs/pull/222)
+- [New `script setup` (without ref sugar)](https://github.com/vuejs/rfcs/pull/227)
+
+### 三、组件自动注册
+
+在 script setup 中，引入的组件可以直接使用
+
++ 无需再通过components进行注册，并且无法指定当前组件的名字，它会自动以文件名为主
+
++ 不用再写name属性
+
+例子1
+
+```vue
+<template>
+  <div class="home">
+    <test-com></test-com>
+  </div>
+</template>
+ 
+<script lang="ts" setup>
+ 
+// 组件命名采用的是大驼峰，引入后不需要在注册
+// 在使用的使用直接是小写和横杠的方式连接 test-com
+import TestCom from "../components/TestCom.vue"    // 一般情况不加{}
+ 
+</script>
+```
+
+例子2
+
+```html
+<script setup>
+import MyComponent from './MyComponent.vue'
+</script>
+
+<template>
+  <MyComponent />
+</template>
+```
+
+### 四、传参
+
+**defineProps** 用来接收父组件传来的 props ; **defineEmits** 用来声明触发的事件
+
++ <strong style="color:red">父组件 ===> 子组件</strong>   defineProps()
++ **<strong style="color:red">子组件 ===> 父组件</strong>**  defineEmits()
++ 传参:  `@`或`:`参数传递
+
+#### 例子1
+
+<strong style="color:red">父组件 ===> 子组件</strong>   defineProps
+
+ **父组件传递参数：**
+
+```javascript
+<template>
+  <div class="box">
+    <test-com :info="msg" time="42分钟"></test-com>
+  </div>
+</template>
+ 
+<script lang="ts" setup>
+    import TestCom from "../components/TestCom.vue"
+    
+	let msg='今天是2023年3月14日'
+</script>
+```
+
+**子组件接受参数：**
+
+```javascript
+<template>
+    <div>
+        <h2> 啦啦啦啦啦啦啦啦</h2>
+        <p>信息: {{ info}}</p>
+        <p> {{ time }}</p>
+    </div>
+</template>
+ 
+<script lang="ts" setup>
+ 
+import {defineProps} from 'vue'
+ 
+defineProps({
+    info:{
+        type:String,
+        default:'----'
+    },
+    time:{
+        type:String,
+        default:'0分钟'
+    },
+})
+ 
+</script>
+```
+
+父组件同样使用`@`或`:`参数  传递。
+
+#### 例子2
+
+**<strong style="color:red">子组件 ===> 父组件</strong>**  defineEmits
+
+子组件`CompA.vue`
+
+```html
+<script setup>
+defineProps({
+  msg: String
+})
+
+const emit = defineEmits(['func'])
+
+// 不用有箭头函数
+function func() {
+  emit('func', 'func called')
+}
+    
+</script>
+
+<template>
+  <div>{{msg}}</div>
+  <button @click="func">func</button>
+</template>
+```
+
+父组件`App.vue`
+
+```html
+<script setup>
+    import CompA from './components/Comp-A.vue'
+
+    function fun(text) {
+      console.log(text)
+    }
+</script>
+
+<template>
+	<CompA msg="hello" @func='fun'></CompA>
+</template>
+```
+
+父组件同样使用`@`或`v-on:`接收。
+
+#### 例子3
+
+**<strong style="color:red">父组件 <===> 子组件</strong>**  两者结合
+
+父组件
+
+```javascript
+//父组件
+<template>
+    //监听子组件的getChild方法，传msg给子组件
+    <Child @getChild="getChild" :title="msg" />
+</template>
+ 
+<script setup>
+    import { ref } from 'vue'
+    import Child from '@/components/Child.vue'
+
+    const msg = ref('parent value')
+    const getChild = (e) => {
+        // 接收父组件传递过来的数据
+        console.log(e); // child value
+    }
+</script>
+```
+
+ 子组件
+
+```javascript
+//子组件
+<template>
+    <div @click="toEmits">Child Components</div>
+</template>
+ 
+<script setup>
+// defineEmits,defineProps无需导入，直接使用
+const emits = defineEmits(['getChild']);
+//接收父组件传来的props
+const props = defineProps({
+    title: {
+        type: String,
+        defaule: 'defaule title'
+    }
+});
+
+const toEmits = () => {
+    // 向父组件抛出带参事件getChild（其中参数是child value）
+    emits('getChild', 'child value') 
+}
+// 获取父组件传递过来的数据
+console.log(props.title); // parent value
+</script>
+```
+
+- 子组件通过 defineProps 接收父组件传过来的数据
+- 子组件通过 defineEmits 定义事件发送信息给父组件
+
+### 五、useSlots()和 useAttrs()
+
+获取 slots 和 attrs
+
+1. `useAttrs`：这是用来获取 attrs 数据，但是这和 vue2 不同，里面包含了 `class`、`属性`、`方法`。
+
+```javascript
+<template>
+    <component v-bind='attrs'></component>
+</template>
+<srcipt setup lang='ts'>
+   const attrs = useAttrs();
+<script>
+```
+
+1. `useSlots`: 顾名思义，获取插槽数据。
+
+使用示例：
+
+```javascript
+// 旧
+<script setup>
+  import { useContext } from 'vue'
+  const { slots, attrs } = useContext()
+</script>
+ 
+// 新
+<script setup>
+  import { useAttrs, useSlots } from 'vue'
+  const attrs = useAttrs()
+  const slots = useSlots()
+</script>
+```
+
+------
+
+### 六、defineExpose API
+
+defineExpose ----> [组件暴露出自己的属性]
+
+传统的写法，我们可以在父组件中，通过 ref 实例的方式去访问子组件的内容，但在 script setup 中，该方法就不能用了，setup 相当于是一个闭包，除了内部的 `template`模板，谁都不能访问内部的数据和方法。
+
+> <script setup> 的组件默认不会对外部暴露任何内部声明的属性。
+>
+> 如果有部分属性要暴露出去，可以使用 `defineExpose`
+
+如果需要对外暴露 setup 中的数据和方法，需要使用 defineExpose API。
+
+tip:// defineExpose无需导入，直接使用
+
+**示例**：
+
+子组件
+
+```javascript
+//子组件
+<template>
+    {{msg}}
+</template>
+ 
+<script setup>
+import { ref } from 'vue'
+let msg = ref("Child Components");
+let num = ref(123);
+defineExpose({
+    msg,
+    num
+});
+</script>
+```
+
+父组件
+
+```javascript
+//父组件
+<template>
+    <Child ref="child" />
+</template>
+ 
+<script setup>
+import { ref, onMounted } from 'vue'
+import Child from '@/components/Child.vue'
+let child = ref(null);
+onMounted(() => {
+    console.log(child.value.msg); // Child Components
+    console.log(child.value.num); // 123
+})
+</script>
+```
+
+------
+
+### 七、 新增指令 v-memo
+
+`v-memod`会记住一个模板的子树，元素和组件上都可以使用。
+
+该指令接收一个固定长度的数组作为依赖值进行“记忆比对”。如果数组中的每个值都和上次渲染的时候相同，则整个子树的更新会被跳过。
+
+即使是虚拟 DOM 的 VNode 创建也将被跳过，因为子树的记忆副本可以被重用。
+
+**因此渲染的速度会非常的快。**
+
+tip:正确地声明记忆数组是很重要。
+
+开发者有责任指定正确的依赖数组，以避免必要的更新被跳过。
+
+```javascript
+<li v-for="item in listArr"  :key="item.id"  v-memo="['valueA'，'valueB']">
+    {{ item.name   }}
+</li>
+```
+
+`v-memod`的指令使用较少，它的作用是：缓存模板中的一部分数据。
+
+只创建一次，以后就不会再更新了。也就是说用内存换取时间。
+
+------
+
+### 八、style v-bind
+
+**`例：style v-bind`将`span`变成红色**
+
+```javascript
+<template>
+  <span> 啦啦啦啦啦啦啦啦啦啦 </span>  
+</template>
+ 
+<script setup>
+  import { reactive } from 'vue'
+  const state = reactive({
+    color: 'red'
+  })
+</script>
+<style scoped>
+  span {
+    /* 使用v-bind绑定state中的变量 */
+    color: v-bind('state.color');
+  }  
+</style>
+```
+
+------
+
+### 九、定义组件其他配置
+
+配置项的缺失，有时候我们需要更改组件选项，在`setup`中我们目前是无法做到的。我们需要在`上方`再引入一个 `script`，在上方写入对应的 `export`即可，需要单开一个 script。
+
+<script setup> 可以和普通的 <script> 一起使用。
+
+普通的 `<script>` 在有这些需要的情况下或许会被使用到：
+
+- 无法在 `<script setup>` 声明的选项，例如 `inheritAttrs` 或通过插件启用的自定义的选项。
+- 声明命名导出。
+- 运行副作用或者创建只需要执行一次的对象。
+
+在script setup 外使用export default，其内容会被处理后放入原组件声明字段。
+
+```javascript
+<script>
+// 普通 `<script>`, 在模块范围下执行(只执行一次)
+runSideEffectOnce()
+// 声明额外的选项
+  export default {
+    name: "MyComponent",
+    inheritAttrs: false,
+    customOptions: {}
+  }
+</script>
+<script setup>
+    import HelloWorld from '../components/HelloWorld.vue'
+    // 在 setup() 作用域中执行 (对每个实例皆如此)
+    
+</script>
+<template>
+  <div>
+    <HelloWorld msg="Vue3 + TypeScript + Vite"/>
+  </div>
+</template>
+```
+
+# $ref语法糖
+
+为了避免在使用ref的时候，需要通过`.value`调用，vue3提供了`$ref`语法糖。
+
+要开启`$ref`语法糖，需要先在`vite.config.js`中配置：
+
+```javascript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+export default defineConfig({
+  plugins: [
+    vue({
+      reactivityTransform: true,
+      refSugar:true
+    })
+  ]
+})
+```
+
+然后在vue中直接使用即可：
+
+```html
+<script setup>
+import { watchEffect } from 'vue'
+
+let count = $ref(1)
+
+watchEffect(() => console.log(count))
+
+function inc() {
+  count++
+}
+</script>
+
+<template>
+<div>{{count}}</div>
+<button @click="inc">increase</button>
+</template>
+```
+
+参考：[Reactivity Transform](https://github.com/vuejs/rfcs/discussions/369)
+
+---
+
+
+在较早的版本中（**目前已弃用**），可以使用 `ref:`创建。<br />ref语法糖是一个引起热议的试验性特性，因为其违反了JavaScript语法规则，必须借助编译器实现解析。
+
+```vue
+<template>
+<div>{{count}}</div>
+<button @click="inc">增加</button>
+<button @click="dec">减少</button>
+</template>
+
+<script setup>
+ref: count = 0
+const inc = () => { count++ }
+const dec = () => { count-- }
+</script>
+```
+
+参考：
+
+- [New script setup and ref sugar](https://github.com/vuejs/rfcs/pull/222)
+- [Ref sugar](https://github.com/vuejs/rfcs/pull/228)
+
+<a name="qpxTU"></a>
+
+## 顶层await
+
+可以直接在script setup中使用await，相当于创建了一个 `async setup()`。<br />示例：
+
+```html
+<script setup>
+let res = await fetch('http://localhost:3000/')
+console.log(await res.text())
+</script>
+
+```
+
+<a name="Z09Uh"></a>
+
+## 组件传值
+
+<a name="EPBiI"></a>
+
+### `defineProps`和`defineEmits`
+
+要接收值，需要使用`defineProps`；需要传递值，需要使用`defineEmits`
+
+示例：<br />子组件`CompA.vue`
+
+```html
+<script setup>
+defineProps({
+  msg: String
+})
+
+const emit = defineEmits(['func'])
+
+function func() {
+  emit('func', 'func called')
+}
+</script>
+
+<template>
+  <div>{{msg}}</div>
+  <button @click="func">func</button>
+</template>
+```
+
+父组件`App.vue`
+
+```html
+<script setup>
+import CompA from './components/Comp-A.vue'
+
+function fun(text) {
+  console.log(text)
+}
+</script>
+
+<template>
+<CompA msg="hello" @func='fun'></CompA>
+</template>
+```
+
+上面的示例：从父组件传递一个msg的参数到子组件，子组件通过`defineProps`接收，相当于optional API的`props`选项；子组件通过 `defineEmits` 定义emit，组件中有一个按钮，点击的时候，通过`emit`定义自定义事件并传出数据，父组件同样使用`@`或`v-on:`接收。
+
+<a name="YO4cb"></a>
+
+### 组件ref
+
+通过引入组件的方式获取组件ref，默认是不会暴露任何声明的数据的，需要使用`defineExpose`暴露属性或方法。
+
+示例：<br />子组件`CompA.vue`
+
+```html
+<script setup>
+function func() {
+  console.log('func called')
+}
+
+const a = 1
+const b = ref(2)
+
+defineExpose({
+  a,
+  b,
+  func
+})
+</script>
+```
+
+父组件`App.vue`
+
+```html
+<script setup>
+import CompA from './components/Comp-A.vue'
+import { onMounted } from 'vue'
+
+const compA = $ref(null)
+onMounted(() => {
+  // 在渲染完成后，才能获取到此组件对象
+  console.log(compA)
+})
+</script>
+
+<template>
+	<CompA ref='compA'></CompA>
+</template>
+```
+
+除了使用组件ref外，通过`$parent`获取也是同样的操作。
+
+<a name="KZps0"></a>
+
+## 自定义指令
+
+自定义指令，必须按`vNameOfDirective`的格式创建。
+
+示例：
+
+```html
+<script setup>
+let count = $ref(0)
+
+function inc() {
+  count++
+}
+
+const vClickDirective = {
+  mounted: (el) => {
+    el.click()
+  }
+}
+</script>
+
+<template>
+  <div>{{count}}</div>
+  <button @click="inc" v-click-directive>increase</button>
+</template>
+```
+
+
+
+## 第三方组件element-ui
+
+```
+npm install element-plus --save
+```
+
+![image-20231123110217653](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231123110217653.png)
+
+
+
+# vuecli vue3引入Element-plus
+
+代码见: [3testelement](C:\Users\16658\Documents\GitHub\java_note\5-前端\vue\code\3testelement)
+
+[element-ui](https://so.csdn.net/so/search?q=element-ui&spm=1001.2101.3001.7020)是vuecli2版本，与vuecli3版本不兼容，故vuecli3则是使用element-plus。想要将element-plus引入到项目中去，有以下方法：
+
+#### vuecli3引入[Element-plus](https://so.csdn.net/so/search?q=Element-plus&spm=1001.2101.3001.7020)
+
+- [一、下载安装element-plus依赖包到项目中去](https://blog.csdn.net/qq_45438471/article/details/129478396#elementplus_5)
+- [二、导入（组件和组件样式）](https://blog.csdn.net/qq_45438471/article/details/129478396#_8)
+- - [1、全手动导入（不推荐：手动导入组件，手动导入组件样式）](https://blog.csdn.net/qq_45438471/article/details/129478396#1_9)
+  - [2、半自动导入（推荐：手动导入组件，自动导入组件样式）](https://blog.csdn.net/qq_45438471/article/details/129478396#2_57)
+  - [3、全自动导入组件和样式（推荐）](https://blog.csdn.net/qq_45438471/article/details/129478396#3_142)
+- [三、测试](https://blog.csdn.net/qq_45438471/article/details/129478396#_255)
+
+[elementPLUS的官网](https://element-plus.org/zh-CN/component/),注意不要与elementUI官网搞混,  elementPLUS和elementUI的部分组件名有区别。
+
+## 一、下载安装element-plus依赖包
+
+下载安装element-plus依赖包到项目中去
+
+```
+npm i -D element-plus
+```
+
+## 二、导入（组件和组件样式）
+
+### 1、全手动导入（不推荐：手动导入组件，手动导入组件样式）
+
+（1）在组件中手动导入组件和组件样式
+
+```html
+<template>
+	<div>
+		<el-button @click="summit"><el-button>
+	</div>
+</template>
+<script setup>
+import { ElMessage } from 'element-plus'
+import 'element-plus/es/components/message/style/css'
+const summit = () => {
+	Elmessage.warning('warning')
+}
+</script>
+
+12345678910111213
+```
+
+（2）在main.js中全局注册
+
+- 1.插件式全局注册
+    在vue的机制中，**组件间是不能互相直接使用**，需要手动导入组件及其样式。而使用app.use()是将插件全局注册，之后在其他组件中可以直接使用，无需再手动导入。
+
+```javascript
+import { createApp } from 'vue'
+
+// 导入elemen-plus全部组件
+import ElementPlus from 'element-plus'
+// 导入element-plus全部组件样式
+import 'element-plus/dist/index.css'
+
+const app = createApp()
+// 全局注册插件
+app.use(ElementPlus)
+app.mount("#app")
+```
+
+- 2.组件式全局注册
+    与app.use()不同的是，使用app.component()是将组件全局注册，在其他组件中也可以直接使用。
+
+```javascript
+import { createApp } from 'vue'
+
+import { ElButton } from 'element-plus'
+import 'element-plus/es/components/button/style/css'
+
+const app = createApp()
+app.component(ElButton)
+app.mount("#app")
+```
+
+  你会发现无论是（1）（2）还是（3），操作都很麻烦，当项目一大就会很混乱，所以不推荐这个方法。
+
+### 2、半自动导入（推荐：手动导入组件，自动导入组件样式）
+
+首先你需要安装unplugin-element-plus插件，帮助我们导入所需组件的样式。
+
+```js
+npm install -D unplugin-element-plus 
+```
+
+  **补充： unplugin-element-plus插件的主要功能如下：**
+
+> import { ElButton } from ‘element-plus’
+>
+>     ↓ ↓ ↓ ↓ ↓ ↓↓ ↓ ↓ ↓
+>
+> import { ElButton } from ‘element-plus’
+> import ‘element-plus/es/components/button/style/css’
+
+  然后配置vue.config.js文件。
+
+```javascript
+// 直接复制到vue.config.js中去就可以了
+const { defineConfig } = require('@vue/cli-service')
+
+const ElementPlus = require('unplugin-element-plus/webpack')
+
+module.exports = defineConfig({
+  transpileDependencies: true,
+  configureWebpack: {
+  	plugins: [
+  		ElementPlus({
+  			libs: [{
+  				libraryName: 'element-plus',
+                esModule: true,
+                resolveStyle: (name) => {
+                	return `element-plus/theme-chalk/${name}.css`
+                }
+  			}]
+  		})
+  	]
+  }
+})
+
+12345678910111213141516171819202122
+```
+
+  为了方便管理，将所需组件封装起来，再统一注册。在components文件下新建一个ElementPLUS.js文件。
+
+```javascript
+import { 
+	ElButton,
+	ElTable,
+	ElAlert,
+	ElAside,
+	ElAutocomplete,
+	ElAvatar,
+	ElBacktop,
+	ElBadge
+} from 'element-plus'
+
+const cpns = [
+  ElButton,
+  ElTable,
+  ElAlert,
+  ElAside,
+  ElAutocomplete,
+  ElAvatar,
+  ElBacktop,
+  ElBadge
+]
+
+// 将组件结合暴露出去
+export default cpn
+123456789101112131415161718192021222324
+```
+
+  在main.js文件中将组件全局注册、（局部导入请参考上面）
+
+```javascript
+import { createApp } from 'vue';
+// 将封装起来的组件集合导入，并逐个全局注册
+import cpn from './components/ElementPLUS.js'
+import router from './router'
+
+const app = createApp(App),
+app.use(router)
+for (const c of cpn) {
+	// vue使用component函数全局注册组件，use函数全局注册插件
+	app.component(c.name, c)
+}
+app.mount('#app')
+```
+
+  当所需组件很多的时候，半自动导入的弊端就会暴露出来，就是麻烦。但是还是需要学一学这种方。
+
+### 3、全自动导入组件和样式（推荐）
+
+首先在2的基础上，你还需要安装 [unplugin-vue-components](https://www.npmjs.com/package/unplugin-vue-components) 和 unplugin-auto-import这两款插件
+
+```
+npm install -D unplugin-vue-components unplugin-auto-import
+```
+
+> - unplugin-auto-import插件可以`自动根据代码上下文来确定导入哪些模块`，比如函数、常量等，而不需要额外的配置。
+> - unplugin-vue-components插件在我的理解，就是可以根据需要自动导入Vue组件及其样式。
+> - 再加上unplugin-element-plus插件帮助我们导入所需组件的样式，三者相辅相成，让我们无需再显式地导入和注册组件及其样式。解放双手啦~~~
+
+```javascript
+// 直接复制到vue.config.js中去就可以了
+const { defineConfig } = require('@vue/cli-service')
+
+const ElementPlus = require('unplugin-element-plus/webpack')
+const AutoImport = require('unplugin-auto-import/webpack')
+const Components = require('unplugin-vue-components/webpack')
+/*
+{键名：值}是将对象解构，只有键名匹配才能解构，否则失败
+unplugin-vue-components支持多种组件库，需要其中的ElementPlus组件库，所以将其解构，然后配置。
+若需要Ant Design Vue，则
+const { AntDesignVueResolver } = require('unplugin-vue-components/resolvers')，然后配置。
+重申以下，不配置自动导入失效，因为无法检索到所需组件在哪个组件库中
+*/
+const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
+
+module.exports = defineConfig({
+  transpileDependencies: true,
+  configureWebpack: {
+  	plugins: [
+  		/**
+  		ElementPlus({
+  			libs: [{
+  				libraryName: 'element-plus',
+                esModule: true,
+                resolveStyle: (name) => {
+                	return `element-plus/theme-chalk/${name}.css`
+                }
+  			}]
+  		}),**/
+  		AutoImport({
+        	resolvers: [
+        		ElementPlusResolver(),
+        		// AntDesignVueResolver()
+        	],
+      	}),
+      	Components({
+        	resolvers: [
+        		// 需要ElementPus组件库，所以配置ElementPlus组件库
+        		ElementPlusResolver(),
+        		// AntDesignVueResolver()
+        	],
+      	})
+  	]
+  }
+})
+```
+
+- 若全自动导入组件和样式，其实连下载element-plus安装包和unplugin-element-plus插件到项目中去这两步操作都可以省去。只需要下载安装unplugin-vue-components和unplugin-auto-import这两个插件就可以了。
+- （unplugin-vue-components和unplugin-element-plus）或者（unplugin-auto-import和unplugin-element-plus）这两个搭配在遇到`el组件创建el组件时都会出错`，只有unplugin-vue-components和unplugin-auto-import搭配使用才正确。所以**unplugin-element-plus在三者中可有可无**。
+
+## 三、测试
+
+  在App.vue中添加几个element-ui看是否成功
+
+```javascript
+<template>
+  	<el-button>Default</el-button>
+    <el-button type="primary">Primary</el-button>
+    <el-button type="success">Success</el-button>
+    <el-button type="info">Info</el-button>
+    <el-button type="warning">Warning</el-button>
+    <el-button type="danger">Danger</el-button>
+</template>
+```
+
+![img](vue%E7%AC%94%E8%AE%B02.0.assets/%25P(W)YSQT2A5%25NZ%5D%5B%7B3YM5.png)
+
+# vite vue3引入Element-plus
+
+具体方法直接见官网
+
+具体代码见:  [3viteelement](C:\Users\16658\Documents\GitHub\java_note\5-前端\vue\code\3viteelement)
+
+[教程2 Vue3中引入Element Plus_vue3引入](https://blog.csdn.net/boxuestudio/article/details/128916186)
+
+要求:
+
++ node.js   > V18
+
++ vite  > V3
+
+**（1）引入Element开发环境**
+
+```shell
+npm install element-plus --save 
+npm i -D unplugin-auto-import
+npm i -D unplugin-vue-components
+```
+
+**（2）自动引入Element**
+
+```shell
+npm install -D unplugin-vue-components unplugin-auto-import
+```
+
+ **（3）在配置文件中进行配置，本人使用的是Vit构建工具**
+
+如果使用Vite作为构建工具，配置文件为vite.config.js，配置方法如下：
+
+```js
+import { fileURLToPath, URL } from "node:url";
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+
+import AutoImport from 'unplugin-auto-import/vite';
+import Components from 'unplugin-vue-components/vite';
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    AutoImport({
+      resolvers: [ElementPlusResolver()],
+    }),
+    Components({
+      resolvers: [ElementPlusResolver()],
+    }),
+  ],
+
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
+
+  server: {
+    port: 8080,
+  },
+});
+```
+
+ **Element Plus图标全局引入【推荐】**
+
+```shell
+# 图标
+npm install @element-plus/icons-vue  
+```
+
+main.js中增加下面的代码：
+
+```js
+import { createApp } from "vue";
+import App from "./App.vue";
+import * as ElementPlusIconsVue from "@element-plus/icons-vue";
+
+const app = createApp(App);
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component);
+}
+app.mount("#app");
+```
+
+例子
+
+```vue
+<template>
+  <el-form :model="form" ref="formRef" :rules="rules" label-width="120px">
+        <el-form-item label="活动名称:" prop="ActName">
+          <el-input v-model="form.ActName" placeholder="请输入活动名称" />
+        </el-form-item>
+        <el-form-item label="活动分类:" prop="ActCategory">
+          <el-select v-model="form.ActCategory" placeholder="请选择活动类型">
+            <el-option label="下单奖励红包" value="1" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="活动有效时间:" prop="time">
+          <el-date-picker
+            v-model="form.time"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始时间"
+            end-placeholder="结束时间"
+            value-format="YYYY-MM-DD"
+          />
+        </el-form-item>
+        <el-form-item label="活动金额:" prop="TotalAmount">
+          <el-input v-model="form.TotalAmount" />
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="createClick">创 建</el-button>
+        </el-form-item>
+      </el-form>
+</template>
+
+<script setup>
+  import { reactive, ref } from "vue";
+  const formRef = ref(null);
+  const form = reactive({
+    ActName: "",
+    ActCategory: "",
+    BeginTime: "",
+    EndTime: "",
+    TotalAmount: "",
+    time: [],
+  })
+  // form表单的校验规则
+  const rules = reactive({
+    ActName: [{ required: true, message: "请输入活动名称", trigger: "blur" }],
+    ActCategory: [
+      {
+        required: true,
+        message: "请选择活动类型",
+        trigger: "change",
+      },
+    ],
+    TotalAmount: [
+      {
+        required: true,
+        message: "请输入活动金额",
+        trigger: "blur",
+      },
+    ],
+    time: [
+      {
+        type: "array",
+        required: true,
+        message: "请选择活动有效时间",
+        trigger: "change",
+      },
+    ],
+  });
+
+  // 创建活动事件
+  const createClick = () => {
+    formRef.value.validate(async (isValid, invalidFields) => {
+      if (isValid) {
+        console.log(tableData.value);
+        if (tableData.value.length === 0) {
+          ElMessage({
+            message: "配置信息不能为空",
+            type: "warning",
+          });
+          return;
+        }
+        const params = {
+          ActName: form.ActName,
+          ActCategory: form.ActCategory,
+          BeginTime: form.time[0],
+          EndTime: form.time[1],
+          TotalAmount: form.TotalAmount,
+          ActConfigs: tableData.value,
+        };
+        const loading = ElLoading.service({
+          lock: true,
+          text: "Loading",
+          background: "Transparent",
+        });
+        const res = await actCreate(params);
+        if (res.result) {
+          loading.close();
+          ElMessage({
+            message: res.msg,
+            type: "success",
+          });
+          formRef.value.resetFields(); //清空表单
+        } else {
+          loading.close();
+          ElMessage.error(res.msg);
+        }
+      } else {
+        console.log("验证不通过,不能提交,请检查");
+      }
+    });
+  };
+</script>
+```
+
+![image-20231123160157899](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231123160157899.png)
+
+
+
+# 路径问题
+
+不带{ }以组件方式 引入后，用 组件名. 变量 的方式一直提示变量未定义的问题，改成直接 带{ }引入变量直接使用变量就不提示错误了，（不知道是不是我引入的包和他人不一样的原因...），
+
+直接记录一下查到的两个区别
+
+**1、import ...与import{ }的区别：**
+
+**import{ }：**带{ }引入的是某个变量，多个变量可以逗号分隔；
+**import ...：**不带{ }引入的是组件，可以用.的方式使用组件里的变量
+
+![image-20231123205819408](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231123205819408.png)
+
+**2、import from '@路径' 与 import from '../路径'的区别**
+
+**import from '@路径'**：以根目录的方式定义相对路径，从项目第一级节点开始表示src/
+**import from '../路径'**：是以父子目录的方式定义相对路径
+                   . /指当前目录
+
+```js
+import { fileURLToPath, URL } from "node:url";
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+
+import AutoImport from 'unplugin-auto-import/vite';
+import Components from 'unplugin-vue-components/vite';
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    AutoImport({
+      resolvers: [ElementPlusResolver()],
+    }),
+    Components({
+      resolvers: [ElementPlusResolver()],
+    }),
+  ],
+
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
+
+  server: {
+    port: 3000,
+  },
+});
+
+```
+
+
+
+# vscode 中 vue文件下，css无提示
+
+目前只能手动切换
+
+![在这里插入图片描述](vue%E7%AC%94%E8%AE%B02.0.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQyNDI2MTU5,size_16,color_FFFFFF,t_70.png)

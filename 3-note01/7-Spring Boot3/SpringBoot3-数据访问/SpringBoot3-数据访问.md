@@ -273,10 +273,15 @@ ptions选项作用大致如下：
 
 官网 [代码生成器（新） | MyBatis-Plus (baomidou.com)](https://baomidou.com/pages/779a6e/#快速入门)
 
-#### pom.xml
+#### ①  pom.xml
 
 ```xml
-	    <!-- mybatisplus+数据库相关开始-->
+    <!-- mysql -->
+    <dependency>
+        <groupId>com.mysql</groupId>
+        <artifactId>mysql-connector-j</artifactId>
+    </dependency>	    
+    <!-- mybatisplus+数据库相关开始-->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-core</artifactId>
@@ -306,7 +311,11 @@ ptions选项作用大致如下：
         </dependency>
 ```
 
-#### 更新配置
+#### ②  **mapper包**
+
+**添加@Mapper注解**
+
+#### ③  更新配置
 
 ```properties
 #在较新的MySQL驱动版本中，使用com.mysql.cj.jdbc.Driver来代替com.mysql.jdbc.Driver作为数据库驱动的类名是推

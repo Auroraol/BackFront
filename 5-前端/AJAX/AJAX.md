@@ -202,12 +202,6 @@ xhr.open('GET', 'http://127.0.0.1:8000/server-ie?t' + Date.now());
 
 ![img](AJAX.assets/1652780085283-5dda6624-340c-468a-98c9-30c917c3263d.png)
 
-
-
-
-
-
-
 # 原生方式 发送AJAX请求
 
 ## 准备

@@ -1,0 +1,22 @@
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:/mapper/*.xml
+server:
+  port: 9090
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: 741106
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://localhost:3306/wms
+    username: root
+
+swagger:
+  enable: true
+  title: "仓库管理系统"
+  description: "用户信息操作"
+  version: "1.0.0"
+  author: "lfj"
+  url: ""
+  email: "1665834268@qq.com"

@@ -1,0 +1,11 @@
+server:
+    port: 9000
+
+swagger:
+  enable: true
+  title: "仓库管理系统"
+  description: "用户信息操作"
+  version: "1.0.0"
+  author: "lfj"
+  url: ""
+  email: "1665834268@qq.com"
