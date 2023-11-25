@@ -6,7 +6,8 @@
       </el-aside>
 
       <el-container style="height: 100%">
-        <el-header style="text-align: right; font-size: 12px">
+        <!-- <el-header style="text-align: right; font-size: 12px; border: #c45656;"> -->
+        <el-header style="text-align: right; font-size: 12px; background-color: #409EFF 1px solid;">
           <Header></Header>
         </el-header>
 
