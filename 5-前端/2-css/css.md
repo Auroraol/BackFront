@@ -356,7 +356,9 @@ body>p{
 
 
 
-# 3、美化网页元素:crossed_swords:
+# 3、 css核心属性:crossed_swords:
+
+美化网页元素
 
 1. 有效的传递页面信息
 2. 美化网页，页面漂亮才能吸引客户
@@ -365,32 +367,113 @@ body>p{
 
 ## 3.1、字体样式
 
-span标签：重点要突出的字，使用span标签套起来
+### 文字大小 font-size
 
-```text
-CSS 使用 font-size 属性定义字体大小。
-font-family：字体
-font-size：字体大小
-font-weight：字体粗细
+1. 单位`px`,`pt`
+   + px
+     + `font-size: 16px;`   浏览器默认文字大小为`16px`
+     + 文字大小低于`12px`之后，是不显示的
+   + pt
+     + `font-size: 9pt;`
+     + ``9pt = 12px`
+
+2. 数值只能为**偶数**（不可以设置为奇数）
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/preview/OJdEZMN?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/OJdEZMN">
+  Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+### 文字颜色 color:rgb
+
+1. `color: pink;`
+2. 十六进制颜色
+   + 值 0 1 2 3 4 5 6 7 8 9 A B C D E F
+   + #12 3d fa
+   + `color:#aabbcc;`= `#abc`
+
+```css
+color: #05d2b3;
+color: #ff0000;
+color: #f00;
+color: #66bb00;
+color: #6b0;
+color: #abc;
 ```
 
-  **字体大小**font-size
+3. `rgb(颜色值,颜色值,颜色值)`
 
-1. px（像素）大小是我们网页的最常用的单位
+-   颜色值的取值`0~255`
 
-2. 谷歌浏览器默认的文字大小为16px
+```css
+color: rgb(000, 000, 000);
+color: rgb(255,255,255);
+```
 
-3. 不同浏览器可能默认显示的字号大小不一致，我们尽量给一个明确值大小，不要默认大小
+4. 透明度rgba
 
-4. 可以给 body 指定整个页面文字的大小
+   rgba 透明，IE8以下不支持，但是好用
+   opacity: value; 透明，value取值0~1，高版本支持
+   filter: alpha(opacity="value");兼容，value取值0~100，低版本支持（IE浏览器）
+   opacity 需要做兼容来支持各个版本
+   opacity 具有继承性，子元素会继承父元素的透明，一起变浅，因此建议使用rgba
 
-**字体粗细**font-weight
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/preview/xxMzjXe?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/xxMzjXe">
+  Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+### 文字字体 font-family
+
+```css
+font-family: "楷体";
+font-family: 'Times New Roman';
+font-family: '甲骨文','草书','楷体','宋体';
+/* 后三个文字字体为备选，以便不显示甲骨文时候使用 */
+```
+
+### 字体加粗 font-weight
 
 ![img](css.assets/v2-03927af6ec0893608b1d1970ba1bdf35_r.jpg)
 
- **字体样式**font-family
+#### 文字加粗 font-weight: bold/bolder;
+
+```css
+font-weight: bold;
+font-weight: bolder;
+font-weight: 600; 
+/* 600-900为加粗 */
+```
+
+#### 加粗文字变常规文字 font-weight: normal;
+
+```css
+font-weight: 500;
+font-weight: 400;
+font-weight: normal;
+```
+
+#### 常规文字变细 font-weight: lighter;
+
+```css
+font-weight: 300;
+font-weight: 200;
+font-weight: 100;
+font-weight: lighter;
+```
+
+### 文字倾斜 font-style
 
 ![img](css.assets/v2-dd0aa9ac5ebf7027c197432fb9e410f2_r.jpg)
+
+```css
+font-style: oblique;
+font-style: italic;
+```
+
+### 综合案例
 
 例子
 
@@ -469,9 +552,9 @@ font-weight：字体粗细
 
 ![img](css.assets/v2-3309e8bb11d737296916fc849a2143a8_r.jpg)
 
-## 3.2、文本样式
+## 3.2、文本样式  
 
-### 文本对齐方式text-align:xxx
+### 文本对齐方式  text-align:xxx
 
 （1）height = line-height时   **//    相当于文字居中**
 ![在这里插入图片描述](css.assets/70-16579334034616.png)
@@ -481,9 +564,22 @@ font-weight：字体粗细
 （3）height<line-height时   // **偏下**
 ![在这里插入图片描述](css.assets/70-16579334034628.png)
 
-### 首行缩进text-indent:xxx
+### 首行缩进  text-indent:xxx
 
-### 行高line-height:xxx
+1. `xxx`是一个表示大小的单位
+   + 该值可以为**负值**
+   + 默认情况下`1em= 16px`
+
+2. `1em`表示一个文字的字体大小
+3. `xxx`和该元素的字体大小相关
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/preview/QWYxrQa?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/QWYxrQa">
+  Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+### 行高  line-height:xxx
 
 <img src="css.assets/image-20230918152752743.png" alt="image-20230918152752743" style="zoom:67%;" />
 
@@ -670,7 +766,103 @@ text-shadow:5px 5px 5px 颜色
 
 <img src="css.assets/image-20230918154420446.png" alt="image-20230918154420446" style="zoom:67%;" />
 
-## 3.6、列表ul li
+## 3.6、列表的属性
+
+### 去除样式 list-style: none;
+
+```css
+list-style: none;
+```
+
+### 更改小圆圈的样式 list-style-type
+
+```css
+list-style-type: disc;				/* 实心圆 */
+list-style-type: circle;			/* 空心圆 */
+list-style-type: square;			/* 正方实体 */
+list-style-type: none;				/* 去除样式 */
+list-style-type: decimal;			/* 阿拉伯数字 */
+list-style-type: georgian;		/* 格鲁吉亚语言 */
+list-style-type: lower-roman;	/* 小罗马 */
+list-style-type: lower-greek;	/* 希腊 */
+list-style-type: lower-latin;	/* 英文 */
+```
+
+### 更改列表小圆圈的位置 list-style-position
+
+- 默认值在`li`外侧
+
+```css
+list-style-position: outside; /* 默认值 */
+list-style-position: inside;  /* 在li内侧 */
+```
+
+### 自定义图片为列表样式 list-style-image: url
+
+```css
+list-style-image: url(../images/1.jpg);
+```
+
+### 综合案例
+
+例子1
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style type="text/css">
+        ul {
+            background-color: skyblue;
+            /* 1.注意！要背住的 是一个简写 是啥呢 去除列表样式 */
+            /* list-style: none; */
+            /* 2.更改小圆圈的样式 */
+            list-style-type: disc;/* 实心圆 */
+            list-style-type: circle;/* 空心圆 */
+            list-style-type: square;/* 正方实体 */
+            list-style-type: none;/* 去除样式 */
+            list-style-type: decimal;/* 阿拉伯数字 */
+            list-style-type: georgian;/* 格鲁吉亚语言 */
+            list-style-type: lower-roman;/* 小罗马 */
+            list-style-type: lower-greek;/* 希腊 */
+            list-style-type: lower-latin;/* 英文 */
+            /* 3.更改列表小圆圈的位置 默认值在li外侧 */
+            list-style-position: outside;/* 默认值 */
+            list-style-position: inside;/* 在li内侧 */
+            /* 4.自定义图片为列表样式 */
+            list-style-image: url(../images/1.jpg);
+        }
+
+        li {
+            background-color: slateblue;
+        }
+    </style>
+</head>
+
+<body>
+    <ul>
+        <li>阿拉丁神灯许愿：年年有余</li>
+        <li>阿拉丁神灯许愿：年年有余</li>
+        <li>阿拉丁神灯许愿：年年有余</li>
+        <li>阿拉丁神灯许愿：年年有余</li>
+    </ul>
+</body>
+
+</html>
+```
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/preview/poGKVKK?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/poGKVKK">
+  Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+例子2
 
 ```css
 /*list-style{
@@ -699,8 +891,6 @@ a:hover{
 	width:300px;
 }
 ```
-
-
 
 ```html
 <!DOCTYPE html>
@@ -760,6 +950,14 @@ a:hover{
 ![image-20230918154656443](css.assets/image-20230918154656443.png)
 
 ## 3.7、背景
+
+
+
+
+
+
+
+
 
 1. 背景颜色：background
 2. 背景图片
@@ -834,6 +1032,83 @@ background-size: 100%; /*全显示*/
 <body>
 
 </body>
+</html>
+```
+
+## 3.9、 图片相关的属性 vertical-align
+
+1. **图片默认自带3px间隙**，[如何解决图片3px问题](https://blog.csdn.net/qq_37855074/article/details/88826617)？
+
+- img添加：`vertical-align: top;`
+- img添加：`display: block;`
+- **float**：浮动的意义就是为了解决缝隙
+
+2. 注意！`vertical-align`这个属性只能给图片设置
+
+- 给其他元素设置则无效
+
+```css
+vertical-align: baseline;	/* 默认值 图片基线（图片底部往下3px）和其他元素对齐 */
+vertical-align: bottom;		/* 图片底部和其他元素对齐 */
+vertical-align: middle;		/* 图片中心和其他元素对齐 */
+vertical-align: top;			/* 图片上边和其他元素对齐（一般用来解决图片3px问题） */
+```
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/preview/eYxKrMP?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/eYxKrMP">
+  Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+## 3.10 扩展-字词间距
+
+### 字间距 letter-spacing
+
+- 用于**中文**
+
+```css
+div {
+    letter-spacing: 20px;
+}
+```
+
+### 词间距 word-spacing
+
+- 用于**英文**（**空格隔开**，它是来识别空格的）
+
+```css
+p {
+    word-spacing: 30px;
+}
+```
+
+### 代码汇总
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style type="text/css">
+        div {
+            /* 字间距 用于中文 */
+            letter-spacing: 20px;
+        }
+
+        p {
+            /* 词间距 用于英文（空格隔开 它是来识别空格的） */
+            word-spacing: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>万事顺意，平安喜乐，nice</div>
+    <p>sss sss ssssss sssss ssss ssssssss sssss</p>
+</body>
+
 </html>
 ```
 
@@ -1664,7 +1939,7 @@ padding-bottom: 50px; /* 下内填充 */
 </body>
 ```
 
-![image.png](https://cdn.nlark.com/yuque/0/2022/png/25380982/1648694358945-3c4e8ad8-f71f-4236-b1cb-bf915d655797.png#clientId=u994dd6d9-d692-4&from=paste&height=301&id=uc55147ad&originHeight=525&originWidth=524&originalType=binary&ratio=1&rotation=0&showTitle=false&size=34784&status=done&style=stroke&taskId=ubcb34160-7b09-41ec-a7e8-fa4bde6527d&title=&width=300)
+<img src="https://cdn.nlark.com/yuque/0/2022/png/25380982/1648694358945-3c4e8ad8-f71f-4236-b1cb-bf915d655797.png#clientId=u994dd6d9-d692-4&from=paste&height=301&id=uc55147ad&originHeight=525&originWidth=524&originalType=binary&ratio=1&rotation=0&showTitle=false&size=34784&status=done&style=stroke&taskId=ubcb34160-7b09-41ec-a7e8-fa4bde6527d&title=&width=300" alt="image.png" style="zoom:50%;" />
 
 #### 辅助计算
 
@@ -1684,7 +1959,6 @@ padding-bottom: 50px; /* 下内填充 */
 5. 第三行到第四行 行高24px   第三行12
 
 - 间隙12/2=6
-  <a name="BswQ4"></a>
 
 #### 马身练习
 
@@ -1759,9 +2033,7 @@ padding-bottom: 50px; /* 下内填充 */
 </body>
 ```
 
-![image.png](https://cdn.nlark.com/yuque/0/2022/png/25380982/1648694888881-9b1ae80f-4d2f-47c1-8fd9-e34877ab92cb.png#clientId=u994dd6d9-d692-4&from=paste&height=287&id=u786f2915&originHeight=505&originWidth=527&originalType=binary&ratio=1&rotation=0&showTitle=false&size=115546&status=done&style=stroke&taskId=u59c7628b-cb48-4bd5-bf38-3030b5a29af&title=&width=300)
-
-
+<img src="https://cdn.nlark.com/yuque/0/2022/png/25380982/1648694888881-9b1ae80f-4d2f-47c1-8fd9-e34877ab92cb.png#clientId=u994dd6d9-d692-4&from=paste&height=287&id=u786f2915&originHeight=505&originWidth=527&originalType=binary&ratio=1&rotation=0&showTitle=false&size=115546&status=done&style=stroke&taskId=u59c7628b-cb48-4bd5-bf38-3030b5a29af&title=&width=300" alt="image.png" style="zoom:50%;" />
 
 ## 怪异盒模型
 
@@ -2093,7 +2365,7 @@ overflow：scoll/*滚动*/
 
 ## Flex布局(弹性布局)
 
-> 弹性盒子
+> 弹性盒子: 作用类似于浮动布局
 
 ![flex主轴方向.png](https://cdn.nlark.com/yuque/0/2023/png/22608300/1676953375531-7e429201-90f7-473b-b438-d385a675146b.png#averageHue=%23fcfcfc&clientId=uf449dac6-aba7-4&from=paste&height=771&id=uf16746bf&originHeight=1541&originWidth=2992&originalType=binary&ratio=2&rotation=0&showTitle=false&size=64647&status=done&style=none&taskId=u3a54f573-85ad-49f8-ad8e-bb13e37dd74&title=&width=1496)
 
