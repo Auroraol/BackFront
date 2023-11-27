@@ -1,4 +1,4 @@
-# 1、导入方式
+1、导入方式
 
 ```java
 <!DOCTYPE html>
@@ -951,13 +951,128 @@ a:hover{
 
 ## 3.7、背景
 
+### 背景图大小 background-size
+
+1. `background-size: 水平大小 垂直大小;`
+
+- 可以写数值，也可以写百分比
+- `background-size: 100px 200px;`
+- `background-size: 100% 100%;`（如果不是等比例的图片，会拉伸变形）
+
+2. `background-size: cover;` 覆盖
+
+- 等比例拉伸到宽高**最大值** 
+- 弊端：图片显示可能不完全
+
+<img src="https://cdn.nlark.com/yuque/0/2022/png/25380982/1642173921018-206e98a2-4d25-46f2-8c8c-1128170d1b61.png#clientId=u97ef8e6d-705a-4&from=paste&height=226&id=ub3cea68a&originHeight=565&originWidth=808&originalType=binary&ratio=1&rotation=0&showTitle=false&size=318444&status=done&style=stroke&taskId=u6ff9afae-1b88-4c6d-bdba-9ac42914e31&title=&width=323" alt="image.png" style="zoom:50%;" />
+
+3. `background-size: contain;`
+
+- 等比例拉伸到宽高**最小值 **
+- 弊端：可能会遗漏背景色
+
+### 背景图原点 background-origin
+
+1. 什么是背景图原点 ? 
+
+- 就是背景图以哪一块为起始点，开始向四周平铺
+- 默认 `padding` 区域
+
+2. `background-origin: padding-box;` 默认值
+
+- 背景图以 `padding` 区域为原点开始向四周平铺
+
+![image.png](https://cdn.nlark.com/yuque/0/2022/png/25380982/1650080888803-ba59eec3-0901-457d-aa4d-1ecd36f77086.png#clientId=u45071fb1-bdfd-4&from=paste&height=250&id=uc74b2c60&originHeight=323&originWidth=453&originalType=binary&ratio=1&rotation=0&showTitle=false&size=130108&status=done&style=stroke&taskId=ua8e6097c-fbea-4da8-9ff5-5c5892be2d5&title=&width=350)
+
+3. `background-origin: content-box;` 
+
+- 背景图以 `contnet` 区域为原点开始向四周平铺
+
+<img src="https://cdn.nlark.com/yuque/0/2022/png/25380982/1642174395847-e119ce91-b399-4684-86d1-93da33f43236.png#clientId=u97ef8e6d-705a-4&from=paste&height=300&id=u3a663456&originHeight=653&originWidth=762&originalType=binary&ratio=1&rotation=0&showTitle=false&size=351945&status=done&style=stroke&taskId=ue15cf1c1-4218-48a1-90c7-824bf16265b&title=&width=350" alt="image.png" style="zoom: 50%;" />
+
+4. `background-origin: border-box;`
+
+- 背景图以 `border` 区域为原点开始向四周平铺
+
+​                                                   <img src="https://cdn.nlark.com/yuque/0/2022/png/25380982/1650081080118-cacf656f-2a54-4c55-b4c3-e318900f38a1.png#clientId=u45071fb1-bdfd-4&from=paste&height=299&id=u813a2e2b&originHeight=408&originWidth=477&originalType=binary&ratio=1&rotation=0&showTitle=false&size=194011&status=done&style=stroke&taskId=uce8435e6-494c-48df-9ee7-4945640d288&title=&width=350" alt="image.png" style="zoom:67%;" />
+
+### 背景图裁切 background-clip: *-box;
+
+1. `background-clip: border-box;` 默认值，背景图在边框区域裁切
+2. `background-clip: padding-box;` 背景图在`padding`区域裁切
+
+- 也就是说背景展现到`padding` 区域，`border`区域不展示背景图
+
+3. `background-clip: content-box;` 背景图在内容`content`区域裁切  
+
+- 也就是说背景展现到`content`区域，`padding``border`区域没有背景
+
+### 多背景图的引入 background: url(图片路径), url(.图片路径);
+
+1. 使用逗号隔开  
+2. **不能**同时设置**背景颜色 **
+3. 如果你想要设置背景颜色，那么在设置完多背景图之后，设置`background-color`即可
+4. 示例
+
+```css
+background: url(图片路径) no-repeat left top, url(图片路径) no-repeat right bottom;
+/* 如果在后续代码中想要设置背景颜色 */
+background-color: green;
+```
+
+### 完整代码
+
+#### 例子1
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS3背景相关属性</title>
+    <style>
+        div {
+            width: 1900px;
+            height: 1700px;
+            border: 100px solid rgba(0, 0, 0, 0.5);
+            padding: 200px 100px;
+            margin: 0 auto;
+            background: #f90 url(./g.jpg);
+            /* 1、背景图大小 */
+            background-size: 100px 200px;
+            background-size: 100% 100%; 
+            background-size: cover; 
+            background-size: contain;
+            /* 2、背景图原点 */
+            background-origin: padding-box;
+            background-origin:content-box;
+            background-origin: border-box;
+            /* 3、背景图裁切   默认值是显示到边框 */
+            background-clip: border-box;
+            background-clip: padding-box;
+            background-clip: content-box; 
+            /* 4、多背景图引入 */
+            background: url(./1.jpg) no-repeat left top, url(./2.jpg) no-repeat right bottom;
+            background-color: cyan;
+        }
+    </style>
+</head>
+
+<body>
+    <div>我是content区域的填充文字</div>
+</body>
+
+</html>
+```
+
+<img src="https://cdn.nlark.com/yuque/0/2022/png/25380982/1642174928202-d2b5d630-83cb-498b-a77a-0df6a6c13ff1.png#clientId=u97ef8e6d-705a-4&from=paste&height=357&id=uf7c433a4&originHeight=714&originWidth=716&originalType=binary&ratio=1&rotation=0&showTitle=false&size=157236&status=done&style=stroke&taskId=u2318eceb-c8f1-4543-997b-1679296a8f5&title=&width=358" alt="image.png" style="zoom: 50%;" />
 
 
 
-
-
-
-
+#### 例子2
 
 1. 背景颜色：background
 2. 背景图片
@@ -1060,9 +1175,64 @@ vertical-align: top;			/* 图片上边和其他元素对齐（一般用来解决
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
 
-## 3.10 扩展-字词间距
+## 3.10、 边框属性
 
-### 字间距 letter-spacing
+- 四个方向边框的设置
+  - border:粗细 线型 颜色;
+  - 线型:solid直线 / dashed虚线 / dotted点状线 / double双线;
+- 单方向边框的设置
+  - 上边框  `border-top:`粗细 线型 颜色;
+  - 下边框 `border-bottom`
+  - 左边框 `border-left`
+  - 右边框 `border-right`
+- 面试题：利用边框制作一个三角形
+  - transparent 代表透明
+  - width: 0px;代码不能删除
+- 块级元素如果不设置宽度,默认的宽度和父元素保持一致
+
+```css
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .box {
+            width: 0;
+            border-top: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid pink;
+            border-left: 10px solid transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="box"></div>
+</body>
+</html>
+```
+
+## 3.11、CSS 属性的继承性
+
+- 不可继承的：display、margin、border、padding、background、height、min-height、max- height、、min-width、max-width、overflow、position、left、right、top、 bottom、z-index、float、clear、table-layout、vertical-align
+- 所有元素可继承：visibility和cursor。
+- 内联元素可继承：letter-spacing、word-spacing、line-height、color、font、 font-family、font-size、font-style、font-variant、font-weight、text- decoration、text-transform。
+- 块状元素可继承：text-indent和text-align
+- 列表元素可继承：list-style、list-style-type、list-style-position、list-style-image。
+- 表格元素可继承：border-collapse。
+
+1.  ***一般来说：font-,line-,text-,color,opacity有继承性
+2.  注意：a标签继承不了color
+3.  拓展知识：
+    1. border: inherit; border的值继承与父元素的border值
+
+## 3.10 扩展
+
+### 字词间距
+
+#### 字间距 letter-spacing
 
 - 用于**中文**
 
@@ -1072,7 +1242,7 @@ div {
 }
 ```
 
-### 词间距 word-spacing
+#### 词间距 word-spacing
 
 - 用于**英文**（**空格隔开**，它是来识别空格的）
 
@@ -1082,7 +1252,7 @@ p {
 }
 ```
 
-### 代码汇总
+#### 代码汇总
 
 ```html
 <!DOCTYPE html>
@@ -1111,6 +1281,36 @@ p {
 
 </html>
 ```
+
+### 单行文本省略号效果
+
+```
+.para {
+  /* 设置宽度 */
+  width:300px;
+	/* 文本不换行 */
+  white-space: nowrap;
+  /* 溢出隐藏 */
+  overflow: hidden;
+  /* 添加省略号 */
+  text-overflow: ellipsis;
+}
+```
+
+### 多行文本省略号效果
+
+```
+.box {
+  width: 600px;
+  border: 1px solid red;
+  display: -webkit-box;
+  overflow: hidden;  
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+```
+
+
 
 
 
