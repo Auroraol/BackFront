@@ -143,3 +143,107 @@ const toggle = () => {
 
 
 
+
+
+
+
+# TODO
+
+![image-20231204143711244](Element%E7%AC%94%E8%AE%B0.assets/image-20231204143711244.png)
+
+0: 表示该菜单只有管理员能看见
+
+0,1: 表示该菜单用户和管理员都能看见
+
+![image-20231204152828089](Element%E7%AC%94%E8%AE%B0.assets/image-20231204152828089.png)
+
+
+
+
+
+
+
+![image-20231204152510726](Element%E7%AC%94%E8%AE%B0.assets/image-20231204152510726.png)
+
+
+
+![image-20231204152439441](Element%E7%AC%94%E8%AE%B0.assets/image-20231204152439441.png)
+
+
+
+![image-20231204152419279](Element%E7%AC%94%E8%AE%B0.assets/image-20231204152419279.png)
+
+
+
+![image-20231204152347839](Element%E7%AC%94%E8%AE%B0.assets/image-20231204152347839.png)
+
+
+
+出入库管理
+
+![image-20231204154223689](Element%E7%AC%94%E8%AE%B0.assets/image-20231204154223689.png)
+
+
+
+![image-20231204154931868](Element%E7%AC%94%E8%AE%B0.assets/image-20231204154931868.png)
+
+
+
+出⼊库权限控制
+
+![image-20231204154315921](Element%E7%AC%94%E8%AE%B0.assets/image-20231204154315921.png)
+
+0 超级管理员
+
+1 管理员
+
+2 用户
+
+![](Element%E7%AC%94%E8%AE%B0.assets/image-20231204154519254.png)
+
+
+
+记录查询权限控制
+
+![image-20231204155448266](Element%E7%AC%94%E8%AE%B0.assets/image-20231204155448266.png)
+
+![image-20231204155455530](Element%E7%AC%94%E8%AE%B0.assets/image-20231204155455530.png)
+
+
+
+
+
+
+
+
+
+
+
+![image-20231204155611891](Element%E7%AC%94%E8%AE%B0.assets/image-20231204155611891.png)![image-20231204160032978](Element%E7%AC%94%E8%AE%B0.assets/image-20231204160032978.png)
+
+
+
+![image-20231204160304438](Element%E7%AC%94%E8%AE%B0.assets/image-20231204160304438.png)
+
+
+
+
+
+
+
+# 动态路由问题
+
+![image-20231204162701262](Element%E7%AC%94%E8%AE%B0.assets/image-20231204162701262.png)
+
+![image-20231204162729435](Element%E7%AC%94%E8%AE%B0.assets/image-20231204162729435.png)![image-20231204162753002](Element%E7%AC%94%E8%AE%B0.assets/image-20231204162753002.png)
+
+
+
+![image-20231204162921425](Element%E7%AC%94%E8%AE%B0.assets/image-20231204163048454.png)
+
+![image-20231204163331847](Element%E7%AC%94%E8%AE%B0.assets/image-20231204163331847.png)
+
+
+
+
+

@@ -1205,7 +1205,7 @@ public class SelectTest {
 
 
 
-#### **使用条件构造器进行查询**
+##### **使用条件构造器进行查询**
 
 1. Java的传统写法
 
@@ -1237,8 +1237,6 @@ public AjaxResult selectStudentByNumber(@RequestBody Student student) {
     return AjaxResult.success(result);
 }
 ```
-
-##### 用法：
 
 ##### allEq：全部等于
 

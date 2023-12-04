@@ -8953,8 +8953,6 @@ Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的
 
 - [vuex 中文文档](https://vuex.vuejs.org/zh/)
 
-<a name="e655a410"></a>
-
 ### 一、安装与使用
 
 ```bash
@@ -8994,17 +8992,13 @@ Vuex 状态管理示意图：
 
 ![image-20231121204636343](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231121204636343.png)
 
-<a name="0d354fbc"></a>
-
 ### 二、State
 
 state 保存了程序需要运行时的所有状态, 遵循以下原则：
 
 - 单一状态树：每个应用将仅仅包含一个 store 实例
 
-<a name="cc5468f5"></a>
-
-### 在组件中使用
+#### 在组件中使用
 
 ```javascript
 computed: {
@@ -9014,9 +9008,7 @@ computed: {
 }
 ```
 
-<a name="mapState"></a>
-
-### mapState
+#### mapState
 
 当一个组件需要获取多个状态时候，将这些状态都声明为计算属性会有些重复和冗余。为了解决这个问题，可以使用 `mapState` 辅助函数帮助我们生成计算属性。
 
@@ -9062,8 +9054,6 @@ computed: {
   localComputed () { return this.otherData }
 }
 ```
-
-<a name="a967149b"></a>
 
 ### 三、Getter
 
@@ -9124,9 +9114,7 @@ getters: {
 store.getters.getTodoById(2) // -> { id: 2, text: '...', done: false }
 ```
 
-<a name="33cad330"></a>
-
-### 在组件中使用
+#### 在组件中使用
 
 在组件中只需要在计算属性中引入这些 getter 即可。
 
@@ -9138,9 +9126,7 @@ computed: {
 }
 ```
 
-<a name="mapGetters"></a>
-
-### mapGetters
+#### mapGetters
 
 `mapGetters` 辅助函数可以将 store 中的 getter 映射到局部计算属性。
 
@@ -9171,8 +9157,6 @@ mapGetters({
 })
 ```
 
-<a name="20b16040"></a>
-
 ### 四、Mutation
 
 更改 Vuex 的 store 中的状态的唯一方法是提交 mutation。Vuex 中的 mutation 非常类似于事件：每个 mutation 都有一个字符串的 **事件类型 (type)** 和 一个 **回调函数 (handler)**。这个回调函数就是我们实际进行状态更改的地方，并且它会接受 state 作为第一个参数：
@@ -9199,9 +9183,7 @@ store.commit('increment')
 
 Mutation 必须是同步函数。
 
-<a name="2cff5dfb"></a>
-
-### 提交载荷 (Payload)
+#### 提交载荷 (Payload)
 
 可以向 `store.commit` 传入额外的参数，即 mutation 的 **载荷（payload）**：
 
@@ -9237,9 +9219,7 @@ store.commit('increment', {
 })
 ```
 
-<a name="1967513a"></a>
-
-### 对象风格的提交方式
+#### 对象风格的提交方式
 
 提交 mutation 的另一种方式是直接使用包含 `type` 属性的对象：
 
@@ -9260,9 +9240,7 @@ mutations: {
 }
 ```
 
-<a name="f5d76687"></a>
-
-### 使用常量替代 Mutation 事件类型
+#### 使用常量替代 Mutation 事件类型
 
 使用常量替代 mutation 事件类型在各种 Flux 实现中是很常见的模式。这样可以使 linter 之类的工具发挥作用，同时把这些常量放在单独的文件中可以让你的代码合作者对整个 app 包含的 mutation 一目了然：
 
@@ -9287,7 +9265,7 @@ const store = new Vuex.Store({
 
 <a name="mapMutations"></a>
 
-### mapMutations
+#### mapMutations
 
 可以在组件中使用 `this.$store.commit('xxx')` 提交 mutation，或者使用 `mapMutations` 辅助函数将组件中的 methods 映射为 `store.commit` 调用（需要在根节点注入 `store`）。
 
@@ -9311,8 +9289,6 @@ export default {
 ```
 
 注意，在 beforeCreate 的时候还不能获取到 methods 里面的方法。
-
-<a name="464752d6"></a>
 
 ### 五、Action
 
@@ -9345,7 +9321,7 @@ Action 函数接受一个与 store 实例具有相同方法和属性的 context 
 
 <a name="f9829ba9"></a>
 
-### 参数解构
+#### 参数解构
 
 实际应用当中，可以使用 [参数解构](https://github.com/lukehoban/es6features#destructuring) 来简化代码（特别是我们需要调用 `commit` 很多次的时候）：
 
@@ -9359,7 +9335,7 @@ actions: {
 
 <a name="2fa34eb6"></a>
 
-### 分发 Action
+#### 分发 Action
 
 Action 通过 `store.dispatch` 方法触发：
 
@@ -9384,7 +9360,7 @@ store.dispatch({
 
 <a name="iQRTl"></a>
 
-### 提交载荷 (Payload)
+#### 提交载荷 (Payload)
 
 同样的，action 支持传递载荷，可以通过第二参数接收载荷，比如一个购物车结算的 action：
 
@@ -9411,7 +9387,7 @@ actions: {
 
 <a name="mapActions"></a>
 
-### mapActions
+#### mapActions
 
 在组件中可以使用 `this.$store.dispatch('xxx')` 分发 action，也可以使用 `mapActions` 辅助函数将组件的 methods 映射为 `store.dispatch` 调用（需要先在根节点注入 `store`）。
 
@@ -9435,7 +9411,7 @@ export default {
 
 <a name="683d24bc"></a>
 
-### 组合 Action
+#### 组合 Action
 
 Action 通常是异步的，那么我们如何才能组合多个 action，以处理更加复杂的异步流程？
 
@@ -9526,7 +9502,7 @@ store.state.b // -> moduleB 的状态
 
 <a name="5faeb6da"></a>
 
-### 模块的局部状态
+#### 模块的局部状态
 
 对于模块内部的 mutation 和 getter，接收的第一个参数是**模块的局部状态对象**。
 
@@ -9629,9 +9605,7 @@ const store = new Vuex.Store({
 
 启用了命名空间的 getter 和 action 会收到局部化的 `getter`，`dispatch` 和 `commit`。换言之，你在使用模块内容（module assets）时不需要在同一模块内额外添加空间名前缀。更改 `namespaced` 属性后不需要修改模块内的代码。
 
-<a name="96763f0a"></a>
-
-### 在命名空间模块内访问全局内容（Global Assets）
+#### 在命名空间模块内访问全局内容（Global Assets）
 
 如果你希望使用全局 state 和 getter，`rootState` 和 `rootGetter` 会作为第三和第四参数传入 getter，也会通过 `context` 对象的属性传入 action。
 
@@ -9673,7 +9647,7 @@ modules: {
 
 <a name="19351008"></a>
 
-### 带命名空间的绑定函数
+#### 带命名空间的绑定函数
 
 当使用 `mapState`, `mapGetters`, `mapActions` 和 `mapMutations` 这些函数来绑定命名空间模块时，写起来可能比较繁琐：
 
@@ -9733,6 +9707,20 @@ export default {
   }
 }
 ```
+
+### 十、综合使用
+
+动态管理
+
++ 安装( npm i vuex@3.0.0 )
++ 编写store
++ main.js注册
+
+```
+
+```
+
+
 
 ##  Vuex 4
 
