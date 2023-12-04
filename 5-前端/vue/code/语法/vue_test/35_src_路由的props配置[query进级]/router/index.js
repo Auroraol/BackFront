@@ -31,7 +31,6 @@ export default new VueRouter({
 							name:'xiangqing',
 							path:'detail',
 							component:Detail,
-
 							//props的第一种写法，值为对象，该对象中的所有key-value都会以props的形式传给Detail组件。
 							// props:{a:1,b:'hello'}
 

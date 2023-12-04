@@ -89,7 +89,7 @@ npm install
 npm run dev
 ```
 
-方式2
+方式2(推荐)
 
 ```bash
 npm init vite@latest <project-name> -- --template vue
@@ -374,6 +374,7 @@ Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进
 
 + 容器和vue实例是一对一关系
 + 真实开发中只有一个Vue实例，并且会配合着组件一起使用
++ html中的所有动态数据, 都需要在js中定义出来
 
 ### 插值语法
 
@@ -1568,13 +1569,17 @@ var example1 = new Vue({
 8. **自定义事件：** 除了上述内置事件外，你还可以使用 `$emit` 来触发和监听自定义事件。
 
    ```
+   @参数=方法
+   ```
+
+   ```
    <my-component @custom-event="handleCustomEvent"></my-component>
    ```
-
+   
    在组件内部：
-
+   
    ```
-   javascriptCopy codemethods: {
+   codemethods: {
        triggerCustomEvent() {
            this.$emit('custom-event', eventData);
        }
@@ -2169,6 +2174,91 @@ v-show实际会将p标签的css样式的display属性设为none来达到隐藏�
 	</script>
 </html>
 ```
+
+### 补充
+
+vue3中默认支持动态渲染, 及不需要:
+
+例子 
+
+vue3
+
+```vue
+<template>
+  <div>
+    <button @click="toggleExpansion">Toggle Expansion</button>
+
+    <template v-if="isExpanded">
+      <Expand />
+    </template>
+    <template v-else>
+      <Fold />
+    </template>
+  </div>
+</template>
+
+<script>
+import { ref } from 'vue';
+import Expand from './Expand.vue';
+import Fold from './Fold.vue';
+
+export default {
+  components: {
+    Expand,
+    Fold,
+  },
+  data() {
+    return {
+      isExpanded: false,
+    };
+  },
+  methods: {
+    toggleExpansion() {
+      this.isExpanded = !this.isExpanded;
+    },
+  },
+};
+</script>
+```
+
+vue2
+
+在Vue 2中，可以使用带有<component>元素的is属性实现动态组件呈现。这里有一个例子:
+
+```vue
+<template>
+  <div>
+    <button @click="toggleExpansion">Toggle Expansion</button>
+
+    <component :is="isExpanded ? 'Expand' : 'Fold'" />
+  </div>
+</template>
+
+<script>
+import Expand from './Expand.vue';
+import Fold from './Fold.vue';
+
+export default {
+  components: {
+    Expand,
+    Fold,
+  },
+  data() {
+    return {
+      isExpanded: false,
+    };
+  },
+  methods: {
+    toggleExpansion() {
+      this.isExpanded = !this.isExpanded;
+    },
+  },
+};
+</script>
+
+```
+
+
 
 ## 列表渲染(for)
 
@@ -4862,7 +4952,7 @@ School.vue
 </style>
 ```
 
-### 方式2: 插槽
+### 方式2: 插槽:crossed_swords:
 
 1. 作用：让父组件可以向子组件指定位置插入html结构，也是一种组件间通信的方式，适用于 <strong style="color:red">父组件 ===> 子组件</strong> 
 
@@ -4913,6 +5003,8 @@ School.vue
 
      理解：<span style="color:red">数据在组件的自身，但根据数据生成的结构需要组件的使用者来决定。</span>（games数据在Category组件中，但使用数据所遍历出来的结构由App组件决定）
 
+     slot-scope="xxx"  通过xxx. 获得传递的参数
+     
      ```vue
      父组件中：
      		<Category>
@@ -4951,6 +5043,168 @@ School.vue
                  }
              </script>
      ```
+
+#### 使用vue2的写法，会报错：
+
+##### vue2：上下对应，title是自己随便起的名字
+
+ 1、定义一个普通的插槽，可以用div，任何标签
+
+```xml
+<div slot="title"></div>
+```
+
+2、定义一个element列表里面插槽的标签
+
+```xml
+<div slot="title" slot-scope="scope"></div>
+```
+
+![img](vue%E7%AC%94%E8%AE%B02.0.assets/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5rWp5pif,size_20,color_FFFFFF,t_70,g_se,x_16.png)
+
+##### vue3：上下对应，title是自己随便起的名字
+
+ 1、注意，vue3中只能用template, # 等同于 slot=
+
+```cpp
+<template #title></template>
+```
+
+ 2、注意，vue3中只能用template, # 等同于 slot=
+
+```cpp
+<template #title="scope"></template>
+```
+
+![image-20231127161957118](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231127161957118.png)
+
+#### 综合案例
+
+在 Vue 3 中使用插槽：
+
+```vue
+vueCopy code<!-- ParentComponent.vue -->
+<template>
+  <ChildComponent>
+    <!-- 使用默认插槽 -->
+    <template v-slot:default="slotProps">
+      <p>父组件的内容</p>
+      <p>{{ slotProps.message }}</p>
+    </template>
+
+    <!-- 使用具名插槽 -->
+    <template v-slot:footer="footerProps">
+      <p>{{ footerProps.text }}</p>
+    </template>
+  </ChildComponent>
+</template>
+
+<script>
+import ChildComponent from './ChildComponent.vue';
+
+export default {
+  components: {
+    ChildComponent,
+  },
+};
+</script>
+
+
+
+vueCopy code<!-- ChildComponent.vue -->
+<template>
+  <div>
+    <h1>子组件</h1>
+    <!-- 默认插槽 -->
+    <slot :message="childMessage"></slot>
+
+    <!-- 具名插槽 -->
+    <footer>
+      <slot name="footer" :text="childFooterText"></slot>
+    </footer>
+  </div>
+</template>
+
+<script>
+import { ref } from 'vue';
+
+export default {
+  setup() {
+    const childMessage = ref('Hello from child!');
+    const childFooterText = ref('Footer text from child');
+
+    return {
+      childMessage,
+      childFooterText,
+    };
+  },
+};
+</script>
+```
+
+在这个例子中，`ParentComponent` 组件包含了一个默认插槽和一个具名插槽。`ChildComponent` 组件定义了这两个插槽，并通过 `slotProps` 和 `footerProps` 来传递数据。在父组件中，通过 `<template>` 元素的 `v-slot` 或 `#` 缩写来使用这些插槽。
+
+父组件：
+
+```vue
+<template>
+  <div class="father">
+    <h3>这里是父组件</h3>
+    <!--第一次使用：用flex展示数据-->
+    <child>
+      <template slot-scope="user">
+        <div class="tmpl">
+          <span v-for="item in user.data">{{item}}</span>
+        </div>
+      </template>
+    </child>
+
+    <!--第二次使用：用列表展示数据-->
+    <child>
+      <template slot-scope="user">
+        <ul>
+          <li v-for="item in user.data">{{item}}</li>
+        </ul>
+      </template>
+    </child>
+
+    <!--第三次使用：直接显示数据-->
+    <child>
+      <template slot-scope="user">
+       {{user.data}}
+      </template>
+    </child>
+
+    <!--第四次使用：不使用其提供的数据, 作用域插槽退变成匿名插槽-->
+    <child>
+      我就是模板
+    </child>
+  </div>
+</template>
+```
+
+子组件：
+
+```vue
+<template>
+  <div class="child">
+
+    <h3>这里是子组件</h3>
+    // 作用域插槽
+    <slot  :data="data"></slot>
+  </div>
+</template>
+
+ export default {
+    data: function(){
+      return {
+        data: ['zhangsan','lisi','wanwu','zhaoliu','tianqi','xiaoba']
+      }
+    }
+}
+```
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hvdXlpYmluZzkzMDkyMA==,size_16,color_FFFFFF,t_70.png" alt="img" style="zoom: 67%;" />
 
 App.vue
 
@@ -5085,10 +5339,6 @@ Category.vue
 6. 组件上也可以绑定原生DOM事件，需要使用```native```修饰符。
 
 7. 注意：通过```this.$refs.xxx.$on('atguigu',回调)```绑定自定义事件时，回调<span style="color:red">要么配置在methods中</span>，<span style="color:red">要么用箭头函数</span>，否则this指向会出问题！
-
-
-
-
 
 ### 方式4: 全局事件总线
 
@@ -6727,6 +6977,8 @@ input[type="range"] {
 
 ## vue脚手架配置代理
 
+前端解决跨域的一种方式
+
 ### 方法一
 
 ​	在vue.config.js中添加如下配置：
@@ -6752,7 +7004,7 @@ module.exports = {
 	devServer: {
       proxy: {
       '/api1': {// 匹配所有以 '/api1'开头的请求路径
-        target: 'http://localhost:5000',// 代理目标的基础路径
+        target: 'http://localhost:5000',// 代理目标的基础路径  //代理服务器路径
         changeOrigin: true,
         pathRewrite: {'^/api1': ''}   // 前缀,必须写
       },
@@ -6775,6 +7027,86 @@ module.exports = {
 
 1. 优点：可以配置多个代理，且可以灵活的控制请求是否走代理。
 2. 缺点：配置略微繁琐，请求资源时必须加前缀。
+
+例子
+
+vue.config.js 配置代理
+
+```js
+module.exports = {
+  pages: {
+    index: {
+      //入口
+      entry: 'src/main.js',
+    },
+  },
+	lintOnSave:false, //关闭语法检查
+	//开启代理服务器（方式一）
+	/* devServer: {
+    proxy: 'http://localhost:5000'
+  }, */
+	//开启代理服务器（方式二）
+	devServer: {
+    proxy: {
+      '/atguigu': {
+        target: 'http://localhost:5000',
+				pathRewrite:{'^/atguigu':''},
+        // ws: true, //用于支持websocket
+        // changeOrigin: true //用于控制请求头中的host值
+      },
+      '/demo': {
+        target: 'http://localhost:5001',
+				pathRewrite:{'^/demo':''},
+        // ws: true, //用于支持websocket
+        // changeOrigin: true //用于控制请求头中的host值
+      }
+    }
+  }
+}
+```
+
+组件中发起请求
+
+```vue
+<template>
+	<div>
+		<button @click="getStudents">获取学生信息</button>
+		<button @click="getCars">获取汽车信息</button>
+	</div>
+</template>
+
+<script>
+	import axios from 'axios'
+	export default {
+		name:'App',
+		methods: {
+			getStudents(){
+				axios.get('http://localhost:8080/students').then(         // 不加前缀不走代理
+					response => {
+						console.log('请求成功了',response.data)
+					},
+					error => {
+						console.log('请求失败了',error.message)
+					}
+				)
+			},
+			getCars(){
+				axios.get('http://localhost:8080/demo/cars').then(  ///demo为前缀
+					response => {
+						console.log('请求成功了',response.data)
+					},
+					error => {
+						console.log('请求失败了',error.message)
+					}
+				)
+			}
+		},
+	}
+</script>
+
+```
+
+
 
 ## 路由
 
@@ -6870,7 +7202,7 @@ module.exports = {
 
 <img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231122200936282.png" alt="image-20231122200936282" style="zoom:67%;" />
 
-index.js 路由
+router/index.js 路由
 
 ```js
 //该文件专门用于创建整个应用的路由器
@@ -6932,7 +7264,7 @@ App.vue
       <div class="col-xs-6">
         <div class="panel">
           <div class="panel-body">
-						<!-- 指定组件的呈现位置 -->
+						<!-- 指定组件的呈现位置 类似于插件-->
             <router-view></router-view>
           </div>
         </div>
@@ -6951,9 +7283,17 @@ App.vue
 
 ```
 
+路由组件通常存放在```pages```文件夹
+
+![image-20231128210058546](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231128210058546.png)
+
+运行效果
+
 <img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231122201139356.png" alt="image-20231122201139356" style="zoom:67%;" />
 
 ### 4.路由的query参数
+
+ @RequestParam()
 
 1. 传递参数
 
@@ -6980,6 +7320,172 @@ App.vue
    $route.query.title
    ```
 
+例子
+
+![image-20231201102458989](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231201102458989.png)
+
+App.vue
+
+```vue
+<template>
+  <div>
+    <div class="row">
+      <Banner/>
+    </div>
+    <div class="row">
+      <div class="col-xs-2 col-xs-offset-2">
+        <div class="list-group">
+					<!-- 原始html中我们使用a标签实现页面的跳转 -->
+          <!-- <a class="list-group-item active" href="./about.html">About</a> -->
+          <!-- <a class="list-group-item" href="./home.html">Home</a> -->
+
+					<!-- Vue中借助router-link标签实现路由的切换 -->
+					<router-link class="list-group-item" active-class="active" to="/about">About</router-link>
+          <router-link class="list-group-item" active-class="active" to="/home">Home</router-link>
+        </div>
+      </div>
+      <div class="col-xs-6">
+        <div class="panel">
+          <div class="panel-body">
+						<!-- 指定组件的呈现位置 -->
+            <router-view></router-view>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+	import Banner from './components/Banner'
+	export default {
+		name:'App',
+		components:{Banner}
+	}
+</script>
+
+```
+
+router/index.js
+
+```js
+// 该文件专门用于创建整个应用的路由器
+import VueRouter from 'vue-router'
+//引入组件
+import About from '../pages/About'
+import Home from '../pages/Home'
+import News from '../pages/News'
+import Message from '../pages/Message'
+import Detail from '../pages/Detail'
+
+//创建并暴露一个路由器
+export default new VueRouter({
+	routes:[
+		{
+			path:'/about',
+			component:About
+		},
+		{
+			path:'/home',
+			component:Home,
+			children:[
+				{
+					path:'news',
+					component:News,
+				},
+				{
+					path:'message',
+					component:Message,
+					//
+					children:[
+						{
+							path:'detail',
+							component:Detail,
+						}
+					]
+				}
+			]
+		}
+	]
+})
+
+```
+
+pages/Message.vue
+
+```vue
+<template>
+	<div>
+		<ul>
+			<li v-for="m in messageList" :key="m.id">
+				<!-- 跳转路由并携带query参数，to的字符串写法 -->
+				<!-- <router-link :to="`/home/message/detail?id=${m.id}&title=${m.title}`">{{m.title}}</router-link>&nbsp;&nbsp; -->
+
+				<!-- 跳转路由并携带query参数，to的对象写法 
+				传递参数给/home/message/detail路由所表示的组件
+				-->
+				<router-link :to="{
+					path:'/home/message/detail',
+					// 携带参数
+					query:{
+						id:m.id,
+						title:m.title
+					}
+				}">
+					{{m.title}}
+				</router-link>
+			
+			</li>
+		</ul>
+		<hr>
+		<!-- 展示区域 -->
+		<router-view></router-view>  
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'Message',
+		data() {
+			return {
+				messageList:[
+					{id:'001',title:'消息001'},
+					{id:'002',title:'消息002'},
+					{id:'003',title:'消息003'}
+				]
+			}
+		},
+	}
+</script>
+```
+
+pages/Detail.vue
+
+```vue
+<template>
+	<ul>
+		<!-- 接收参数 -->
+		<li>消息编号：{{$route.query.id}}</li>
+		<li>消息标题：{{$route.query.title}}</li>
+	</ul>
+</template>
+
+<script>
+	export default {
+		name:'Detail',
+		mounted() {
+			console.log(this.$route)
+		},
+	}
+</script>
+```
+
+…….
+
+运行结果
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231201095900420.png" alt="image-20231201095900420" style="zoom:50%;" />
+
 ### 5.命名路由
 
 1. 作用：可以简化路由的跳转。
@@ -6990,7 +7496,7 @@ App.vue
 
       ```js
       {
-      	path:'/demo',
+      	path:'/demo',         
       	component:Demo,
       	children:[
       		{
@@ -6998,7 +7504,7 @@ App.vue
       			component:Test,
       			children:[
       				{
-                          name:'hello' //给路由命名
+                          name:'hello' //给路由命名  //一般取path相同的名字//一级路由简化没有意义
       					path:'welcome',
       					component:Hello,
       				}
@@ -7031,6 +7537,8 @@ App.vue
 
 ### 6.路由的params参数
 
+ @PathVariable()
+
 1. 配置路由，声明接收params参数
 
    ```js
@@ -7047,7 +7555,7 @@ App.vue
    			children:[
    				{
    					name:'xiangqing',
-   					path:'detail/:id/:title', //使用占位符声明接收params参数
+   					path:'detail/:id/:title', //使用占位符声明接收params参数 //动态路径参数以冒号开头
    					component:Detail
    				}
    			]
@@ -7083,7 +7591,163 @@ App.vue
    $route.params.title
    ```
 
-### 7.路由的props配置
+例子
+
+App.vue
+
+```vue
+<template>
+  <div>
+    <div class="row">
+      <Banner/>
+    </div>
+    <div class="row">
+      <div class="col-xs-2 col-xs-offset-2">
+        <div class="list-group">
+					<!-- 原始html中我们使用a标签实现页面的跳转 -->
+          <!-- <a class="list-group-item active" href="./about.html">About</a> -->
+          <!-- <a class="list-group-item" href="./home.html">Home</a> -->
+
+					<!-- Vue中借助router-link标签实现路由的切换 -->
+					<router-link class="list-group-item" active-class="active" to="/about">About</router-link>
+          <router-link class="list-group-item" active-class="active" to="/home">Home</router-link>
+        </div>
+      </div>
+      <div class="col-xs-6">
+        <div class="panel">
+          <div class="panel-body">
+						<!-- 指定组件的呈现位置 -->
+            <router-view></router-view>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+	import Banner from './components/Banner'
+	export default {
+		name:'App',
+		components:{Banner}
+	}
+</script>
+```
+
+router/index.js
+
+```js
+// 该文件专门用于创建整个应用的路由器
+import VueRouter from 'vue-router'
+//引入组件
+import About from '../pages/About'
+import Home from '../pages/Home'
+import News from '../pages/News'
+import Message from '../pages/Message'
+import Detail from '../pages/Detail'
+
+//创建并暴露一个路由器
+export default new VueRouter({
+	routes:[
+		{
+			name:'guanyu',
+			path:'/about',
+			component:About
+		},
+		{
+			path:'/home',
+			component:Home,
+			children:[
+				{
+					path:'news',
+					component:News,
+				},
+				{
+					path:'message',
+					component:Message,
+					children:[
+						{
+							name:'xiangqing',
+							path:'detail/:id/:title', //参数:id/:title
+							component:Detail,
+						}
+					]
+				}
+			]
+		}
+	]
+})
+```
+
+pages/Message.vue
+
+```vue
+<template>
+	<div>
+		<ul>
+			<li v-for="m in messageList" :key="m.id">
+				<!-- 跳转路由并携带params参数，to的字符串写法 -->
+				<!-- <router-link :to="`/home/message/detail/${m.id}/${m.title}`">{{m.title}}</router-link>&nbsp;&nbsp; -->
+
+				<!-- 跳转路由并携带params参数，to的对象写法 -->
+				<router-link :to="{
+					name:'xiangqing',  //必须用name
+					params:{ //携带params参数
+						id:m.id,
+						title:m.title
+					}
+				}">
+					{{m.title}}
+				</router-link>
+			
+			</li>
+		</ul>
+		<hr>
+		<router-view></router-view>
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'Message',
+		data() {
+			return {
+				messageList:[
+					{id:'001',title:'消息001'},
+					{id:'002',title:'消息002'},
+					{id:'003',title:'消息003'}
+				]
+			}
+		},
+	}
+</script>
+```
+
+pages/Detail.vue
+
+```vue
+<template>
+	<ul>
+        <!-- 接收参数 -->
+		<li>消息编号：{{$route.params.id}}</li>            
+		<li>消息标题：{{$route.params.title}}</li>
+	</ul>
+</template>
+
+<script>
+	export default {
+		name:'Detail',
+		mounted() {
+			// console.log(this.$route)
+		},
+	}
+```
+
+运行结果
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231201101413382.png" alt="image-20231201101413382" style="zoom:50%;" />
+
+### 7.路由的props配置[query进级]
 
 ​	作用：让路由组件更方便的收到参数
 
@@ -7106,8 +7770,160 @@ App.vue
 			title:route.query.title
 		}
 	}
-}
+} 
 ```
+
+
+
+
+
+![image-20231201102352825](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231201102352825.png)
+
+App.vue
+
+```
+
+```
+
+index.js
+
+```js
+// 该文件专门用于创建整个应用的路由器
+import VueRouter from 'vue-router'
+//引入组件
+import About from '../pages/About'
+import Home from '../pages/Home'
+import News from '../pages/News'
+import Message from '../pages/Message'
+import Detail from '../pages/Detail'
+
+//创建并暴露一个路由器
+export default new VueRouter({
+	routes:[
+		{
+			name:'guanyu',
+			path:'/about',
+			component:About
+		},
+		{
+			path:'/home',
+			component:Home,
+			children:[
+				{
+					path:'news',
+					component:News,
+				},
+				{
+					path:'message',
+					component:Message,
+					children:[
+						{
+							name:'xiangqing',
+							path:'detail',
+							component:Detail,
+							//props的第一种写法，值为对象，该对象中的所有key-value都会以props的形式传给Detail组件。
+							// props:{a:1,b:'hello'}
+
+							//props的第二种写法，值为布尔值，若布尔值为真，就会把该路由组件收到的所有params参数，以props的形式传给Detail组件。
+							// props:true
+
+							//props的第三种写法，值为函数
+							props($route){
+								return {
+									id:$route.query.id,
+									title:$route.query.title,
+									a:1,
+									b:'hello'
+								}
+							}
+
+						}
+					]
+				}
+			]
+		}
+	]
+})
+
+```
+
+Message.vue
+
+```vue
+<template>
+	<div>
+		<ul>
+			<li v-for="m in messageList" :key="m.id">
+				<!-- 跳转路由并携带params参数，to的字符串写法 -->
+				<!-- <router-link :to="`/home/message/detail/${m.id}/${m.title}`">{{m.title}}</router-link>&nbsp;&nbsp; -->
+				<!-- 跳转路由并携带params参数，to的对象写法 -->
+				<router-link :to="{
+					name:'xiangqing',
+					query:{              // 
+						id:m.id,
+						title:m.title
+					}
+				}">
+					{{m.title}}
+				</router-link>
+			
+			</li>
+		</ul>
+		<hr>
+		<router-view></router-view>
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'Message',
+		data() {
+			return {
+				messageList:[
+					{id:'001',title:'消息001'},
+					{id:'002',title:'消息002'},
+					{id:'003',title:'消息003'}
+				]
+			}
+		},
+	}
+</script>
+```
+
+Detail.vue
+
+```vue
+<template>
+	<ul>
+		<li>消息编号：{{id}}</li>
+		<li>消息标题：{{title}}</li>
+	</ul>
+</template>
+
+<script>
+	export default {
+		name:'Detail',
+		props:['id','title'],
+		computed: {
+			// id(){
+			// 	return this.$route.query.id
+			// },
+			// title(){
+			// 	return this.$route.query.title
+			// },
+		},
+		mounted() {
+			// console.log(this.$route)
+		},
+	}
+</script>
+```
+
+
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20231201101852565.png" alt="image-20231201101852565" style="zoom:50%;" />
+
+
 
 ### 8.```<router-link>```的replace属性
 
@@ -7115,7 +7931,7 @@ App.vue
 2. 浏览器的历史记录有两种写入方式：分别为```push```和```replace```，```push```是追加历史记录，```replace```是替换当前记录。路由跳转时候默认为```push```
 3. 如何开启```replace```模式：```<router-link replace .......>News</router-link>```
 
-### 9.编程式路由导航
+### 9. 编程式路由导航
 
 1. 作用：不借助```<router-link> ```实现路由跳转，让路由跳转更加灵活
 
@@ -7145,11 +7961,15 @@ App.vue
 
 ### 10.缓存路由组件
 
-1. 作用：让不展示的路由组件保持挂载，不被销毁。
+1. 作用：让不展示的路由组件保持挂载，不销毁, 保留数据。
 
 2. 具体编码：
 
    ```vue
+   <!-- 缓存多个路由组件 -->
+   <!-- <keep-alive :include="['News','Message']"> -->
+   				
+   <!-- 缓存一个路由组件, (保持活着), News必须是组件名 -->
    <keep-alive include="News"> 
        <router-view></router-view>
    </keep-alive>
@@ -7165,13 +7985,17 @@ App.vue
 ### 12.路由守卫
 
 1. 作用：对路由进行权限控制(登录后才能看)
-
 2. 分类：全局守卫、独享守卫、组件内守卫
 
-3. 全局守卫:
+![image-20231201134917426](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231201134917426.png)
+
+router/index.js
+
+1. 全局守卫:
 
    ```js
    //全局前置守卫：初始化时执行、每次路由切换前执行
+   //全局前置路由守卫————初始化的时候被调用、每次路由切换之前被调用
    router.beforeEach((to,from,next)=>{
    	console.log('beforeEach',to,from)
    	if(to.meta.isAuth){ //判断当前路由是否需要进行权限控制
@@ -7187,10 +8011,11 @@ App.vue
    })
    
    //全局后置守卫：初始化时执行、每次路由切换后执行
+   //全局后置路由守卫————初始化的时候被调用、每次路由切换之后被调用	// 可以用来切换网页标题
    router.afterEach((to,from)=>{
    	console.log('afterEach',to,from)
    	if(to.meta.title){ 
-   		document.title = to.meta.title //修改网页的title
+   		document.title = to.meta.title   //修改网页的title
    	}else{
    		document.title = 'vue_test'
    	}
@@ -7226,6 +8051,8 @@ App.vue
    }
    ```
 
+
+
 ### 13.路由器的两种工作模式
 
 1. 对于一个url来说，什么是hash值？—— #及其后面的内容就是hash值。
@@ -7239,7 +8066,7 @@ App.vue
    2. 兼容性和hash模式相比略差。
    3. 应用部署上线时需要后端人员支持，解决刷新页面服务端404的问题。
 
-## 使用Axios发送请求
+## 使用Axios发送请求:crossed_swords:
 
 ### 使用 Axios
 
@@ -7365,6 +8192,112 @@ this.axios({
 	alert(response.data.message)
 });
 ```
+
+### 补充
+
+在 Vue 3 中，通过 `createApp` 函数来创建 Vue 应用实例，而不再使用 `Vue.prototype` 来挂载属性。Vue 3 使用了 Composition API，可以使用 `provide` 和 `inject` 来在组件之间共享数据。
+
+以下是将 Axios 实例和 HTTP URL 全局配置在 Vue 3 中的示例：
+
+```
+import { createApp } from 'vue';
+import axios from 'axios';
+import App from './App.vue';
+
+// 创建一个 Axios 实例
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:8090',
+  // 其他 Axios 配置
+});
+
+// 创建 Vue 应用实例
+const app = createApp(App);
+
+// 在 app 对象中提供 axios 实例和 httpUrl
+app.provide('$axios', axiosInstance);
+app.provide('$httpUrl', 'http://localhost:8090');
+
+// 挂载到 #app 元素上
+app.mount('#app');
+```
+
+在组件中，你可以通过 `inject` 来访问提供的数据：
+
+```
+javascriptCopy code// 在组件中使用提供的数据
+export default {
+  setup() {
+    // 在 setup 函数中使用 inject 获取提供的数据
+    const axiosInstance = inject('$axios');
+    const httpUrl = inject('$httpUrl');
+
+    // 然后在组件中可以使用 axiosInstance 和 httpUrl
+
+    return {
+      // 返回数据供模板使用
+      axiosInstance,
+      httpUrl,
+    };
+  },
+};
+```
+
+请注意，在 Vue 3 中，`provide` 和 `inject` 是一对，子组件可以通过 `inject` 访问到父组件通过 `provide` 提供的数据。
+
+
+
+在 Vue 2 中，你可以使用 `Vue.prototype` 来将 Axios 实例和 HTTP URL 挂载到 Vue 实例上，以便在整个应用中访问。以下是在 Vue 2 中的示例：
+
+```
+// main.js
+
+import Vue from 'vue';
+import App from './App.vue';
+import axios from 'axios';
+
+// 创建 Axios 实例
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:8090',
+  // 其他 Axios 配置
+});
+
+// 挂载到 Vue 实例上
+Vue.prototype.$axios = axiosInstance;
+Vue.prototype.$httpUrl = 'http://localhost:8090';
+
+Vue.config.productionTip = false;
+
+new Vue({
+  render: h => h(App),
+}).$mount('#app');
+```
+
+在组件中，你可以通过 `this.$axios` 和 `this.$httpUrl` 来访问挂载在 Vue 实例上的数据：
+
+```
+javascriptCopy code// YourComponent.vue
+
+export default {
+  mounted() {
+    // 在组件中使用 this.$axios 和 this.$httpUrl
+    this.$axios.get('/api/data')
+      .then(response => {
+        // 处理响应数据
+      })
+      .catch(error => {
+        // 处理错误
+      });
+      
+    console.log(this.$httpUrl); // 输出 http://localhost:8090
+  },
+};
+```
+
+
+
+
+
+
 
 ## Vue实战项目：Webpack登录验证后路由至列表页
 
@@ -8967,6 +9900,7 @@ a {
 4. setup函数的两种返回值：
    1. 若返回一个对象，则对象中的属性、方法, 在模板中均可以直接使用。（重点关注！）
    2. <span style="color:#aad">若返回一个渲染函数：则可以自定义渲染内容。（了解）</span>
+5. 在 Vue 3 中，组件的 `setup` 函数中，`this` 不再指向组件实例，而是指向 `undefined`。及**不能使用this**
 5. 注意点：
    1. **不要与Vue2.x语法混用**
       - Vue2.x配置（data、methos、computed...）中<strong style="color:#DD5145">可以访问到</strong>setup中的属性、方法。
@@ -9199,6 +10133,7 @@ const MyComponent = {
   - 创建一个包含响应式数据的<strong style="color:#DD5145">引用对象（reference对象，简称ref对象）</strong>
   - JS中操作数据： ```xxx.value```
   - 模板中读取数据: 不需要.value，直接：```<div>{{xxx}}</div>```
+  - 
 - 备注：
   - 接收的数据可以是：基本类型、也可以是对象类型
   - 基本类型的数据：响应式依然是靠``Object.defineProperty()``的```get```与```set```完成的
@@ -9606,6 +10541,45 @@ const MyComponent = {
 </script>
 ```
 
+#### 4. const关键字
+
+**①在 Vue 3 中，`const` 是 JavaScript 中的一个关键字，用于声明常量。使用 `const` 声明的变量必须进行初始化，并且一旦被赋值，就不能再被重新赋值。**
+
+例如：
+
+```vue
+const myConstant = 42;
+```
+
+在这个例子中，`myConstant` 被声明为一个常量，其值为 42。试图在之后的代码中重新赋值给 `myConstant` 将会导致错误。
+
+**②在 Vue 3 的 Composition API 中，`const` 主要用于声明响应式数据、计算属性、方法等，以及用于解构对象或数组。**
+
+例如：
+
+```vue
+import { ref, reactive, computed } from 'vue';
+
+// 声明响应式数据
+const count = ref(0);
+
+// 声明响应式对象
+const user = reactive({
+  name: 'John',
+  age: 25,
+});
+
+// 声明计算属性
+const doubledCount = computed(() => count.value * 2);
+
+// 声明方法
+const increment = () => {
+  count.value++;
+};
+```
+
+在上述例子中，`const` 被用于声明变量，但这些变量是响应式的，因为它们是通过 Vue 3 提供的 `ref`、`reactive` 和 `computed` 等函数创建的。这些函数确保了数据的响应性，使得当数据发生变化时，相关的视图会得到更新。
+
 ### 6.生命周期
 
 - Vue3.0中可以继续使用Vue2.x中的生命周期钩子，但有有两个被更名：
@@ -9620,6 +10594,76 @@ const MyComponent = {
   - `updated` =======>`onUpdated`
   - `beforeUnmount` ==>`onBeforeUnmount`
   - `unmounted` =====>`onUnmounted`
+
+```vue
+<template>
+	<h2>当前求和为：{{sum}}</h2>
+	<button @click="sum++">点我+1</button>
+</template>
+
+<script>
+	import {ref,onBeforeMount,onMounted,onBeforeUpdate,onUpdated,onBeforeUnmount,onUnmounted} from 'vue'
+	export default {
+		name: 'Demo',
+		
+		setup(){
+			console.log('---setup---')
+			//数据
+			let sum = ref(0)
+
+			//通过组合式API的形式去使用生命周期钩子
+			onBeforeMount(()=>{
+				console.log('---onBeforeMount---')
+			})
+			onMounted(()=>{
+				console.log('---onMounted---')
+			})
+			onBeforeUpdate(()=>{
+				console.log('---onBeforeUpdate---')
+			})
+			onUpdated(()=>{
+				console.log('---onUpdated---')
+			})
+			onBeforeUnmount(()=>{
+				console.log('---onBeforeUnmount---')
+			})
+			onUnmounted(()=>{
+				console.log('---onUnmounted---')
+			})
+
+			//返回一个对象（常用）
+			return {sum}
+		},
+		//通过配置项的形式使用生命周期钩子
+		//#region 
+		beforeCreate() {
+			console.log('---beforeCreate---')
+		},
+		created() {
+			console.log('---created---')
+		},
+		beforeMount() {
+			console.log('---beforeMount---')
+		},
+		mounted() {
+			console.log('---mounted---')
+		},
+		beforeUpdate(){
+			console.log('---beforeUpdate---')
+		},
+		updated() {
+			console.log('---updated---')
+		},
+		beforeUnmount() {
+			console.log('---beforeUnmount---')
+		},
+		unmounted() {
+			console.log('---unmounted---')
+		},
+		//#endregion
+	}
+</script>
+```
 
 **新增的钩子函数**
 
@@ -10756,7 +11800,12 @@ import MyComponent from './MyComponent.vue'
 
 + <strong style="color:red">父组件 ===> 子组件</strong>   defineProps()
 + **<strong style="color:red">子组件 ===> 父组件</strong>**  defineEmits()
-+ 传参:  `@`或`:`参数传递
++ 子组件通过 defineProps 接收父组件传过来的数据
++ 子组件通过 defineEmits 定义事件发送信息给父组件
++ 父传参:  `@`或`:`参数传递
++ 子传参 emit
++ 父接受参数  @参数=方法   , 注意: 参数和方法一般设置成同名的
++ 子接受参数   defineProps
 
 #### 例子1
 
@@ -10767,7 +11816,7 @@ import MyComponent from './MyComponent.vue'
 ```javascript
 <template>
   <div class="box">
-    <test-com :info="msg" time="42分钟"></test-com>
+    <test-com :info="msg" time="42分钟"></test-com>       //父传参:  `@`或`:`参数传递
   </div>
 </template>
  
@@ -10793,7 +11842,7 @@ import MyComponent from './MyComponent.vue'
  
 import {defineProps} from 'vue'
  
-defineProps({
+defineProps({                     //子接受参数   defineProps
     info:{
         type:String,
         default:'----'
@@ -10816,29 +11865,32 @@ defineProps({
 子组件`CompA.vue`
 
 ```html
+<template>
+  <div>{{msg}}</div>
+  <button @click="func">func</button>
+</template>
+
 <script setup>
 defineProps({
   msg: String
 })
 
-const emit = defineEmits(['func'])
+const emit = defineEmits(['func'])   //子传参 emit
 
 // 不用有箭头函数
-function func() {
+function func() { 
   emit('func', 'func called')
 }
-    
 </script>
-
-<template>
-  <div>{{msg}}</div>
-  <button @click="func">func</button>
-</template>
 ```
 
 父组件`App.vue`
 
 ```html
+<template>
+	<CompA msg="hello" @func='fun'></CompA>  //父接受参数  @参数=方法   , 注意: 参数和方法不重名
+</template>
+
 <script setup>
     import CompA from './components/Comp-A.vue'
 
@@ -10846,10 +11898,6 @@ function func() {
       console.log(text)
     }
 </script>
-
-<template>
-	<CompA msg="hello" @func='fun'></CompA>
-</template>
 ```
 
 父组件同样使用`@`或`v-on:`接收。
@@ -10864,7 +11912,7 @@ function func() {
 //父组件
 <template>
     //监听子组件的getChild方法，传msg给子组件
-    <Child @getChild="getChild" :title="msg" />
+    <Child @getChild="getchild" :title="msg" />
 </template>
  
 <script setup>
@@ -10872,7 +11920,7 @@ function func() {
     import Child from '@/components/Child.vue'
 
     const msg = ref('parent value')
-    const getChild = (e) => {
+    const getchild = (e) => {
         // 接收父组件传递过来的数据
         console.log(e); // child value
     }
@@ -11089,6 +12137,106 @@ runSideEffectOnce()
   </div>
 </template>
 ```
+
+### 十、生命周期钩子函数
+
+这里主要讲常用的6个[钩子函数](https://so.csdn.net/so/search?q=钩子函数&spm=1001.2101.3001.7020)：onBeforeMount, onMounted, onBeforeUpdate, onUpdated，onBeforeUnmount, onUnmounted
+
+其中onBeforeUnmount, onUnmounted需要引用组件来实现调用，在子组件里面添加，在父组件中使用v-if控制这个子组件的显示和消失，就可以了。
+
+子组件代码：
+
+```vue
+<template>
+<div>
+这是关于页面的内容
+</div>
+</template>
+ 
+<script setup lang='ts'>
+import {onBeforeUnmount, onUnmounted } from 'vue'
+    
+// 组件销毁之前
+onBeforeUnmount(() => {
+  console.log("组件销毁之前");
+})
+ 
+// 组件销毁之后
+onUnmounted(() => {
+  console.log("组件销毁之后");
+})
+    
+</script>
+ 
+<style scoped>
+ 
+</style>
+```
+
+父组件代码：
+
+```vue
+<template>
+<div>
+  <h2>Vue3的生命周期</h2>
+  <div>
+    <button @click="updateContent">点击更改组件内容</button>
+    <button @click="show">创建和销毁组件</button>
+    <div ref="demo">{{ content }}</div>
+    <AboutMe v-if="display" ></AboutMe>
+  </div>
+</div>
+</template>
+ 
+<script setup lang='ts'>
+import { ref, onBeforeMount, onMounted, onBeforeUpdate, onUpdated } from 'vue'
+// import AboutMe from './views/AboutMe.vue'
+import AboutMe from './views/AboutMe.vue'
+ 
+console.log("setup语法糖模式中，可以直接在这里当做created函数使用");
+ 
+const demo = ref<HTMLDivElement>()
+ 
+const content = ref<string>("这是内容：div内容")
+ 
+const display = ref<boolean>(true)
+ 
+const updateContent = ()=>{
+  content.value = "div组价内容更新"
+}
+ 
+const show = ()=>{
+  display.value = !display.value
+}
+ 
+// 页面渲染之前
+onBeforeMount(() => {
+  console.log("渲染之前", demo);
+})
+ 
+// 页面渲染之后
+onMounted(() => {
+  console.log("渲染之后", demo);
+})
+ 
+// 组件更新之前
+onBeforeUpdate(() => {
+  console.log("组件更新之前", demo);
+})
+ 
+// 组件更新之后
+onUpdated(() => {
+  console.log("组件更新之后", demo);
+})
+ 
+</script>
+ 
+<style scoped>
+ 
+</style>
+```
+
+
 
 # $ref语法糖
 

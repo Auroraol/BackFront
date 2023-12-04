@@ -1,56 +1,37 @@
 <template>
   <el-menu
-    active-text-color="#ffd04b"
-    background-color="#545c64"
-    class="el-menu-vertical-demo"
-    default-active="2"
-    text-color="#fff"
-    @open="handleOpen"
-    @close="handleClose"
+     background-color="#545c64"
+            text-color="#fff"
+            active-text-color="#ffd04b"
+            style="height: 100%;"
+            default-active="/Home"
+            :collapse="isCollapse"
+            :collapse-transition="false"
+            router
   >
-    <el-sub-menu index="/Home">
-      <template #title>
-        <el-icon><location /></el-icon>
+    <el-menu-item  index="/Home">
+      <el-icon><House /></el-icon>
         <span>首页</span>
-      </template>
-<!-- 
-      <el-menu-item
-        :index="'/' + item.menuclick"
-        v-for="(item, i) in menu"
-        :key="i"
-      >
-        <i :class="item.menuicon"></i>
-        <span>{{ item.menuname }}</span>
-      </el-menu-item> -->
-
-      <el-menu-item-group title="Group One">
-        <el-menu-item index="1-1">item one</el-menu-item>
-        <el-menu-item index="1-2">item two</el-menu-item>
-      </el-menu-item-group>
-      <el-menu-item-group title="Group Two">
-        <el-menu-item index="1-3">item three</el-menu-item>
-      </el-menu-item-group>
-      <el-sub-menu index="1-4">
-        <template #title>item four</template>
-        <el-menu-item index="1-4-1">item one</el-menu-item>
-      </el-sub-menu>
-    </el-sub-menu>
-    <el-menu-item index="2">
-      <el-icon><icon-menu /></el-icon>
-      <span>Navigator Two</span>
+      </el-menu-item>
+    <el-menu-item index="/One">
+     <el-icon><Flag /></el-icon>
+      <span>导航1</span>
     </el-menu-item>
-    <el-menu-item index="3" disabled>
-      <el-icon><document /></el-icon>
-      <span>Navigator Three</span>
+    <el-menu-item index="/Two">
+     <el-icon><Location /></el-icon>
+      <span>导航2</span>
     </el-menu-item>
-    <el-menu-item index="4">
-      <el-icon><setting /></el-icon>
-      <span>Navigator Four</span>
-    </el-menu-item>
-    
   </el-menu>
+    
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="js">
+
+defineProps({
+   isCollapse:Boolean
+})
+
+
+</script>
 
 <style></style>

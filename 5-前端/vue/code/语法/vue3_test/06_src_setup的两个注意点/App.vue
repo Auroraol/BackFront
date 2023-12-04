@@ -16,7 +16,7 @@
 	export default {
 		name: 'App',
 		components:{Demo},
-		setup(){
+		setup()
 			function showHelloMsg(value){
 				alert(`你好啊，你触发了hello事件，我收到的参数是:${value}！`)
 			}

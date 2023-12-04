@@ -11,7 +11,7 @@
 		name:'App',
 		methods: {
 			getStudents(){
-				axios.get('http://localhost:8080/students').then(           // 不加前缀不走代理
+				axios.get('http://localhost:8080/students').then(         // 不加前缀不走代理
 					response => {
 						console.log('请求成功了',response.data)
 					},

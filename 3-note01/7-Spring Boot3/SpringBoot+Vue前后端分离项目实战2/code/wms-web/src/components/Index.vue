@@ -1,25 +1,24 @@
 <template>
   <div style="height: 100%">
     <el-container class="layout-container-demo" style="height: 100%">
-      <el-aside width="200px" style="height: 100%">
-        <Aside></Aside>
+      <el-aside :width="aside_witdh" style="height: 100%">
+        <Aside :isCollapse="isCollapse"></Aside>
       </el-aside>
 
       <el-container style="height: 100%">
-        <!-- <el-header style="text-align: right; font-size: 12px; border: #c45656;"> -->
-        <el-header style="text-align: right; font-size: 12px; background-color: #409EFF 1px solid;">
-          <Header></Header>
+        <el-header
+          style="
+            text-align: right;
+            font-size: 12px;
+            background-color: #409eff 1px solid;
+          "
+        >
+          <Header @doCollapse="doCollapse" :isExpanded="isExpanded"></Header>
         </el-header>
 
-        <el-main style="height: 100%">
-          <!-- <Main></Main> -->
-          <el-scrollbar>
-            <el-table :data="tableData">
-              <el-table-column prop="date" label="Date" width="140" />
-              <el-table-column prop="name" label="Name" width="120" />
-              <el-table-column prop="address" label="Address" />
-            </el-table>
-          </el-scrollbar>
+        <el-main style="height: 100%"> 
+          <Main></Main>
+           <!-- <router-view/> -->
         </el-main>
       </el-container>
     </el-container>
@@ -27,49 +26,40 @@
 </template>
 
 <script setup lang="js">
-// import { ref } from "vue";
-import { Menu as IconMenu, Message, Setting } from "@element-plus/icons-vue";
+// import { Menu as IconMenu, Message, Setting } from "@element-plus/icons-vue";
 import Aside from "./Aside.vue";
-// import Main from './Main.vue'
 import Header from "./Header.vue";
 import { ref } from "vue";
-const item = {
-  date: "2016-05-02",
-  name: "Tom",
-  address: "No. 189, Grove St, Los Angeles",
-};
-const tableData = ref(Array.from({ length: 12 }).fill(item));
+
+  const isCollapse = ref(false);
+  const aside_witdh = ref("200px");
+  const isExpanded = ref(false);
+  let doCollapse = () => {
+      isCollapse.value = !isCollapse.value; //JS中操作数据xxx.value
+        if(!isCollapse.value){// 展开
+            aside_witdh.value='200px'
+           isExpanded.value=false;
+        }else{//关起、关闭、收起
+           aside_witdh.value='64px'
+           isExpanded.value=true;
+           console.log(aside_witdh);
+        }
+  }
 </script>
-
 <style>
-/* .layout-container-demo .el-header {
-  position: relative;
-  background-color: var(--el-color-primary-light-7);
-  color: var(--el-text-color-primary);
-} */
-/* .layout-container-demo .el-aside {
-  color: var(--el-text-color-primary);
-  background: var(--el-color-primary-light-8);
-}
-.layout-container-demo .el-menu {
-  border-right: none;
-}
-.layout-container-demo .el-main {
-  padding: 0;
-} */
-
 /*
 	找到html标签、body标签，和挂载的标签
 	都给他们统一设置样式
 */
-html,body,#app,.el-container{
-        /*设置内部填充为0，几个布局元素之间没有间距*/
-        padding: 0px;
-         /*外部间距也是如此设置*/
-        margin: 0px;
-        /*统一设置高度为100%*/
-        height: 100%;
-    }
-
-    
+html,
+body,
+#app,
+.el-container {
+  /*设置内部填充为0，几个布局元素之间没有间距*/
+  padding: 0px;
+  /*外部间距也是如此设置*/
+  margin: 0px;
+  /*统一设置高度为100%*/
+  height: 100%;
+}
 </style>

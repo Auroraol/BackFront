@@ -3,17 +3,18 @@
 
 vue-router 主要用于创建单页应用，再结合 vue.js 的时候显得得心应手。
 
-<a name="e655a410"></a>
 ## 一、安装与使用
+
 安装：
-```bash
-$ yarn add vue-router
+
+```shell
+npm i vue-router
 ```
 
 基本组件:
 
-- **router-view** 路由入口
-- **router-link** 路由链接
+- **router-view**  路由入口
+- **router-link**    路由链接
 
 使用方式：
 
@@ -53,35 +54,31 @@ new Vue({
 <template lang="pug">
 div
   p
-    router-link(to="/home") Home
+    <router-link to="/home"> Home</router-link>
     span(style="margin: 0 10px") |
-    router-link(to="/page") Page
+    <router-link to="/page"> Page</router-link>
   router-view
 </template>
 ```
-效果：<br />![GIF.gif](https://cdn.nlark.com/yuque/0/2020/gif/2213540/1607933542163-77c74955-70d0-4385-9332-26c01310ccf6.gif#align=left&display=inline&height=77&originHeight=77&originWidth=229&size=2988&status=done&style=none&width=229)
+效果：![GIF.gif](https://cdn.nlark.com/yuque/0/2020/gif/2213540/1607933542163-77c74955-70d0-4385-9332-26c01310ccf6.gif#align=left&display=inline&height=77&originHeight=77&originWidth=229&size=2988&status=done&style=none&width=229)
 
-以上示例只为演示最简的基础用法，通常我们会将 `router` 拆分为单独的 `js` 模块，然后引入到 `main.js` 。
-
-<a name="UWvd7"></a>
-## 二、$route与$router
+## 二、`$route`与`$router`
 
 使用模块注册 vue-router，将会在 `Vue.prototype` 中注入一个 `$route` 和 `$router` 的只读属性。
 
 其中，`$route` 用于监测当前路由，`$router` 用于进行路由操作，事实上，`$route` 与 `$router.currentRoute` 相同。
 
-**$route**<br />**![025.png](https://cdn.nlark.com/yuque/0/2020/png/2213540/1607933616987-5fa42f67-be8a-4149-8f02-76ce522e75b3.png#align=left&display=inline&height=162&originHeight=162&originWidth=240&size=2790&status=done&style=none&width=240)**
+**$route**<br />**<img src="https://cdn.nlark.com/yuque/0/2020/png/2213540/1607933616987-5fa42f67-be8a-4149-8f02-76ce522e75b3.png#align=left&display=inline&height=162&originHeight=162&originWidth=240&size=2790&status=done&style=none&width=240" alt="025.png" style="zoom:67%;" />**
 
-**$router**<br />**![026.png](https://cdn.nlark.com/yuque/0/2020/png/2213540/1607933624065-ef297bfc-e8c4-4a25-8d44-13fdac55c358.png#align=left&display=inline&height=639&originHeight=639&originWidth=705&size=21557&status=done&style=none&width=705)**
+**$router**<br />**<img src="https://cdn.nlark.com/yuque/0/2020/png/2213540/1607933624065-ef297bfc-e8c4-4a25-8d44-13fdac55c358.png#align=left&display=inline&height=639&originHeight=639&originWidth=705&size=21557&status=done&style=none&width=705" alt="026.png" style="zoom:67%;" />**
 
 - **$router**为VueRouter实例，比如想要导航到不同URL，则使用`$router.push`方法
 - **$route**为当前router跳转对象，里面可以获取name、path、query、params等
 
-<a name="vuex-router-sync"></a>
 ## 三、路由状态管理
 [vuex-router-sync](https://www.npmjs.com/package/vuex-router-sync) 是一款将 vue-router 的 `$route` 属性同步到 vuex 中 state 的插件, 可以通过操作路由改变状态管理, 方便监视路由变化。
 
-使用方式：<br />
+使用方式：
 ```javascript
 import { sync } from 'vuex-router-sync'
 import store from './vuex/store' // vuex store instance
@@ -97,11 +94,36 @@ store.state.route.params // current params (object)
 store.state.route.query  // current query (object)
 ```
 
-<a name="10jSs"></a>
-## 四、**路由历史栈**
+## 四、**路由历史栈:crossed_swords:**
+
 在使用路由的单页应用中，每访问一个页面，便将其加入**路由历史栈**当中，vue-router 提供各种控制路由的方法，操作方法同 `window.history`。
 
-<a name="V5Jyt"></a>
+### 声明式路由
+
+- `<router-link :to='...'></router-link>`
+- `<router-link :to="..." replace></router-link>`
+
+直接书写路径：
+
+```html
+<router-link to='/'></router-link>
+```
+
+通过对象的方式：
+
+```html
+<router-link :to="{ name: 'home' }"></router-link>
+<router-link :to="{ path: 'foo/bar/index' }"></router-link>
+<router-link :to="{ name: 'user', params: { userId: 123 }}">User</router-link>
+<router-link :to="{ path: 'register', query: { plan: 'private' } }"></router-link>
+```
+
+ **<router-link>的replace属性:  **
+
+1. 作用：控制路由跳转时操作浏览器历史记录的模式
+2. 浏览器的历史记录有两种写入方式：分别为```push```和```replace```，```push```是追加历史记录，```replace```是替换当前记录。路由跳转时候默认为```push```
+3. 如何开启```replace```模式：```<router-link replace .......>News</router-link>```
+
 ### 编程式路由
 
 - `router.push(location, onComplete?, onAbort?)` 跳转
@@ -112,67 +134,79 @@ store.state.route.query  // current query (object)
 
 直接书写路径：
 ```javascript
-router.push('/home')
-router.push('/home?from=index')
+this.$router.push('/home')
+this.$router.push('/home?from=index')
 ```
 
 通过对象的方式：
 ```javascript
-router.push({ name: 'home' })
-router.push({ path: 'foo/bar/index' })
+this.$router.push({ name: 'home' })
+this.$router.push({ path: 'foo/bar/index' })
 ```
 
 动态路由参数的传递, 有以下两种写法：
 ```javascript
 const userId = 123
-router.push({ name: 'user', params: { userId }}) // -> /user/123
-router.push({ path: `/user/${userId}` }) // -> /user/123
+this.$router.push({ name: 'user', params: { userId }}) // -> /user/123
+this.$router.push({ path: `/user/${userId}` }) // -> /user/123
 ```
 
 查询字符串的写法，有以下两种写法：
 ```javascript
-router.push(`register?plan=${private}`)
-router.push({ path: 'register', query: { plan: 'private' }})
+this.$router.push(`register?plan=${private}`)
+this.$router.push({ path: 'register', query: { plan: 'private' }})
 ```
 
-<a name="CwBBg"></a>
-### 声明式路由
+总结：
 
-- `<router-link :to='...'></router-link>`
-- `<router-link :to="..." replace></router-link>`
+```js
+//$router的两个API
+this.$router.push({
+	name:'xiangqing',
+		params:{
+			id:xxx,
+			title:xxx
+		}
+})
 
-直接书写路径：
-```html
-<router-link to='/'></router-link>
+this.$router.replace({
+	name:'xiangqing',
+		params:{
+			id:xxx,
+			title:xxx
+		}
+})
+this.$router.forward() //前进
+this.$router.back() //后退
+this.$router.go() //可前进也可后退
 ```
 
-通过对象的方式：
-```html
-<router-link :to="{ name: 'home' }"></router-link>
-<router-link :to="{ path: 'foo/bar/index' }"></router-link>
-<router-link :to="{ name: 'user', params: { userId: 123 }}">User</router-link>
-<router-link :to="{ path: 'register', query: { plan: 'private' } }"></router-link>
-```
-
-<a name="as5lj"></a>
 ## 五、路由模式
-`vue-router` 默认 **hash 模式**: 使用 URL 的 hash 来模拟一个完整的 URL，于是当 URL 改变时，页面不会重新加载。
 
-如果不想要很丑的 hash，我们可以用路由的 **history 模式**，这种模式充分利用 `history.pushState` API 来完成 URL 跳转而无须重新加载页面。
+### 两种工作模式
+
+1. hash模式：
+   1. 地址中永远带着#号，不美观 。
+   2. 若以后将地址通过第三方手机app分享，若app校验严格，则地址会被标记为不合法。
+   3. 兼容性较好。
+2. history模式：
+   1. 地址干净，美观 。
+   2. 兼容性和hash模式相比略差。
+   3. 应用部署上线时需要后端人员支持，解决刷新页面服务端404的问题。
+
+**router/index.js**
+
 ```javascript
 const router = new VueRouter({
   mode: 'history',
-  routes: [...]
+  routes: [
+      ...//路由
+  ]
 })
 ```
 
-当你使用 history 模式时，URL 就像正常的 url，例如 `http://yoursite.com/user/id`。
+当使用 history 模式时，URL 就像正常的 url，例如 `http://yoursite.com/user/id`。
 
-不过这种模式要玩好，还需要后台配置支持。因为我们的应用是个单页客户端应用，如果后台没有正确的配置，当用户在浏览器直接访问 `http://oursite.com/user/id` 就会返回 404，这就不好看了。
-
-所以呢，你要在服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 `index.html` 页面，这个页面就是你 app 依赖的页面。
-
-<a name="LMsyK"></a>
 ### 服务器配置以支持History模式
 **nginx**
 ```bash
@@ -216,56 +250,616 @@ http.createServer((req, res) => {
 })
 ```
 
-<a name="b3690595"></a>
-## 六、路由传参
-路由传参有两种方式：`query `和 `params`
+## 六、路由传参:crossed_swords:
 
-通过 query 传参：
-```javascript
-// 注意: 使用 path 方式的路由才能使用 query
-this.$router.push({
-  path:'/xxx',
-  query:{
-    id: id
-  }
-})
+### 几个注意点
 
-// 接收参数:
-this.$route.query.id
+1. 路由组件通常存放在```pages```文件夹，一般组件通常存放在```components```文件夹。
+2. 通过切换，“隐藏”了的路由组件，默认是被销毁掉的，需要的时候再去挂载。
+3. 每个组件都有自己的```$route```属性，里面存储着自己的路由信息。
+4. 整个应用只有一个router，可以通过组件的```$router```属性获取到。
+
+### 路由的query参数
+
+ @RequestParam()
+
+1. 传递参数
+
+   ```vue
+   <!-- 跳转并携带query参数，to的字符串写法 -->
+   <router-link :to="/home/message/detail?id=666&title=你好">跳转</router-link>
+   				
+   <!-- 跳转并携带query参数，to的对象写法 -->
+   <router-link 
+   	:to="{
+   		path:'/home/message/detail',
+   		query:{
+   		   id:666,
+               title:'你好'
+   		}
+   	}"
+   >跳转</router-link>
+   ```
+
+2. 接收参数：
+
+   ```js
+   $route.query.id
+   $route.query.title
+   ```
+
+例子
+
+![image-20231201102458989](%F0%9F%93%83%20Vue%20Router%203.assets/image-20231201102458989.png)
+
+App.vue
+
+```vue
+<template>
+  <div>
+    <div class="row">
+      <Banner/>
+    </div>
+    <div class="row">
+      <div class="col-xs-2 col-xs-offset-2">
+        <div class="list-group">
+					<!-- 原始html中我们使用a标签实现页面的跳转 -->
+          <!-- <a class="list-group-item active" href="./about.html">About</a> -->
+          <!-- <a class="list-group-item" href="./home.html">Home</a> -->
+
+					<!-- Vue中借助router-link标签实现路由的切换 -->
+					<router-link class="list-group-item" active-class="active" to="/about">About</router-link>
+          <router-link class="list-group-item" active-class="active" to="/home">Home</router-link>
+        </div>
+      </div>
+      <div class="col-xs-6">
+        <div class="panel">
+          <div class="panel-body">
+						<!-- 指定组件的呈现位置 -->
+            <router-view></router-view>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+	import Banner from './components/Banner'
+	export default {
+		name:'App',
+		components:{Banner}
+	}
+</script>
+
 ```
 
-通过 params 传参：
-```javascript
-// 注意: 使用 name 方式的路由才能使用 params
-this.$router.push({
-  name:'xxx',
-  params:{
-    id: id
-  }
+router/index.js
+
+```js
+// 该文件专门用于创建整个应用的路由器
+import VueRouter from 'vue-router'
+//引入组件
+import About from '../pages/About'
+import Home from '../pages/Home'
+import News from '../pages/News'
+import Message from '../pages/Message'
+import Detail from '../pages/Detail'
+
+//创建并暴露一个路由器
+export default new VueRouter({
+	routes:[
+		{
+			path:'/about',
+			component:About
+		},
+		{
+			path:'/home',
+			component:Home,
+			children:[
+				{
+					path:'news',
+					component:News,
+				},
+				{
+					path:'message',
+					component:Message,
+					//
+					children:[
+						{
+							path:'detail',
+							component:Detail,
+						}
+					]
+				}
+			]
+		}
+	]
 })
 
-// 接收参数:
-this.$route.params.id
 ```
 
-<a name="dad2860d"></a>
-## 七、404 的处理
-按照下面的方法，服务器将不再返回 404 错误页面，因为对于所有路径都会返回 `index.html` 文件。为了避免这种情况，应该在 Vue 应用里面覆盖所有的路由情况，然后在给出一个 404 页面。
+pages/Message.vue
 
-```javascript
-const router = new VueRouter({
-  mode: 'history',
-  routes: [
-    { path: '*', component: NotFoundComponent }
-  ]
+```vue
+<template>
+	<div>
+		<ul>
+			<li v-for="m in messageList" :key="m.id">
+				<!-- 跳转路由并携带query参数，to的字符串写法 -->
+				<!-- <router-link :to="`/home/message/detail?id=${m.id}&title=${m.title}`">{{m.title}}</router-link>&nbsp;&nbsp; -->
+
+				<!-- 跳转路由并携带query参数，to的对象写法 
+				传递参数给/home/message/detail路由所表示的组件
+				-->
+				<router-link :to="{
+					path:'/home/message/detail',
+					// 携带参数
+					query:{
+						id:m.id,
+						title:m.title
+					}
+				}">
+					{{m.title}}
+				</router-link>
+			
+			</li>
+		</ul>
+		<hr>
+		<!-- 展示区域 -->
+		<router-view></router-view>  
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'Message',
+		data() {
+			return {
+				messageList:[
+					{id:'001',title:'消息001'},
+					{id:'002',title:'消息002'},
+					{id:'003',title:'消息003'}
+				]
+			}
+		},
+	}
+</script>
+```
+
+pages/Detail.vue
+
+```vue
+<template>
+	<ul>
+		<!-- 接收参数 -->
+		<li>消息编号：{{$route.query.id}}</li>
+		<li>消息标题：{{$route.query.title}}</li>
+	</ul>
+</template>
+
+<script>
+	export default {
+		name:'Detail',
+		mounted() {
+			console.log(this.$route)
+		},
+	}
+</script>
+```
+
+…….
+
+运行结果
+
+<img src="%F0%9F%93%83%20Vue%20Router%203.assets/image-20231201140755215.png" alt="image-20231201140755215" style="zoom:50%;" />
+
+
+
+### 路由的props配置[query进级]
+
+​	作用：让路由组件更方便的收到参数
+
+```js
+{
+	name:'xiangqing',
+	path:'detail/:id',
+	component:Detail,
+
+	//第一种写法：props值为对象，该对象中所有的key-value的组合最终都会通过props传给Detail组件
+	// props:{a:900}
+
+	//第二种写法：props值为布尔值，布尔值为true，则把路由收到的所有params参数通过props传给Detail组件
+	// props:true
+	
+	//第三种写法：props值为函数，该函数返回的对象中每一组key-value都会通过props传给Detail组件
+	props(route){
+		return {
+			id:route.query.id,
+			title:route.query.title
+		}
+	}
+} 
+```
+
+
+
+
+
+![image-20231201102352825](%F0%9F%93%83%20Vue%20Router%203.assets/image-20231201102352825.png)
+
+App.vue
+
+```
+
+```
+
+index.js
+
+```js
+// 该文件专门用于创建整个应用的路由器
+import VueRouter from 'vue-router'
+//引入组件
+import About from '../pages/About'
+import Home from '../pages/Home'
+import News from '../pages/News'
+import Message from '../pages/Message'
+import Detail from '../pages/Detail'
+
+//创建并暴露一个路由器
+export default new VueRouter({
+	routes:[
+		{
+			name:'guanyu',
+			path:'/about',
+			component:About
+		},
+		{
+			path:'/home',
+			component:Home,
+			children:[
+				{
+					path:'news',
+					component:News,
+				},
+				{
+					path:'message',
+					component:Message,
+					children:[
+						{
+							name:'xiangqing',
+							path:'detail',
+							component:Detail,
+							//props的第一种写法，值为对象，该对象中的所有key-value都会以props的形式传给Detail组件。
+							// props:{a:1,b:'hello'}
+
+							//props的第二种写法，值为布尔值，若布尔值为真，就会把该路由组件收到的所有params参数，以props的形式传给Detail组件。
+							// props:true
+
+							//props的第三种写法，值为函数
+							props($route){
+								return {
+									id:$route.query.id,
+									title:$route.query.title,
+									a:1,
+									b:'hello'
+								}
+							}
+
+						}
+					]
+				}
+			]
+		}
+	]
+})
+
+```
+
+Message.vue
+
+```vue
+<template>
+	<div>
+		<ul>
+			<li v-for="m in messageList" :key="m.id">
+				<!-- 跳转路由并携带params参数，to的字符串写法 -->
+				<!-- <router-link :to="`/home/message/detail/${m.id}/${m.title}`">{{m.title}}</router-link>&nbsp;&nbsp; -->
+				<!-- 跳转路由并携带params参数，to的对象写法 -->
+				<router-link :to="{
+					name:'xiangqing',
+					query:{              // 
+						id:m.id,
+						title:m.title
+					}
+				}">
+					{{m.title}}
+				</router-link>
+			
+			</li>
+		</ul>
+		<hr>
+		<router-view></router-view>
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'Message',
+		data() {
+			return {
+				messageList:[
+					{id:'001',title:'消息001'},
+					{id:'002',title:'消息002'},
+					{id:'003',title:'消息003'}
+				]
+			}
+		},
+	}
+</script>
+```
+
+Detail.vue
+
+```vue
+<template>
+	<ul>
+		<li>消息编号：{{id}}</li>
+		<li>消息标题：{{title}}</li>
+	</ul>
+</template>
+
+<script>
+	export default {
+		name:'Detail',
+		props:['id','title'],
+		computed: {
+			// id(){
+			// 	return this.$route.query.id
+			// },
+			// title(){
+			// 	return this.$route.query.title
+			// },
+		},
+		mounted() {
+			// console.log(this.$route)
+		},
+	}
+</script>
+```
+
+
+
+<img src="%F0%9F%93%83%20Vue%20Router%203.assets/image-20231201101852565.png" alt="image-20231201101852565" style="zoom:50%;" />
+
+### 路由的params参数
+
+ @PathVariable()
+
+1. 配置路由，声明接收params参数
+
+   ```js
+   {
+   	path:'/home',
+   	component:Home,
+   	children:[
+   		{
+   			path:'news',
+   			component:News
+   		},
+   		{
+   			component:Message,
+   			children:[
+   				{
+   					name:'xiangqing',
+   					path:'detail/:id/:title', //使用占位符声明接收params参数 //动态路径参数以冒号开头
+   					component:Detail
+   				}
+   			]
+   		}
+   	]
+   }
+   ```
+
+2. 传递参数
+
+   ```vue
+   <!-- 跳转并携带params参数，to的字符串写法 -->
+   <router-link :to="/home/message/detail/666/你好">跳转</router-link>
+   				
+   <!-- 跳转并携带params参数，to的对象写法 -->
+   <router-link 
+   	:to="{
+   		name:'xiangqing',
+   		params:{
+   		   id:666,
+               title:'你好'
+   		}
+   	}"
+   >跳转</router-link>
+   ```
+
+   > 特别注意：路由携带params参数时，若使用to的对象写法，则不能使用path配置项，必须使用name配置！
+
+3. 接收参数：
+
+   ```js
+   $route.params.id
+   $route.params.title
+   ```
+
+例子
+
+App.vue
+
+```vue
+<template>
+  <div>
+    <div class="row">
+      <Banner/>
+    </div>
+    <div class="row">
+      <div class="col-xs-2 col-xs-offset-2">
+        <div class="list-group">
+					<!-- 原始html中我们使用a标签实现页面的跳转 -->
+          <!-- <a class="list-group-item active" href="./about.html">About</a> -->
+          <!-- <a class="list-group-item" href="./home.html">Home</a> -->
+
+					<!-- Vue中借助router-link标签实现路由的切换 -->
+					<router-link class="list-group-item" active-class="active" to="/about">About</router-link>
+          <router-link class="list-group-item" active-class="active" to="/home">Home</router-link>
+        </div>
+      </div>
+      <div class="col-xs-6">
+        <div class="panel">
+          <div class="panel-body">
+						<!-- 指定组件的呈现位置 -->
+            <router-view></router-view>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+	import Banner from './components/Banner'
+	export default {
+		name:'App',
+		components:{Banner}
+	}
+</script>
+```
+
+router/index.js
+
+```js
+// 该文件专门用于创建整个应用的路由器
+import VueRouter from 'vue-router'
+//引入组件
+import About from '../pages/About'
+import Home from '../pages/Home'
+import News from '../pages/News'
+import Message from '../pages/Message'
+import Detail from '../pages/Detail'
+
+//创建并暴露一个路由器
+export default new VueRouter({
+	routes:[
+		{
+			name:'guanyu',
+			path:'/about',
+			component:About
+		},
+		{
+			path:'/home',
+			component:Home,
+			children:[
+				{
+					path:'news',
+					component:News,
+				},
+				{
+					path:'message',
+					component:Message,
+					children:[
+						{
+							name:'xiangqing',
+							path:'detail/:id/:title', //参数:id/:title
+							component:Detail,
+						}
+					]
+				}
+			]
+		}
+	]
 })
 ```
 
-或者，如果使用 Node.js 服务器，也可以用服务端路由匹配到来的 URL，并在没有匹配到路由的时候返回 404，以实现回退。
+pages/Message.vue
 
-此配置一定要放于所有路由配置之后, 否则有些路由将无法匹配
+```vue
+<template>
+	<div>
+		<ul>
+			<li v-for="m in messageList" :key="m.id">
+				<!-- 跳转路由并携带params参数，to的字符串写法 -->
+				<!-- <router-link :to="`/home/message/detail/${m.id}/${m.title}`">{{m.title}}</router-link>&nbsp;&nbsp; -->
 
-<a name="3920986a"></a>
+				<!-- 跳转路由并携带params参数，to的对象写法 -->
+				<router-link :to="{
+					name:'xiangqing',  //必须用name
+					params:{ //携带params参数
+						id:m.id,
+						title:m.title
+					}
+				}">
+					{{m.title}}
+				</router-link>
+			
+			</li>
+		</ul>
+		<hr>
+		<router-view></router-view>
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'Message',
+		data() {
+			return {
+				messageList:[
+					{id:'001',title:'消息001'},
+					{id:'002',title:'消息002'},
+					{id:'003',title:'消息003'}
+				]
+			}
+		},
+	}
+</script>
+```
+
+pages/Detail.vue
+
+```vue
+<template>
+	<ul>
+        <!-- 接收参数 -->
+		<li>消息编号：{{$route.params.id}}</li>            
+		<li>消息标题：{{$route.params.title}}</li>
+	</ul>
+</template>
+
+<script>
+	export default {
+		name:'Detail',
+		mounted() {
+			// console.log(this.$route)
+		},
+	}
+```
+
+运行结果
+
+<img src="%F0%9F%93%83%20Vue%20Router%203.assets/image-20231201140950403.png" alt="image-20231201140950403" style="zoom:50%;" />
+
+## 七、缓存路由组件
+
+1. 作用：让不展示的路由组件保持挂载，不销毁, 保留数据。
+
+2. 具体编码：
+
+   ```vue
+   <!-- 缓存多个路由组件 -->
+   <!-- <keep-alive :include="['News','Message']"> -->
+   				
+   <!-- 缓存一个路由组件, (保持活着), News必须是组件名 -->
+   <keep-alive include="News"> 
+       <router-view></router-view>
+   </keep-alive>
+   ```
+
 ## 八、动态路由
 我们经常需要把某种模式匹配到的所有路由，全都映射到同个组件。例如，我们有一个 `User` 组件，对于所有 ID 各不相同的用户，都要使用这个组件来渲染。那么，我们可以在 `vue-router` 的路由路径中使用『动态路径参数』（dynamic segment）来达到这个效果：
 ```javascript
@@ -300,7 +894,6 @@ const router = new VueRouter({
 
 除了 `$route.params` 外，`$route` 对象还提供了其它有用的信息，例如，`$route.query`（如果 URL 中有查询参数）、`$route.hash` 等等。
 
-<a name="631b3d85"></a>
 ## 九、响应路由的变化
 当使用路由参数时，例如从 `/user/foo` 导航到 `/user/bar`，**原来的组件实例会被复用**。因为两个路由都渲染同个组件，比起销毁再创建，复用则显得更加高效。**不过，这也意味着组件的生命周期钩子不会再被调用**。
 
@@ -329,107 +922,183 @@ const User = {
 }
 ```
 
+## 十、嵌套路由:crossed_swords:
 
-<a name="bd526d70"></a>
-## 十、嵌套路由
+1. 配置路由规则，使用children配置项：
 
-通常， `<router-view>` 是最顶层的出口，渲染最高级路由匹配到的组件。
+   ```js
+   routes:[
+   	{
+   		path:'/about',
+   		component:About,
+   	},
+   	{
+   		path:'/home',
+   		component:Home,
+   		children:[ //通过children配置子级路由
+   			{
+   				path:'news', //此处一定不要写：/news
+   				component:News
+   			},
+   			{
+   				path:'message',//此处一定不要写：/message
+   				component:Message
+   			}
+   		]
+   	}
+   ]
+   ```
 
-同样地，一个被渲染组件同样可以包含自己的嵌套 `<router-view>`。
+2. 跳转（要写完整路径）：
 
-例如，在 `User` 组件的模板添加一个 `<router-view>` :
+   ```vue
+   <router-link to="/home/news">News</router-link>
+   ```
 
-```html
-<script src="//unpkg.com/vue/dist/vue.js"></script>
-<script src="//unpkg.com/vue-router/dist/vue-router.js"></script>
+示例
 
-<div id="app">
-  <p>
-    <router-link to="/">&le;root&gt;</router-link>
-    <router-link to="/user">/user/foo</router-link>
-    <router-link to="/user/profile">/user/foo/profile</router-link>
-    <router-link to="/user/posts">/user/foo/posts</router-link>
-  </p>
-  <p>Hello Vue-Router</p>
-  <router-view></router-view>
-</div>
+<img src="%F0%9F%93%83%20Vue%20Router%203.assets/image-20231122200936282.png" alt="image-20231122200936282" style="zoom:67%;" />
+
+router/index.js 路由
+
+```js
+//该文件专门用于创建整个应用的路由器
+import VueRouter from 'vue-router'
+//引入组件
+import About from '../pages/About'
+import Home from '../pages/Home'
+import News from '../pages/News'
+import Message from '../pages/Message'
+
+//创建并暴露一个路由器
+export default new VueRouter({
+	routes:[
+		{
+			path:'/about',
+			component:About
+		},
+		// 多级路由
+		{
+			path:'/home',
+			component:Home,
+			// 
+			children:[
+				{
+					path:'news',  //此处一定不要写：/news
+					component:News,
+				},
+				{
+					path:'message',
+					component:Message,
+				}
+			]
+		}
+	]
+})
+
 ```
 
-要在嵌套的出口中渲染组件，需要在 VueRouter 的参数中使用 children 配置：
+App.vue
 
-```javascript
-const User = {
-  template: `
-    <div class="user">
-      <h2>User {{ $route.params.id }}</h2>
-      <router-view></router-view>
+```vue
+<template>
+  <div>
+    <div class="row">
+      <Banner/>
     </div>
-  `
-}
+    <div class="row">
+      <div class="col-xs-2 col-xs-offset-2">
+        <div class="list-group">
+					<!-- 原始html中我们使用a标签实现页面的跳转 -->
+          <!-- <a class="list-group-item active" href="./about.html">About</a> -->
+          <!-- <a class="list-group-item" href="./home.html">Home</a> -->
 
-const UserHome = { template: '<div>Home</div>' }
-const UserProfile = { template: '<div>Profile</div>' }
-const UserPosts = { template: '<div>Posts</div>' }
+					<!-- Vue中借助router-link标签实现路由的切换 -->
+					<router-link class="list-group-item" active-class="active" to="/about">About</router-link>
+          <router-link class="list-group-item" active-class="active" to="/home">Home</router-link>
+        </div>
+      </div>
+      <div class="col-xs-6">
+        <div class="panel">
+          <div class="panel-body">
+						<!-- 指定组件的呈现位置 类似于插件-->
+            <router-view></router-view>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
-const router = new VueRouter({
-  routes: [
-    { path: '/user', component: User,
-      children: [
-        // 空子路由，用于默认渲染
-        { path: '', component: UserHome },
+<script>
+	import Banner from './components/Banner'
+	export default {
+		name:'App',
+		components:{Banner}
+	}
+</script>
 
-        // 当 /user/profile 匹配成功
-        // UserProfile 会被渲染在 User 的 <router-view> 中
-        { path: 'profile', component: UserProfile },
-
-         // 当 /user/posts 匹配成功
-         // UserPosts 会被渲染在 User 的 <router-view> 中
-        { path: 'posts', component: UserPosts }
-      ]
-    }
-  ]
-})
-
-const app = new Vue({ router }).$mount('#app')
 ```
 
-:::info
-以 / 开头的嵌套路径会被当作根路径。 这能充分的使用嵌套组件而无须设置嵌套的路径。
-:::
+路由组件通常存放在```pages```文件夹
 
-基于上面的配置，当访问 /user 时，User 的出口是不会渲染任何东西，这是因为没有匹配到合适的子路由。如果你想要渲染点什么，可以如上提供一个空的子路由。
+![image-20231128210058546](%F0%9F%93%83%20Vue%20Router%203.assets/image-20231128210058546.png)
 
-<a name="bded8606"></a>
-## 十一、命名视图
-有时候想同时（同级）展示多个视图，而不是嵌套展示，例如创建一个布局，有 `sidebar`（侧导航） 和 `main`（主内容） 两个视图，这个时候命名视图就派上用场了。你可以在界面中拥有多个单独命名的视图，而不是只有一个单独的出口。如果 `router-view` 没有设置名字，那么默认为 `default`。
-```html
-<router-view class="view one"></router-view>
-<router-view class="view two" name="a"></router-view>
-<router-view class="view three" name="b"></router-view>
-```
+运行效果
 
-一个视图使用一个组件渲染，因此对于同个路由，多个视图就需要多个组件。确保正确使用 `components` 配置（带上 s）：
-```javascript
-const router = new VueRouter({
-  routes: [
-    {
-      path: '/',
-      components: {
-        default: Foo,
-        a: Bar,
-        b: Baz
-      }
-    }
-  ]
-})
-```
+<img src="%F0%9F%93%83%20Vue%20Router%203.assets/image-20231122201139356.png" alt="image-20231122201139356" style="zoom:67%;" />
 
-<a name="69c967fe"></a>
-### 嵌套命名视图
-我们也有可能使用命名视图创建嵌套视图的复杂布局，这时也可以用到嵌套 `router-view` 组件。
+## 十一、命名路由
 
-<a name="39db45cb"></a>
+作用：可以简化路由的跳转。
+
+如何使用
+
+1. 给路由命名：
+
+   ```js
+   {
+   	path:'/demo',         
+   	component:Demo,
+   	children:[
+   		{
+   			path:'test',
+   			component:Test,
+   			children:[
+   				{
+                       name:'hello' //给路由命名  //一般取path相同的名字//一级路由简化没有意义
+   					path:'welcome',
+   					component:Hello,
+   				}
+   			]
+   		}
+   	]
+   }
+   ```
+
+2. 简化跳转：
+
+   ```vue
+   <!--简化前，需要写完整的路径 -->
+   <router-link to="/demo/test/welcome">跳转</router-link>
+   
+   <!--简化后，直接通过名字跳转 -->
+   <router-link :to="{name:'hello'}">跳转</router-link>
+   
+   <!--简化写法配合传递参数 -->
+   <router-link 
+   	:to="{
+   		name:'hello',
+   		query:{
+   		   id:666,
+               title:'你好'
+   		}
+   	}"
+   >跳转</router-link>
+   ```
+
 ## 十二、路由重定向
+
 重定向也是通过 `routes` 配置来完成，下面例子是从 `/a` 重定向到 `/b`：
 ```javascript
 const router = new VueRouter({
@@ -460,23 +1129,77 @@ const router = new VueRouter({
 })
 ```
 
-<a name="d4e8f398"></a>
-## 十三、路由别名
-『重定向』的意思是，当用户访问 `/a`时，URL 将会被替换成 `/b`，然后匹配路由为 `/b`，而『别名』是什么？ 举个栗子： **/a 的别名是 /b，意味着，当用户访问 /b 时，URL 会保持为 /b，但是路由匹配则为 /a，就像用户访问 /a 一样。**
+## 十三、路由守卫:crossed_swords:
 
-上面对应的路由配置为：
-```javascript
-const router = new VueRouter({
-  routes: [
-    { path: '/a', component: A, alias: '/b' }
-  ]
-})
-```
+1. 作用：对路由进行权限控制(登录后才能看)
+2. 分类：全局守卫、独享守卫、组件内守卫
 
-『别名』的功能可以自由地将 UI 结构映射到任意的 URL，而不是受限于配置的嵌套路由结构。
+![image-20231201134917426](%F0%9F%93%83%20Vue%20Router%203.assets/image-20231201134917426.png)
 
-<a name="89f7ebf2"></a>
+router/index.js
+
+1. 全局守卫:
+
+   ```js
+   //全局前置守卫：初始化时执行、每次路由切换前执行
+   //全局前置路由守卫————初始化的时候被调用、每次路由切换之前被调用
+   router.beforeEach((to,from,next)=>{
+   	console.log('beforeEach',to,from)
+   	if(to.meta.isAuth){ //判断当前路由是否需要进行权限控制
+   		if(localStorage.getItem('school') === 'atguigu'){ //权限控制的具体规则
+   			next() //放行
+   		}else{
+   			alert('暂无权限查看')
+   			// next({name:'guanyu'})
+   		}
+   	}else{
+   		next() //放行
+   	}
+   })
+   
+   //全局后置守卫：初始化时执行、每次路由切换后执行
+   //全局后置路由守卫————初始化的时候被调用、每次路由切换之后被调用	// 可以用来切换网页标题
+   router.afterEach((to,from)=>{
+   	console.log('afterEach',to,from)
+   	if(to.meta.title){ 
+   		document.title = to.meta.title   //修改网页的title
+   	}else{
+   		document.title = 'vue_test'
+   	}
+   })
+   ```
+
+2. 独享守卫:
+
+   ```js
+   beforeEnter(to,from,next){
+   	console.log('beforeEnter',to,from)
+   	if(to.meta.isAuth){ //判断当前路由是否需要进行权限控制
+   		if(localStorage.getItem('school') === 'atguigu'){
+   			next()
+   		}else{
+   			alert('暂无权限查看')
+   			// next({name:'guanyu'})
+   		}
+   	}else{
+   		next()
+   	}
+   }
+   ```
+
+3. 组件内守卫：
+
+   ```js
+   //进入守卫：通过路由规则，进入该组件时被调用
+   beforeRouteEnter (to, from, next) {
+   },
+   //离开守卫：通过路由规则，离开该组件时被调用
+   beforeRouteLeave (to, from, next) {
+   }
+   ```
+
 ## 十四、路由元信息
+
 定义路由的时候可以配置 `meta` 字段：
 ```javascript
 const router = new VueRouter({
@@ -525,8 +1248,8 @@ router.beforeEach((to, from, next) => {
 })
 ```
 
-<a name="78b836e0"></a>
 ## 十五、路由动画
+
 可以在路由入口外围套上一层 transition 以实现路由切换过程中的动画效果：
 ```html
 <script src="//unpkg.com/vue/dist/vue.js"></script>
@@ -631,7 +1354,6 @@ new Vue({
 }
 ```
 
-<a name="0cfe063b"></a>
 ## 十六、数据获取
 有时候，进入某个路由后，需要从服务器获取数据。例如，在渲染用户信息时，你需要从服务器获取用户的数据。我们可以通过两种方式来实现：
 
@@ -640,8 +1362,8 @@ new Vue({
 
 从技术角度讲，两种方式都不错 —— 就看你想要的用户体验是哪种。
 
-<a name="7db78a95"></a>
 ### 导航完成后获取数据
+
 当你使用这种方式时，我们会马上导航和渲染组件，然后在组件的 `created` 钩子中获取数据。这让我们有机会在数据获取期间展示一个 loading 状态，还可以在不同视图间展示不同的 loading 状态。
 
 假设我们有一个 `Post` 组件，需要基于 `$route.params.id` 获取文章数据：
@@ -700,8 +1422,8 @@ export default {
 }
 ```
 
-<a name="a40b6e45"></a>
 ### 在导航完成前获取数据
+
 通过这种方式，我们在导航转入新的路由前获取数据。我们可以在接下来的组件的 `beforeRouteEnter` 守卫中获取数据，当数据获取成功后只调用 `next` 方法。
 ```javascript
 export default {
@@ -739,7 +1461,6 @@ export default {
 
 在为后面的视图获取数据时，用户会停留在当前的界面，因此建议在数据获取期间，显示一些进度条或者别的指示。如果数据获取失败，同样有必要展示一些全局的错误提醒。
 
-<a name="eae4f618"></a>
 ## 十七、滚动行为
 使用前端路由，当切换到新路由时，想要页面滚到顶部，或者是保持原先的滚动位置，就像重新加载页面那样。 `vue-router` 能做到，而且更好，它让你可以自定义路由切换时页面如何滚动。
 
@@ -797,7 +1518,6 @@ scrollBehavior (to, from, savedPosition) {
 
 我们还可以利用[路由元信息](https://router.vuejs.org/zh-cn/advanced/meta.html)更细颗粒度地控制滚动。查看完整例子请[移步这里](https://github.com/vuejs/vue-router/blob/next/examples/scroll-behavior/app.js)。
 
-<a name="r5PIe"></a>
 ### 异步滚动
 2.8.0+ , 也可以返回一个 Promise 来得出预期的位置描述：
 ```javascript
@@ -812,7 +1532,6 @@ scrollBehavior (to, from, savedPosition) {
 
 将其挂载到从页面级别的过渡组件的事件上，令其滚动行为和页面过渡一起良好运行是可能的。但是考虑到用例的多样性和复杂性，我们仅提供这个原始的接口，以支持不同用户场景的具体实现。
 
-<a name="d14e3942"></a>
 ## 十八、路由懒加载
 当打包构建应用时，Javascript 包会变得非常大，影响页面加载。如果我们能把不同路由对应的组件分割成不同的代码块，然后当路由被访问的时候才加载对应组件，这样就更加高效了。
 
@@ -844,8 +1563,8 @@ const router = new VueRouter({
 })
 ```
 
-<a name="z4jlq"></a>
 ### 把组件按组分块
+
 有时候我们想把某个路由下的所有组件都打包在同个异步块 (chunk) 中。只需要使用 [命名 chunk](https://webpack.js.org/guides/code-splitting-require/#chunkname)，一个特殊的注释语法来提供 chunk name (需要 Webpack > 2.4)。
 ```javascript
 const Foo = () => import(/* webpackChunkName: "group-foo" */ './Foo.vue')
@@ -854,4 +1573,11 @@ const Baz = () => import(/* webpackChunkName: "group-foo" */ './Baz.vue')
 ```
 
 Webpack 会将任何一个异步模块与相同的块名称组合到相同的异步块中。
+
+### 两个新的生命周期钩子
+
+1. 作用：路由组件所独有的两个钩子，用于捕获路由组件的激活状态。
+2. 具体名字：
+   1. ```activated```路由组件被激活时触发。
+   2. ```deactivated```路由组件失活时触发。
 

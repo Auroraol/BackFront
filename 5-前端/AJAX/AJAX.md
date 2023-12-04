@@ -864,7 +864,7 @@ $.ajax({
 </body>
 ```
 
-# axios方式 发送 ajax 请求
+# axios方式 发送 ajax 请求:crossed_swords:
 
 axios 官网：https://www.npmjs.com/package/axios
 

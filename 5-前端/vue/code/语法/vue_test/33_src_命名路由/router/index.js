@@ -11,7 +11,7 @@ import Detail from '../pages/Detail'
 export default new VueRouter({
 	routes:[
 		{
-			name:'guanyu',       //没有一级路由简化没有意义
+			name:'guanyu',       //没有一级路由简化没有意义  //一般取path相同的名字
 			path:'/about',
 			component:About
 		},
