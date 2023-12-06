@@ -192,6 +192,30 @@ $ vue ui -p 3000
 1. 使用vue inspect > output.js可以查看到Vue脚手架的默认配置。
 2. 使用vue.config.js可以对脚手架进行个性化定制，详情见：https://cli.vuejs.org/zh
 
+## 4. 拉取vue项目运行
+
+第一步：拉取项目代码
+
+```
+git clone 项目代码库地址
+```
+
+第二步：安装依赖
+
+一般来说，Vue项目依赖的包都在项目的package.json文件中说明，可以根据这个文件来进行安装。在项目根目录下执行如下命令可以安装项目所需的所有包（需安装Node.js）：
+
+```
+npm install
+```
+
+第三步：运行项目
+
+使用如下命令启动Vue项目：
+
+```
+npm run serve
+```
+
 ## 补充
 
 Vue组件间的参数传递
@@ -202,9 +226,9 @@ Vue组件间的参数传递
 
 在idea中下载vue插件
 
-
-
 ![img](vue%E7%AC%94%E8%AE%B0.assets/1646014031373-51ea51b2-4e36-4171-884b-28d88c39db05.png)
+
+
 
 
 
