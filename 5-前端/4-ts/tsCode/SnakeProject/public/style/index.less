@@ -1,0 +1,72 @@
+*{
+    margin:0;
+    padding:0;
+    // 使用怪异盒模型 元素的宽度(不包含外边距) = width
+    box-sizing: border-box;
+}
+
+body{
+    font: bold 20px "Courier";
+}
+
+// 主界面
+#main {
+    // 内容区
+    width: 360px;
+    height: 420px;
+    background-color: #b7d4a8;
+    // div之间
+    margin: 100px auto;  /* 水平居中 */
+    // 边框
+    border: 10px solid black;
+    border-radius: 10px;
+    // 子元素居中
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+#stage{
+    width: 304px;
+    height: 304px;
+    outline: 2px solid black;
+    // margin-top: 10px;
+    position:relative;
+}
+
+#snake>div{
+    width: 4px;
+    height: 4px;
+    background-color: black;
+}
+
+#food{
+    // 大小
+    width: 10px;
+    height: 10px;
+    // 布局
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    // 位置
+    position:absolute;
+    left: 40px;
+    top: 100px;
+}
+
+#food>div{
+    width: 4px;
+    height: 4px;
+    background-color: black;
+    transform: rotate(45deg);
+}
+
+//记分牌
+#score-panel{
+    width: 300px;
+    margin-top: 35px;
+    display: flex;
+    justify-content: space-around;
+
+}

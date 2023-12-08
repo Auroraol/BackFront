@@ -1,4 +1,4 @@
-1、导入方式
+# 1、导入方式
 
 ```java
 <!DOCTYPE html>
@@ -102,62 +102,81 @@ li { /* 代表选中了页面中所有的li */
 
 ## 2.2、层次选择器:crossed_swords:
 
-<img src="css.assets/image-20230918144735435.png" alt="image-20230918144735435" style="zoom:67%;" />
-
-1. 后代选择器：在某个元素的后面的所有
-
 ```html
-/*后代选择器*/
-<style>
-body p{
-	background:red;
-}
-</style>
+<body>
+  <p class="active">p1</p>
+  <p>p2</p>
+  <p>p3</p>
+  <p>p4</p>
+  <ul>
+    <li><p>li-p1</p></li>
+    <li><p>li-p2</p></li>
+    <li><p>li-p3</p></li>
+    <li><p>li-p4</p></li>
+  </ul>
+</body>
 ```
+
+1. 后代选择器,  在某个元素的后面的所有
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/XWOOqXr?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/XWOOqXr">
+  Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
 
 2. 子一代元素选择器
 
-```html
-/*子选择器*/
-<style>
-body>p{
-	background:orange;
-}
-</style>
-```
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/KKJJRwr?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/KKJJRwr">
+  Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
 
 3. 相邻的兄弟选择器 同辈(和类选择器连用)
 
-```html
-/*相邻兄弟选择器：只有一个，相邻（向下）*/
-<style>
-    .active+p{
-    	background: red
-    }
-</style>
-
-<body>
-	<p class="active">p1<p>
-	<p>p2</p>
-</body>
-```
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/KKJJRPG?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/KKJJRPG">
+  Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
 
 4. 通用选择器(和类选择器连用)
 
-```html
-<style>
-/*通用兄弟选择器，当前选中元素的向下的所有兄弟元素*/
-	.active~p{
-		background:red;
-	}
-</style>
-<body>
-	<p class="active">p1<p>
-	<p>p2</p>
-</body>
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/qBggoeO?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/qBggoeO">
+  Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+补充:
+
+less写法
+
+```less
+#food{
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    
+    &>div{
+          /* 这里是 div 元素的样式 */
+    }
+} 
 ```
 
-![image-20230918145758814](css.assets/image-20230918145758814.png)
+ CSS写法
+
+```css
+#food {
+  width: 10px;
+  height: 10px;
+  position: absolute;
+}
+#food > div {
+  /* 这里是 div 元素的样式 */
+}
+```
 
 ## 2.3、伪类选择器
 
@@ -1589,19 +1608,19 @@ border-radius有四个参数（顺时针），左上开始
 
 相对于原来的位置，进行指定的偏移，相对定位的话，它仍然在标准文档流中，原来的位置会被保留
 
-属性position:relative;
+属性 position:relative;
 
-参考物：元素本身
+参考物：元素自己本身
 
 是否脱离文档流：不脱离
 
 偏移距离:(向着中心点方向移动为正值)
 
 - ```
-  top:100px 顶部向下移动
-  bottom:100px 底部向上移动
-  left:100px 左侧向右移动
-  right:100px 右侧向左移动
+  top:100px 元素自身顶部向下移动
+  bottom:100px 元素自身底部向上移动
+  left:100px 元素自身左侧向右移动
+  right:100px 元素自身右侧向左移动
   ```
 
 + <img src="css.assets/bg2019111723.jpg" alt="img" style="zoom:67%;" />
@@ -1682,7 +1701,7 @@ border-radius有四个参数（顺时针），左上开始
 
 属性position:absolute;
 
-参考物：外层具有position属性的元素,一层层向上查找，如果没有找到最终参考浏览器空白文档区域定位
+参考物：父层具有position:relative属性的元素, 一层层向上查找，如果没有找到最终参考浏览器空白文档区域定位
 
 + 没有父级元素定位的前提下，相对于浏览器定位
 + 假设父级元素存在定位，我们通常会相对于父级元素进行偏移
@@ -1694,13 +1713,13 @@ border-radius有四个参数（顺时针），左上开始
 偏移距离:(向着中心点方向移动为正值)
 
 - ```
-  top 参考物的顶部距离元素的顶部
-  bottom 参考物的底部距离元素的底部
-  left 参考物的左侧距离元素的左侧
+  top 参考物的顶部距离该元素的顶部
+  bottom 参考物的底部距离该元素的底部
+  left 参考物的左侧距离该元素的左侧
   right 参考物的右侧距离元素的右侧
   ```
 
-+ <img src="css.assets/bg2019111723.jpg" alt="img" style="zoom:67%;" />
++ <img src="css.assets/image-20231207222357709.png" alt="image-20231207222357709" style="zoom:67%;" />
 
 应用场景：元素叠加效果，关闭按钮、二级菜单、轮播指示器
 
@@ -1752,7 +1771,21 @@ border-radius有四个参数（顺时针），左上开始
 </html>
 ```
 
-![image-20230918162359022](css.assets/image-20230918162359022.png)
+运行结果:
+
+```
+right:30px;
+top:30px
+```
+
+![image-20231207221841380](css.assets/image-20231207221841380.png)
+
+```
+left:30px;
+top:30px
+```
+
+![image-20231207222210217](css.assets/image-20231207222210217.png)
 
 ## 6.3、固定定位-fixed
 
@@ -1991,6 +2024,8 @@ z-index：默认是0，最高无限~999
 
 ### 内容区 content
 
+宽高设置的是内容区
+
 ```css
 div {
     width: 200px;
@@ -2019,8 +2054,8 @@ padding-bottom: 50px; /* 下内填充 */
 1. 块状元素，可以设置上下左右的`padding`
 2. 行内元素，默认情况下只能设置左右`padding`,  行内元素不可以设置宽高、上下padding, 上下border
 3. 作用:
-   + <strong style ="color:red">一般用于内容和边界之间的距离</strong>
-4. 会撑大盒子
+   + <strong style ="color:red">一般用于内容和边框之间的距离</strong>
+4. 会撑大盒子, 不影响定位
 5. 属性
 
 - 上下左右相同`padding:值;`
@@ -2033,23 +2068,35 @@ padding-bottom: 50px; /* 下内填充 */
   Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
-
-
 ### 边框 border
 
 1. 块状元素，可以设置上下左右`border`边框
 2. 行内元素，只能设置左右`border`边框
-3. 会撑大盒子
-4. 去除边框 `border: 0;`
+3. 会撑大盒子,  干扰绝对定位,  **搞不明白就使用outline** [border占用空间，outline不占用空间，不会影响元素的尺寸和位置。]
+4. 默认去除边框 `border: 0;`
 5. 块状元素水平居中 `margin: 0 auto;`
 
 - [margin:0 auto 失效的原因
 
-<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/MWLXgBw?default-tab=html%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
-  See the Pen <a href="https://codepen.io/Auroraol/pen/MWLXgBw">
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/YzBBbza?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/YzBBbza">
   Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
+
+补充:
+
+如果有一个需求，给一个元素增加一条边框，想必大家会习惯且娴熟的使用**[border](https://link.zhihu.com/?target=http%3A//www.w3school.com.cn/cssref/pr_border.asp)**来实现。
+
+其实**[outline](https://link.zhihu.com/?target=http%3A//www.w3school.com.cn/cssref/pr_outline.asp)**也能达到同样的效果，并且在有些场景下会更适用，比如下面的demo
+
+**使用border后，div宽度增加，导致超出父元素**
+
+<img src="css.assets/v2-bb61a9c58b418fa161171fc832701143_r.jpg" alt="img" style="zoom: 40%;" />
+
+**使用outline后，div元素宽度不会改变**
+
+<img src="css.assets/v2-7dde399d26fc9bfe3658fabe24dbb7c9_r.jpg" alt="img" style="zoom:50%;" />
 
 ### 外边距 margin
 
@@ -2057,20 +2104,18 @@ padding-bottom: 50px; /* 下内填充 */
 2. 行内元素，只能设置左右边框 
 3. 作用:
    + <strong style="color:red">用于一个标签和另一个标签之间的距离</strong>
-   + <strong style="color:red">用于元素整体和其他地方之间的距离</strong>
-
-4. 不会撑大盒子
+   + <strong style="color:red">用于元素整体和其他地方之间的距离,  没有父级定位, 则相对浏览器定位</strong>
+4. 不会撑大盒子, 影响定位
 5. `margin` 可以设置负值
 6. 注意！
    + `text-align: center;` 让这个块里面的内容，在这个块里，水平居中
    + `margin: 0 auto;` 是将整个块水平居中
 
-<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/MWLXgBw?default-tab=html%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
-  See the Pen <a href="https://codepen.io/Auroraol/pen/MWLXgBw">
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/jOddoEN?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/jOddoEN">
   Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
-
 
 ### 元素尺寸的计算
 
@@ -2244,6 +2289,10 @@ padding-bottom: 50px; /* 下内填充 */
   - 怪异盒模型的width把内容、内边距和边框都包含在内
 - 移动端 *{box-sizing:border-box}
 - 用途：正常盒子模型主要用于pc端。怪异盒子模型主要用于手机端
+
+怪异盒模型 `box-sizing:border-box` 使用如下:
+
+<img src="css.assets/image-20231208115624586.png" alt="image-20231208115624586" style="zoom:50%;" />>
 
 **正常盒子和怪异盒子的记忆方法**
 
@@ -2618,7 +2667,7 @@ overflow：scoll/*滚动*/
 
 **以及flex-direction，justify-content，align-items**
 
-+ 若给一个 **div 设置 display：[flex](https://so.csdn.net/so/search?q=flex&spm=1001.2101.3001.7020)；**这个div就可以成为flex容器**，在flex容器中用flex-direction，justify-content，align-items等属性对子div进行布局是十分方便的。
++ 若给一个 **div 设置 display：[flex](https://so.csdn.net/so/search?q=flex&spm=1001.2101.3001.7020)；**这个div就可以成为flex容器，在flex容器中用flex-direction，justify-content，align-items等属性对子div进行布局是十分方便的。
 
 ####  flex-direction
 
@@ -2626,7 +2675,7 @@ n. 方向，方位
 
 ###### .flex-direction: row; (默认)
 
-div是块级元素，默认一个div独占一行，可以**通过在父级div**（必须是flex容器）中设置flex-direction: row;  让其在一行并排显示
+div是块级元素，默认一个div独占一行，可以**通过在父级div**（必须是flex容器）中设置flex-direction: row;  让其子div在一行并排显示
 
 ```css
 <style>
@@ -2692,20 +2741,13 @@ div是块级元素，默认一个div独占一行，可以**通过在父级div**�
    flex-direction: column-reverse;
    border: 1px solid black;
 }
-123456
 ```
 
 <img src="css.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1pvZXlfSg==,size_16,color_FFFFFF,t_70-165793403588325.png" alt="在这里插入图片描述" style="zoom:50%;" />
 
-
-
----------
-
-
-
 ####  justify-content
 
-  v.  使（文本）对齐  
+v.  使（文本）对齐  
 
 **justify-content的可选值包括：**
 
@@ -2725,7 +2767,7 @@ justify-content: center;   **可让子元素居中显示**。
 #box-container {
    height: 300px;
    display: flex;
-   flex-direction: row;   //一行
+   flex-direction: row;   //默认一行
    justify-content: center;    //居中
    border: 1px solid black;
 }
@@ -2789,7 +2831,6 @@ justify-content: center;   **可让子元素居中显示**。
     justify-content: flex-end;
     border: 1px solid black;
 }
-1234567
 ```
 
 ![在这里插入图片描述](css.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1pvZXlfSg==,size_16,color_FFFFFF,t_70-165793410396030.png)
@@ -2807,7 +2848,6 @@ flex-direction: column;时的效果类似只不过从横向排列改为纵向排
     justify-content: space-between;   // 
     border: 1px solid black;
 }
-1234567
 ```
 
 加入一个颜色为green的div3（其余属性和div1，div2完全一样），效果更明显：
@@ -2825,7 +2865,6 @@ flex-direction: column;时的效果类似只不过从横向排列改为纵向排
     justify-content: space-around;
     border: 1px solid black;
 }
-1234567
 ```
 
 ![在这里插入图片描述](css.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1pvZXlfSg==,size_16,color_FFFFFF,t_70-165793410396032.png)
@@ -2844,7 +2883,6 @@ align-items的可选值包括：
 
 - baseline：基线对齐地排列。基线是字体相关的概念，可以认为字体坐落在基线上。
 
-  
 
 ###### · align-items: flex-start;（默认）
 
@@ -2861,7 +2899,6 @@ align n. 对齐
     align-items: flex-start;     // 对齐
     border: 1px solid black;
 }
-1234567
 ```
 
 ![在这里插入图片描述](css.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1pvZXlfSg==,size_16,color_FFFFFF,t_70-165793410396033.png)
@@ -2880,7 +2917,6 @@ align n. 对齐
     align-items: flex-end;    //
     border: 1px solid black;
 }
-1234567
 ```
 
 ![在这里插入图片描述](css.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1pvZXlfSg==,size_16,color_FFFFFF,t_70-165793410396034.png)
@@ -2899,12 +2935,17 @@ align n. 对齐
     align-items: center;         //中间
     border: 1px solid black;
 }
-1234567
 ```
 
 ![在这里插入图片描述](css.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1pvZXlfSg==,size_16,color_FFFFFF,t_70-165793410396035.png)
 
-----------
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/preview/yLZZKOp?default-tab=html%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/yLZZKOp">
+  Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+---
 
 ###### · align-items: stretch;
 
@@ -2986,10 +3027,77 @@ v. 拉长
 ![在这里插入图片描述](css.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1pvZXlfSg==,size_16,color_FFFFFF,t_70-165793410396038.png)
 虽然这个很好实现布局，但还是要根据实际情况运用。
 
+#### flex-wrap 设置子元素是否换行
+
+默认情况下，项目都排在一条线（又称‘轴线’）上，flex-wrap属性定义，flex布局中默认是不换行的, 可以设置当子元素超出父元素时，进行换行
+
+![img](css.assets/1af9703e98054447b23ed57199a027fc.png)
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/BaMMxPq?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/BaMMxPq">
+  Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+补充:
+
+**align-items设置测轴上的子元素排列方式（单行）⭐**
+
+该属性是控制子项在测轴（默认是y轴）上的排序方式在子项为单项的时候使用
+
+![img](css.assets/5b8628ffb4df4bb38bf2067a08954ed1.png)
+
+ 那么问题来了align-item只能设置单行如果多行如何设置 如下图应该如何实现呐
+
+![img](css.assets/bfc9969b3c8f427eb6c5fa3e34c3cb88.png)
+
+ 如果想实现flex提供了以下属性
+
+ **align-content设置测轴上子元素的排列方式（多行）⭐**
+
+设置子项在测轴上的排列方式并且只能用于子项出现换行的情况（多行），在单行下没有效果
+
+![img](css.assets/5a1d608e72d8411d9685049feffaf2eb.png)
+
+ 我们来总结align-content和align-items区别
+
+- align-items 适用于单行情况下，只有上对齐，下对齐，居中和拉伸
+- align-content 适用于换行（多行）的情况下（单行情况下无效），可以设置上对齐，下对齐，居中，拉伸以及平均分配剩余空间等属性
+- 总结就是单行找align-item，多行找align-content
+
+![img](css.assets/4235b27fbfb548a5baeb6fb6fa83675f.png)
+
+#### 总结
+
+justify对应主轴方向排，align对应次轴方向排
+
+![image-20231207210341079](css.assets/image-20231207210341079.png)
+
+##### justify-content 和 align-content
+
+分配**主轴/次轴**方向元素之间的空间，以center为例，直接上图理解。
+
+![img](css.assets/ebb56e9eb742bac247c8bb3cdf860aa9.png)
+
+------
+
+##### justify-items 和 align-items
+
+![](css.assets/image-20231207204556623.png)
+
+在弹性布局中，这四个属性设置为center产生的效果如下：
+
+**单行：justify-content 主轴居中，align-items 次轴居中**
+
+**多行：justify-content 主轴居中， align-content 次轴整体居中, align-items 各行内居中**
+
+**justify对应主轴，align对应次轴。content对应的是整体，items对应的是每个元素所在的那个周边区域**
+
 ###  子元素添加的属性
 
 - 1.align-self 灵活容器内被选中项目的对齐方式
       - 可重写灵活容器的align-items属性
+  
    - auto 默认值，元素继承了它的父容器的align-items属性
    - stretch 元素被拉伸以适应容器
    - center 元素位于容器的中心
@@ -3742,7 +3850,7 @@ css复制代码.container {
 
 在上述示例中，将容器的宽度设置为一个固定值，然后使用 margin: 0 auto; 将左右外边距设置为 "auto"，实现元素的水平居中。由于左右外边距都设置为 "auto"，浏览器会自动将剩余的空间均匀分配给两侧的外边距，从而使元素居中显示，这种方法适用于具有固定宽度的块级元素。
 
-## 四、使用 Flexbox 居中元素
+## 四、使用 Flex居中元素
 
 Flex 弹性布局，通过将容器的 display 属性设置为 flex，并使用 justify-content 和 align-items 属性分别进行水平和垂直居中设置，元素将在容器中居中显示。
 

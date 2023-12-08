@@ -195,3 +195,120 @@ nvm use 11.3.0
 ![](node%E4%BD%BF%E7%94%A8.assets/1fc9509be83f400db3545c6ba9887e20.png)
 
  
+
+# Nodejs中的require函数的具体使用方法
+
+## 什么是require函数
+
+在Node.js中，我们使用模块(module)来实现代码的模块化管理。而每个模块又可以引入其他的模块，这就需要使用到require函数。require函数用于加载模块，根据传入的参数，返回一个模块对象。
+
+## 如何使用require函数
+
+#### 基本使用
+
+使用`require()`时，我们通常需要提供一个字符串参数，即要引入的模块的文件路径。这个文件路径可以是绝对路径，也可以是相对路径。例如：
+
+```
+// 引入当前目录下的foo.js模块
+const foo = require('./foo.js');
+
+// 引入node_modules目录下的bar.js模块
+const bar = require('bar');
+```
+
+#### 自定义模块
+
+我们也可以自己创建模块，在模块中引入其他模块。例如，假设我们在项目的根目录下创建了一个名为`utils.js`的模块，该模块中引入了`fs`模块和`path`模块的内容：
+
+```
+const fs = require('fs');
+const path = require('path');
+
+module.exports = {
+  // ...
+};
+```
+
+我们可以使用以下方式在其他文件中引入`utils.js`模块：
+
+```
+const utils = require('./utils.js');
+```
+
+## require函数的返回值
+
+当使用`require()`函数成功加载一个模块之后，它会返回一个模块对象，我们可以使用这个模块对象来访问模块导出的变量、方法和类等。例如，假设我们在`foo.js`模块中导出了一个名为`calculate`的函数：
+
+```
+// foo.js
+function calculate(num) {
+  return num * 2;
+}
+
+module.exports = {
+  calculate,
+};
+```
+
+我们可以在其他模块中这样使用它：
+
+```
+const foo = require('./foo.js');
+
+const result = foo.calculate(10); // result = 20
+```
+
+## require函数的缓存
+
+当使用`require()`函数加载一个模块时，Node.js会将模块的内容缓存起来。这就意味着，如果我们在多个地方使用`require()`函数加载同一个模块，只会获取到相同的模块对象。例如：
+
+```
+const foo1 = require('./foo.js');
+const foo2 = require('./foo.js');
+
+console.log(foo1 === foo2); // true
+```
+
+## 示例
+
+#### 示例1
+
+让我们来看一个关于如何自定义模块的示例：
+
+```
+// foo.js
+function sum(a, b) {
+  return a + b;
+}
+
+module.exports = {
+  sum,
+};
+
+// index.js
+const foo = require('./foo.js');
+
+const result = foo.sum(10, 20); // result = 30
+console.log(result);
+```
+
+在`foo.js`中我们定义了一个名为`sum`的函数，然后通过`module.exports`将其导出。在`index.js`中，我们通过`require()`函数引入`foo.js`模块，并使用其导出的`sum`函数计算出10和20的和。
+
+#### 示例2
+
+让我们来看一个关于如何引入内置模块的示例：
+
+```
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+  res.end('Hello, World!');
+});
+
+server.listen(8080, () => {
+  console.log('Server is running at 8080 port.');
+});
+```
+
+这个示例中，我们使用Node.js内置的`http`模块创建了一个HTTP服务器，当我们访问服务器时，会返回一个`Hello, World!`的字符串。我们通过`require()`函数引入了内置模块`http`，然后使用它创建了我们的服务器。
+
