@@ -22,17 +22,16 @@ class Food{
 
     change(){
         // 生成一个阔机的位置
-        // 食物的位置最小足0 最大是298
+        // 食物的位置最小足0 最大是298  //304-4-10
         // 蛇移动一次就是一格，一格的大小就是10，所以就要求食物的
-        // this.element.scrollLeft(298)
-           // Generate a random horizontal position between 0 and 298
+        // this.element.scrollLeft(290)
+           // Generate a random horizontal position between 0 and 290
            const newX = Math.round(Math.random() * 29) * 10;
            const newy = Math.round(Math.random() * 29) * 10;
         
            // Set the new horizontal position using the css method
            this.element.css('left', `${newX}px`);
            this.element.css('top', `${newy}px`);
-        // this.element.scrollTop(0)
     }
 }
 

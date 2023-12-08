@@ -1127,7 +1127,7 @@ data: {
    <a :href="url">动态链接</a>
    ```
 
-5. **自定义属性：** 用于设置自定义属性。
+5. **自定义属性：** 用于设置自定义属性。用于组件通讯
 
    ```vue
    <div :data-custom="customData">自定义属性</div>
@@ -1593,7 +1593,7 @@ var example1 = new Vue({
 8. **自定义事件：** 除了上述内置事件外，你还可以使用 `$emit` 来触发和监听自定义事件。
 
    ```
-   @参数=方法
+   @参数=自定义方法
    ```
 
    ```
@@ -3031,7 +3031,7 @@ export default {
 
 在 directives 对象下声明指令的具体名称(`directiveName`)，声明指令的 inserted 方法，用于指令插入时调用，在模板中指令使用 `v-directiveName` 调用。
 
-#### 三、自定义指令钩子
+#### 三、自定义指令钩子:crossed_swords:
 
 ##### 钩子函数
 
@@ -3198,7 +3198,7 @@ new Vue({
 })
 ```
 
-#### 七、综合代码
+#### 七、综合代码:crossed_swords:
 
 ```html
 <!DOCTYPE html>
@@ -3320,6 +3320,113 @@ new Vue({
 	</script>
 </html>
 ```
+
+#### 八、案例
+
+```html
+<div id="app">
+  <div v-time="nowTime"></div>
+  <div v-time="beforeTime"></div>
+  <script src="js/vue.js"></script>
+  <script src="js/time.js"></script>
+  <script>
+    new Vue({
+      el: "#app",
+      data() {
+        return {
+          nowTime: new Date().getTime(),
+          beforeTime: 1628407242588,
+        };
+      },
+      directives: {
+        // 自定义指令
+        time: {
+          // 绑定一次性事件等初始化操作
+          bind(el, binding) {
+            el.innerHTML = Time.getFormatTime(binding.value);
+            // 定时器1分钟更新1次
+            el.timeout = setInterval(() => {
+                el.innerHTML = Time.getFormatTime(binding.value);
+            }, 60000);
+          },
+          unbind(el) {
+            clearInterval(el.timeout);
+            delete el.timeout;
+          },
+        },
+      },
+    });
+  </script>
+</div>
+
+```
+
+time.js
+
+```js
+var Time = {
+  //获得当前时间戳
+  getUnix: function () {
+    var date = new Date();
+    return date.getTime();
+  },
+  //获取今天0点0分0秒的时间戳
+  getTodayUnix: function () {
+    var date = new Date();
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    return date.getTime();
+  },
+  //获取今年1月1日0点0秒的时间戳
+  getYearUnix: function () {
+    var date = new Date();
+    date.setMonth(0);
+    date.setDate(1);
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    return date.getTime();
+  },
+  //获取标准年月日
+  getLastDate: function (time) {
+    var date = new Date(time);
+    var month =
+      date.getMonth() + 1 < 10
+        ? "0" + (date.getMonth() + 1)
+        : date.getMonth() + 1;
+    var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+    return date.getFullYear() + "-" + month + "-" + day;
+  },
+  //转换时间
+  getFormatTime: function (timestamp) {
+    var now = this.getUnix();
+    var today = this.getTodayUnix();
+    var year = this.getYearUnix();
+    var timer = (now - timestamp) / 1000;
+    var tip = "";
+
+    if (timer <= 0) {
+      tip = "刚刚";
+    } else if (Math.floor(timer / 60) <= 0) {
+      tip = "刚刚";
+    } else if (timer < 3600) {
+      tip = Math.floor(timer / 60) + "分钟前";
+    } else if (timer >= 3600 && timestamp - today >= 0) {
+      tip = Math.floor(timer / 3600) + "小时前";
+    } else if (timer / 86400 <= 31) {
+      tip = Math.ceil(timer / 86400) + "天前";
+    } else {
+      tip = this.getLastDate(timestamp);
+    }
+    return tip;
+  },
+};
+```
+
+![image-20231208163449687](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231208163449687.png)
 
 ## ——————
 
@@ -4462,13 +4569,13 @@ new Vue({
 
 1. 功能：让组件接收外部传过来的数据
 
-2. 传递数据：```<Demo 子属性name="xxx"/>```
+2. 传递数据：```<Demo 子组件props中名字="xxx">  </Demo>```
 
 3. 接收数据：
 
-   1. 第一种方式（只接收）：```props:['name'] ```
+   1. 第一种方式（只接收）：```props:['子组件props中名字'] ```
 
-   2. 第二种方式（限制类型）：```props:{name:String}```
+   2. 第二种方式（限制类型）：```props:{子组件props中名字:类型}```
 
    3. 第三种方式（限制类型、限制必要性、指定默认值）：
 
@@ -11818,6 +11925,7 @@ import MyComponent from './MyComponent.vue'
 + 子传参 emit
 + 父接受参数  @参数=方法   , 注意: 参数和方法一般设置成同名的
 + 子接受参数   defineProps
++ ![image-20231208215629688](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231208215629688.png)
 
 #### 例子1
 
@@ -12331,17 +12439,11 @@ console.log(await res.text())
 
 ```
 
-<a name="Z09Uh"></a>
-
-## 组件传值
-
-<a name="EPBiI"></a>
-
 ### `defineProps`和`defineEmits`
 
 要接收值，需要使用`defineProps`；需要传递值，需要使用`defineEmits`
 
-示例：<br />子组件`CompA.vue`
+示例：子组件`CompA.vue`
 
 ```html
 <script setup>

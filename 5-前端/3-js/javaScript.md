@@ -2624,3 +2624,223 @@ import * as sqrtobj from "....."
 sqrtobj.sqrt1
 sqrtobj.sqrt2
 ```
+
+# 定时器
+
+js中定时器有两种，一个是循环执行setInterval，另一个是定时执行setTimeout
+
+**一、循环执行（setInterval）**
+顾名思义，循环执行就是设置一个时间间隔，每过一段时间都会执行一次这个方法,直到这个定时器被销毁掉
+
+用法是setInterval（“方法名或方法”，“延时”）， 第一个参数为方法名或者方法，**注意为方法名的时候不要加括号**,第二个参数为时间间隔
+
+常见方法。在data中声明一个变量，定时器绑定到变量中，然后在beforeDestory中销毁这个定时器
+**举个例子**:
+*方案一:*
+首先我在data函数里面进行定义定时器名称
+
+```
+<template>
+  <section>
+    <h1>hello world~</h1>
+  </section>
+</template>
+<script>
+  export default {
+    data() {
+      return {
+        timer: null	// 定时器名称  
+      };
+    },
+    mounted() {		// 定时器一般写mounted() 生命周期内
+     this.timer = (() => {
+   			 // 某些操作
+   			 console.log(1);
+		}, 1000)		// 1000毫秒
+    },
+    // 最后在beforeDestroy()生命周期内清除定时器：
+    beforeDestroy() {
+      clearInterval(this.timer);
+      this.timer =  null;
+    }
+  };
+</script>
+1234567891011121314151617181920212223242526
+```
+
+方案一有两点不好的地方，引用尤大的话来说就是：
+
+1. 它需要在这个组件实例中保存这个 timer，如果可以的话最好只有生命周期钩子可以访问到它。这并不算严重的问题，但是它可以被视为杂物。
+2. 我们的建立代码独立于我们的清理代码，这使得我们比较难于程序化的清理我们建立的所有东西。
+
+*方案二:*
+通过$once这个事件侦听器器在定义完定时器之后的位置来清除定时
+
+```
+const timer = setInterval(() =>{                    
+    // 某些定时器操作                
+}, 500);            
+// 通过$once来监听定时器，在beforeDestroy钩子可以被清除。
+this.$once('hook:beforeDestroy', () => {            
+    clearInterval(timer);      
+    this.timer =  null;                              
+})
+
+123456789
+```
+
+综合来说，我们更推荐使用方案2，使得代码可读性更强，一目了然。
+
+**二、定时执行 （setTimeout）**
+定时执行setTimeout是设置一个时间，等待时间到达的时候只执行一次，但是执行完以后定时器还在，只是没有运行
+
+用法是setTimeout(“方法名或方法”, “延时”); 第一个参数为方法名或者方法，**注意为方法名的时候不要加括号**,第二个参数为时间间隔
+
+```
+<template>
+  <section>
+    <h1>hello world~</h1>
+  </section>
+</template>
+<script>
+  export default {
+    data() {
+      return {
+        timer: null,	// 定时器名称  
+      };
+    },
+    mounted() {
+      this.timer = setTimeout(() => {		
+      // 定时器一般写mounted() 生命周期内
+       // 某些操作
+		console.log(1)
+	},1000);		// 1000毫秒
+    },
+    beforeDestroy() {	// 最后在beforeDestroy()生命周期内清除定时器：
+      clearTimeout(this.timer);	
+      this.timer =  null;
+    }
+  };
+</script>
+```
+
+定时器两点缺一不可:
+
+1. 在mounted生命周期内设置定时器setInterval或setTimeout
+2. 在beforeDestory生命周期内清除一下定时器，方法 clearInterval()或者 clearTimeout() ,意思就是 需要在页面销毁的时候清除掉，不然会一直存在，消耗性能，最后奔溃浏览器！
+
+
+
+# js函数的几种写法
+
+## 1. 常规写法：
+
+```javascript
+// 函数的定义
+function foo() {
+    alert('常规写法');
+}
+
+// 函数的调用
+foo()
+```
+
+这种写法是大家最熟悉，最易于理解的写法和调用方法，接着往下看
+
+## 2. 匿名函数写法
+
+```javascript
+// 函数的定义
+var foo = function(){
+    alert('匿名函数定义');
+}
+// 函数的调用
+foo()
+```
+
+这里把功能定义弄成了匿名，省去了命名的痛苦，同时赋给了一个变量，变量就成了功能的代名词，接着看
+
+## 3. 将方法作为一个对象
+
+```javascript
+// 定义
+var test = {
+    fun1: function(){  },
+    fun2: function(){  }
+}
+
+// 调用
+test.fun1();
+test.fun2();
+```
+
+## 4. 构造函数中给对象添加方法
+
+```javascript
+// 给对象添加方法
+var fun = function(){ };  // 定义函数对象
+fun.prototype.test = function(){ 
+    alert('这是在在foo函数上的原始对象上添加test方法，构造函数中用到');
+}
+
+// 调用
+var myfun = new fun(); // 创建对象
+myfun.test(); // 调用对象属性
+123456789
+```
+
+通过prototype关键字添加方法。
+
+## 5. 自执行函数 ( function(){…} )() 和( function(){…} () )
+
+( function(){…} )() 和( function(){…} () ) 是 两种javascript立即执行函数的常见写法，最初我以为是一个括号包裹匿名函数，再在后面加个括号调用函数，最后达到函数定义后立即执行的目的，后来发现加括号的原因并非如此。要理解立即执行函数，需要先理解一些函数的基本概念。
+**函数声明、函数表达式、匿名函数**
+**函数声明**：function fnName () {…};使用function关键字声明一个函数，再指定一个函数名，叫**函数声明**。
+
+**函数表达式** var fnName = function () {…};使用function关键字声明一个函数，但未给函数命名，最后将匿名函数赋予一个变量，叫**函数表达式**，这是最常见的函数表达式语法形式。
+
+**匿名函数**：function () {}; 使用function关键字声明一个函数，但未给函数命名，所以叫匿名函数，匿名函数属于函数表达式，匿名函数有很多作用，赋予一个变量则创建函数，赋予一个事件则成为事件处理程序或创建闭包等等。
+
+函数声明和函数表达式不同之处在于，
+一、Javascript引擎在解析javascript代码时会‘函数声明提升’（Function declaration Hoisting）当前执行环境（作用域）上的函数声明，而函数表达式必须等到Javascirtp引擎执行到它所在行时，才会从上而下一行一行地解析函数表达式，
+二、函数表达式后面可以加括号立即调用该函数，函数声明不可以，只能以fnName()形式调用 。以下是两者差别的两个例子。
+
+```javascript
+// 方式1： ( function(){…} () )
+(
+     function(){alert('hello world, I am coming');}()
+);
+// 函数有参数的情况，有时为确保执行，前面加;
+// 看到别人的插件，你会发现人家开头处加了一个";"，这样就算页面js有错误，加载运行他的插件也能保证运行，如：
+;(function(e){alert(e);}('hello world'));
+
+// 方式2：( function(){…} )()
+(function(){alert('hello');})();
+
+// 有时在前面加运算符，常见的是!与void
+!function(){alert('hello');}();
+void function(){alert(2);}();
+1234567891011121314
+```
+
+## 6 $(function(){})写法
+
+$ (function(){/*…*/});是 $(document).ready(function(){/*…*/})的简写形式，是在DOM加载完成后执行的回调函数，并且只会执行一次。
+
+```javascript
+$( document ).ready(function() {
+   console.log( "ready!" );
+});  
+123
+```
+
+与如下写法等价
+
+```javascript
+$(function() {
+   console.log( "ready!" );
+});
+123
+```
+
+在一个页面中不同的js中写的$(function(){/*…*/});函数，会根据js的排列顺序依次执行。
