@@ -18,11 +18,13 @@
   <head>
   <script src="jquery-1.10.2.min.js"></script>
   </head>
+  //或者
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
   ```
 
 关键：独立的js文件不需要引用任何jquery.js文件，只需要在相应的html网页中引用jquery.js和.js文件，jquery文件引用必须在.js文件之前。<font color =red>js文件中没有引入jquery，一样可以用jquery的，就是在html中引入jquery，但是顺序一定不能错，一定是先引入jquery，再引入js文件。</font>
 
-### 选择器
+### 选择器:crossed_swords:
 
 原生的js选择器的种类有：
 
@@ -47,10 +49,10 @@ $(“选择器”) // 选择器格式与 css 选择器格式一摸一样
 
 ####  jQuery 层级选择器
 
-| 名称       | 用法        | 描述                                                         |
-| ---------- | ----------- | ------------------------------------------------------------ |
-| 子代选择器 | $(“ul>li”); | 使用 > 号，获取儿子层级的元素；注意，并不会获取孙子层级的元素 |
-| 后代选择器 | $(“ul li”); | 使用空格，代表后代选择器，获取 ul 下的所有 li 元素，包括孙子等 |
+| 名称         | 用法        | 描述                                                         |
+| ------------ | ----------- | ------------------------------------------------------------ |
+| 子一代选择器 | $(“ul>li”); | 使用 > 号，获取儿子层级的元素；注意，并不会获取孙子层级的元素 |
+| 后代选择器   | $(“ul li”); | 使用空格，代表后代选择器，获取 ul 下的所有 li 元素，包括孙子等 |
 
 ####  过滤选择器
 
@@ -67,15 +69,53 @@ $(“选择器”) // 选择器格式与 css 选择器格式一摸一样
 | 名称               | 用法                                                         | 描述                                                    |
 | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------- |
 | parent()           | $(".first").parent();                                        | 查找父亲                                                |
-| children(selector) | $(“ul”).children(“li”)      | 相当于$(“ul>li”)，子类选择器   |                                                         |
-| find(selector)     | $(“ul”).find(“li”);         | 相当于$(“ul li”)，后代选择器   |                                                         |
+| children(selector) | `$(“ul”).children(“li”)      | 相当于$(“ul>li”)，子类选择器` |                                                         |
+| **find(selector)** | `$(“ul”).find(“li”);         | 相当于$(“ul li”)，后代选择器` |                                                         |
 | siblings(selector) | $(".first").siblings(“li”);                                  | 查找兄弟节点，不包括自己本身。                          |
 | next()             | $(".first").next();                                          | 查找当前元素之后的下一个兄弟                            |
 | nextAll()          | $(".first").nextAll();                                       | 查找当前元素之后的所有同辈元素                          |
 | prev()             | $(".last").prev();                                           | 查找当前元素之前的上一个兄弟                            |
 | prevAll()          | $(“last”).prevAll();                                         | 查找当前元素之前的所有同辈元素                          |
 | hasClass(class)    | $(“div”).hasClass(“show”)                                    | 检查当前的元素是否含有某个特定的类，如果有，则返回 true |
-| eq(index)          | $(“li”).eq(2);              | 相当于$(“li:eq(2)”)，index 从0开始 |                                                         |
+| eq(index)          | `$(“li”).eq(2);              | 相当于$(“li:eq(2)”)，index 从0开始` |                                                         |
+
+技巧:   选择包含特定文本的元素
+
+例子:  a:contains("评价") 会选择所有包含文本 "评价" 的 <a> 元素。
+
+![image-20231214142135576](JQuery%E7%AC%94%E8%AE%B0.assets/image-20231214142135576.png)
+
+```js
+ var evaluateLink = $(this).find('a:contains("评价")').attr('href');
+ console.log(evaluateLink);  // 打印评价链接
+```
+
+### 立即调用的函数表达式:crossed_swords:
+
+1. **IIFE（立即调用函数表达式）:**
+
+   第一个是IIFE，全称为立即调用函数表达式。它是创建一个函数表达式并立即执行的一种方式。通常用于创建一个私有的作用域，以避免污染全局作用域。结构如下：
+
+   ```js
+   (function() {
+       'use strict';  //开启严格模式
+   
+       // 在这里编写你的代码...
+   })();
+   ```
+
+2. **使用 jQuery:**
+
+   确保代码在DOM（文档对象模型）完全加载后运行的方式。结构如下：
+
+   ```js
+   $(function() {
+       // 在这里编写你的代码...
+   });
+   
+   //等价
+   $(document).ready(function() { /* code here */ });
+   ```
 
 ### 排他思想
 
@@ -111,7 +151,7 @@ $("div").css("background", "pink");
 $("ul li").css("color", "red");
 ```
 
-### 响应事件(个人理解入口函数):crossed_swords:
+### 响应事件
 
 ```js
 $(function () {
@@ -142,6 +182,170 @@ mouse : <span id="mouseMove"></span>
 window.onload = function () {  }
 ```
 
+## $(this)
+
+表示当前元素
+
+```
+$(this).is(':checked')
+```
+
+## 表单
+
+### 输入框
+
+```html
+<input id="login_username" autocomplete="off" class="form-control form-control-sm" type="text" placeholder="用户名"
+```
+
+```js
+// 当用户名或密码输入框的值发生变化时取消复选框的选中状态
+$('#login_username, #login_password').on('input', function() {
+    $('#check1').prop('checked', false);
+});
+```
+
+### checkbox勾选
+
+```html
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="check1" name="option1" value="something">
+        <label class="form-check-label">记住密码</label>
+      </div>
+```
+
+```js
+ // 当用户点击记住密码时保存用户名和密码到本地存储
+      $('#check1').on('change', function () {
+        localStorage.setItem('rememberPassword', $(this).is(':checked'));
+        if ($(this).is(':checked')) {
+          localStorage.setItem('username', $('#login_username').val());
+          localStorage.setItem('password', $('#login_password').val());
+        } else {
+          localStorage.removeItem('username');
+          localStorage.removeItem('password');
+        }
+      });
+
+
+ // 页面加载时检查本地存储中是否有用户名和密码，并填充到输入框中
+      if (localStorage.getItem('username')) {
+        $('#login_username').val(localStorage.getItem('username'));
+      }
+      if (localStorage.getItem('password')) {
+        $('#login_password').val(localStorage.getItem('password'));
+      }
+      if (localStorage.getItem('rememberPassword') === 'true') {
+        $('#check1').prop('checked', true);
+      } else {
+        $('#check1').prop('checked', false);
+      }
+    });
+```
+
+补充:
+
+1、全选的勾选框
+
+```javascript
+<span style="color:#000000">if ($(this).is(':checked')) {
+    $('input:checkbox[name=checkBoxName]').each(function (i) {
+        $(this).prop("checked", true);
+    });
+}
+else {
+    $('input:checkbox[name=checkBoxName]:checked').each(function (i) {
+        $(this).prop("checked", false);
+    });
+}</span>
+```
+
+效果：点击勾选可以勾选所有，再点击，取消勾选所有。
+
+2、遍历所有勾选框
+
+```javascript
+$('input:checkbox[name=checkBoxName]').each(function (i) {});        //遍历未勾选
+$('input:checkbox[name=checkBoxName]:checked').each(function (i) {});//遍历已勾选
+```
+
+3、判断是否选中
+
+```javascript
+$(this).is(':checked')
+```
+
+4、设置选中
+
+```javascript
+$(this).prop("checked", true);//选中
+```
+
+### 按钮
+
+```html
+<div class="row">
+        <button type="button" class="btn btn-primary btn-sm" id="start_run">未运行</button>
+</div>
+```
+
+```js
+ $('#start_run').click(function () {
+        if ($(this).text() === "未运行") {
+          $(this).text('正在运行');
+          localStorage.setItem('start_run', "true");
+
+          countdownInterval = setInterval(function () {
+            countdownElement.text('倒计时：' + countdown + ' 秒');
+            countdown--;
+
+            if (countdown < 0) {
+              clearInterval(countdownInterval);
+              countdownElement.text('倒计时结束');
+              // 操作
+              if (window.location.href.startsWith("https://cdjwc.webvpn.ccu.edu.cn/jsxsd/") && localStorage.getItem('automatic_login')) {
+                localStorage.setItem('indexNext', '0');
+                $("#userAccount").val(localStorage.getItem('username'));
+                $("#userPassword").val(localStorage.getItem('password'));
+                $("#btnSubmit").click();
+              }
+            }
+          }, 1000);
+
+        } else {
+          $(this).text('未运行');
+          clearInterval(countdownInterval);
+          countdown = 5;
+          countdownElement.text('倒计时：' + countdown + ' 秒'); // 更新倒计时显示
+          localStorage.setItem('start_run', "false");
+        }
+      });
+```
+
+### 下拉框
+
+```html
+<select id="kksj" name="kksj" style="width: 170px;">
+						<option value="">---请选择---</option>
+						<option value="2023-2024-2">2023-2024-2</option>
+						<option value="2023-2024-1">2023-2024-1</option>
+						<option value="2022-2023-2">2022-2023-2</option>
+						<option value="2022-2023-1">2022-2023-1</option>
+						<option value="2021-2022-2">2021-2022-2</option>
+</select>
+```
+
+```js
+// 设置开课时间选择框的值为 "2023-2024-1"
+$('#kksj').val('2023-2024-1');
+//或者 根据选项的文本内容选择开课时间
+$('#kksj option:contains("2023-2024-1")').prop('selected', true);
+// 设置开课时间选择框的值为第二个选项
+$('#kksj option:eq(1)').prop('selected', true);
+```
+
+
+
 ##  jQuery 样式操作
 
 ### 操作 css 方法
@@ -168,6 +372,8 @@ $(this).css({"color":"red","font-size":"20px"});
 
 ### 设置样式类方法
 
+==搭配css可以做到切换样式的目的==
+
 作用等同于以前的 classList，可以操作类样式，注意操作类里面的参数不要加点
 
 - 添加类
@@ -185,8 +391,43 @@ $("div").removeClass("current");
 - 切换类
 
 ```javascript
-$("div").toggleClass("current");
+$("aaa").toggleClass("current");  //aaa切换为current
 ```
+
+例子
+
+```html
+<html>
+<head>
+<script type="text/javascript" src="/jquery/jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $("button").click(function(){
+    $("p").toggleClass("main");
+  });
+});
+</script>
+<style type="text/css">
+.main
+{
+font-size:120%;
+color:red;
+}
+</style>
+</head>
+
+<body>
+<h1 id="h1">This is a heading</h1>
+<p class='init'>This is a paragraph.</p>
+<p>This is another paragraph.</p>
+<button class="btn1">切换段落的 "main" 类</button>
+</body>
+</html>
+```
+
+运行结果:  点击来回切换
+
+![image-20231215191252958](JQuery%E7%AC%94%E8%AE%B0.assets/image-20231215191252958.png)
 
 ### 与原生 js 区别
 
@@ -199,7 +440,7 @@ one.className = "two";  // one : class="two"
 $(".one").addClass("two");  // one: class="one two"
 ```
 
-## jQuery 效果
+## jQuery 效果:crossed_swords:
 
 ### 3.3.1 显示隐藏效果
 
@@ -236,6 +477,56 @@ hide([speed,[easing],[fn]])
   - `speed`:三种预定速度之一的字符串(“slow”,“normal”, or “fast”)或表示动画时长的毫秒数值(如：1000)。
   - `easing`:(Optional) 用来指定切换效果，默认是"swing"，可用参数"linear"。
   - `fn`:在动画完成时执行的函数，每个元素执行一次。
+
+
+
+#### show 和 hide
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/la-L/embed/bGzPRJV?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/la-L/pen/bGzPRJV">
+  Untitled</a> by la L (<a href="https://codepen.io/la-L">@la-L</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+#### fadeIn 和 fadeOut
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/la-L/embed/mdvZwgY?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/la-L/pen/mdvZwgY">
+  Untitled</a> by la L (<a href="https://codepen.io/la-L">@la-L</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+#### fadeToggle
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/la-L/embed/qBgzjeM?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/la-L/pen/qBgzjeM">
+  Untitled</a> by la L (<a href="https://codepen.io/la-L">@la-L</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+#### fadeTo
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/la-L/embed/NWoZvKN?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/la-L/pen/NWoZvKN">
+  Untitled</a> by la L (<a href="https://codepen.io/la-L">@la-L</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+#### slideDown 和 slideUp
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/la-L/embed/yLZdoBb?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/la-L/pen/yLZdoBb">
+  Untitled</a> by la L (<a href="https://codepen.io/la-L">@la-L</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+#### slideToggle
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/la-L/embed/rNPEzBY?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/la-L/pen/rNPEzBY">
+  Untitled</a> by la L (<a href="https://codepen.io/la-L">@la-L</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
 
 ### 3.3.2 滑动效果
 
@@ -407,7 +698,6 @@ fadeTo([[speed],opacity,[easing],[fn]])
 
 ```javascript
 animate(params,[speed],[easing],[fn])
-1
 ```
 
 - 概述
@@ -420,7 +710,7 @@ animate(params,[speed],[easing],[fn])
   - `easing`:(Optional) 用来指定切换效果，默认是"swing"，可用参数"linear"。
   - `fn`:在动画完成时执行的函数，每个元素执行一次。
 
-## 属性操作
+## jQuery 操作属性
 
 ### 3.4.1 设置或获取元素固有属性值 prop()
 
@@ -436,6 +726,27 @@ prop("属性")
 
 ```javascript
 prop("属性","属性值")
+```
+
+例子
+
+```js
+// 设置多选框为选中状态
+$('#checkbox').prop('checked', true);
+```
+
+注意:  `.prop('href')`方法返回的是一个字符串而不是一个数组
+
+```js
+// $("a[title='点击进入评价']").prop('href') 报错
+
+var links = $("a[title='点击进入评价']").map(function() {
+    return $(this).prop('href');
+}).get();
+
+links.forEach(function(value) {
+    console.log(value);
+});
 ```
 
 ### 3.4.2 设置或获取元素自定义属性值 attr()
@@ -526,6 +837,13 @@ val()  // 获取元素的内容
 val("内容")  // 设置元素的内容
 ```
 
+例子
+
+```js
+// 设置输入框的值为"中文网"
+$('#input').val('中文网');
+```
+
 ## jQuery 元素操作
 
 ### 3.6.1 遍历元素
@@ -538,10 +856,117 @@ $("div").each(function (index, domEle) {xxx;})
 // 也可以写成
 $.each($("div"),function (index, domEle) {xxx;}))
 // 主要用于处理数据
+
+// 遍历链接列表
+var links = $("a");
+links.each(function(index) {
+  // 点击链接，跳转到页面2
+  $(this).get(0).click();
+}  
+           
+// 遍历name-jynr的标签, 填写不同内容
+var neueInhalte = ["文本1", "文本2"];
+$("textarea[name='jynr']").each(function(index, value) {
+     $(this).text(neueInhalte[index]);
+});
 ```
 
 > - index 是每个元素的索引号，domEle 是每个 DOM 元素对象，不是 jQuery 对象
 > - 想要使用 jQuery 方法，就要给这个 dom 元素转换为 jQuery 对象 $(domEle)
+
+#### 例子
+
+使用jQuery的.each()函数来遍历表格的每一行，并检查每一行的评价状态。如果所有的行都已经评价，那么就点击返回按钮。以下是一个示例：
+
+```js
+// ==UserScript==
+// @name         检查评价状态并返回
+// @namespace    https://github.com/Auroraol
+// @version      0.1
+// @description  检查所有行的评价状态，如果都已评价，点击返回按钮
+// @author       lfj
+// @match        http://your-website.com/*  // 请替换为你的网站地址
+// @grant        none
+// @require      https://code.jquery.com/jquery-2.1.4.min.js
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    var allEvaluated = true;  // 假设所有行都已评价
+
+    // 遍历表格的每一行
+    $('#dataList tr').each(function() {
+        var tdText = $(this).find('td').eq(6).text();  // 获取第7列的文本
+        if (tdText === '否') {
+            allEvaluated = false;  // 如果有未评价的行，设置allEvaluated为false
+            return false;  // 结束.each()循环
+        }
+    });
+
+    // 如果所有行都已评价，点击返回按钮
+    if (allEvaluated) {
+        $('#btnShenshen').click();
+    }
+})();
+```
+
+#### 例子
+
+获取每一行的评价链接
+
+```js
+// ==UserScript==
+// @name         获取评价链接
+// @namespace    https://github.com/Auroraol
+// @version      0.1
+// @description  获取每一行的评价链接
+// @author       lfj
+// @match        http://your-website.com/*  // 请替换为你的网站地址
+// @grant        none
+// @require      https://code.jquery.com/jquery-2.1.4.min.js
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // 遍历表格的每一行
+    $('#dataList tr').each(function() {
+        var tdText = $(this).find('td').eq(6).text();  // 获取第7列的文本
+        if (tdText === '否') {
+            // 如果有未评价的行，获取评价链接
+            var evaluateLink = $(this).find('a:contains("评价")').attr('href');
+            console.log(evaluateLink);  // 打印评价链接
+        }
+    });
+})();
+```
+
+#### jQuery 遍历 - next() 方法
+
+next() 获得匹配元素集合中每个元素紧邻的同胞元素。如果提供选择器，则取回匹配该选择器的下一个同胞元素。
+
+```js
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="text/javascript" src="/jquery/jquery.js"></script>
+</head>
+
+<body>
+  <p>Hello</p>
+  <p class="selected">Hello Again</p>
+  <div><span>And Again</span></div>
+
+<script>
+  $("p").next(".selected").css("background", "yellow");
+</script>
+
+</body>
+</html>
+```
+
+![image-20231215182206304](JQuery%E7%AC%94%E8%AE%B0.assets/image-20231215182206304.png)
 
 ### 3.6.2 创建元素
 
@@ -835,10 +1260,6 @@ $("p").before("<span>下面是个段落</span>");
 before方法查找每个元素p，将新建的span元素插入到元素p之前做为p的前一个兄弟节点。
 ```
 
-
-
-
-
 （3）**、insertAfter()把匹配的元素插入到另一个指定的元素集合的后面**
 
  注释：如果该方法用于已有元素，这些元素会被从当前位置移走，然后被添加到被选元素之后。
@@ -882,6 +1303,16 @@ $("input").val();
 ```
 
 [jQuery 创建和插入元素_A_山水子农的博客-CSDN博客_jquery创建元素](https://blog.csdn.net/qq_27626333/article/details/51927022)
+
+##### 5.例子
+
+```
+
+```
+
+
+
+
 
 ### 3.6.3 获取元素
 
@@ -1008,28 +1439,70 @@ console.log(food.y);
 
 ## jQuery 事件
 
-### [JQuery](https://so.csdn.net/so/search?q=JQuery&spm=1001.2101.3001.7020)中的常用事件
+### JQuery中的常用事件
 
-| 事件                  | 说明                                         |
-| --------------------- | -------------------------------------------- |
-| .click()              | 鼠标单击触发事件，参数可选（data，function） |
-| .dblclick()           | 双击触发，同上                               |
-| .mousedown()/up()     | 鼠标按下/弹起触发事件                        |
-| .mousemove()          | 鼠标移动事件                                 |
-| .mouseover()/out()    | 鼠标移入/移出触发事件                        |
-| .mouseenter()/leave() | 鼠标进入/离开触发事件*                       |
-| .hover(func1,func2)   | 鼠标移入调用func1函数，移出调用func2函数     |
-| .focusin()            | 鼠标聚焦到该元素时触发事件                   |
-| .focusout()           | 鼠标失去焦点时触发事件                       |
-| . focus()/.blur()     | 鼠标聚焦/失去焦点触发事件（不支持冒泡）      |
-| .change()             | 表单元素发生改变时触发事件                   |
-| .select()             | 文本元素被选中时触发事件                     |
-| .submit()             | 表单提交动作触发                             |
-| .keydown()/up()       | 键盘按键按下/弹起触发                        |
-| .on()                 | 多事件的绑定                                 |
-| .off()                | 移除事件的绑定                               |
-| .trigger(“event”)     | 触发事件event调用                            |
-| .triggerHandler()     | 触发事件，不会冒泡，不会触发默认事件         |
+#### 常见事件:crossed_swords:
+
+| 事件                  | 说明                                                         |
+| --------------------- | ------------------------------------------------------------ |
+| .click()              | **鼠标单击触发事件，参数可选（data，function), 一般用于按钮和绑定click的input** |
+| .dblclick()           | 双击触发，同上                                               |
+| .mousedown()/up()     | 鼠标按下/弹起触发事件                                        |
+| .mousemove()          | 鼠标移动事件                                                 |
+| .mouseover()/out()    | 鼠标移入/移出触发事件                                        |
+| .mouseenter()/leave() | 鼠标进入/离开触发事件*                                       |
+| .hover(func1,func2)   | 鼠标移入调用func1函数，移出调用func2函数                     |
+| .focusin()            | 鼠标聚焦到该元素时触发事件                                   |
+| .focusout()           | 鼠标失去焦点时触发事件                                       |
+| . focus()/.blur()     | 鼠标聚焦/失去焦点触发事件（不支持冒泡）                      |
+| .change()             | **单选框/复选框/表单元素发生改变时触发事件**                 |
+| .select()             | 文本元素被选中时触发事件                                     |
+| .submit()             | 表单提交动作触发                                             |
+| .keydown()/up()       | 键盘按键按下/弹起触发                                        |
+| .on()                 | 多事件的绑定                                                 |
+| .off()                | 移除事件的绑定                                               |
+| .trigger(“event”)     | 触发事件event调用                                            |
+| .triggerHandler()     | 触发事件，不会冒泡，不会触发默认事件                         |
+
+ 例子 使用 jQuery 进行表单操作可以通过下面的方式实现，以下是一些常见的表单操作
+
+1. 获取表单中的输入值：
+
+```js
+// 获取输入框的值
+var value = $('#input').val();
+```
+
+1. 设置表单中的输入值：
+
+```js
+// 设置输入框的值
+$('#input').val('新的数值');
+```
+
+1. 提交表单：
+
+```js
+// 提交表单
+$('#myForm').submit();
+```
+
+1. 检查复选框是否被选中：
+
+```js
+// 检查复选框是否被选中
+var isChecked = $('#checkbox').prop('checked');
+```
+
+1. 监听表单提交事件：
+
+```js
+// 监听表单提交事件
+$('#myForm').submit(function(event) {
+  event.preventDefault(); // 阻止默认提交行为
+  // 在这里执行自定义的表单提交逻辑
+});
+```
 
 #### 事件函数有三种用法
 
@@ -1046,7 +1519,7 @@ $("#test").click(11111,function(e) {
     //e.data  => 11111 通过e传递参数数据
 });
  
-//手动触发已绑定的点击事件
+//自动直接触发已绑定的点击事件
 $elem.click()
 ```
 
@@ -1069,7 +1542,7 @@ $('#target2').submit(function() {
 
 基本用法：.on( events ,[ selector ] ,[ data ] )
 
-最常见的给元素绑定一个点击事件，对比一下快捷方式与on方式的不同
+注意: 可以给任何标签绑定事件
 
 ```javascript
 $("#elem").click(function(){})  //快捷方式
@@ -1093,6 +1566,50 @@ function greet(event ) {
   alert( "Hello " + event.data.name ); //输出Hello Mr.Tory
 }
 ```
+
+例子
+
+```html
+<div class="form-check">
+              <input class="form-check-input" type="checkbox" id="check1" name="option1" value="something" checked>
+              <label class="form-check-label">记住密码</label>
+ </div>
+```
+
+```js
+// 当用户点击记住密码时保存用户名和密码到本地存储
+$('#check1').on('change', function() {
+  if ($(this).is(':checked')) {
+    localStorage.setItem('username', $('#login_username').val());
+    localStorage.setItem('password', $('#login_password').val());
+  } else {
+    localStorage.removeItem('username');
+    localStorage.removeItem('password');
+  }
+});
+
+// 页面加载时检查本地存储中是否有用户名和密码，并填充到输入框中
+$(document).ready(function() {
+  $('#login_username').val(localStorage.getItem('username'));
+  $('#login_password').val(localStorage.getItem('password'));
+});
+```
+
+
+
+```js
+// 使用箭头函数绑定事件处理程序
+$('#myButton').on('click', () => {
+  console.log('按钮被点击了');
+});
+
+// 使用箭头函数和事件对象
+$('#myInput').on('input', (event) => {
+  console.log('输入框的值发生了变化：', event.target.value);
+});
+```
+
+
 
 #### 事件处理 off() 解绑事件
 
@@ -1136,6 +1653,8 @@ one(type,[data],fn)
 ####  自动触发事件 trigger()
 
 有些事件希望自动触发，比如轮播图自动播放功能与点击右侧按钮功能一致，可以利用定时器自动触发右侧按钮点击事件，不必鼠标点击触发。
+
+注意:  按钮元素自带click()所以可以直接使用
 
 ```javascript
 el.click();  // 简写形式
@@ -1339,7 +1858,6 @@ $("body").on(events, "#n5", data);
     <!-- 引入jQuery -->
     <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
     <script>
-        var data = { id: 5, name: "张三" };
 
         // 入口函数
         $(function(){
@@ -1361,6 +1879,7 @@ $("body").on(events, "#n5", data);
             // 为`<body>`中的所有`id=n5`元素绑定事件：
             // 为n5绑定mouseenter mouseleave两个事件，并为其传入附加数据data
             // 附加数据可以是任意类型
+            var data = { id: 5, name: "张三" };
             $("body").on("mouseenter mouseleave", "#n5", data, function(event){
                 var $me = $(this);
                 var options = event.data; // 这就是传入的附加数据
@@ -1384,10 +1903,11 @@ $("body").on(events, "#n5", data);
 
             //案例4
             // on()函数的第一个参数eventsMap是一个对象，可以"属性-值"的方式指定多个"事件类型-处理函数"
+            var data2 = { id: 5, name: "张三" };
             var events = {
                 "mouseenter": function(event){
                     //event.data == 传进来的参数
-                    $(this).html( "你好，" + event.data.name + "!");		
+                    $(this).html( "你好，" + event.data2.name + "!");		
                 },
                 "mouseleave": function(event){
                     $(this).html( "再见!");
@@ -1413,6 +1933,8 @@ $("body").on(events, "#n5", data);
 ```
 
 详细代码见jsCode\事件\jQuery事件处理方式\demo01.html
+
+<img src="JQuery%E7%AC%94%E8%AE%B0.assets/image-20231213213508960.png" alt="image-20231213213508960" style="zoom:67%;" />
 
 ## html自带的事件(一般用JQuery替代)
 
@@ -1762,4 +2284,3 @@ btn.onclick = function () {
 </html>
 ```
 
-#

@@ -1419,6 +1419,81 @@ KuangApp.add = function (a,b) {
 }
 ```
 
+在JavaScript中，可以通过以下方式声明一个全局变量：
+
+1. **使用 `var` 关键字（不推荐）**：
+
+   ```javascript
+   var globalVar = 10;
+   1
+   ```
+
+   这将在全局作用域中声明一个全局变量 `globalVar`。但请注意，使用 `var` 声明的全局变量存在变量提升（hoisting）和潜在的全局污染问题，因此不推荐使用。
+
+2. **使用 `window` 对象（不推荐）**：
+
+   ```javascript
+   window.globalVar = 10;
+   1
+   ```
+
+   在浏览器环境中，可以将变量附加到 `window` 对象上来创建全局变量。这也存在全局污染的问题，因此不建议使用。
+
+3. **使用 `let` 或 `const` 关键字（推荐）**：
+
+   ```javascript
+   let globalVar = 10;
+   const anotherGlobalVar = 20;
+   ```
+
+   在现代JavaScript中，可以使用 `let` 或 `const` 声明变量，它们将在全局作用域中创建全局变量，但不会存在 `var` 的变量提升问题，也可以避免全局污染。
+
+```
+
+```
+
+
+
+①显示声明（使用var + 变量名）
+
+②隐式声明（变量名=变量值）
+
+③使用window全局声明
+
+第一种声明方式：使用var关键字+变量名在函数外部声明就是全局变量,例如：
+
+```javascript
+var bianliang = "全局变量";
+```
+
+第二种声明方式：没有使用var关键字声明，直接给变量名赋值，不管是在函数内部还是外部都是全局变量,例如：
+
+```javascript
+<script>
+    text = "全局变量";
+
+    function bl() {
+      text1 = "我也是全局变量";
+      var text2 = "我是局部变量";
+      console.log(text2); //局部变量只能在函数中使用
+    }
+
+    bl() //结果：我是局部变量
+
+    console.log(text); //结果：全局变量
+    console.log(text1); //结果：我也是全局变量
+    //console.log(text2); //局部变量，在函数外使用会报错
+</script>
+```
+
+第三种声明方式：使用window全局对象来声明，全局对象的属性对应也是全局变量,例如：
+
+```javascript
+window.test3 = 'window全局对象声明全局变量';
+
+console.log(test3);//结果：window全局对象声明全局变量
+```
+
 ### 局部作用域(使用let)
 
 ```js
@@ -1429,6 +1504,197 @@ function aaa() {
     console.log(i+1); 
 }
 ```
+
+### **局部变量的声明**
+
+```
+简要概括：中括号内{ }，局部变量用Var
+```
+
+```js
+<script>
+// 局部变量的声明
+function add(){
+    var men = 6;//局部变量
+}
+ </script>
+```
+
+例子
+
+```js
+<script>
+    function bl() {
+      text1 = "我也是全局变量";//没有使用var 为全局变量
+      var text2 = "我是局部变量";
+      console.log(text2); //局部变量只能在函数中使用
+    }
+</script>
+```
+
+**①相同变量名问题**
+
+就近原则
+
+```js
+//同名问题
+var num =7;//全局变量
+function aa(){
+    var num = 9;//局部变量
+    console.log(num)//结果为：9 
+}
+aa();//调用函数才能控制台输出结果
+console.log(num);//结果为：7
+```
+
+
+
+### **零散变量的问题**
+
+②：变量零散问题
+
+所以Javascript允许在函数的任意地方声明变量，无论在哪里声明，效果都等同于在函数顶部进行声明
+
+```js
+<script>
+    var str = "我是全局变量";
+    ! function b() {
+      console.log(str); //结果：undefined
+      var str = "我是局部变量";
+      console.log(str); //结果：我是局部变量
+    }()
+</script>
+```
+
+上面的代码相当于：
+
+```js
+<script>
+    var str = "我是全局变量";
+    ! function b() {
+      var str; //系统自动赋值为 str = undefined
+      console.log(str); //结果：undefined
+      var str = "我是局部变量";
+      console.log(str); //结果：我是局部变量
+    }()
+</script>
+```
+
+例子
+
+```js
+<script>
+	var a = 9;//全局变量
+	function aa(){
+	console.log(a);//思考点：结果为undefined 为啥？
+	var a = 8;//局部变量
+	console.log(a);//结果为8 局部变量
+	}
+	console.log(a);//结果为9 全局变量
+</script>
+
+```
+
+**解读**：
+第一个console.log(a)输出语句值为undefined,是因为变量在使用之前系统默认在函数体内声明了变量a，但是没有给定值，所以结果为undefined。
+
+```js
+<script>
+   var a = 9;//全局变量
+   function aa(){
+    var  a;//注意看这里，系统默认声明
+   console.log(a);//思考点：结果为undefined 为啥？
+   var a = 8;//局部变量
+   console.log(a);//结果为8 局部变量
+   }
+   console.log(a);//结果为9 全局变量
+</script>
+
+```
+
+
+
+
+
+
+
+
+
+### **3.3. 变量释放问题**
+
+③变量释放问题
+
+请看下面的代码：
+
+```javascript
+<script>
+    var a = "hello"; //全局变量
+    window.b = "word"; //全局变量
+    delete a;
+    delete b;
+    console.log(typeof a); //结果：string
+    console.log(typeof b); //结果：undefined
+    ! function b() {
+      var c = 1; //局部变量
+      d = 2; //全局变量
+      delete c;
+      delete d;
+      console.log(typeof c); //结果：number
+      console.log(typeof d); //结果：undefined
+    }()
+</script>
+```
+
+**结论：**
+
+- 使用 **var** 创建的变量不能使用 **delete** 释放内存。
+- 不使用 **var** 创建的变量可以使用 **delete** 释放内存。
+
+
+
+### 变量提升
+
+ES6
+
+```js
+const myName = '哈默
+console.log('myName', myName)  //哈默
+
+//
+console.log('myName', myName)  //报错
+const myName = '哈默  
+```
+
+ES5
+
+```js
+var myName = '哈默;
+console.log('myName', myName)  //哈默
+
+
+//
+console.log('myName', myName)  //undefined
+var myName = '哈默'
+
+//会进行变量提升, 所以上述代码等价于如下:
+var myName = undefined
+console.log('myName', myName)  //undefined
+myName = '哈默
+```
+
+总结
+
+**js变量提升机制中,var声明会被提升到函数头部,但是赋值不会提升**
+
+<img src="javaScript.assets/4a47472fa6953ba5406bc9c2ec536478c1902ae7.png@690w_!web-note.webp" alt="img" style="zoom:67%;" />
+
+**function声明的函数不遵循的是变量提升规则**
+
+<img src="javaScript.assets/eb9063735c1033d2b6d8bfe1eb5ac9422e9f4021.png@690w_!web-note.webp" alt="img" style="zoom:67%;" />
+
+**函数表达式遵循的是变量提升规则**
+
+<img src="javaScript.assets/740ae1db3192800accaf925e4f17efc64f2ade99.png@690w_!web-note.webp" alt="img" style="zoom: 67%;" />
 
 ### 常量const
 
@@ -2639,7 +2905,7 @@ js中定时器有两种，一个是循环执行setInterval，另一个是定时�
 *方案一:*
 首先我在data函数里面进行定义定时器名称
 
-```
+```js
 <template>
   <section>
     <h1>hello world~</h1>
@@ -2685,8 +2951,6 @@ this.$once('hook:beforeDestroy', () => {
     clearInterval(timer);      
     this.timer =  null;                              
 })
-
-123456789
 ```
 
 综合来说，我们更推荐使用方案2，使得代码可读性更强，一目了然。
@@ -2728,6 +2992,32 @@ this.$once('hook:beforeDestroy', () => {
 
 1. 在mounted生命周期内设置定时器setInterval或setTimeout
 2. 在beforeDestory生命周期内清除一下定时器，方法 clearInterval()或者 clearTimeout() ,意思就是 需要在页面销毁的时候清除掉，不然会一直存在，消耗性能，最后奔溃浏览器！
+
+```js
+function startCountdownTimer(duration, displayElement, onCountdownEnd) {
+  var countdown = duration;
+  var countdownInterval = setInterval(function() {
+    displayElement.text('倒计时：' + countdown + ' 秒');
+    countdown--;
+
+    if (countdown < 0) {
+      clearInterval(countdownInterval);
+      if (typeof onCountdownEnd === 'function') {
+        onCountdownEnd();
+      }
+    }
+  }, 1000);
+
+  return countdownInterval; // 返回定时器的 ID
+}
+
+// 调用函数开始倒计时
+var countdownElement = $('#countdown');
+var countdownDuration = 5;
+var countdownInterval = startCountdownTimer(countdownDuration, countdownElement, function() {
+  // 倒计时结束后的操作
+});
+```
 
 
 
@@ -2831,7 +3121,6 @@ $ (function(){/*…*/});是 $(document).ready(function(){/*…*/})的简写形�
 $( document ).ready(function() {
    console.log( "ready!" );
 });  
-123
 ```
 
 与如下写法等价
@@ -2840,7 +3129,6 @@ $( document ).ready(function() {
 $(function() {
    console.log( "ready!" );
 });
-123
 ```
 
 在一个页面中不同的js中写的$(function(){/*…*/});函数，会根据js的排列顺序依次执行。

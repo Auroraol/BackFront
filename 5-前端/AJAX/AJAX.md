@@ -1893,7 +1893,7 @@ response.setHeader("Access-Control-Allow-Headers", "*");
 response.setHeader("Access-Control-A1low-Method", "*");
 ```
 
-# FormData（重点）
+# FormData（重点）:crossed_swords:
 
 ## 基本使用
 

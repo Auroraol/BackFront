@@ -211,7 +211,134 @@ less写法
 
 ## 2.4、属性选择器（常用）
 
-==id + class结合==
+#### 1，E[attr]
+
+（1）用于选取带有指定属性的元素。
+
+```js
+/**选择了.demo下所有带有id属性的a元素 **/
+
+.demo a[id] {
+
+}
+```
+
+
+（2）也可以使用多属性进行选择元素。
+
+```js
+/**选择了.demo下同时拥有href和title属性的a元素 **/
+
+.demo a[href][title] {
+
+}
+```
+
+#### 2，E[attribute=value]
+
+用于选取所有带有指定属性和值的元素。当前也可以多个属性一起使用：
+
+```js
+/**选择了.demo下id="first"的a元素 **/
+
+.demo a[id="first"] {
+
+}
+
+/**选择了.demo下id="first"，且拥有title属性的a元素 **/
+
+.demo a[id="first"][title] {
+
+}
+```
+
+注意：E[attribute=value] 这种属性选择器，属性和属性值必须完全匹配，特别是对于属性值是词列表的形式时。
+
+```js
+/** 匹配不到元素 **/
+
+a[class="links"] {
+
+}
+
+/** 这个才能匹配到 **/
+
+a[class="links item"] {
+
+}
+
+<a href="" class="links item">hangge.com</a>
+```
+
+#### 3，E[attribute~=value]
+
+用于选取属性值中包含指定词汇的元素。同上面的完全匹配不同，这个只要属性值中有 value 就相匹配。
+
+```js
+/** 可以匹配到元素 **/
+
+a[class~="links"] {
+
+}
+
+<a href="" class="links item">hangge.com</a>
+```
+
+#### 4，E[attribute^=value]
+
+匹配属性值以指定 value 值开头的每个元素。
+
+```js
+/** href属性值以"mailto:"开头的所有a元素 **/
+
+a[href^="mailto:"] {
+
+}
+```
+
+#### 5，E[attribute$=value]
+
+匹配属性值以指定 value 值结尾的每个元素。
+
+```js
+/** href属性值以"png"结尾的所有a元素 **/
+
+a[href$="png"] {
+
+}
+```
+
+#### 6，E[attribute*=value]
+
+匹配属性值中包含指定 value 值的每个元素。
+
+```js
+/** title属性值中只要包含有"site"的所有a元素 **/
+
+a[title*="site"] {
+
+}
+```
+
+#### 7，E[attribute|=value]
+
+这个选择器会选择 attr 属性值等于 value 或以 value- 开头的所有元素。
+
+```js
+/** 下面3个img都会被匹配到 **/
+
+img[src|="figure"] {
+
+}
+
+<img src="figure-0.png" alt="图1">
+
+<img src="figure-1.png" alt="图1">
+
+<img src="figure-2.png" alt="图1">
+```
+
+例子
 
 ```html
 <!DOCTYPE html>
@@ -1169,7 +1296,39 @@ background-size: 100%; /*全显示*/
 </html>
 ```
 
-## 3.9、 图片相关的属性 vertical-align
+## 3.9、 图片相关的属性
+
+# 图片内嵌到 HTML 中
+
+方法1
+
+```html
+<img src="./case1.svg" width="100" height="100">
+```
+
+方法2
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>svg demo</title>
+</head>
+<body>
+  <div>
+    <!-- 内嵌到 HTML 中 -->
+    <svg width="100%" height="100%" version="1.1">
+      <circle cx="50" cy="50" r="50" fill="hotpink"></circle>
+    </svg>
+  </div>
+</body>
+</html>
+```
+
+###  vertical-align
 
 1. **图片默认自带3px间隙**，[如何解决图片3px问题](https://blog.csdn.net/qq_37855074/article/details/88826617)？
 
@@ -1193,7 +1352,6 @@ vertical-align: top;			/* 图片上边和其他元素对齐（一般用来解决
   Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
-
 ## 3.10、 边框属性
 
 - 四个方向边框的设置

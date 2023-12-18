@@ -3104,11 +3104,15 @@ Bootstrap 3 与 Bootstrap 4/5 最大的区别就是 Bootstrap 4/5 使用弹性�
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 ```
 
-**步骤 二:** 要将图标放置到网页中,使用语法`<i class="bi-*"></i>`其中*代表特定图标的类名。
+**步骤 二:** 要将图标放置到网页中,
 
 ```html
-<i class="bi-archive-fill"></i>
+使用语法 <i class="bi-*"></i>
 ```
+
+其中*代表特定图标的类名。
+
+比如: `<i class="bi-archive-fill"></i>`
 
 ## 基本使用
 
