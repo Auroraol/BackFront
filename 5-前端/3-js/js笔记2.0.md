@@ -1,0 +1,170 @@
+# 变量
+
+**使用 `let` 或 `const` 来定义变量,  不要使用`var`**：
+
+```js
+//方法1:   定义全局变量或者局部局部
+let globalVar = 10;    
+
+//方法2:   不能修改
+const anotherGlobalVar = 20;  
+```
+
+使用 `var` 声明的全局变量存在变量提升（hoisting）和潜在的全局污染问题，因此不推荐使用。
+
+# 函数
+
+## 函数定义
+
+**使用 `匿名函数` 或 `箭头函数` 来定义函数,  不要使用`命名函数`**：
+
+```js
+//方法1:   匿名函数
+const sum = function(a, b) {
+	return a + b;
+}
+
+//方法2:   箭头函数
+const sum1 = (a, b) => {
+	return a + b;
+}
+```
+
+使用 `命名函数` 声明的函数存在函数提升（hoisting）和潜在的全局污染问题，因此不推荐使用。
+
+如果使用`let`关键字声明的函数`sum`可以在定义后重新赋值，也就是说可以修改`sum`指向的函数, 修改后前一个函数是无法调用的 (**不推荐**)：
+
+```js
+let sum = function(a, b) {
+  return a + b;
+}
+
+sum = function(a, b) {   // 允许  
+  return a * b;
+}
+console.log(sum(100,2)) //200
+```
+
+## 函数参数
+
+### 参数(传值/引用)
+
+- a)	基本类型-传值；
+- b)	引用类型-地址；
+
+基本类型是通过传值（传递副本）的方式进行传递的。JavaScript 中的基本类型包括字符串（String）、数字（Number）、布尔值（Boolean）、null、undefined 和 Symbol。
+
+引用类型是通过地址（引用）的方式进行传递的。JavaScript 中的引用类型包括对象（Object）、数组（Array）、函数（Function）等。
+
+**基本类型-传值例子:**
+
+```js
+var abs = function(x){
+    //手动抛出异常来判断
+    if (typeof x !== 'number') {
+        throw 'not a number';
+    }
+    if (x >= 0) {
+        return x;
+    }else{
+        return -x;
+    }
+}
+
+abs(-100)  //100
+```
+
+**引用类型-地址例子:**
+
+```js
+let modifyObject = function (obj) {
+  obj.value = 10;
+}
+
+let myObject = { value: 5 };
+
+modifyObject(myObject);
+console.log(myObject.value); // 输出 10
+```
+
+### 默认值
+
+```html
+<script>
+  // 设置参数默认值
+  function sayHi(name="小明", age=18) {
+    document.write(`<p>大家好，我叫${name}，我今年${age}岁了。</p>`);
+  }
+  // 调用函数
+  sayHi();
+  sayHi('小红');
+  sayHi('小刚', 21);
+</script>
+```
+
+### 动态参数
+
+`arguments` 是函数内部内置的伪数组变量，它包含了调用函数时传入的所有实参。
+
+```html
+<script>
+  // 求生函数，计算所有参数的和
+  function sum() {
+    // console.log(arguments);
+    let s = 0;
+    for(let i = 0; i < arguments.length; i++) {
+      s += arguments[i];
+    }
+    console.log(s);
+  }
+
+  // 调用求和函数
+  sum(5, 10); // 两个参数
+  sum(1, 2, 4); // 两个参数
+</script>
+```
+
+### rest参数
+
+例如：函数定义了两个参数，但是传入了第三个参数，要怎么取出第三个参数呢？
+
+```js
+function test(a,b){
+    console.log('a->'+a);
+    console.log('b->'+b);
+    //以前的方法取第三个元素：
+    if (arguments.length>2) {
+        for(var i = 2; i<arguments.length;i++){
+            console.log(arguments[i])
+        }
+    }
+}
+
+//现在的方法(rest参数)：在函数中定义rest参数
+function test1(a,b,...rest){
+    console.log('a->'+a);
+    console.log('b->'+b);
+    console.log(rest);
+}
+```
+
+### 剩余参数(ES6新增)
+
+```js
+<script>
+  function config(baseURL, ...other) {
+    console.log(baseURL);
+    // other 是真数组，动态获取实参
+    console.log(other);
+  }
+
+  // 调用函数
+  config('http://baidu.com', 'get', 'json');
+</script>
+```
+
+# 面向对象
+
+详细见[面向对象1笔记](.\参考\第3天(重要).md)
+
+详细见[面向对象2笔记](.\参考\第4天(重要).md)

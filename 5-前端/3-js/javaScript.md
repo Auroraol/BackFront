@@ -1407,7 +1407,7 @@ getSum();
 
 ## 变量的作用域
 
-### 全局作用域(使用var)
+### 全局作用域(使用let)
 
 ```js
 //唯一全局变量
@@ -1418,41 +1418,6 @@ KuangApp.add = function (a,b) {
     return a + b;
 }
 ```
-
-在JavaScript中，可以通过以下方式声明一个全局变量：
-
-1. **使用 `var` 关键字（不推荐）**：
-
-   ```javascript
-   var globalVar = 10;
-   1
-   ```
-
-   这将在全局作用域中声明一个全局变量 `globalVar`。但请注意，使用 `var` 声明的全局变量存在变量提升（hoisting）和潜在的全局污染问题，因此不推荐使用。
-
-2. **使用 `window` 对象（不推荐）**：
-
-   ```javascript
-   window.globalVar = 10;
-   1
-   ```
-
-   在浏览器环境中，可以将变量附加到 `window` 对象上来创建全局变量。这也存在全局污染的问题，因此不建议使用。
-
-3. **使用 `let` 或 `const` 关键字（推荐）**：
-
-   ```javascript
-   let globalVar = 10;
-   const anotherGlobalVar = 20;
-   ```
-
-   在现代JavaScript中，可以使用 `let` 或 `const` 声明变量，它们将在全局作用域中创建全局变量，但不会存在 `var` 的变量提升问题，也可以避免全局污染。
-
-```
-
-```
-
-
 
 ①显示声明（使用var + 变量名）
 
@@ -1609,18 +1574,9 @@ console.log(num);//结果为：7
    }
    console.log(a);//结果为9 全局变量
 </script>
-
 ```
 
-
-
-
-
-
-
-
-
-### **3.3. 变量释放问题**
+### **变量释放问题**
 
 ③变量释放问题
 
@@ -1649,8 +1605,6 @@ console.log(num);//结果为：7
 
 - 使用 **var** 创建的变量不能使用 **delete** 释放内存。
 - 不使用 **var** 创建的变量可以使用 **delete** 释放内存。
-
-
 
 ### 变量提升
 
@@ -1793,7 +1747,7 @@ function test1(a,b,...rest){
 - prototype，指向函数附带的原型对象；
 - constructor，指向创建该对象的构造函数；
 
-### 随机数
+# 随机数
 
 <font color = red> Math.floor(min + Math.random() * (max - min + 1) )生成随机整数</font>
 
@@ -3076,7 +3030,7 @@ fun.prototype.test = function(){
 // 调用
 var myfun = new fun(); // 创建对象
 myfun.test(); // 调用对象属性
-123456789
+
 ```
 
 通过prototype关键字添加方法。
@@ -3132,3 +3086,10 @@ $(function() {
 ```
 
 在一个页面中不同的js中写的$(function(){/*…*/});函数，会根据js的排列顺序依次执行。
+
+
+
+
+
+
+
