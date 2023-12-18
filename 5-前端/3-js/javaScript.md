@@ -3030,7 +3030,6 @@ fun.prototype.test = function(){
 // 调用
 var myfun = new fun(); // 创建对象
 myfun.test(); // 调用对象属性
-
 ```
 
 通过prototype关键字添加方法。

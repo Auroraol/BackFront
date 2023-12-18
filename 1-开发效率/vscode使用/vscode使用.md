@@ -146,3 +146,9 @@
 使用
 
 ![img](vscode%E4%BD%BF%E7%94%A8.assets/2425050-20210827010113446-1979732276.png)
+
+# vscode 中 vue文件下，css无提示问题
+
+目前只能手动切换
+
+![image-20231218223826249](vscode%E4%BD%BF%E7%94%A8.assets/image-20231218223826249.png)

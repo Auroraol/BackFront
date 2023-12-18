@@ -8,7 +8,7 @@ vue-router 主要用于创建单页应用，再结合 vue.js 的时候显得�
 安装：
 
 ```shell
-npm i vue-router
+npm  install vue-router
 ```
 
 基本组件:

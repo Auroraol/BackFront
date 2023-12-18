@@ -11817,12 +11817,12 @@ export default defineComponent({
 
 ```js
 // 普通函数
-let sum = function(a, b) {
+const sum = function(a, b) {
 	return a + b;
 }
 
 // 箭头函数
-let sum1 = (a, b) => {
+const sum1 = (a, b) => {
 	return a + b;
 }
 ```
@@ -12575,7 +12575,9 @@ npm install element-plus --save
 
 [element-ui](https://so.csdn.net/so/search?q=element-ui&spm=1001.2101.3001.7020)是vuecli2版本，与vuecli3版本不兼容，故vuecli3则是使用element-plus。想要将element-plus引入到项目中去，有以下方法：
 
-#### vuecli3引入[Element-plus](https://so.csdn.net/so/search?q=Element-plus&spm=1001.2101.3001.7020)
+**vuecli3引入**
+
+[Element-plus](https://so.csdn.net/so/search?q=Element-plus&spm=1001.2101.3001.7020)
 
 - [一、下载安装element-plus依赖包到项目中去](https://blog.csdn.net/qq_45438471/article/details/129478396#elementplus_5)
 - [二、导入（组件和组件样式）](https://blog.csdn.net/qq_45438471/article/details/129478396#_8)
@@ -13079,13 +13081,5 @@ export default defineConfig({
     port: 3000,
   },
 });
-
 ```
 
-
-
-# vscode 中 vue文件下，css无提示
-
-目前只能手动切换
-
-![在这里插入图片描述](vue%E7%AC%94%E8%AE%B02.0.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQyNDI2MTU5,size_16,color_FFFFFF,t_70.png)
