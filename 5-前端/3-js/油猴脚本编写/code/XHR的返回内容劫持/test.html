@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <style>
+      #result {
+        width: 200px;
+        height: 100px;
+        border: 1px solid #90b;
+      }
+    </style>
+    <script type="text/javascript">
+      let xmlhttp;
+      function loadXMLDoc() {
+  let xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("GET", 'http://127.0.0.1:8000/server');
+  xmlhttp.send();
+  xmlhttp.onreadystatechange = () => {
+    if (xmlhttp.readyState == 4) {
+      if (xmlhttp.status >= 200 && xmlhttp.status < 300) {
+        document.getElementById("A1").innerHTML = xmlhttp.status;
+        document.getElementById("A2").innerHTML = xmlhttp.statusText;
+        document.getElementById("result").innerHTML = xmlhttp.responseText;
+      } else {
+        alert("Problem retrieving XML data:" + xmlhttp.statusText);
+      }
+    }
+  };
+}
+    </script>
+  </head>
+
+  <body>
+    <p>
+      <b>状态码:</b>
+      <span id="A1"></span>
+    </p>
+
+    <p>
+      <b>状态文本:</b>
+      <span id="A2"></span>
+    </p>
+
+    <p><b>响应结果:</b></p>
+    <div id="result"></div>
+    <button onclick="loadXMLDoc()">点击发送请求</button>
+  </body>
+</html>

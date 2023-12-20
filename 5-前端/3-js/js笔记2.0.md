@@ -24,7 +24,7 @@ const sum = function(a, b) {
 	return a + b;
 }
 
-//方法2:   箭头函数
+//方法2:   箭头函数  ❤基于原型的面向对象不使用箭头函数 ❤DOM事件回调函数不使用箭头函数
 const sum1 = (a, b) => {
 	return a + b;
 }
@@ -168,3 +168,127 @@ function test1(a,b,...rest){
 详细见[面向对象1笔记](.\参考\第3天(重要).md)
 
 详细见[面向对象2笔记](.\参考\第4天(重要).md)
+
+<font color="red">支持动态为对象添加方法/属性</font>
+
+## 方式1: 字面量对象
+
+字面量对象适合创建单个对象或对象比较简单的情况 
+
+```js
+let user = {
+    name: '小明',
+    // function xxx() {} 的简化写法  (推荐)
+    walk() {
+        console.log(this.name);  //小明
+    },
+    // 箭头函数  在字面量对象中使用箭头函数会导致 this 指向错误。
+    eat:()=>{
+        console.log(this.name)   //undefined
+    },
+};
+
+// 普通函数
+function sayHi() {
+    console.log("动态1-" + this.name);  //动态1-小明
+}
+
+// 匿名函数
+const sayHi2 = function(){
+    console.log("动态2-" + this.name);   //动态2-小明
+}
+
+// 箭头函数  
+const sayHi3 = ()=>{
+    console.log("动态3-" + this.name);   //动态3-undefined
+}
+
+
+// ------------------------- 调用 -------------------------    
+user.walk();
+user.eat();
+
+//动态为对象添加方法/属性
+user.eat1 = sayHi;
+user.eat1()
+
+user.eat2 = sayHi2;
+user.eat2()
+
+user.eat3 = sayHi3;
+user.eat3()
+```
+
+运行结果
+
+```
+小明
+undefined
+动态1-小明
+动态2-小明
+动态3-undefined
+```
+
+## 方式2: 构造函数
+
+构造函数适合需要创建多个相似对象实例、需要在创建对象时执行额外逻辑的情况
+
+```js
+function User(name) {
+  this.name = name;
+  //方式1  匿名函数   (推荐)
+  this.walk = function() {
+    console.log(this.name);    // 小明
+  };
+   //方式3 箭头函数
+   this.eat = () => {
+      console.log(this.name);   // 小明 
+    }
+}
+
+// 普通函数
+function sayHi() {
+  console.log("动态1-" + this.name);  //动态1-小明
+}
+
+// 匿名函数
+const sayHi2 = function() {
+  console.log("动态2-" + this.name);  //动态2-小明
+}
+
+// 箭头函数
+const sayHi3 = () => {
+  console.log("动态3-" + this.name);   //动态3-undefined
+}
+
+
+// ------------------------- 调用 -------------------------
+const user = new User('小明');
+user.walk();  
+user.eat();  
+
+//动态为对象添加方法/属性
+user.eat1 = sayHi;
+user.eat1();  
+
+user.eat2 = sayHi2;
+user.eat2();  
+
+user.eat3 = sayHi3;
+user.eat3();  
+```
+
+```
+小明
+小明
+动态1-小明
+动态2-小明
+动态3-undefined
+```
+
+## class
+
+详细见[面向对象2笔记](.\参考\第4天(重要).md)
+
+
+

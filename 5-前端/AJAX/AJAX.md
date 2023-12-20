@@ -419,7 +419,7 @@ window.onkeydown = function () {
 
 <img src="AJAX.assets/yYNBQG4ahDq8mHC.gif" alt="img" style="zoom:67%;" />
 
-### 手动转换数据
+### 手动转换数据-JSON.parse()
 
 因为我们服务端返回的是`json`字符串内容，所以`response`的内容类型也是字符串
 
@@ -718,7 +718,7 @@ $.ajax({
 </html>
 ```
 
-## 通用模版(推荐)
+## 通用模版(推荐):crossed_swords:
 
 ```js
 $.ajax({

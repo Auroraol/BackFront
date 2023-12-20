@@ -1,10 +1,12 @@
 # 引言
 
-Jackson和FastJSON都是Java的序列化/反序列化库，用于在Java对象和JSON数据之间进行互相转换。
+> Jackson和FastJSON都是Java的序列化/反序列化库，用于在Java对象和JSON数据之间进行互相转换。
 
-`@ResponseBody`注解用于指示方法返回的对象会被自动转换为JSON格式的数据。
+springboot3 为了方便, 定义了如下两个注解
 
-`@RequestBody`注解用于指示方法接受的JSON格式数据会被自动转换为对象。
++ `@ResponseBody`注解用于指示方法返回的对象会被自动转换为JSON格式的数据。
+
++ `@RequestBody`注解用于指示方法接受的JSON格式数据会被自动转换为对象。
 
 # JackSon和FastJSON差异对比
 
@@ -350,8 +352,6 @@ Student data = JSON.parseObject(text, Student.class);
 
 		//{"测试2":"hello","测试1":null}
         String str = JSON.toJSONString(map, JSONWriter.Feature.WriteMapNullValue);
-
-1234567
 ```
 
 如果你使用的是老的fastjson1,可以像下面这样转换：
@@ -361,7 +361,6 @@ Student data = JSON.parseObject(text, Student.class);
 		map.put("测试1",null);
 		map.put("测试2","hello");
 		String str = JSON.toJSONString(map, SerializerFeature.WriteMapNullValue) ;
-1234
 ```
 
 ## 八、json数组转List
