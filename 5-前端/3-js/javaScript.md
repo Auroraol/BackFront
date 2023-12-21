@@ -1,17 +1,32 @@
-# javaScript使用方式
+# javaScript 引入方式
 
 1、内部标签
 
-```html
-<script>
-//......
-</script>
-```
++ 放在 <head> 标签内：整个页面加载完成之前就进行读取。
 
-+ 放在head  整个页面加载完成之前就进行读取。
-+ 放在body 是在页面加载完成之后进行读取的。
-  + 如果你的某段js中是涉及页面某个元素的获取之类的代码，如果把这段js 直接放到head 那在页面渲染的时候就会报undefind 错误。
-  + 当js是给某个按钮绑定了onclick时间的时候 我们可以放到head之间。
+  如果将 <script> 标签放在 <head> 标签内，那么它会在页面加载时立即执行。这可能会导致页面加载速度变慢，因为在执行 JavaScript 代码之前，浏览器必须先下载并解析完整个脚本文件。
+
+  ```html
+  <head>
+    <script>
+      // JavaScript 代码
+    </script>
+  </head>
+  ```
+
+
++ 放在 <body> 结尾前：页面加载完成之后进行读取的。
+
+  将 <script> 标签放在 <body> 结尾前，可以让页面的 HTML 结构先加载完毕，然后再加载和执行 JavaScript 代码。这样可以加快页面的加载速度，因为在执行 JavaScript 代码之前，页面的大部分内容已经加载完毕。
+
+  ```html
+  <body>
+    <!-- 页面内容 -->
+    <script>
+      // JavaScript 代码
+    </script>
+  </body>
+  ```
 
 2、外部引入
 

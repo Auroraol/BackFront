@@ -16,7 +16,7 @@ const anotherGlobalVar = 20;
 
 ## 函数定义
 
-**使用 `匿名函数` 或 `箭头函数` 来定义函数,  不要使用`命名函数`**：
+**建议使用 `匿名函数` 或 `箭头函数` 来定义函数**：
 
 ```js
 //方法1:   匿名函数
@@ -43,6 +43,14 @@ sum = function(a, b) {   // 允许
   return a * b;
 }
 console.log(sum(100,2)) //200
+```
+
+**`命名函数`一般用于DOM事件回调函数:**
+
+```js
+let btn = document.querySelector('#btn');
+btn.addEventListener('click',function(){
+    console.log(duanzi);                                                                       })
 ```
 
 ## 函数参数

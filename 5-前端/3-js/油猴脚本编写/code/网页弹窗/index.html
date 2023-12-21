@@ -4,20 +4,77 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-<script>
-    
-    function saveData(status) {
-		if(status == "1" && !confirm("您是否确认提交当前评价,提交后不能修改！")) {
-		} else {
-            console.log("提交")
-			document.getElementById("Form1").submit();
-		}
-	}
-    </script>
   </head>
+
   <body>
     <div>
-        <input type="button" name="qx" id="qx" value="保存" class="button" onclick="saveData(1)" />
+      <input
+        type="button"
+        name="qx"
+        id="qx"
+        value="保存"
+        class="button"
+        onclick="saveData(1)"
+      />
     </div>
+    <button id="btn" type="button">这是一个按钮</button>
   </body>
+  <script>
+    function saveData(status) {
+      if (
+        status == "1" &&
+        !confirm("您是否确认提交当前评价,提交后不能修改！")
+      ) {
+      } else {
+        console.log("提交");
+        document.getElementById("Form1").submit();
+      }
+    }
+
+    /*
+      可复用的发 ajax 请求的函数: xhr + promise
+      */
+    function promiseAjax(url) {
+      return new Promise((resolve, reject) => {
+        // 1、创建对象
+        const xhr = new XMLHttpRequest();
+        // 2、初始化
+        xhr.open("GET", url);
+        // 3、发送
+        xhr.send();
+        // 4、事件绑定，处理服务器端返回的结果
+        xhr.onreadystatechange = function () {
+          // 服务端返回所有结果
+          if (xhr.readyState === 4) {
+            // 2xx 成功
+            if (xhr.status >= 200 && xhr.status < 300) {
+                //console.log( xhr.response)
+              resolve(JSON.parse(xhr.response)); // 设置响应体类型 xhr.responseType = 'json';则可以自动转换不需要JSON.parse()
+            } else {
+              // 请求失败, 调用 reject(reason)
+              reject(new Error("请求失败: status: " + status));
+            }
+          }
+        };
+      });
+    }
+
+    let btn = document.querySelector("#btn");
+    btn.addEventListener("click", async function () {
+      try {
+        /*
+        curl -X 'GET' \
+        'https://api.apiopen.top/api/sentences' \
+        -H 'accept: application/json'
+        */
+        const responseRsult = await promiseAjax(          // 返回promise 成功的值
+        "https://api.apiopen.top/api/sentences"
+        );
+        console.log(responseRsult); // 在控制台打印获取到的数据
+        console.log(responseRsult.result.name);
+      } catch (error) {
+        console.error("发生错误:", error);
+      }
+    });
+  </script>
 </html>

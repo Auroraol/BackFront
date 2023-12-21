@@ -1595,7 +1595,7 @@ $(document).ready(function() {
 });
 ```
 
-
+例子
 
 ```js
 // 使用箭头函数绑定事件处理程序
@@ -1609,7 +1609,18 @@ $('#myInput').on('input', (event) => {
 });
 ```
 
+补充:  原生绑定事件
 
+```js
+//html
+<button id="btn" type="button">这是一个按钮</button>
+
+//js
+let btn = document.querySelector("#btn");
+btn.addEventListener("click",  function () {
+    
+})
+```
 
 #### 事件处理 off() 解绑事件
 
@@ -1940,7 +1951,7 @@ $("body").on(events, "#n5", data);
 
 ==通过html自带的事件 + js的函数实现==
 
-#### 鼠标事件
+### 鼠标事件
 
 - click ： 单击
 - dblick：双击
@@ -1991,7 +2002,7 @@ $("body").on(events, "#n5", data);
    }   
 ```
 
-#### 键盘事件
+### 键盘事件
 
 - keydown：按键按下
 - keyup：按键抬起
@@ -2016,7 +2027,7 @@ function myKeyUp(id) {
 }
 ```
 
-#### HTML事件
+### HTML事件
 
 - load：文档加载完成
 - select：被选中的时候
@@ -2063,6 +2074,19 @@ window.onresize = function () {
 window.onscroll = function () {  
        console.log("滚动");  
    }  
+```
+
+# 原生绑定事件
+
+```js
+//html
+<button id="btn" type="button">这是一个按钮</button>
+
+//js
+let btn = document.querySelector("#btn");
+btn.addEventListener("click",  function () {
+    
+})
 ```
 
 ### 事件模型
@@ -2283,4 +2307,3 @@ btn.onclick = function () {
 </body>
 </html>
 ```
-

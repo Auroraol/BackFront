@@ -362,9 +362,10 @@ promise.then(// promise 指定成功或失败的回调函数来获取成功的 v
       }
     })
   }
+
 promiseAjax('https://api.apiopen.top2/getJoke?page=1&count=2&type=video').then(
       value => {
-        console.log('显示成功数据', data)
+        console.log('显示成功数据', value)
       },
       error => {
         alert(error.message)
@@ -3119,25 +3120,191 @@ Promise.prototype.then = function (onResolved, onRejected) {
 > 1. [async](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FWeb%2FJavaScript%2FReference%2FStatements%2Fasync_function)
 > 2. [await](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FWeb%2FJavaScript%2FReference%2FOperators%2Fawait)
 
-## Ⅰ-async函数
+## async函数
 
 > 1. 函数的返回值为 promise 对象
 > 2. promise 对象的结果由 async 函数执行的返回值决定
+> 3. 和then的返回规则一样
 
-## Ⅱ-await表达式
+```js
+async function main(){
+//1. 如果返回值是一个非Promise类型的数据
+// return 521;
+//2. 如果返回的是一个Promise对象
+ // return new Promise((resolve, reject) => {
+    // resolve('OK');
+    reject('Error');
+// });
+//3. 抛出异常throw."ohNo"
+}
+
+let result = main();
+console.log(result);  //失败 Error
+```
+
+返回一个promise对象
+
+![image-20231221112326243](Promise%E6%95%99%E7%A8%8B.assets/image-20231221112326243.png)
+
+## await表达式
 
 > 1. await 右侧的表达式一般为 promise 对象, 但也可以是其它的值
 > 2. 如果表达式是 promise 对象, await 返回的是 promise 成功的值
 > 3. 如果表达式是其它值, 直接将此值作为 await 的返回值
 
-## Ⅲ-注意
+```js
+async function main(){
+
+    let p = new Promise((resolve, reject) => [
+        // resolve('OK');
+        reject('Error');
+    }
+	//1. 右侧为promise的情况
+    // let res = await p;
+    //console.log(res)  //ok
+    //2。右侧为其他类型的数据
+    // let res2 = await 20;
+    //console.log(res)  //20
+    //3。如果promise是失败的状态
+    try{
+    	let res3 = await p;
+    }catch(e){
+    	console.log(e);  //Error
+	}
+}
+
+let result = main();
+```
+
+## 注意
 
 > 1. await 必须写在 async 函数中, 但 async 函数中可以没有 await
 > 2. 如果 await 的 promise 失败了, 就会抛出异常, 需要通过 try...catch 捕获处理
 
-## Ⅳ-自己对某些问题理解解答
+## 例子1
 
-### 1、如何在Promise外部使用Promise的结果
+```js
+//使用回调函数的方式
+fs.readFile('./resource/1.html'，(err,data1) =>{
+	if(err) throw err;
+	fs.readFile('./resource/2.html',(err,data2)=>{
+    	if(err) throw err;
+		fs.readFile('./resource/3.html',(err,data3) => {
+            if(err) throw err;
+			console.log(data1+data2+data3);
+        })
+     })
+})
+```
+
+```js
+//使用async 与 await
+
+const fs = require('fs');
+const util = require('util');
+const mineReadFile = util.promisify(fs.readFile); //可以将函数自动封装成promise,不用再去手动封装
+
+async function main(){
+    //读取第一个文件的内容
+    try{
+        let data1 = await mineReadFile('./resource/1.html'):
+        let data2 = await mineReadFile('./resource/2.html'):
+        let data3 = await mineReadFile('./resource/3.html'):
+        console.log(data1 + data2 + data3);
+    }catch(e){
+        console.log(e); 
+    }
+}
+```
+
+## 例子2
+
+```js
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div>
+      <input
+        type="button"
+        name="qx"
+        id="qx"
+        value="保存"
+        class="button"
+        onclick="saveData(1)"
+      />
+    </div>
+    <button id="btn" type="button">这是一个按钮</button>
+  </body>
+  <script>
+    function saveData(status) {
+      if (
+        status == "1" &&
+        !confirm("您是否确认提交当前评价,提交后不能修改！")
+      ) {
+      } else {
+        console.log("提交");
+        document.getElementById("Form1").submit();
+      }
+    }
+
+    /*
+      可复用的发 ajax 请求的函数: xhr + promise
+      */
+    function promiseAjax(url) {
+      return new Promise((resolve, reject) => {
+        // 1、创建对象
+        const xhr = new XMLHttpRequest();
+        // 2、初始化
+        xhr.open("GET", url);
+        // 3、发送
+        xhr.send();
+        // 4、事件绑定，处理服务器端返回的结果
+        xhr.onreadystatechange = function () {
+          // 服务端返回所有结果
+          if (xhr.readyState === 4) {
+            // 2xx 成功
+            if (xhr.status >= 200 && xhr.status < 300) {
+                //console.log( xhr.response)
+              resolve(JSON.parse(xhr.response)); // 设置响应体类型 xhr.responseType = 'json';则可以自动转换不需要JSON.parse()
+            } else {
+              // 请求失败, 调用 reject(reason)
+              reject(new Error("请求失败: status: " + status));
+            }
+          }
+        };
+      });
+    }
+
+    let btn = document.querySelector("#btn");
+    btn.addEventListener("click", async function () {
+      try {
+        /*
+        curl -X 'GET' \
+        'https://api.apiopen.top/api/sentences' \
+        -H 'accept: application/json'
+        */
+        const responseRsult = await promiseAjax(          // 返回promise 成功的值
+        "https://api.apiopen.top/api/sentences"
+        );
+        console.log(responseRsult); // 在控制台打印获取到的数据
+        console.log(responseRsult.result.name);
+      } catch (error) {
+        console.error("发生错误:", error);
+      }
+    });
+  </script>
+</html>
+```
+
+![image-20231221121924073](Promise%E6%95%99%E7%A8%8B.assets/image-20231221121924073.png)
+
+## 如何在Promise外部使用Promise的结果
 
 > 用到的本章节知识:
 >
