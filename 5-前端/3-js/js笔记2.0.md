@@ -241,6 +241,8 @@ undefined
 
 构造函数适合需要创建多个相似对象实例、需要在创建对象时执行额外逻辑的情况
 
+### 动态为对象添加方法/属性 方式1
+
 ```js
 function User(name) {
   this.name = name;
@@ -259,7 +261,7 @@ function sayHi() {
   console.log("动态1-" + this.name);  //动态1-小明
 }
 
-// 匿名函数
+// 匿名函数(推荐)
 const sayHi2 = function() {
   console.log("动态2-" + this.name);  //动态2-小明
 }
@@ -294,9 +296,53 @@ user.eat3();
 动态3-undefined
 ```
 
-## class
+### 动态为对象添加方法/属性 方式2 [推荐]
 
-详细见[面向对象2笔记](.\参考\第4天(重要).md)
+注意: **当访问对象的属性或方法时，先在当前实例对象是查找，然后再去原型对象查找，并且原型对象被所有实例共享。**
+
+```js
+function User(name) {
+  	this.name = name;
+    //方式1  匿名函数   (推荐)
+    this.walk = function() {
+        console.log(this.name);    // 小明
+    };
+    //方式3 箭头函数
+    this.eat = () => {
+        console.log(this.name);   // 小明 
+    }
+}
+
+// 使用原型对象的方式
+User.prototype.sayHi = function() {
+  console.log("动态1-" + this.name);
+};
+
+User.prototype.sayHi2 = function() {
+  console.log("动态2-" + this.name);
+};
+
+User.prototype.sayHi3 = function() {
+  console.log("动态3-" + this.name);
+};
+
+const user = new User('小明');
+user.sayHi();   //动态2-小明
+user.sayHi2();  //动态2-小明
+user.sayHi3();  //动态2-小明
+```
+
+```js
+小明
+小明
+动态1-小明
+动态2-小明
+动态3-小明
+```
+
+## 方法3: class
+
+ECMAScript 6 新增,  详细见[面向对象2笔记](.\参考\第4天(重要).md)
 
 
 

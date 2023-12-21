@@ -1,49 +1,78 @@
 # javaScript 引入方式
 
-1、内部标签
+**html中**:
 
-+ 放在 <head> 标签内：整个页面加载完成之前就进行读取。
+1. 内部标签
 
-  如果将 <script> 标签放在 <head> 标签内，那么它会在页面加载时立即执行。这可能会导致页面加载速度变慢，因为在执行 JavaScript 代码之前，浏览器必须先下载并解析完整个脚本文件。
+   + 放在 <head> 标签内：整个页面加载完成之前就进行读取。
 
-  ```html
-  <head>
-    <script>
-      // JavaScript 代码
-    </script>
-  </head>
-  ```
+   如果将 <script> 标签放在 <head> 标签内，那么它会在页面加载时立即执行。这可能会导致页面加载速度变慢，因为在执行 JavaScript 代码之前，浏览器必须先下载并解析完整个脚本文件。
 
+   ```html
+   <head>
+     <script>
+       // JavaScript 代码
+     </script>
+   </head>
+   ```
 
-+ 放在 <body> 结尾前：页面加载完成之后进行读取的。
+   + 放在 <body> 结尾前：页面加载完成之后进行读取的。
 
-  将 <script> 标签放在 <body> 结尾前，可以让页面的 HTML 结构先加载完毕，然后再加载和执行 JavaScript 代码。这样可以加快页面的加载速度，因为在执行 JavaScript 代码之前，页面的大部分内容已经加载完毕。
+   将 <script> 标签放在 <body> 结尾前，可以让页面的 HTML 结构先加载完毕，然后再加载和执行 JavaScript 代码。这样可以加快页面的加载速度，因为在执行 JavaScript 代码之前，页面的大部分内容已经加载完毕。
 
-  ```html
-  <body>
-    <!-- 页面内容 -->
-    <script>
-      // JavaScript 代码
-    </script>
-  </body>
-  ```
+   ```html
+   <body>
+     <!-- 
+       //页面内容
+     -->
+       
+     <script>
+       // JavaScript 代码
+     </script>
+   </body>
+   ```
 
-2、外部引入
+2. 外部引入(一般都把该js写成模块)
 
-```html
-<script src="abc.js"></script>
-```
+   ```html
+   <script src="abc.js"></script>
+   ```
+
+   ```html
+   //------------  模块调用--------------------------------------------
+   <script type="text/javascript" src="myModule.js"</script>
+   <script type="text/javascript">
+     var module = myModule()
+     module.doSomething()
+     module.doOtherthing()
+   </script>
+   ```
+
+**js中:**  
+
+1. 使用es6模块化规范,  比如:
+
+   ```js
+   // myModule.js  
+   export default function hello() {  
+     return "Hello, world!";  
+   }  
+   
+   // main.js  
+   import hello from './myModule.js';  
+   console.log(hello()); // 输出 "Hello, world!"  
+   ```
+
+2. 使用CommonJS 规范
 
 # 运算符
 
 比较运算符：
 
 - = 如果1=’1’,则为false
-
 - == 等于 类型不一样，值一样，也会判断为true
-
 - === 绝对等于，类型一样，值一样，判断为true
-
+- !==  不等于
 - **这是js的缺陷，尽量不使用==比较**
 
 浮点数问题：
@@ -69,6 +98,96 @@ console.log(typeof {});//object 是一个对象
 console.log(typeof null);//objecy 是一个对象，在javascript里，null是一个空指针；
 console.log(typeof function(){});//function，是一个方法，也是属于object类型的；js里万物皆对象
 ```
+
+## 分类
+
+### 基本(值)类型
+
+> 1. String: 任意字符串
+> 2. Number: 任意的数字
+> 3. boolean: true/false
+> 4. undefined: undefined
+> 5. null: null -->使用`typeof`时返回`object`
+> 6. [symbol](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FGlossary%2FSymbol) ([ECMAScript](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FGlossary%2FECMAScript) 2016新增)。 -->Symbol 是 [基本数据类型](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FGlossary%2FPrimitive) 的一种，[`Symbol`](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FWeb%2FJavaScript%2FReference%2FGlobal_Objects%2FSymbol) 对象是 Symbol原始值的[封装 (en-US)](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FGlossary%2FWrapper) 。
+> 7. [bigint](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FGlossary%2FBigInt)， -->**BigInt** 是一种数字类型的数据，它可以表示任意精度格式的整数。
+
+### 对象(引用)类型
+
+> 1. Object: 任意对象
+> 2. Function: 一种特别的`对象`(可以执行) --内部包含可运行的代码
+> 3. Array: 一种特别的`对象`(`key`为数值下标属性, 内部数据是有序的)
+
+### 判断方法
+
+#### ①` typeof`
+
+**`typeof`** 操作符返回一个`字符串`，表示未经计算的操作数的类型。
+
+- 可以判断: undefined/ 数值 / 字符串 / 布尔值 / function
+
+- 不能判断: null与object object与array
+
+- `注意`: 运行`console.log(typeof undefined)`时,得到的的也是一个`字符串,同时为小写!!`--> `'undefined'`
+
+- 代码示例
+
+- ```js
+    // typeof返回数据类型的字符串表达
+    var a
+    
+    //注意:typeof返回的是字符串
+    console.log(a, typeof a, typeof a==='undefined',a===undefined )  // undefined 'undefined' true true
+    console.log(undefined === 'undefined') //false
+    a = 4
+    console.log(typeof a==='number') //true
+    a = 'hongjilin'
+    console.log(typeof a==='string') //true
+    console.log(typeof a==='String') //false  -->注意,返回的类型为小写
+    a = true
+    console.log(typeof a==='boolean') //true
+    a = null
+    console.log(typeof a, a===null) // 'object'  true
+   let b={}
+    console.log(typeof b,typeof null, '-------') // 'object' 'object'  -->所以Typeof不能判断null与object
+  ```
+
+#### ②`instanceof`(判断实例方法)
+
+`专门判断对象`的具体类型
+
+- **`instanceof`** **运算符**用于检测构造函数的 `prototype` 属性是否出现在某个实例对象的原型链上。
+
+- 代码示例:
+
+- ```js
+      b2: [1, 'abc', console.log],
+   //可以简化成 b3:()=>()=> 'hongjilin'  -->高阶函数相关知识
+      b3: function () {
+        return  () =>{  return   'hongjilin'}
+      }
+    }
+   /**使用instanceof进行对象判断*/
+    console.log(b1 instanceof Object, b1 instanceof Array) // true  false
+    console.log(b1.b2 instanceof Array, b1.b2 instanceof Object) // true true
+    console.log(b1.b3 instanceof Function, b1.b3 instanceof Object) // true true
+  
+    /**使用typeof进行对象中某属性的判断*/
+   console.log(typeof b1.b2, typeof null) // 'object' 'object'  
+    console.log(typeof b1.b3==='function') // true
+    console.log(typeof b1.b2[2]==='function') //true
+  
+    /**调用对象与数组中某函数示例*/
+    b1.b2[2]('调用console.log打印hongjilin')    //调用console.log打印hongjilin
+    console.log(b1.b3()()) // hongjilin
+  ```
+
+#### ③`===`
+
+具体可以看 MDN的[JavaScript中的相等性判断](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FWeb%2FJavaScript%2FEquality_comparisons_and_sameness)
+
+可以判断: undefined, null
+
+简而言之，在比较两件事情时，`双等号将执行类型转换`;` 三等号将进行相同的比较，而不进行类型转换` (如果类型不同, 只是总会返回 false )
 
 ## string
 
@@ -263,7 +382,7 @@ NaN
 + null 空
 + undefined 未定义
 
-#### 一、相同点：
+#### 一、相同点
 
 1、都是原始类型的值，且保存在栈中变量本地
 2、进行条件判断时，两者都是false：
@@ -299,16 +418,17 @@ console.log(Number(11+ null));//11
 
 当需要释放一个对象的时候可以将该对象赋值为null，进而来释放对象
 
-```bash
+```js
 var a = {
   a:1,
   b:2
 };
+
+//释放对象
 a = null;
-12345
 ```
 
-#### null、undefined是怎么产生的
+#### 四、null、undefined 产生
 
 1、产生null方式一：当访问一个不存的DOM节点时
 
@@ -371,7 +491,7 @@ var arr6 = ["lily","lucy","Tom"];   // 创建一个包含3个字符串的数组
 #### 2.使用 Array 构造函数
 
 ```js
-var arr1 = new Array();   //创建一个空数组**
+var arr1 = new Array();   //创建一个空数组
 ```
 
 ```js
@@ -3104,7 +3224,313 @@ $(function() {
 
 
 
+[前端 | JS引擎的执行机制 - 简书 (jianshu.com)](https://www.jianshu.com/p/9dd4427f540e)
 
 
 
+# 执行上下文与执行上下文栈
 
+> > 当代码在 JavaScript 中运行时，执行代码的环境非常重要，并将概括为以下几点：
+> >
+> > **全局代码**——第一次执行代码的默认环境。
+> >
+> > **函数代码**——当执行流进入函数体时。
+> >
+> > (…) —— 我们当作 执行上下文 是当前代码执行的一个环境与范围。
+>
+> 换句话说，当我们启动程序时，我们从全局执行上下文中开始。一些变量是在全局执行上下文中声明的。我们称之为全局变量。当程序调用一个函数时，会发生什么?
+>
+> 以下几个步骤：
+>
+> - JavaScript 创建一个新的执行上下文，我们叫作本地执行上下文。
+> - 这个本地执行上下文将有它自己的一组变量，这些变量将是这个执行上下文的本地变量。
+> - 新的执行上下文被推到到执行堆栈中。可以将执行堆栈看作是一种保存程序在其执行中的位置的容器。
+>
+> 函数什么时候结束?当它遇到一个 return 语句或一个结束括号}。
+>
+> 当一个函数结束时，会发生以下情况:
+>
+> - 这个本地执行上下文从执行堆栈中弹出。
+> - 函数将返回值返回调用上下文。调用上下文是调用这个本地的执行上下文，它可以是全局执行上下文，也可以是另外一个本地的执行上下文。这取决于调用执行上下文来处理此时的返回值，返回的值可以是一个对象、一个数组、一个函数、一个布尔值等等，如果函数没有 return 语句，则返回 undefined。
+> - 这个本地执行上下文被销毁，销毁是很重要，这个本地执行上下文中声明的所有变量都将被删除，不在有变量，这个就是为什么 称为本地执行上下文中自有的变量。
+>
+> 此图出于CSDN的[Free Joe](https://gitee.com/link?target=https%3A%2F%2Fblog.csdn.net%2Fwangfeijiu)
+
+![image-20210723181727823](javaScript.assets/image-20210723181727823.png)
+
+### Ⅰ-变量提升与函数提升
+
+> 1. 变量声明提升
+>
+> - 通过var定义(声明)的变量, 在定义语句之前就可以访问到
+> - 值: undefined
+>
+> 1. 函数声明提升
+>
+> - 通过function声明的函数, 在之前就可以直接调用
+> - 值: 函数定义(对象)
+>
+> 1. 引出一个问题: 变量提升和函数提升是如何产生的?
+>
+> ```
+> /*
+>  面试题 : 输出 undefined
+>   */
+>  var a = 3
+>  function fn () {
+>    console.log(a)
+>    var a = 4 //变量提升
+>  }
+>  fn()  //undefined
+> '--------------------------------------------'
+>  console.log(b) //undefined  变量提升
+>  fn2() //可调用  函数提升
+>  // fn3() //不能  变量提升
+>  var b = 3
+>  function fn2() {  console.log('fn2()') }
+>  var fn3 = function () { console.log('fn3()') }
+> ```
+
+### Ⅱ-执行上下文
+
+> 1. 代码分类(位置)
+>
+> - 全局代码
+> - 函数(局部)代码
+>
+> 1. 全局执行上下文
+>
+> - 在执行全局代码前将window确定为全局执行上下文
+> - 对全局数据进行预处理
+>   - var定义的全局变量==>undefined, 添加为window的属性
+>   - function声明的全局函数==>赋值(fun), 添加为window的方法
+>   - this==>赋值(window)
+> - 开始执行全局代码
+>
+> 1. 函数执行上下文
+>
+> - 在调用函数, 准备执行函数体之前, 创建对应的函数执行上下文对象(虚拟的, 存在于栈中)
+> - 对局部数据进行预处理
+>   - 形参变量==>赋值(实参)==>添加为执行上下文的属性
+>   - `arguments`==>赋值(实参列表), 添加为执行上下文的属性 -->[不懂的同学看这里](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2Forphaned%2FWeb%2FJavaScript%2FReference%2FFunctions%2Farguments)
+>   - var定义的局部变量==>undefined, 添加为执行上下文的属性
+>   - function声明的函数 ==>赋值(fun), 添加为执行上下文的方法
+>   - this==>赋值(调用函数的对象)
+> - 开始执行函数体代码
+
+### Ⅲ-执行上下文栈
+
+> 1. 在全局代码执行前, JS引擎就会创建一个栈来存储管理所有的执行上下文对象
+> 2. 在全局执行上下文(window)确定后, 将其添加到栈中(压栈)-->`所以栈底百分百是[window]`
+> 3. 在函数执行上下文创建后, 将其添加到栈中(压栈)
+> 4. 在当前函数执行完后,将栈顶的对象移除(出栈)
+> 5. 当所有的代码执行完后, 栈中只剩下window
+> 6. `上下文栈数==函数调用数+1`
+>
+> ```
+> //1. 进入全局执行上下文
+> var a = 10
+> var bar = function (x) {
+>   var b = 5
+>   foo(x + b)   //3. 进入foo执行上下文           
+> }
+> var foo = function (y) {
+>   var c = 5
+>   console.log(a + c + y)
+> }
+> bar(10) //2. 进入bar函数执行上下文
+> ```
+>
+> ![image-20210723183046182](javaScript.assets/image-20210723183046182.png)
+>
+> 此处用一个动态图来展示:
+>
+> ![img](javaScript.assets/%E6%89%A7%E8%A1%8C%E6%A0%88%E4%B8%8E%E4%BA%8B%E4%BB%B6%E9%98%9F%E5%88%97.gif)
+>
+> 举个栗子:
+>
+> ```
+> //栗子
+> <!--
+> 1. 依次输出什么?
+> gb: undefined
+> fb: 1
+> fb: 2
+> fb: 3
+> fe: 3
+> fe: 2
+> fe: 1
+> ge: 1
+> 2. 整个过程中产生了几个执行上下文?  5
+> -->
+> <script type="text/javascript">
+> console.log('gb: '+ i)
+> var i = 1
+> foo(1)
+> function foo(i) {
+>   if (i == 4) {
+>     return
+>   }
+>   console.log('fb:' + i)
+>   foo(i + 1) //递归调用: 在函数内部调用自己
+>   console.log('fe:' + i) //出栈 所以会 3 2 1这样的结果
+> }
+> console.log('ge: ' + i)
+> </script>
+> ```
+
+### Ⅳ-相关面试题
+
+> ```
+> 函数提升优先级高于变量提升,且不会被变量声明覆盖,但是会被变量赋值覆盖
+> /*
+> 测试题1:  先执行变量提升, 再执行函数提升
+> 
+> */
+> function a() {}
+> var a
+> console.log(typeof a) // 'function'
+> 
+> 
+> /*
+> 测试题2:
+> */
+> if (!(b in window)) {
+>  var b = 1
+> }
+> console.log(b) // undefined
+> 
+> /*
+> 测试题3:
+> */
+> var c = 1
+> function c(c) {
+>  console.log(c)
+>  var c = 3 //与此行无关
+> }
+> c(2) // 报错  c is not a function
+> ```
+
+# 作用域与作用域链
+
+### Ⅰ-作用域
+
+> 1. 理解
+>
+> - 就是一块"地盘", 一个代码段所在的区域
+> - 它是静态的(相对于上下文对象), 在编写代码时就确定了
+>
+> 1. 分类
+>
+> - 全局作用域
+> - 函数作用域
+> - 没有块作用域(ES6有了) -->(java语言也有)
+>
+> 1. 作用
+>
+> - 隔离变量，不同作用域下同名变量不会有冲突
+>
+> ```
+> /*  //没块作用域
+>  if(true) { var c = 3 }
+>  console.log(c)
+>  */
+>  var a = 10,
+>    b = 20
+>  function fn(x) {
+>    var a = 100, c = 300;
+>    console.log('fn()', a, b, c, x) //100 20 300 10
+>    function bar(x) {
+>      var a = 1000, d = 400
+>      console.log('bar()', a, b, c, d, x)
+>    }
+>    bar(100)//1000 20 300 400 100
+>    bar(200)//1000 20 300 400 200
+>  }
+>  fn(10)
+> ```
+
+### Ⅱ-作用域与执行上下文的区别与联系
+
+> 1. 区别1:
+>
+> - 全局作用域之外，每个函数都会创建自己的作用域，`作用域在函数定义时就已经确定了。而不是在函数调用时`
+> - 全局执行上下文环境是在全局作用域确定之后, js代码马上执行之前创建
+> - 函数执行上下文是在调用函数时, 函数体代码执行之前创建
+>
+> 1. 区别2:
+>
+> - 作用域是静态的, 只要函数定义好了就一直存在, 且不会再变化
+> - 执行上下文是动态的, 调用函数时创建, 函数调用结束时就会自动释放
+>
+> 1. 联系:
+>
+> - 执行上下文(对象)是从属于所在的作用域
+> - 全局上下文环境==>全局作用域
+> - 函数上下文环境==>对应的函数使用域
+>
+> ![image-20210727141319410](javaScript.assets/image-20210727141319410.png)
+
+### Ⅲ-作用域链
+
+> 1. 理解
+>
+> - 多个上下级关系的作用域形成的链, 它的方向是从下向上的(从内到外)
+> - 查找变量时就是沿着作用域链来查找的
+>
+> 1. 查找一个变量的查找规则
+>
+> - 在当前作用域下的执行上下文中查找对应的属性, 如果有直接返回, 否则进入2
+> - 在上一级作用域的执行上下文中查找对应的属性, 如果有直接返回, 否则进入3
+> - 再次执行2的相同操作, 直到全局作用域, 如果还找不到就抛出找不到的异常
+>
+> ```
+> var a = 1
+>  function fn1() {
+>    var b = 2
+>    function fn2() {
+>      var c = 3
+>      console.log(c)
+>      console.log(b)
+>      console.log(a)
+>      console.log(d)
+>    }
+>    fn2()
+>  }
+>  fn1()
+> ```
+
+### Ⅳ-相关面试题
+
+#### ① `作用域在函数定义时就已经确定了。而不是在函数调用时`
+
+> 作用域1:`作用域在函数定义时就已经确定了。而不是在函数调用时`
+>
+> ```
+>  var x = 10;
+>  function fn() { console.log(x); }
+>  function show(f) {
+>    var x = 20;
+>    f();
+>  }
+>  show(fn); //输出10
+> ```
+>
+> ![image-20210726192714660](javaScript.assets/image-20210726192714660.png)
+
+#### ② 对象变量不能产生局部作用域
+
+> ```
+> var fn = function () {
+>  console.log(fn)
+> }
+> fn()
+> 
+> var obj = { //对象变量不能产生局部作用域,所以会找到全局去,导致报错
+>  fn2: function () {
+>   console.log(fn2)
+>   //console.log(this.fn2)
+>  }
+> }
+> obj.fn2()
+> ```

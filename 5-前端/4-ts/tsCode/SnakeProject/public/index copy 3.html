@@ -1,22 +1,19 @@
-<button onclick="updateSync()">同步</button>
-<button onclick="updateAsync()">异步</button>
-<div id="output"></div>
+<button>测试1</button>
+<button>测试2</button>
+<button>测试3</button>
+<!--
+需求: 点击某个按钮, 提示"点击的是第n个按钮"
+-->
 
-<script>
-  function updateSync() {
-    for (var i = 0; i < 500; i++) {
-      document.getElementById('output').innerHTML = i;
-    }
-  }
-    
-  function updateAsync() {
-    var i = 0;
-    function updateLater() {
-      document.getElementById('output').innerHTML = (i++);
-      if (i < 500) {
-        setTimeout(updateLater, 0);
-      }
-    }
-    updateLater();
-  }
-</script>
+<script type="text/javascript">
+ var btns = document.getElementsByTagName('button')
+ //注意[btns]不是一个数组,它是一个伪数组
+ //每次获取[btns.length]其实都是需要进行计算的(因为它是伪数组)
+ //所以为了性能更好,在此处赋值,就只需要计算一次
+ for (let i = 0,length=btns.length; i < length; i++) {
+   let btn = btns[i]
+   btn.onclick = function () {  //遍历加监听
+     alert('第'+(i+1)+'个')     //结果 全是[4]
+   }
+ }
+</script>  
