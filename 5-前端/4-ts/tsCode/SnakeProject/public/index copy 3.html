@@ -1,0 +1,22 @@
+<button onclick="updateSync()">同步</button>
+<button onclick="updateAsync()">异步</button>
+<div id="output"></div>
+
+<script>
+  function updateSync() {
+    for (var i = 0; i < 500; i++) {
+      document.getElementById('output').innerHTML = i;
+    }
+  }
+    
+  function updateAsync() {
+    var i = 0;
+    function updateLater() {
+      document.getElementById('output').innerHTML = (i++);
+      if (i < 500) {
+        setTimeout(updateLater, 0);
+      }
+    }
+    updateLater();
+  }
+</script>

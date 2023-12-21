@@ -172,7 +172,6 @@ console.log('----')
 
 ```javascript
 console.log(a) // ReferenceError:a is not defined
-1
 ```
 
 `TypeError`：数据类型不正确
@@ -186,7 +185,6 @@ let c = {
    }
 c.xxx()
 // TypeError:c.xxx is not a function
-12345678
 ```
 
 `RangeError`：数据值不在其所允许的范围内
@@ -198,7 +196,6 @@ function fn() {
 }
 fn()
 // RangeError:Maximum call stack size exceeded
-123456
 ```
 
 `SyntaxError`：语法错误
@@ -206,7 +203,6 @@ fn()
 ```javascript
 const c = """"
 // SyntaxError:Unexpected string
-12
 ```
 
 #### 2. 错误处理（捕获与抛出）
@@ -224,7 +220,6 @@ function something() {
     throw new Error('当前时间为偶数，无法执行任务')
   }
 }
-12345678910
 ```
 
 捕获错误：`try ... catch`
@@ -238,7 +233,7 @@ try {
    
   alert(error.message)
 }
-12345678
+
 ```
 
 #### 3. 错误对象

@@ -2862,6 +2862,8 @@ sqrtobj.sqrt2
 
 # 定时器
 
+setInterval 函数会在每隔指定的时间间隔执行一次回调函数，而 setTimeout 函数只会在指定的时间间隔之后执行一次回调函数。
+
 js中定时器有两种，一个是循环执行setInterval，另一个是定时执行setTimeout
 
 **一、循环执行（setInterval）**
@@ -2888,7 +2890,7 @@ js中定时器有两种，一个是循环执行setInterval，另一个是定时�
       };
     },
     mounted() {		// 定时器一般写mounted() 生命周期内
-     this.timer = (() => {
+     this.timer = setInterval(() => {
    			 // 某些操作
    			 console.log(1);
 		}, 1000)		// 1000毫秒
@@ -2900,7 +2902,6 @@ js中定时器有两种，一个是循环执行setInterval，另一个是定时�
     }
   };
 </script>
-1234567891011121314151617181920212223242526
 ```
 
 方案一有两点不好的地方，引用尤大的话来说就是：
@@ -2929,7 +2930,7 @@ this.$once('hook:beforeDestroy', () => {
 
 用法是setTimeout(“方法名或方法”, “延时”); 第一个参数为方法名或者方法，**注意为方法名的时候不要加括号**,第二个参数为时间间隔
 
-```
+```js
 <template>
   <section>
     <h1>hello world~</h1>
