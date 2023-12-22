@@ -5,7 +5,7 @@ vue-router 主要用于创建单页应用，再结合 vue.js 的时候显得�
 
 ## 一、安装与使用
 
-安装：
+### 安装
 
 ```shell
 npm  install vue-router
@@ -15,6 +15,8 @@ npm  install vue-router
 
 - **router-view**  路由入口
 - **router-link**    路由链接
+
+### 基本使用
 
 使用方式：
 
@@ -61,6 +63,134 @@ div
 </template>
 ```
 效果：![GIF.gif](https://cdn.nlark.com/yuque/0/2020/gif/2213540/1607933542163-77c74955-70d0-4385-9332-26c01310ccf6.gif#align=left&display=inline&height=77&originHeight=77&originWidth=229&size=2988&status=done&style=none&width=229)
+
+### 几个注意点
+
+实现切换（active-class可配置高亮样式）
+
+```vue
+<router-link active-class="active" to="/about">About</router-link>
+```
+
+指定路由页面展示位置
+
+```vue
+<router-view></router-view>
+```
+
+1. 路由组件通常存放在```pages```文件夹，一般组件通常存放在```components```文件夹。
+2. 通过切换，“隐藏”了的路由组件，默认是被销毁掉的，需要的时候再去挂载。
+3. 每个组件都有自己的```$route```属性，里面存储着自己的路由信息。
+4. 整个应用只有一个router，可以通过组件的```$router```属性获取到。
+
+### 模版:crossed_swords:
+
+router.ts
+
+```js
+import
+{
+  createRouter,
+  createWebHistory,
+  createWebHashHistory,
+} from "vue-router";
+
+// 导入路由404分模块
+import NoFond from "./NoFond";
+// 导出多个要导出一个数组形式，在router.js中使用,必须使用扩展运算全部导入
+
+//引入main.ts
+import app from "../main";
+
+const routes = [
+  // 重定向
+  {
+    path: "/index.html",
+    redirect: "/",
+  },
+  {
+    path: "/",
+    name: "home",
+    component: () => import("/@/pages/home/home.vue"),
+    meta: {
+      loading: true,
+      title: "首页",
+    },
+  },
+  {
+    path: "/vuex",
+    component: () => import("/@/pages/vuex/vuex.vue"),
+    meta: {
+      loading: true,
+      title: "vuex",
+    },
+  },
+  {
+    path: "/vaxiso",
+    component: () => import("/@/pages/vaxiso/vaxiso.vue"),
+    meta: {
+      loading: true,
+      title: "vaxiso",
+    },
+  },
+  {
+    path: "/editTable",
+    component: () => import("/@/pages/editTable/index.vue"),
+    meta: {
+      loading: true,
+      title: "editTable",
+    },
+  },
+  // 路由分模块
+  NoFond,
+];
+
+// 导出路由
+const router = createRouter({
+  history: createWebHistory(), //开启history模式
+  // history: createWebHashHistory(), //开启hash模式
+  routes,
+});
+
+// 在路由元信息配置守卫 requiredPath为true, 适合守卫多个页面 vue3next() 变成return true
+router.beforeEach((to, from, next) =>
+{
+  if (to.meta.loading)
+  {
+    app.config.globalProperties.$loading.showLoading();
+    next();
+  } else
+  {
+    next();
+  }
+});
+
+router.afterEach((to, from) =>
+{
+  if (to.meta.loading)
+  {
+    app.config.globalProperties.$loading.hideLoading();
+  }
+});
+export default router;
+
+```
+
+NoFond.ts
+
+```ts
+export default {
+  // 路由分模块
+  // 如果url找不到就会报404,必须放在路由页面最下面
+  //   !!! 项目中不能以关键字命名，否则会报错 包括不限于 xx.vue组件页面
+  path: "/:pathMatch(.*)",
+  component: () => import("/@/pages/404/NoFondPage.vue"),
+  meta: {
+    loading: true,
+    title: "404",
+  },
+};
+```
 
 ## 二、`$route`与`$router`
 
@@ -132,36 +262,51 @@ store.state.route.query  // current query (object)
 - `router.go(n)` 直接抵达指定的路由历史栈中的某个页面，指定n值，当前页面为 0，正数为此页之后的页面，负数为此页之前的页面
 - `router.replace(location, onComplete?, onAbort?)` 替换
 
+**使用**
+
+```ts
+<script setup lang="ts">
+    
+import { useRouter } from 'vue-router'
+const router = useRouter();
+const toPage = (url) => {
+  router.push(url) // 字符串形式跳转  //路由地址
+}
+
+</script>
+```
+
 直接书写路径：
 ```javascript
-this.$router.push('/home')
-this.$router.push('/home?from=index')
+router.push('路由地址')
+router.push('/home')
+router.push('/home?from=index')
 ```
 
 通过对象的方式：
 ```javascript
-this.$router.push({ name: 'home' })
-this.$router.push({ path: 'foo/bar/index' })
+router.push({ name: 'home' })
+router.push({ path: 'foo/bar/index' })
 ```
 
 动态路由参数的传递, 有以下两种写法：
 ```javascript
 const userId = 123
-this.$router.push({ name: 'user', params: { userId }}) // -> /user/123
-this.$router.push({ path: `/user/${userId}` }) // -> /user/123
+router.push({ name: 'user', params: { userId }}) // -> /user/123
+router.push({ path: `/user/${userId}` }) // -> /user/123
 ```
 
 查询字符串的写法，有以下两种写法：
 ```javascript
-this.$router.push(`register?plan=${private}`)
-this.$router.push({ path: 'register', query: { plan: 'private' }})
+router.push(`register?plan=${private}`)
+router.push({ path: 'register', query: { plan: 'private' }})
 ```
 
 总结：
 
 ```js
 //$router的两个API
-this.$router.push({
+router .push({
 	name:'xiangqing',
 		params:{
 			id:xxx,
@@ -169,16 +314,16 @@ this.$router.push({
 		}
 })
 
-this.$router.replace({
+router.replace({
 	name:'xiangqing',
 		params:{
 			id:xxx,
 			title:xxx
 		}
 })
-this.$router.forward() //前进
-this.$router.back() //后退
-this.$router.go() //可前进也可后退
+router.forward() //前进
+router.back() //后退
+router.go() //可前进也可后退
 ```
 
 ## 五、路由模式
@@ -315,7 +460,7 @@ App.vue
       <div class="col-xs-6">
         <div class="panel">
           <div class="panel-body">
-						<!-- 指定组件的呈现位置 -->
+			<!-- 指定组件的呈现位置 -->
             <router-view></router-view>
           </div>
         </div>
@@ -1138,65 +1283,103 @@ const router = new VueRouter({
 
 router/index.js
 
-1. 全局守卫:
+### 全局守卫
 
-   ```js
-   //全局前置守卫：初始化时执行、每次路由切换前执行
-   //全局前置路由守卫————初始化的时候被调用、每次路由切换之前被调用
-   router.beforeEach((to,from,next)=>{
-   	console.log('beforeEach',to,from)
-   	if(to.meta.isAuth){ //判断当前路由是否需要进行权限控制
-   		if(localStorage.getItem('school') === 'atguigu'){ //权限控制的具体规则
-   			next() //放行
-   		}else{
-   			alert('暂无权限查看')
-   			// next({name:'guanyu'})
-   		}
-   	}else{
-   		next() //放行
-   	}
-   })
-   
-   //全局后置守卫：初始化时执行、每次路由切换后执行
-   //全局后置路由守卫————初始化的时候被调用、每次路由切换之后被调用	// 可以用来切换网页标题
-   router.afterEach((to,from)=>{
-   	console.log('afterEach',to,from)
-   	if(to.meta.title){ 
-   		document.title = to.meta.title   //修改网页的title
-   	}else{
-   		document.title = 'vue_test'
-   	}
-   })
-   ```
+```js
+//全局前置守卫：初始化时执行、每次路由切换前执行
+//全局前置路由守卫————初始化的时候被调用、每次路由切换之前被调用
+router.beforeEach((to,from,next)=>{
+	console.log('beforeEach',to,from)
+	if(to.meta.isAuth){ //判断当前路由是否需要进行权限控制
+		if(localStorage.getItem('school') === 'atguigu'){ //权限控制的具体规则
+			next() //放行
+		}else{
+			alert('暂无权限查看')
+			// next({name:'guanyu'})
+		}
+	}else{
+		next() //放行
+	}
+})
 
-2. 独享守卫:
+//全局后置守卫：初始化时执行、每次路由切换后执行
+//全局后置路由守卫————初始化的时候被调用、每次路由切换之后被调用	// 可以用来切换网页标题
+router.afterEach((to,from)=>{
+	console.log('afterEach',to,from)
+	if(to.meta.title){ 
+		document.title = to.meta.title   //修改网页的title
+	}else{
+		document.title = 'vue_test'
+	}
+})
+```
 
-   ```js
-   beforeEnter(to,from,next){
-   	console.log('beforeEnter',to,from)
-   	if(to.meta.isAuth){ //判断当前路由是否需要进行权限控制
-   		if(localStorage.getItem('school') === 'atguigu'){
-   			next()
-   		}else{
-   			alert('暂无权限查看')
-   			// next({name:'guanyu'})
-   		}
-   	}else{
-   		next()
-   	}
-   }
-   ```
+### 独享守卫
 
-3. 组件内守卫：
+```js
+beforeEnter(to,from,next){
+	console.log('beforeEnter',to,from)
+	if(to.meta.isAuth){ //判断当前路由是否需要进行权限控制
+		if(localStorage.getItem('school') === 'atguigu'){
+			next()
+		}else{
+			alert('暂无权限查看')
+			// next({name:'guanyu'})
+		}
+	}else{
+		next()
+	}
+}
+```
 
-   ```js
-   //进入守卫：通过路由规则，进入该组件时被调用
-   beforeRouteEnter (to, from, next) {
-   },
-   //离开守卫：通过路由规则，离开该组件时被调用
-   beforeRouteLeave (to, from, next) {
-   }
-   ```
+### 组件内守卫
+
+```js
+//进入守卫：通过路由规则，进入该组件时被调用
+beforeRouteEnter (to, from, next) {
+},
+//离开守卫：通过路由规则，离开该组件时被调用
+beforeRouteLeave (to, from, next) {
+}
+```
+
+### 注意事项
+
+第一个例子中的代码如下：
+
+```js
+router.beforeEach((to, from, next) => {
+  if (to.path === "/login") {
+     next(); // 放行
+  }
+
+  const token = localstorage.getItem("token");
+  if (!token) {
+    return next("/login");
+  } 
+  next();
+});
+```
+
+第二个例子中的代码如下：
+
+```js
+router.beforeEach((to, from, next) => {
+  if (to.path === "/login") {
+    return next();
+  }
+  
+  const token = localStorage.getItem("token"); 
+  if (!token) {
+    return next("/login");
+  }
+  next();
+});
+```
+
+在第一个例子中，当 `to.path` 不等于 "/login" 时，代码执行到 `next()` 后没有 `return`，这意味着函数会继续往下执行，导致可能出现重复执行 `next()` 的情况。这可能会导致一些意外行为。
+
+在第二个例子中，无论何种情况，都在执行 `next` 后直接使用 `return`，这样能够确保后续代码不会被执行，从而避免了潜在的问题。
 
 ## 十四、路由元信息
 
