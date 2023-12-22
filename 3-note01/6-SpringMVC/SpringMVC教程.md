@@ -2335,8 +2335,9 @@ ServletContext servletContext = request.getServletContext()
 | http://localhost:8989/xxx/users/1        | 用户1 pathvarbale |
 | http://localhost:8989/xxx/users/1/orders | 用户1的所有订单   |
 
-
 每个请求都有明确的动词(GET，POST，PUT，DELETE)
+
+**看东西(GET),放东西(POST),该东西(put), 丢东西(DELETE)**
 
 | 请求方式 | 标识                                     | 意图                                               |
 | -------- | ---------------------------------------- | -------------------------------------------------- |
