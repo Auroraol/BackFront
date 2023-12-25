@@ -1,10 +1,8 @@
->本人笔记地址分享:[`全部笔记`](https://gitee.com/hongjilin/hongs-study-notes)、[`Sass所有学习笔记`](https://gitee.com/hongjilin/hongs-study-notes/tree/master/%E7%BC%96%E7%A8%8B_%E5%89%8D%E7%AB%AF%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Scss%E7%AC%94%E8%AE%B0)
-
-# 相关介绍
-
 # #目录
 
 >[TOC]
+
+# 引言
 
 ## 一、CSS预处理器出现的原因
 
@@ -110,8 +108,6 @@ less、scss(sass)和stylus代码并不能被浏览器直接解析，所以必须
 现有框架已经提供了css预处理器选项，编译相关配置会自动帮我们生成！所以只有在"练习"情况下才有必要安装该环境
 ~~~
 
-
-
 ## 一、安装分类
 
 ### 1.不依赖编辑器
@@ -134,10 +130,6 @@ d. Dart环境下的sass模块
 a. IDE代表：Webstrom	前提是安装上述"1"中的命令行编译工具，配置自动命令，另安装一个代码提示插件scss
 b. 编辑器代表：vscode   安装Easy Sass（编译）和Sass（代码提示）两个插件
 ~~~
-
-
-
-
 
 ## 二、安装步骤
 
