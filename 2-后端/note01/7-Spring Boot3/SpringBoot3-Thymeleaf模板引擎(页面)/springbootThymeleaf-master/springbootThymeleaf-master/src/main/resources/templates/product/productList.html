@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>productList</title>
+</head>
+<body>
+<br/>
+<h1>商品列表</h1>
+<br/><br/>
+<div class="with:80%">
+    <table>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>productName</th>
+            <th>productPrice</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!--each来进行for循环求值-->
+        <tr  th:each="product : ${products}">
+            <th scope="row" th:text="${product.productId}"></th>
+            <td th:text="${product.productName}"></td>
+            <td th:text="${product.productPrice}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

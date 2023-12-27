@@ -155,8 +155,6 @@ console.log(a); // ReferenceError
 console.log(b); // ReferenceError
 ```
 
-
-
 ### 2、 使用有意义且可发音的变量名  
 
 ```js
@@ -222,7 +220,7 @@ saveCityZipCode(city, zipCode);
 
 ![image-20231225162446558](JavaScript%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83.assets/image-20231225162446558.png)
 
-如果这个解构看不懂的回头要去学习一下 ES6 相关知识点,现在已经是必备技能了 -- **[ES6及后续版本学习笔记](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记/ES6及后续版本学习笔记)** 
+- **[ES6及后续版本学习笔记](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记/ES6及后续版本学习笔记)** 
 
 ### 6、避免心理映射
 
@@ -418,7 +416,7 @@ createStudent ( {  //调用时传入一个对象,里面讲需要的代码
   name : "努力学习的汪" , 
   buttonText : "变帅" , 
   cancellable : true 
-} ) ;
+});
 ```
 
 ### 2、函数应该只做一件事
@@ -683,7 +681,7 @@ function createTempFile(name) {
 }
 ```
 
-### 7、使用 Object.assign 设置默认对象
+### 7、使用 Object.assign 设置默认对象:crossed_swords:
 
 ###### 知识点补充
 
@@ -819,6 +817,7 @@ console.log(newName); // 玛瑞儿爱上了康康
 ##### c) 代码示例
 
 ```js
+// cart is array
 //不好的代码
 const addItemToCart = (cart, item) = {
   cart.push({ item, date: Date.now() });
@@ -847,8 +846,6 @@ count();  // 2
 count(3); // 3
 count();  // 3
 ```
-
-
 
 ### 10、不要写入全局函数
 
@@ -1089,7 +1086,7 @@ const short = function longUniqueMoreDescriptiveLexicalFoo() {/** ... */ }
 
 #### Ⅰ - 永远不要定义一个参数为 `arguments`
 
- ###### 永远不要定义一个参数为 `arguments`。 这将会优先于每个函数给定范围的 `arguments` 对象。
+###### 永远不要定义一个参数为 `arguments`。 这将会优先于每个函数给定范围的 `arguments` 对象。
 
 ```js
 // bad

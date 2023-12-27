@@ -2544,8 +2544,6 @@ spring.thymeleaf.cache=false
 - `~{}`：片段引用
 - `*{}`：变量选择：需要配合th:object绑定对象
 
-
-
 例子:
 
 ```xml
@@ -6003,7 +6001,7 @@ import org.springframework.context.annotation.Configuration;
  * @create 2023-04-28 17:42
  */
 @Configuration
-public class ApiUiConfig {
+public class ApiUiConfigApiUiConf {
 
     /**
      * 分组设置
@@ -6406,3 +6404,11 @@ LoadProperties测试获取的功能描述：原生获取配置文件的值
    		<optional>true</optional>
    </dependency>
    ```
+
+
+
+
+
+# 补充
+
+[springboot由3.1.5升级到3.2.0 报Invalid value type for attribute ‘factoryBeanObjectType‘: java.lang.String-CSDN博客](https://blog.csdn.net/u011410254/article/details/134611035)

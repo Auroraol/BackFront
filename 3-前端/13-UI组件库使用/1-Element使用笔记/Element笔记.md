@@ -44,7 +44,29 @@
 
 
 
+**补充方法**
 
+ 在全局样式中添加以下样式：
+
+style.css
+
+```
+//设置body和html的高度为100%：
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+```
+
+然后，在组件页面样式中，设置 `根div` 的高度为100%：
+
+```
+根div {
+  height: 100%;
+}
+```
 
 # 输入框
 

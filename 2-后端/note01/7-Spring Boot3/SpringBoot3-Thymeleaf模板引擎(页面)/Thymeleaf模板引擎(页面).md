@@ -92,7 +92,7 @@ public class UserController {
     public String all(Model model) {
         model.addAttribute("users", userService.findAll());
         return "all";
-    }
+   
 }
 ```
 
@@ -145,6 +145,16 @@ public class UserController {
 - `*{}`：变量选择：需要配合th:object绑定对象
 
 例子:
+
+注意:  
+
++ `<h1>${msg}</h1>会报错, 并不能像vue那种{{}}一样使用`
+
++ ```html
+  <!--  <span th:text="${user.name}"></span>  报错--> 
+  <span   th:if="${user != null}" th:text="${user.name}"></span>  <!--一定要加限制不然会报错 -->
+  <span  th:if="${user == null}">xxx</span>
+  ```
 
 ```xml
 <!DOCTYPE html>
@@ -304,7 +314,6 @@ public class WelcomeController {
   <h1 th:text="|前缀哈哈 ${name} 后缀呵呵|"></h1>
   ```
 
-  
 
 **布尔操作：**
 
@@ -534,4 +543,90 @@ iterStat 称作状态变量，属性有：
 </body>
 ```
 
+
+
+# 补充
+
+[Springboot使用Thymeleaf模板引擎无法加载css样式等静态资源_引入springsecurity后 thymeleaf 无法访问css-CSDN博客](https://blog.csdn.net/qq_42391904/article/details/98474098/?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0--blog-114848399.235^v39^pc_relevant_anti_vip_base&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
+
+
+
+#### 第二种方法：
+
+我一般 都是
+
+```javascript
+ <head th:fragment="header">
+  <meta charset="UTF-8" />
+  <title th:text="#{head.title}"></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="shortcut icon" th:href="@{/static/img/favicon.gif}" type="image/gif" />
+  
+  <link rel="stylesheet" th:href="@{/resources/css/bootstrap.min.css}" />
+  <link rel="stylesheet" th:href="@{/resources/css/jquery.ui.all.css}" />
+<link rel="stylesheet" th:href="@{/resources/css/jquery.ui.customer.css}" />
+  <script th:src="@{/resources/js/jquery-1.9.1.min.js}"></script>
+  <script th:src="@{/resource/js/bootstrap.min.js}"></script>
+</head>
+123456789101112
+```
+
+
+
+<a th:href="@{'/invoice-list?userId=' + user.id}" class="active">Link to Invoice List</a>
+
+<a th:href="@{/invoice-list?userId=} + ${user.id}">Link to Invoice List</a>
+
+
+
+
+
+# todo
+
+跳转   url地址栏不会产生变化
+
+```java
+//model中的数据，会在V渲染之前，将数据复制一份给request
+@RequestMapping("/test")
+public String testData(Model model){
+    model.addAttribute("name", "张三");
+    return "index";       // 注意上述参数只能给index页面用
+}
+
+//jsp中用EL表达式 取值即可   
+${requestScope.name}
+```
+
+重定向  url地址栏会发生变化
+
+```java
+@PostMapping("/dologin")
+public String login(HttpServletRequest request,  RedirectAttributes redirectAttributes){
+    String name = request.getParameter("username");
+    String password = request.getParameter("password");
+    User user = userService.findByNameAndPassword(name, password);
+    if(user != null){
+        redirectAttributes.addAttribute("userId", user.getId());
+        return "redirect:invoice-list";
+        // http://localhost:9000/invoice-list?userId=1
+    }else{
+        return "login";
+    }
+}
+```
+
+```java
+@RequestMapping("/invoice-list")
+public String invoiceList(Model model, @RequestParam("userId") Integer userId) {
+    user = userService.findById(userId);
+    if (user.get(0) != null) {
+        model.addAttribute("user", user.get(0));
+        return "invoice-list";
+    } else {
+        return "login";
+    }
+}
+```
+
+<strong style="color:red">如果Thymeleaf模板引擎(页面)中使用了某个参数, 那么该页面的Controller必须有该参数传入, 不然会报错! </strong>
 

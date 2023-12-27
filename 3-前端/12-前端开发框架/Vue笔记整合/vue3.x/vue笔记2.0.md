@@ -13244,3 +13244,6 @@ export default defineConfig({
 });
 ```
 
+# html模板资源转为vue项目
+
+[如何将html模板资源转为vuecli项目_html转vue-CSDN博客](https://blog.csdn.net/gxlzhhx/article/details/122922153)
