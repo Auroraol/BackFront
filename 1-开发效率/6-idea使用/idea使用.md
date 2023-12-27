@@ -4,10 +4,6 @@
 
 <img src="idea使用.assets/885a911d8e7646bf897ab4ea92b9dbc3.png" alt="img" style="zoom:67%;" />
 
-
-
-
-
 # IDEA test程序无法输入 This view is read-only 解决办法
 
 ### 问题
@@ -223,3 +219,43 @@ c + j
 
 
 ![image-20231031211959926](idea使用.assets/image-20231031211959926.png)
+
+
+
+
+
+# 详细准确的命中报错
+
+<strong style="color:red">排查：查看报错所有日志的Caused by，**原因往往在最后一个Caused by。**</strong>
+
+##  Error creating bean with name 问题
+
+造成该报错无非这几个原因：扫描不到包、导包导错、注解没加或加错，类型、类名不正确等
+
+### SSM、SpringBoot项目基础检查
+
+1，[Spring项目](https://so.csdn.net/so/search?q=Spring项目&spm=1001.2101.3001.7020)配置文件，查看有没有开启注解扫描bean；
+
+2，Spring项目配置文件，springmvc-config和applicationContext中，扫描Service、Contrller包的代码，查看包名是否写错；
+
+3，分别看Controller、Service、Dao三层包中对应的注解是不是没加？如@Controller、@Service、@Mapper、@Repository等；
+
+4、某个Spring容器托管的类你写成了抽象类，即abstract Class，抽象类是无法new的；
+
+### 如果使用了JPA或[Hibernate]
+
+1，检查@Query注解的SQL语句中表名应该是实体类名，看看是不是写错了；
+
+2，检查实体类是不是加了@Entiy注解；
+
+3，检查实体类的主键注解@Id对应的包是不是正确的，应该是import javax.persistence.Id，别导错了；
+
+4，检查实体类@Entity包，包应该是javax.persistence.Entity，别导错了；
+
+### 如果使用了[Mybatis]
+
+1，检查SqlSessionFactory是不是为空；
+
+2，@MapperSecan注解是不是没加？（SpringBoot启动类中开启mapper接口的扫描）；
+
+3，XXXMapper.xml配置中parameterType如果是类类型，看类名是不是写错了；

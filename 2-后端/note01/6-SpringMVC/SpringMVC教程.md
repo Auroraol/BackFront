@@ -744,7 +744,7 @@ C得到数据后，跳转到V，并向V传递数据。进而V中可以渲染数�
 
 ### request作用域
 
-#### 1、@ModelAttribute注解(不常用)
+#### 1、@ModelAttribute注解(常用)
 
 Controller层
 
@@ -826,8 +826,6 @@ public String testData(Model model){
 //jsp中用EL表达式 取值即可
 ${requestScope.name}
 ```
-
-
 
 #### 4、用map传参（常用）
 
@@ -1039,7 +1037,7 @@ public class User {
 
     private Integer id;
     
-    @JsonFormat(pattern = "yyyy-MM-dd")  //
+    @JsonFormat(pattern = "yyyy-MM-dd")  // 重要
     private Date birthday;
 
     public Date getBirthday() {

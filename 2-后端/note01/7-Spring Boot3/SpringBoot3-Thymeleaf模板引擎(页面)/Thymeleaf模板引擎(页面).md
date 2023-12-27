@@ -259,7 +259,6 @@ public class WelcomeController {
         return "welcome";
     }
 }
-
 ```
 
 **系统工具&内置对象：**[**详细文档**](https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html#appendix-a-expression-basic-objects)
@@ -337,8 +336,8 @@ public class WelcomeController {
 
 **所有以上都可以嵌套组合**
 
-```plain
-'User is of type ' + (${user.isAdmin()} ? 'Administrator' : (${user.type} ?: 'Unknown'))
+```html
+<div th:text='User is of type ' + (${user.isAdmin()} ? 'Administrator' : (${user.type} ?: 'Unknown'))/>
 ```
 
 ### 3. 属性设置
@@ -545,59 +544,91 @@ iterStat 称作状态变量，属性有：
 
 
 
-# 补充
+# 加载css/js
 
-[Springboot使用Thymeleaf模板引擎无法加载css样式等静态资源_引入springsecurity后 thymeleaf 无法访问css-CSDN博客](https://blog.csdn.net/qq_42391904/article/details/98474098/?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0--blog-114848399.235^v39^pc_relevant_anti_vip_base&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
+**文件目录**
 
+```
+-resources
+    --mapper
+    --static
+        ---css
+        ---fonts
+        ---img
+        ---js
+    --templates
+    	---index.html
+```
 
-
-#### 第二种方法：
-
-我一般 都是
+**Thymeleaf加载css/js方法**
 
 ```javascript
- <head th:fragment="header">
-  <meta charset="UTF-8" />
-  <title th:text="#{head.title}"></title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="shortcut icon" th:href="@{/static/img/favicon.gif}" type="image/gif" />
-  
-  <link rel="stylesheet" th:href="@{/resources/css/bootstrap.min.css}" />
-  <link rel="stylesheet" th:href="@{/resources/css/jquery.ui.all.css}" />
-<link rel="stylesheet" th:href="@{/resources/css/jquery.ui.customer.css}" />
-  <script th:src="@{/resources/js/jquery-1.9.1.min.js}"></script>
-  <script th:src="@{/resource/js/bootstrap.min.js}"></script>
-</head>
-123456789101112
+<link th:href="@{/css/amazeui.min.css}" rel="stylesheet">
+<link th:href="@{/css/admin.css }" rel="stylesheet">
+<link th:href="@{/css/app.css}" rel="stylesheet">
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/amazeui.min.js}"></script>
+<script th:src="@{/js/app.js}"></script>
 ```
 
+# 传参:crossed_swords:
 
+##  ① 页面间参数传递
 
-<a th:href="@{'/invoice-list?userId=' + user.id}" class="active">Link to Invoice List</a>
+C得到数据后，跳转到V，并向V传递数据。进而V中可以渲染数据，让用户看到含有数据的页面
 
-<a th:href="@{/invoice-list?userId=} + ${user.id}">Link to Invoice List</a>
+转发跳转：Request作用域
 
+重定向跳转：Session作用域
 
+### request作用域
 
+#### 1、@ModelAttribute 接受参数 (常用)
 
+```html
+<html>
+<body>
+<h2>Hello World!</h2>
+<h2>${uname}</h2>
+<h2>${msg}</h2>
+</body>
+</html>
+```
 
-# todo
-
-跳转   url地址栏不会产生变化
+Controller层
 
 ```java
-//model中的数据，会在V渲染之前，将数据复制一份给request
-@RequestMapping("/test")
-public String testData(Model model){
-    model.addAttribute("name", "张三");
-    return "index";       // 注意上述参数只能给index页面用
+@RequestMapping("/providerInfo1")
+public ModelAndView providerInfo1(@ModelAttribute("uname") String uname) {
+    return new ModelAndView("/hello");
 }
-
-//jsp中用EL表达式 取值即可   
-${requestScope.name}
 ```
 
+效果
+
+![请添加图片描述](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/ca312b94930d4e31b927a6968bdc3d03.png)
+
+#### 2、RedirectAttributes  给重定向页面传递参数 （常用）
+
 重定向  url地址栏会发生变化
+
+```html
+<form class="am-form" action="/dologin" method="post">
+    <fieldset>
+        <div class="am-form-group">
+            <input type="email" class="" id="doc-ipt-email-1" name="username" placeholder="请输入账号">
+        </div>
+        <div class="am-form-group">
+            <input type="password" class="" id="doc-ipt-pwd-1" name="password" placeholder="请输入密码">
+        </div>
+        <a href="#" class="loginBtn" onclick="submitForm()">
+            <div>登 录</div>
+        </a>
+    </fieldset>
+</form>
+```
+
+提交上述表单后
 
 ```java
 @PostMapping("/dologin")
@@ -615,10 +646,13 @@ public String login(HttpServletRequest request,  RedirectAttributes redirectAttr
 }
 ```
 
+重定向后
+
 ```java
+//http://localhost:9000/invoice-list?userId=1
 @RequestMapping("/invoice-list")
 public String invoiceList(Model model, @RequestParam("userId") Integer userId) {
-    user = userService.findById(userId);
+    User user = userService.findById(userId);
     if (user.get(0) != null) {
         model.addAttribute("user", user.get(0));
         return "invoice-list";
@@ -626,7 +660,723 @@ public String invoiceList(Model model, @RequestParam("userId") Integer userId) {
         return "login";
     }
 }
+
+//jsp中用EL表达式 取值即可   
+${user.xxx}
 ```
 
-<strong style="color:red">如果Thymeleaf模板引擎(页面)中使用了某个参数, 那么该页面的Controller必须有该参数传入, 不然会报错! </strong>
+#### 3、用Model 给跳转页面传递参数（常用）
 
+跳转   url地址栏不会产生变化
+
+```java
+//model中的数据，会在V渲染之前，将数据复制一份给request
+@RequestMapping("/test")
+public String testData(Model model){
+    model.addAttribute("name", "张三");
+    return "index";       // 注意上述参数只能给index页面用
+}
+
+//jsp中用EL表达式 取值即可   
+${name}
+```
+
+**例子**
+
+```html
+<html>
+<body>
+<h2>Hello World!</h2>
+<h2>${uname}</h2>
+<h2>${msg}</h2>
+</body>
+</html>
+```
+
+Controller层（返回类型是String）
+
+```java
+@RequestMapping("/providerInfo3")
+public String providerInfo3(Model model) {
+    String msg = "我是providerInfo3";
+    model.addAttribute("msg", msg);
+    return "/hello";
+}
+```
+
+效果
+
+![请添加图片描述](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/76b209ccf84e49309664204087f0fd57.png)
+
+```java
+//model中的数据，会在V渲染之前，将数据复制一份给request
+@RequestMapping("/test")
+public String testData(Model model){
+    model.addAttribute("name", "张三");
+    return "index";
+}
+
+//jsp中用EL表达式 取值即可
+${requestScope.name}
+```
+
+#### 4、用map传参（常用）
+
+> 使用map.put();
+
+Controller层（返回类型是String）
+
+```java
+@RequestMapping("/providerInfo4")
+public String providerInfo4(Map<String, Object> map) {
+    String msg = "我是providerInfo4";
+    map.put("msg", msg);
+    return "/hello";
+}
+```
+
+效果
+
+![请添加图片描述](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/bb78f83520de48a287369fe48c1c1202.png)
+
+#### 5、使用HttpServletRequest  传递参数/接收参数
+
+==Servlet的api不怎么常用==
+
++ setAttribute()     传递
+
++ getParameter()  接收
+
+**例子**
+
+需要先引入servlet-api.jar
+
+pom.xml
+
+```xml
+<!-- javax-Servlet -->
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>servlet-api</artifactId>
+    <version>2.5</version>
+</dependency>
+```
+
+Controller层
+
+```java
+@RequestMapping("/providerInfo5")
+public ModelAndView providerInfo5(HttpServletRequest request) {
+    String msg = "我是providerInfo5";
+    request.setAttribute("msg", msg);
+    return new ModelAndView("/hello");
+}
+```
+
+效果
+
+![请添加图片描述](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/c3f96bc2ef5a4dae931398523a1aac7d.png)
+
+### session作用域
+
+#### 1、@SessionAttributes
+
+只能定义在类上,作用是将指定的Model中的键值对添加至session中
+
+Controller层
+
+```java
+@Controller
+@SessionAttributes(value = {"uname"})
+@RequestMapping("provider") //模块路径：更清晰也防止映射路径访问同名混乱出现问题
+public class ProviderController {
+    
+    @RequestMapping("/providerInfo")
+    public ModelAndView providerInfo(String uname) {
+        ModelAndView mav = new ModelAndView("/hello");
+        mav.addObject("uname",uname);
+        return mav;
+    }
+}
+```
+
+效果
+
+![请添加图片描述](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/5449fa75000045838ea24aec783afc89.png)
+
+先访问providerInfo加入参数添加session，再访问其它方法（providerInfo1）能够接收到
+
+> @SessionAttributes(types=User.class)会将model中所有类型为 User的属性添加到会话中。
+> @SessionAttributes(value={“user1”, “user2”}) 会将model中属性名为user1和user2的属性添加到会话中。
+> @SessionAttributes(types={User.class, Dept.class}) 会将model中所有类型为 User和Dept的属性添加到会话中。
+> @SessionAttributes(value={“user1”,“user2”},types={Dept.class})会将model中属性名为user1和user2以及类型为Dept的属性添加到会话中。
+
+#### 2、以Servlet方式存储
+
+```xml
+<!-- javax-Servlet -->
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>servlet-api</artifactId>
+    <version>2.5</version>
+</dependency>
+```
+
+##### 1.使用HttpServletRequest
+
+Controller层
+
+```java
+@RequestMapping("/providerInfo11")
+public ModelAndView providerInfo11(HttpServletRequest request) {
+    String msg = "我是Session11";
+    request.getSession().setAttribute("msg", msg);
+    return new ModelAndView("/hello");
+}
+```
+
+##### 2.使用HttpSession
+
+Controller层
+
+```java
+@RequestMapping("/providerInfo22")
+public ModelAndView providerInfo22(HttpSession session) {
+    String msg = "我是Session22";
+    session.setAttribute("msg", msg);
+    return new ModelAndView("/hello");
+}
+```
+
+可以先进入然后再分别返回providerInfo1方法中试一下
+
+效果
+
+![请添加图片描述](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/1d75239a7fb249a8bb3bf728be96f2de.png)
+
+运行的是providerInfo1方法但仍然保存着providerInfo22的session值
+
+## ② @ResponseBody
+
+`@ResponseBody`注解用于指示方法返回的对象会被自动转换为JSON格式的数据。
+
+### 传对象参数
+
+使用@ResponseBody注解
+
+Controller层
+
+```java
+@RequestMapping("findProviderJson")
+@ResponseBody
+public Provider findProviderJson() {
+    Provider provider = new Provider();
+    provider.setProName("呆古米");
+    provider.setProCode("222");
+    provider.setCreationDate(new Date());
+
+    return provider;
+}
+```
+
+效果
+
+![请添加图片描述](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/2b9cb7aee730473aa17919b79a411268.png)
+
+想为null时不返回可以用上面说过的（放在实体类所需属性或类上）：
+
+```java
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+```
+
+效果
+
+![请添加图片描述](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/3cc5a22f105a4a9fa66dd0eede431d78.png)
+
+### 传集合参数
+
+Controller层
+
+```java
+@RequestMapping("findProviderListJson")
+@ResponseBody
+public List<Provider> findProviderListJson() {
+    List<Provider> providers = new ArrayList<>();
+
+    Provider provider1 = new Provider();
+    provider1.setProName("呆古米");
+    provider1.setProCode("222");
+    provider1.setCreationDate(new Date());
+
+    Provider provider2 = new Provider();
+    provider2.setProName("海胆kuma");
+    provider2.setProCode("333");
+    provider2.setCreationDate(new Date());
+
+    providers.add(provider1);
+    providers.add(provider2);
+
+    return providers;
+}
+```
+
+效果
+![请添加图片描述](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/6d0d67576c504ea681b67e2353fb7c8a.png)
+
+### 传日期参数
+
+【**第一种办法**】在该属性上添加@JsonFormat(pattern = “yyyy-MM-dd”)注解，代码如下：
+
+```java
+package com.mango.json.bean;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
+
+public class User {
+
+    private Integer id;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd")  // 重要
+    private Date birthday;
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+    
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+}
+```
+
+【**第二种办法**】json肯定离不开ObjectMapper，因为json格式和java中的对象之间进行转换就是通过ObjectMapper类, 重写方法
+
+WebMvcConfig.java
+
+```java
+package com.mango.json.config;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+
+import java.text.SimpleDateFormat;
+
+@Configuration
+public class WebMvcConfig {
+
+    @Bean
+    MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(){
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
+        converter.setObjectMapper(objectMapper);
+        return converter;
+    }
+}
+```
+
+## 总结
+
+<strong style="color:red">如果Thymeleaf模板引擎(页面)中使用了某个参数, 那么该页面的Controller必须有该参数传入, 不然会报错! </strong>
+
+跳转   url地址栏不会产生变化
+
+```java
+//model中的数据，会在V渲染之前，将数据复制一份给request
+@RequestMapping("/test")
+public String testData(Model model){
+    model.addAttribute("name", "张三");
+    return "index";       // 注意上述参数只能给index页面用
+}
+
+//jsp中用EL表达式 取值即可   
+${name}
+```
+
+重定向  url地址栏会发生变化
+
+```html
+<form class="am-form" action="/dologin" method="post">
+    <fieldset>
+        <div class="am-form-group">
+            <input type="email" class="" id="doc-ipt-email-1" name="username" placeholder="请输入账号">
+        </div>
+        <div class="am-form-group">
+            <input type="password" class="" id="doc-ipt-pwd-1" name="password" placeholder="请输入密码">
+        </div>
+        <a href="#" class="loginBtn" onclick="submitForm()">
+            <div>登 录</div>
+        </a>
+    </fieldset>
+</form>
+```
+
+提交上述表单后
+
+```java
+@PostMapping("/dologin")
+public String login(HttpServletRequest request,  RedirectAttributes redirectAttributes){
+    String name = request.getParameter("username");
+    String password = request.getParameter("password");
+    User user = userService.findByNameAndPassword(name, password);
+    if(user != null){
+        redirectAttributes.addAttribute("userId", user.getId());
+        return "redirect:invoice-list";
+        // http://localhost:9000/invoice-list?userId=1
+    }else{
+        return "login";
+    }
+}
+```
+
+重定向后
+
+```java
+//http://localhost:9000/invoice-list?userId=1
+@RequestMapping("/invoice-list")
+public String invoiceList(Model model, @RequestParam("userId") Integer userId) {
+    User user = userService.findById(userId);
+    if (user.get(0) != null) {
+        model.addAttribute("user", user.get(0));
+        return "invoice-list";
+    } else {
+        return "login";
+    }
+}
+
+//jsp中用EL表达式 取值即可   
+${user.xxx}
+```
+
+# 表单
+
+## 所需标签
+
+**th:field**，用法：th:field="*{name}"，(用于表单提交)
+
+**th:value**，用法：th:value="${brand.name}"，(用于显示值)
+
+**th:object, ** 表示替换对象， 在一个标签里使用th:object="xxx"时，可以在其子标签里使用*{…}来获取xxx里面的属性。
+
+## 例子
+
+**loginPage.html**
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<form method="post" th:action="@{/login}" th:object="${user}" class="loginForm">
+  <table>
+    <tr>
+      <td>用户名:</td>
+      <td><input type="text" th:field="*{userName}" /></td>
+    </tr>
+    <tr>
+      <td>密码:</td>
+      <td><input type="password" th:field="*{userPassword}" /></td>
+    </tr>
+    <tr>
+      <td>生日1:</td>
+      <td><input type="datetime-local" th:field="*{birthDate1}" id="student-birth-date" /></td>
+    </tr>
+    <tr>
+    <td>生日2:</td>
+    <td><input type="date" th:field="*{birthDate2}" id="student-birth-date" /></td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center"><input type="submit" class="loginButton" value="登录" /></td>
+    </tr>
+  </table>
+</form>
+
+
+</body>
+</html>
+```
+
+![image-20231227210746793](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/image-20231227210746793.png)
+
+**实体数据**
+
+```java
+package com.example.formtest.dao;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-12-27 17:40
+ */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class User {
+	private long userId;
+	private String userName;
+	private String userPassword;
+	Integer sex;
+
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private LocalDateTime birthDate1;  // 保持为 LocalDateTime 类型  对应type=datetime-local
+
+	private LocalDate birthDate2;  // 修改为 LocalDate 类型 对应date
+
+}
+```
+
+**Controller**
+
+```java
+package com.example.formtest.controller;
+import com.example.formtest.dao.User;
+import org.springframework.stereotype.Controller;
+
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-12-27 17:41
+ */
+@Controller
+public class FieldController {
+
+	// 默认页面
+	@RequestMapping("/toLogin")
+	public String toLogin(Model model){
+		model.addAttribute("user",new User());
+		return "loginPage";
+	}
+
+	// 登录页面
+	@ResponseBody
+	@RequestMapping("/login")
+//	public String login(@RequestBody User user){  // 报错
+	public User login(@ModelAttribute User user){
+		System.out.println("==========用户名: "+user.getUserName());
+		System.out.println("==========密码:   "+user.getUserPassword());
+		System.out.println("生日1是几号: " + user.getBirthDate1().format(DateTimeFormatter.ofPattern("dd")));
+		System.out.println("==========生日2:   "+user.getBirthDate2());
+		return user;
+	}
+}
+```
+
+输出结果
+
+```
+==========用户名: 1665834268
+==========密码:   741106
+生日1是几号: 27
+==========生日2:   2023-12-30
+```
+
+浏览器运行结果
+
+![image-20231227210451987](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/image-20231227210451987.png)
+
+
+
+# 使用日期数据的方法
+
+ EL1004E: Method call: Method format(java.time.LocalDateTime) cannot be found
+
+```html
+<!--会报错-->
+<p th:text="${#dates.format(standardDate, 'dd-MM-yyyy HH:mm')}"></p>  
+```
+
+## 使用
+
+使用新的 *java.time* 包 坚持使用 #*temporals* 实用程序
+
+```xml
+<dependency>
+    <groupId>org.thymeleaf.extras</groupId>
+    <artifactId>thymeleaf-extras-java8time</artifactId>
+</dependency>
+```
+
+```html
+<h1>Format ISO</h1>
+<p th:text="${#temporals.formatISO(localDateTime)}"></p>
+<p th:text="${#temporals.formatISO(localDate)}"></p>
+<p th:text="${#temporals.formatISO(timestamp)}"></p>
+
+<h1>Format manually</h1>
+<p th:text="${#temporals.format(localDateTime, 'dd-MM-yyyy HH:mm')}"></p>
+<p th:text="${#temporals.format(localDate, 'MM-yyyy')}"></p>
+```
+
+其他
+
+```html
+${#temporals.day(date)}
+${#temporals.month(date)}
+${#temporals.monthName(date)}
+${#temporals.monthNameShort(date)}
+${#temporals.year(date)}
+${#temporals.dayOfWeek(date)}
+${#temporals.dayOfWeekName(date)}
+${#temporals.dayOfWeekNameShort(date)}
+${#temporals.hour(date)}
+${#temporals.minute(date)}
+${#temporals.second(date)}
+${#temporals.millisecond(date)}
+```
+
+## 例子
+
+**entity**
+
+```java
+package com.example.demo.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * 
+ * @TableName timetest
+ */
+@TableName(value ="timetest")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Timetest implements Serializable {
+    /**
+     * 
+     */
+    @TableField(value = "Date")
+    private LocalDate date;
+
+    /**
+     * 
+     */
+    @TableField(value = "Time")
+    private LocalTime time;
+
+    /**
+     * 
+     */
+    @TableField(value = "DateTime")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")  //原始数据为2020-01-12T15:17:21 格式化为2020-01-12 15:17:21
+    private LocalDateTime datetime;
+
+    @TableField(exist = false)
+    private static final long serialVersionUID = 1L;
+}
+```
+
+**Controller**
+
+```java
+	/*
+	*
+	   [
+			{
+				"date": null,
+				"time": null,
+				"datetime": "2023-12-27T10:38:51"
+			}
+		]
+	*
+	* */
+@Controller
+public class TimeTestController {
+
+	@GetMapping("/dateTime")
+	String getDateTime(Model model){
+		List<Timetest> datetime = timetestService.getDatetime();
+		model.addAttribute("dateTime", datetime);
+		return "TimeTest";
+	}
+}    
+```
+
+**TimeTest.html**
+
+```html
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+</head>
+<body>
+    <hr />
+    <h1>手动格式</h1>
+    <tr th:each="dateTimeItem : ${dateTime}">
+        <p>
+            显示格式化时间:
+            <span th:text="${#temporals.format(dateTimeItem.datetime, 'dd-MM-yyyy HH:mm')}"></span>
+        </p>
+        <p>
+            显示年:
+            <span th:text="${#temporals.year(dateTimeItem.datetime)}"></span>
+        </p>
+        <p>
+            显示月:
+            <span th:text="${#temporals.month(dateTimeItem.datetime)}"></span>
+        </p>
+        <p>
+            显示日: <span th:text="${#temporals.day(dateTimeItem.datetime)}"></span>
+        </p>
+        <p>
+            显示工作日的名称:
+            <span th:text="${#temporals.dayOfWeekName(dateTimeItem.datetime)}"></span>
+        </p>
+        <p>
+            显示当天的当前秒数:
+            <span th:text="${#temporals.second(dateTimeItem.datetime)}"></span>
+        </p>
+    </tr>
+    <hr />
+</body>
+</html>
+```
+
+<img src="Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/image-20231227170815058.png" alt="image-20231227170815058"  />

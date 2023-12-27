@@ -416,6 +416,52 @@ public class SpringBackEndApplication {
  }
 ```
 
+### 时间数据
+
+<strong  style="color:red">手动添加 @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")</strong>
+
+```java
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import lombok.Data;
+
+/**
+ * 
+ * @TableName timetest
+ */
+@TableName(value ="timetest")
+@Data
+public class Timetest implements Serializable {
+    /**
+     * 
+     */
+    @TableField(value = "Date")
+    private LocalDate date;
+
+    /**
+     * 
+     */
+    @TableField(value = "Time")
+    private LocalTime time;
+
+    /**
+     * 
+     */
+    @TableField(value = "DateTime")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")  //原始数据为2023-12-27T10:38:51 格式化为2023-12-27 10:38:51
+	private LocalDateTime datetime;
+
+    @TableField(exist = false)
+    private static final long serialVersionUID = 1L;
+}
+```
+
 ### CRUD接口方式
 
 [MyBatis-Plus（九）Service的CRUD接口1：基本查询_listbyids_Zack_tzh的博客-CSDN博客](https://blog.csdn.net/Zack_tzh/article/details/107528997)

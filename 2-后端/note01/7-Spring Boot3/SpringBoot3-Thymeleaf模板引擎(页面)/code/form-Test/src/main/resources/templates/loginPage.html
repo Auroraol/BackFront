@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<!--<form th:object="${user}">-->
+<!--  <input type="text" th:field="*{name}" id="name1" />-->
+<!--  <input type="text" th:field="*{name}" />-->
+<!--  <input type="text" th:field="*{name}" />-->
+<!--  <textarea th:field="*{name}"></textarea>-->
+<!--  <textarea th:field="*{name}"></textarea>-->
+<!--  <select th:field="*{sex}">-->
+<!--    <option th:each=&-->
+<!--    <form method="post" th:action="@{/login}" th:object="${user}" class="loginForm">-->
+<!--      <table>-->
+<!--        <tr>-->
+<!--          <td>用户名:</td>-->
+<!--          <td><input type="text" name="userName" th:value="${userName}"/></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td>密码:</td>-->
+<!--          <td><input type="password" name="userPassword" th:value="${userPassword}"/></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--          <td colspan="2" align="center"><input type="submit" class="loginButton" value="登 录"></td>-->
+<!--        </tr>-->
+<!--      </table>-->
+<!--    </form>-->
+
+<!--/login-->
+<form method="post" th:action="@{/login}" th:object="${user}" class="loginForm">
+  <table>
+    <tr>
+      <td>用户名:</td>
+      <td><input type="text" th:field="*{userName}" /></td>
+    </tr>
+    <tr>
+      <td>密码:</td>
+      <td><input type="password" th:field="*{userPassword}" /></td>
+    </tr>
+    <tr>
+      <td>生日1:</td>
+      <td><input type="datetime-local" th:field="*{birthDate1}" id="student-birth-date" /></td>
+    </tr>
+    <tr>
+    <td>生日2:</td>
+    <td><input type="date" th:field="*{birthDate2}" id="student-birth-date" /></td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center"><input type="submit" class="loginButton" value="登录" /></td>
+    </tr>
+  </table>
+</form>
+
+
+</body>
+</html>

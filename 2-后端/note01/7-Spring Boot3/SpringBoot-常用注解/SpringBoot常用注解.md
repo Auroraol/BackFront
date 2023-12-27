@@ -418,6 +418,8 @@ public ResponseEntity deleteUser(@PathVariable(value = "userId") Long userId){
 
 ## 4、传值
 
+<strong style="color:red">注意: 前后端发分离项目使用</strong>
+
 ### 前端传值
 
 | 注解          | 说明                                                         |
@@ -561,6 +563,8 @@ public Result<?> getUserListPage(@RequestParam(value = "username", required = fa
 
 <font color=red>@RequestBody主要用来接收前端传递给后端的json字符串中的数据的(请求体中的数据的)，所以只能发送POST请求。[@RequestBody只能和@PostMapping使用]</font>
 
+使用默认submit提交 的HTML表单数据，默认使用application/x-www-form-urlencoded或multipart/form-data作为Content-Type。是不能使用这个的RequestBody, 发起axios的数据记得转成json格式
+
 ```java
 	@PostMapping("/user/login")
     @ResponseBody //返回响应数据
@@ -580,7 +584,7 @@ export function login(data) {
   return request({
     url: '/user/login',
     method: 'post',
-    data
+    data  //必须是json数据
   })
 }
 ```
@@ -638,7 +642,399 @@ public Map<String, Object> login(XUser user) {
 | 重定向        | url地址栏会发生变化                                          |
 | @ResponseBody | 一般在@Controller中使用: @ResponseBody+@Controller = @RestController,   后端发送java对象 ==记忆: 返回对象,用于指示方法返回的对象会被自动转换为JSON格式的数据== |
 
-一般情况下是直接使用RestController, 可以就不用写ResponseBody了
+一般情况下是该类全是返回给前端数据的就直接使用RestController,  可以就不用写ResponseBody了, 但是写了RestController该类总就不能返回视图页面了, 比如: 
+
+```java
+@RestController
+public class FieldController {
+
+	@RequestMapping("/toLogin")
+	public String toLogin(Model model){
+		model.addAttribute("user",new User());
+		return "loginPage";  // 不会跳转到loginPage  
+	}
+}
+```
+
+运行结果
+
+![image-20231227205724351](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20231227205724351.png)
+
+### 总结
+
+> SpringMVC和SpringBoot接收参数的方式是一样一样的。
+
+#### 一、传非json参数
+
+***下面代码是get、post请求都支持，但是把参数放到路径上，一半这种情况下都用get请求。***
+
+**涉及到的注解：**
+
+- @[RequestParam](https://so.csdn.net/so/search?q=RequestParam&spm=1001.2101.3001.7020)主要用于在SpringMVC后台控制层获取参数，它有三个常用参数：defaultValue = “0”, required = false, value = “xxx”；defaultValue 表示设置默认值，required 表示该参数是否必传，value 值表示接受的传入的参数的key。
+- @[PathVariable](https://so.csdn.net/so/search?q=PathVariable&spm=1001.2101.3001.7020)用于将请求URL中的模板变量映射到功能处理方法的参数上，即取出uri模板中的变量作为参数。
+
+```java
+	/**
+	 * PathVariable(value = "参数名", required = 默认值)  注:没有defaultValue
+	 * http://localhost:8080/test2/1234/john/true/2023-01-01 12:00:00
+	 * param: id name gender birth
+	 * get post都可以, body传参一般都用get
+	 **/
+	@RequestMapping("/test2/{id}/{name}/{gender}/{birth}")    //PathVariable顾名思义需要固定url路径
+	public String testParam2(@PathVariable("id") Integer id,
+							 @PathVariable(value = "name") String name,
+							 @PathVariable(value = "gender", required = false) Boolean gender,
+							 @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+							 @PathVariable(value = "birth",  required = false) Date birth){
+		//为空时指定默认值
+		if (birth == null) {
+			birth = new Date("2023-12-12 12:20:30");
+		}
+		System.out.println("test param2");
+		System.out.println(id + "--" + name+ "--" + gender+ "--" + birth);
+		return "index";
+	}
+```
+
+![image-20231017232927928](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20231017232927928.png)
+
+![image-20231017232910914](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20231017232910914.png)
+
+----
+
+```java
+	/**
+	* http://localhost:8989/xxx/../test1?id=1&name=zzz&gender=false&birth=2018-12-12 12:20:30
+	 * param: id name gender birth
+	 * get post都可以, body传参一般都用get
+	 **/
+	@RequestMapping("/test1")
+	public String testParam1(@RequestParam("id") Integer id,
+							 @RequestParam(value = "name", required = false, defaultValue = "李刚") String name,
+							 @RequestParam(value = "gender", required = false) Boolean gender,
+							 @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+								 @RequestParam(value = "birth", defaultValue = "2023-12-12 12:20:30") Date birth){
+		System.out.println("test param1");
+		System.out.println(id + "--" + name+ "--" + gender+ "--" + birth);
+		return "index";
+	}
+```
+
+![ee7e4784bc05ac129d2fe726f031029](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/ee7e4784bc05ac129d2fe726f031029.png)
+
+<img src="SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20231017225634040.png" alt="image-20231017225634040" style="zoom:80%;" />
+
+![85f31c8b622a32867c261d32b654b5f](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/85f31c8b622a32867c261d32b654b5f.png)
+
+![image-20231017225653260](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20231017225653260.png)
+
+#### 二、传json参数
+
+***1、单个实体接收参数***
+
+```javascript
+    /**
+     * http://localhost/toUser/add6
+     * body: {"username":"张刚","password":"123456"}
+     * get post都可以
+     *
+     * @param user
+     * @return
+     */
+    @RequestMapping(value = "/add6")
+    public void add6(@RequestBody User user) {
+        log.info("打印参数:{}--{}", user.getUserName(), user.getPassword());
+    }
+```
+
+***2、实体嵌套实体接收参数***
+
+注解：
+
++ @RequestBody：该注解会把接收到的参数转为json格式
+
+实体
+
+```java
+@Data
+public class People {
+    private Integer count;
+    private String peoplename;
+    private Student student;
+}
+```
+
+```java
+@Data
+public class Student {
+    private String studentname;
+}
+```
+
+```javascript
+	/**
+	 * http://localhost:8080/test3
+	 * body: {"peoplename":"张刚","student":{"studentname":"你好"}}
+	 * get post都可以, body传参一般都用post
+	 * @param
+	 */
+	@RequestMapping("/test3")
+	@ResponseBody
+	public People testParam3(@RequestBody People people) {
+		System.out.println("打印参数:" + people.getPeoplename() + people.getStudent().getStudentname());
+		return people;
+	}
+```
+
+![image-20231017231530119](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20231017231530119.png)
+
+```
+打印参数:张刚你好
+```
+
+***3、实体嵌套List接收参数***
+
+实体
+
+```java
+@Data
+@ToString
+public class People {
+    private Integer count;
+    private String peoplename;
+    private List<Student> student;
+}
+```
+
+```java
+@Data
+@ToString
+public class Student {
+    private String studentname;
+}
+```
+
+```javascript
+    /**
+     * http://localhost:8080/add8
+     * body: {"peoplename":"张刚","student":[{"studentname":"你好"},{"studentname":"很好"}]}
+     * get post都可以, body传参一般都用post
+     * @param
+     */
+    @RequestMapping(value = "/add8")
+    public void add8(@RequestBody People people) {
+        List<Student> student = people.getStudent();
+        student.stream().forEach(System.out::println);
+        log.info("打印参数:{}--{}", people.getPeoplename());
+    }
+```
+
+***4、Map接收参数***
+
+```javascript
+  /**
+     * http://localhost:80/add9
+     * body: {"peoplename":"张刚","student":[{"studentname":"你好"},{"studentname":"很好"}]}
+     * get post都可以, body传参一般都用post
+     *
+     * @param
+     */
+    @RequestMapping(value = "/add9")
+    public void add7(@RequestBody Map<String, Object> map) {
+        log.info(map.get("peoplename").toString());
+        List<Map<String, Object>> studentMapList = (List<Map<String, Object>>) map.get("student");
+        studentMapList.stream().forEach(System.out::println);
+    }
+```
+
+#### 三、 综合代码[总结]:crossed_swords:
+
+##### json数据
+
+前端
+
+```js
+document.querySelector('#addBtn').addEventListener('click', function () {
+  const bookname = document.querySelector('#addForm [name=bookname]').value
+  const author = document.querySelector('#addForm [name=author]').value
+  const publisher = document.querySelector('#addForm [name=publisher]').value
+
+  const data = {
+    bookname: bookname,
+    author: author,
+    publisher: publisher,
+    appkey: 'laotang110022'
+  };
+
+  axios({
+    method: 'POST',
+    url: 'http://www.itcbc.com:3006/api/addbook',
+    data: JSON.stringify(data),  // json数据
+    headers: {
+      'Content-Type': 'application/json' // Set Content-Type header to application/json
+    }
+  }).then(({ data: res }) => {
+    myModal.hide();
+    document.querySelector('#addForm').reset();
+    renderBooks();
+  });
+});
+
+```
+
+后端
+
+```java
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class BookController {
+
+    @PostMapping("/api/addbook")
+    public void addBook(@RequestBody BookRequest bookRequest) {
+        // Handle the book data received from the frontend
+        // Perform necessary operations, e.g., saving the book to a database
+    }
+}
+
+```
+
+##### 非json
+
+前端
+
+```js
+document.querySelector('#addBtn').addEventListener('click', function () {
+  const bookname = document.querySelector('#addForm [name=bookname]').value
+  const author = document.querySelector('#addForm [name=author]').value
+  const publisher = document.querySelector('#addForm [name=publisher]').value
+
+  const data = {
+    bookname: bookname,
+    author: author,
+    publisher: publisher,
+    appkey: 'laotang110022'
+  };
+
+  axios({
+    method: 'POST',
+    url: 'http://www.itcbc.com:3006/api/addbook',
+    data: data, // 非json数据
+    headers: {
+      'Content-Type': 'application/json' // Set Content-Type header to application/json
+    }
+  }).then(({ data: res }) => {
+    myModal.hide();
+    document.querySelector('#addForm').reset();
+    renderBooks();
+  });
+});
+```
+
+后端
+
+```java
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class BookController {
+
+    @PostMapping("/api/addbook")
+    public void addBook(
+            @RequestParam String bookname,
+            @RequestParam String author,
+            @RequestParam String publisher,
+            @RequestParam String appkey
+    ) {
+        // Handle the form data received from the frontend
+        // Perform necessary operations, e.g., saving the book to a database
+    }
+}
+```
+
+##### 总结:crown:
+
+代码见  [请求参数.zip](请求参数.zip) 使用的是springMVC框架
+
+```java
+package cn.lfj.controller;
+
+import cn.lfj.entity.People;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+
+/**
+ * @Author: LFJ
+ * @Date: 2023-10-17 17:20
+ */
+
+@Controller
+public class FrontParameter {
+
+	/**
+	 * RequestParam(value = "参数名", required = false(表示该值非必须), defaultValue = "默认值")
+	* http://localhost:8989/test1?id=1&name=zzz&gender=false&birth=2018-12-12 12:20:30
+	 * param: id name gender birth
+	 * get post都可以, body传参一般都用get
+	 **/
+	@RequestMapping("/test1")
+	public String testParam1(@RequestParam("id") Integer id,
+							 @RequestParam(value = "name", required = false, defaultValue = "李刚") String name,
+							 @RequestParam(value = "gender", required = false) Boolean gender,
+							 @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+								 @RequestParam(value = "birth", defaultValue = "2023-12-12 12:20:30") Date birth){
+		System.out.println("test param1");
+		System.out.println(id + "--" + name+ "--" + gender+ "--" + birth);
+		return "index";
+	}
+
+
+	/**
+	 * PathVariable(value = "参数名", required = 默认值)  注:没有defaultValue
+	 * http://localhost:8080/test2/1234/john/true/2023-01-01 12:00:00
+	 * param: id name gender birth
+	 * get post都可以, body传参一般都用get
+	 **/
+	@RequestMapping("/test2/{id}/{name}/{gender}/{birth}")    //PathVariable顾名思义需要固定url路径
+	public String testParam2(@PathVariable("id") Integer id,
+							 @PathVariable(value = "name") String name,
+							 @PathVariable(value = "gender", required = false) Boolean gender,
+							 @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+							 @PathVariable(value = "birth",  required = false) Date birth){
+		//为空时指定默认值
+		if (birth == null) {
+			birth = new Date("2023-12-12 12:20:30");
+		}
+		System.out.println("test param2");
+		System.out.println(id + "--" + name+ "--" + gender+ "--" + birth);
+		return "index";
+	}
+
+
+	/**
+	 * http://localhost:8080/test3
+	 * body: {"peoplename":"张刚","student":{"studentname":"你好"}}
+	 * get post都可以, body传参一般都用post
+	 * @param
+	 */
+	@RequestMapping("/test3")
+	@ResponseBody
+	public People testParam3(@RequestBody People people) {
+		System.out.println("打印参数:" + people.getPeoplename() + people.getStudent().getStudentname());
+		return people;
+	}
+
+}
+```
+
+==**详情见 springmvc**==
 
 ## 5、读取配置信息
 

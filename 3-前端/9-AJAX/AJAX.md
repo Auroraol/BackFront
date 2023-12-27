@@ -387,7 +387,7 @@ app.all('/server', (request, response) => {
 
 
 
-## 服务器端响应 JSON 数据
+## 服务器端响应 JSON 数据:crossed_swords:
 
 修改`server.js`中`send`方法中的内容，需要注意的是该方法只能接收字符串和`buffer`，所以对其需要做转换
 
@@ -731,7 +731,7 @@ $.ajax({
     headers: {
         // 头信息
     },
-    dataType: '', //服务器响应数据类型，JSON/TEXT/HTML等
+    dataType: '', //服务器响应数据类型，JSON/TEXT/HTML等 设置后响应数据自动转换
     success: data => {
         // 请求成功后执行的方法 // 成功回调
     },
@@ -990,7 +990,8 @@ axios({
      method: '请求类型',
      url: '请求的URL地址',
      data: { POST数据  },    //POST 数据要通过data属性提供
-     params: { GET参数 }     //GET参数要通过params属性提供
+     params: { GET参数 },     //GET参数要通过params属性提供
+    dataType: 'json'         // 响应体类型设置后响应数据指定转换
 }).then(function(res){
     // 响应数据
     console.log(res.data)
@@ -1007,6 +1008,118 @@ axios({
  **前端参 {params: params} ,  后端@RequestParams("xxx") 接参**
 
  **前端 {data : param} 传参，后端@RequestBody 接参**
+
+## 案例
+
+### json数据
+
+前端
+
+```js
+document.querySelector('#addBtn').addEventListener('click', function () {
+  const bookname = document.querySelector('#addForm [name=bookname]').value
+  const author = document.querySelector('#addForm [name=author]').value
+  const publisher = document.querySelector('#addForm [name=publisher]').value
+
+  const data = {
+    bookname: bookname,
+    author: author,
+    publisher: publisher,
+    appkey: 'laotang110022'
+  };
+
+  axios({
+    method: 'POST',
+    url: 'http://www.itcbc.com:3006/api/addbook',
+    data: JSON.stringify(data),  // json数据
+    headers: {
+      'Content-Type': 'application/json' // Set Content-Type header to application/json
+    }
+  }).then(({ data: res }) => {
+    myModal.hide();
+    document.querySelector('#addForm').reset();
+    renderBooks();
+  });
+});
+
+```
+
+后端
+
+```java
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class BookController {
+
+    @PostMapping("/api/addbook")
+    public void addBook(@RequestBody BookRequest bookRequest) {
+        // Handle the book data received from the frontend
+        // Perform necessary operations, e.g., saving the book to a database
+    }
+}
+
+```
+
+### 非json
+
+前端
+
+```js
+document.querySelector('#addBtn').addEventListener('click', function () {
+  const bookname = document.querySelector('#addForm [name=bookname]').value
+  const author = document.querySelector('#addForm [name=author]').value
+  const publisher = document.querySelector('#addForm [name=publisher]').value
+
+  const data = {
+    bookname: bookname,
+    author: author,
+    publisher: publisher,
+    appkey: 'laotang110022'
+  };
+
+  axios({
+    method: 'POST',
+    url: 'http://www.itcbc.com:3006/api/addbook',
+    data: data, // 非json数据
+    headers: {
+      'Content-Type': 'application/json' // Set Content-Type header to application/json
+    }
+  }).then(({ data: res }) => {
+    myModal.hide();
+    document.querySelector('#addForm').reset();
+    renderBooks();
+  });
+});
+```
+
+后端
+
+```java
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class BookController {
+
+    @PostMapping("/api/addbook")
+    public void addBook(
+            @RequestParam String bookname,
+            @RequestParam String author,
+            @RequestParam String publisher,
+            @RequestParam String appkey
+    ) {
+        // Handle the form data received from the frontend
+        // Perform necessary operations, e.g., saving the book to a database
+    }
+}
+
+```
+
+
 
 ## 案例
 

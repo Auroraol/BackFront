@@ -344,8 +344,6 @@ $('#kksj option:contains("2023-2024-1")').prop('selected', true);
 $('#kksj option:eq(1)').prop('selected', true);
 ```
 
-
-
 ##  jQuery 样式操作
 
 ### 操作 css 方法
