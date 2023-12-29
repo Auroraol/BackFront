@@ -78,7 +78,7 @@
 | 选中文本大小写的切换        | ctrl+shift+u             |
 | 折叠/展开所有方法的具体实现 | ctrl+shift+ -/ +         |
 | 复制光标所在行到下一行      | ctrl+d                   |
-| 光标直接跳到下一行          | shift + enter            |
+| 光标直接跳到下一行          | **shift + enter**        |
 | 光标直接跳到上一行          | ctrl +alt+ enter         |
 | 只能向上/下移动一行代码     | ctrl+shift+↑/↓  (不推荐) |
 | 可以向上/下移动一行或者多行 | alt+shift+↑/↓            |

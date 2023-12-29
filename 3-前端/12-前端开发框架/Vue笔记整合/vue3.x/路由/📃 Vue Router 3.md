@@ -1,7 +1,15 @@
+## 引言
+
 - [vue-router 官网](https://router.vuejs.org/)
 - [vue-router 中文文档](https://router.vuejs.org/zh/)
 
++ 理解： 一个路由（route）就是一组映射关系（key - value），多个路由需要路由器（router）进行管理。
+
++ 前端路由：key是路径，value是组件。
+
 vue-router 主要用于创建单页应用，再结合 vue.js 的时候显得得心应手。
+
+所谓单页面应用，只有一个页面，所以不需要跳转！除非是要做同构应用。vue所谓的路由，可以理解为一个标识，告诉vue当url是什么的时候去渲染什么路由页面。如果真的想跳转页面，直接用a标签。
 
 ## 一、安装与使用
 
