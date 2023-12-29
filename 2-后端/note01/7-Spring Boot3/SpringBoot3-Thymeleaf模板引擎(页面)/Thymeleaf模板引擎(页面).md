@@ -563,12 +563,16 @@ iterStat 称作状态变量，属性有：
 **Thymeleaf加载css/js方法**
 
 ```javascript
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    
 <link th:href="@{/css/amazeui.min.css}" rel="stylesheet">
 <link th:href="@{/css/admin.css }" rel="stylesheet">
 <link th:href="@{/css/app.css}" rel="stylesheet">
 <script th:src="@{/js/jquery.min.js}"></script>
 <script th:src="@{/js/amazeui.min.js}"></script>
 <script th:src="@{/js/app.js}"></script>
+<script th:inline="javascript">/</script>
 ```
 
 # 传参:crossed_swords:
@@ -1380,3 +1384,230 @@ public class TimeTestController {
 ```
 
 <img src="Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/image-20231227170815058.png" alt="image-20231227170815058"  />
+
+#  axios的方式发起ajax
+
+## 例子1
+
+前端
+
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script th:src="@{/js/axios.js}"></script>
+</head>
+<body>
+<form action="user/add" method="get">
+  用户名： <input type="text" id="name" name="name" onblur="checkName()" value=""><span id="one"></span><br>
+  密码： <input type="password" name="password"><br>
+  生日： <input type="date" name="birthday"><br>
+  <input type="submit" id="add" value="添加" >
+</form>
+
+<script th:inline="javascript">
+  function checkName() {
+    let obj = document.getElementById("name")
+    // let param = new URLSearchParams();
+    let param = {};
+    let span = document.getElementById("one");
+    let addObj = document.getElementById("add")
+    // param.name = obj.value;
+    // console.log( param.name)
+    param.name = obj.value;
+    axios.post('/user/check', param
+    ).then(response => {
+      console.log(response)
+      //param.append("name", obj.value)
+      if (response.data == 'no') {
+        span.innerText = "用户名重复";
+        addObj.disabled=true;
+      } else {
+        span.innerText = "";
+        addObj.disabled=false;
+      }
+    })}
+</script>
+
+</body>
+</html>
+```
+
+后端
+
+```java
+package com.example.axiostest.controller;// UserController.java
+
+import com.example.axiostest.entity.User;
+import com.example.axiostest.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+	@Autowired
+	private UserService userService;
+
+	@GetMapping("/add")
+	public ResponseEntity<String> addUser(@RequestParam String name,
+										  @RequestParam String password,
+										  @RequestParam String birthday) {
+		// Assume UserService has a method to add a user
+		boolean success = userService.addUser(name, password, birthday);
+
+		if (success) {
+			return ResponseEntity.ok("User added successfully");
+		} else {
+			return ResponseEntity.status(500).body("Failed to add user");
+		}
+	}
+
+	/*  方式1
+	@PostMapping("/check")
+	public ResponseEntity<String> checkUserName(@RequestParam String name) {
+		boolean isDuplicate = userService.isUserNameDuplicate(name);
+
+		if (isDuplicate) {
+			return ResponseEntity.ok("no");
+		} else {
+			return ResponseEntity.ok("yes");
+		}
+	}
+	*/
+    
+    // 方式2
+	@PostMapping("/check")
+	public ResponseEntity<String> checkUserName(@RequestBody User user) {
+		boolean isDuplicate = userService.isUserNameDuplicate(user.getName());
+
+		if (isDuplicate) {
+			return ResponseEntity.ok("no");
+		} else {
+			return ResponseEntity.ok("yes");
+		}
+	}
+}
+```
+
+![image-20231228172651450](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/image-20231228172651450.png)
+
+<img src="Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/image-20231229152925031.png" alt="image-20231229152925031"  />
+
+
+
+## 例子2
+
+**前端**
+
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Thymeleaf Ajax Example</title>
+  <!-- 引入 Axios -->
+  <script th:src="@{/js/axios.js}"></script>
+</head>
+<body>
+
+<h2>Thymeleaf Ajax Example</h2>
+
+<form id="ajaxForm">
+  <label for="message">Message:</label>
+  <input type="text" id="message" name="message">
+  <button type="button" onclick="sendMessage()">Send Message</button>
+  <button type="button" onclick="sendMessage2()">Send Message</button>
+
+</form>
+
+<div id="response"></div>
+<script th:inline="javascript">
+  function sendMessage() {
+    var message = document.getElementById('message').value;
+
+    // 使用 Axios 发送 Ajax 请求
+    axios.post('/send-message', { message: message }, {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+            .then(function (response) {
+              document.getElementById('response').innerText = 'Response: ' + response.data;
+            })
+            .catch(function (error) {
+              console.error('Error:', error);
+            });
+  }
+
+  function sendMessage2() {
+    let message = {}
+    let val = document.getElementById('message').value;
+    message.data = val;
+    message.code = 200;
+    // 使用 Axios 发送 Ajax 请求
+    axios.post('/send-message2', message,
+    //         {
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   }
+    // }
+    )
+            .then(function (response) {
+              document.getElementById('response').innerText = 'Response: ' + response.data;
+            })
+            .catch(function (error) {
+              console.error('Error:', error);
+            });
+  }
+</script>
+
+</body>
+</html>
+
+```
+
+**后端**
+
+```java
+package com.example.axiostest.controller;
+
+import com.example.axiostest.entity.Message;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+public class AjaxController {
+	
+	@RequestMapping("/index2")
+	public String send(){
+		return "index2";
+	}
+
+	@PostMapping("/send-message")
+	@ResponseBody
+	public String sendMessage(@RequestBody String message) {
+		// 处理接收到的消息，这里简单地返回一个响应
+		return "接收信息: " + message;
+	}
+
+	@PostMapping("/send-message2")
+	@ResponseBody
+	public String sendMessage2(@RequestBody Message message) {
+		// 处理接收到的消息，这里简单地返回一个响应
+		return "接收信息: " + message.getData();
+	}
+}
+
+```
+
+![image-20231229153133776](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/image-20231229153133776.png)
+
+![image-20231229153113542](Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E(%E9%A1%B5%E9%9D%A2).assets/image-20231229153113542.png)

@@ -248,8 +248,6 @@ public class UserController {
 
 现在都是前后端分离，说实话我已经很久没有用过@Controller。如果你的项目太老了的话，就当我没说。
 
-
-
 单独使用 @Controller 不加 @ResponseBody的话一般使用在要返回一个视图的情况，这种情况属于比较传统的 Spring MVC 的应用，对应于前后端不分离的情况。@Controller+@ResponseBody 返回 JSON 或 XML 形式数据
 
 ### 2.4  @Scope
@@ -418,7 +416,7 @@ public ResponseEntity deleteUser(@PathVariable(value = "userId") Long userId){
 
 ## 4、传值
 
-<strong style="color:red">注意: 前后端发分离项目使用</strong>
+<strong style="color:red">注意: 一些注解是前后端发分离项目使用</strong>
 
 ### 前端传值
 
@@ -563,7 +561,9 @@ public Result<?> getUserListPage(@RequestParam(value = "username", required = fa
 
 <font color=red>@RequestBody主要用来接收前端传递给后端的json字符串中的数据的(请求体中的数据的)，所以只能发送POST请求。[@RequestBody只能和@PostMapping使用]</font>
 
-使用默认submit提交 的HTML表单数据，默认使用application/x-www-form-urlencoded或multipart/form-data作为Content-Type。是不能使用这个的RequestBody, 发起axios的数据记得转成json格式
+使用默认submit提交 的HTML表单数据，默认使用application/x-www-form-urlencoded或multipart/form-data作为Content-Type。是不能使用这个的RequestBody 
+
+axios方式发起的ajax请求, 在post方式下, 提交的数据自动转成json, 不需要手动转换, 其他方式需要
 
 ```java
 	@PostMapping("/user/login")

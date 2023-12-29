@@ -601,7 +601,7 @@ Tomcat配置：URIEncoding=utf-8
     </mvc:annotation-driven>
 ```
 
-# 四、页面跳转
+# 四、页面跳转:crossed_swords:
 
 ------
 
@@ -715,7 +715,9 @@ return "redirect:/aaaa/bbbbbbbbb";
 -  在增删改之后，为了防止请求重复提交，重定向跳转 
 -  在查询之后，可以做转发跳转 
 
-# 五、返回响应
+# 五、返回响应:crossed_swords:
+
+[Spring MVC参数传递总结](https://blog.csdn.net/qq_43215592/article/details/121444557)
 
 **前端jsp**
 
@@ -735,6 +737,8 @@ jsp中用EL表达式 取值,  重点复习 EL  JSTL
 <img src="SpringMVC教程.assets/image-20231018164736369.png" alt="image-20231018164736369" style="zoom: 67%;" />
 
 ##  ① 页面间参数传递
+
+> 一般用于前后端不分离项目
 
 C得到数据后，跳转到V，并向V传递数据。进而V中可以渲染数据，让用户看到含有数据的页面
 

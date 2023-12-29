@@ -991,7 +991,7 @@ axios({
      url: '请求的URL地址',
      data: { POST数据  },    //POST 数据要通过data属性提供
      params: { GET参数 },     //GET参数要通过params属性提供
-    dataType: 'json'         // 响应体类型设置后响应数据指定转换
+     dataType: 'json'         // 响应体类型设置后响应数据指定转换
 }).then(function(res){
     // 响应数据
     console.log(res.data)
@@ -1118,8 +1118,6 @@ public class BookController {
 }
 
 ```
-
-
 
 ## 案例
 
@@ -3048,6 +3046,75 @@ document.querySelector('#upload').addEventListener('change', async function () {
 ```
 
 
+
+# 区别:crown:
+
+使用AJAX进行数据提交时，数据的默认内容类型取决于请求的方法以及发送的数据格式。
+
+默认情况下：
+
+1. **对于GET请求：** 数据通常附加在URL上作为查询参数。它采用键值对的形式，并且数据经过URL编码。
+
+   ```js
+   // 示例
+   $.ajax({
+     url: '/your-endpoint',
+     method: 'GET',
+     data: {
+       key1: 'value1',
+       key2: 'value2',
+     },
+     // 其他设置...
+   });
+   ```
+
+2. **对于使用jQuery.ajax()的POST请求：** 默认内容类型是`'application/x-www-form-urlencoded; charset=UTF-8'`。数据以字符串形式发送，HTML表单默认方式就是这种(默认使用application/x-www-form-urlencoded或multipart/form-data作为Content-Type), 一般需要手动json。
+
+   ```js
+   // 示例
+   $.ajax({
+     url: '/your-endpoint',
+     method: 'POST',
+     data: {
+       key1: 'value1',
+       key2: 'value2',
+     },
+     // 其他设置...
+   });
+   ```
+
+3. **对于使用Axios的POST请求：** 默认内容类型是`'application/json'`，当发送一个对象时，Axios会自动将JavaScript对象序列化为JSON。
+
+   ```js
+   // 示例
+   axios.post('/your-endpoint', {
+     key1: 'value1',
+     key2: 'value2',
+   })
+   .then(response => {
+     // 处理响应
+   })
+   .catch(error => {
+     // 处理错误
+   });
+   ```
+
+如果你想自定义内容类型或以不同格式发送数据，可以在AJAX请求中明确设置`contentType`或`headers`选项。例如，使用jQuery.ajax()发送JSON数据：
+
+```js
+javascriptCopy code$.ajax({
+  url: '/your-endpoint',
+  method: 'POST',
+  data: JSON.stringify({
+    key1: 'value1',
+    key2: 'value2',
+  }),
+  contentType: 'application/json',
+  // 其他设置...
+});
+```
+
+确保你的后端能够处理所选的内容类型和格式，并相应地调整服务器端代码。
 
 
 

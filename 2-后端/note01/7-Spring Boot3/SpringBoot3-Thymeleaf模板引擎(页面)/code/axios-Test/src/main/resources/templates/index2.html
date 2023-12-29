@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Thymeleaf Ajax Example</title>
+  <!-- 引入 Axios -->
+  <script th:src="@{/js/axios.js}"></script>
+</head>
+<body>
+
+<h2>Thymeleaf Ajax Example</h2>
+
+<form id="ajaxForm">
+  <label for="message">Message:</label>
+  <input type="text" id="message" name="message">
+  <button type="button" onclick="sendMessage()">Send Message</button>
+  <button type="button" onclick="sendMessage2()">Send Message</button>
+
+</form>
+
+<div id="response"></div>
+<script th:inline="javascript">
+  function sendMessage() {
+    var message = document.getElementById('message').value;
+
+    // 使用 Axios 发送 Ajax 请求
+    axios.post('/send-message', { message: message }, {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+            .then(function (response) {
+              document.getElementById('response').innerText = 'Response: ' + response.data;
+            })
+            .catch(function (error) {
+              console.error('Error:', error);
+            });
+  }
+
+  function sendMessage2() {
+    let message = {}
+    let val = document.getElementById('message').value;
+    message.data = val;
+    message.code = 200;
+    // 使用 Axios 发送 Ajax 请求
+    axios.post('/send-message2', message,
+    //         {
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   }
+    // }
+    )
+            .then(function (response) {
+              document.getElementById('response').innerText = 'Response: ' + response.data;
+            })
+            .catch(function (error) {
+              console.error('Error:', error);
+            });
+  }
+</script>
+
+</body>
+</html>

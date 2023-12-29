@@ -34,5 +34,7 @@ public class FieldController {
 		System.out.println("==========生日2:   "+user.getBirthDate2());
 		return user;
 	}
+
+
 }
 

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script th:src="@{/js/axios.js}"></script>
+</head>
+<body>
+<form action="user/add" method="get">
+  用户名： <input type="text" id="name" name="name" onblur="checkName()" value=""><span id="one"></span><br>
+  密码： <input type="password" name="password"><br>
+  生日： <input type="date" name="birthday"><br>
+  <input type="submit" id="add" value="添加" >
+</form>
+
+<script th:inline="javascript">
+  function checkName() {
+    let obj = document.getElementById("name")
+    // let param = new URLSearchParams();
+    let param = {};
+    let span = document.getElementById("one");
+    let addObj = document.getElementById("add")
+    // param.name = obj.value;
+    // console.log( param.name)
+    param.name = obj.value;
+    axios.post('/user/check', param
+    ).then(response => {
+      console.log(response)
+      //param.append("name", obj.value)
+      if (response.data == 'no') {
+        span.innerText = "用户名重复";
+        addObj.disabled=true;
+      } else {
+        span.innerText = "";
+        addObj.disabled=false;
+      }
+    })}
+</script>
+
+</body>
+</html>
