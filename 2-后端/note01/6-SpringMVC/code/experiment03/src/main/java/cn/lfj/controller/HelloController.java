@@ -13,12 +13,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HelloController {
 	@RequestMapping("/test1")  //访问路径
 	public String hello1(){
-		System.out.println("hello world");
+		System.out.println("hello world1");
 		return "index"; // 跳转:/index.jsp
 	}
 	@RequestMapping("/test2") //访问路径
 	public String hello2(){
-		System.out.println("hello user");
+		System.out.println("hello user2");
+		return "views/user";//  跳转:/views/user.jsp
+	}
+
+	@RequestMapping("") //访问路径
+	public String hello3(){
+		System.out.println("hello user3");
 		return "views/user";//  跳转:/views/user.jsp
 	}
 }
