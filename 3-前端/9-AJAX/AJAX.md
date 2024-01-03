@@ -1011,6 +1011,8 @@ axios({
 
 ## 案例
 
+==axios方式发起的ajax请求, 在post方式下, 提交的数据自动转成json, 不需要手动转换, 其他方式需要==
+
 ### json数据
 
 前端
@@ -1116,7 +1118,6 @@ public class BookController {
         // Perform necessary operations, e.g., saving the book to a database
     }
 }
-
 ```
 
 ## 案例

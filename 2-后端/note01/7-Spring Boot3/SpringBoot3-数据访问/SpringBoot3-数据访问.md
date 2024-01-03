@@ -1311,8 +1311,6 @@ public AjaxResult selectStudent(@RequestBody Student student) {
 }
 ```
 
-
-
 ##### eq：等于 =
 
 ```java
@@ -1323,10 +1321,6 @@ eq(R column, Object val)
 > eq("name", "某某")--->name = '某某'
 
 [MyBatis-Plus——条件构造器_mybatis-plus条件构造器-CSDN博客](https://blog.csdn.net/Yangyeon_/article/details/129452576)
-
-
-
-
 
 #### 使用注解方式
 
@@ -1353,7 +1347,7 @@ void deleteUser(Long id);
 
 MP提供了大量单表查询的方法，但是没有多表的操作，所以涉及到多表的查询时，需要我们自己实现
 
-**单表查询插件自动生成映射类型**
+**单表查询插件可以自动生成映射类型**
 
 ```xml
     <resultMap id="BaseResultMap" type="com.example.experiment01.entity.TbProduct">

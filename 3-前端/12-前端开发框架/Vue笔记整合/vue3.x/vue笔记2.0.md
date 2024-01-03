@@ -8487,13 +8487,13 @@ this.axios({
 });
 ```
 
-### 补充
+### 补充Vue 3
 
 在 Vue 3 中，通过 `createApp` 函数来创建 Vue 应用实例，而不再使用 `Vue.prototype` 来挂载属性。Vue 3 使用了 Composition API，可以使用 `provide` 和 `inject` 来在组件之间共享数据。
 
 以下是将 Axios 实例和 HTTP URL 全局配置在 Vue 3 中的示例：
 
-```
+```js
 import { createApp } from 'vue';
 import axios from 'axios';
 import App from './App.vue';
@@ -8517,8 +8517,8 @@ app.mount('#app');
 
 在组件中，你可以通过 `inject` 来访问提供的数据：
 
-```
-javascriptCopy code// 在组件中使用提供的数据
+```js
+// 在组件中使用提供的数据
 export default {
   setup() {
     // 在 setup 函数中使用 inject 获取提供的数据
@@ -8537,8 +8537,6 @@ export default {
 ```
 
 请注意，在 Vue 3 中，`provide` 和 `inject` 是一对，子组件可以通过 `inject` 访问到父组件通过 `provide` 提供的数据。
-
-
 
 在 Vue 2 中，你可以使用 `Vue.prototype` 来将 Axios 实例和 HTTP URL 挂载到 Vue 实例上，以便在整个应用中访问。以下是在 Vue 2 中的示例：
 
@@ -8586,12 +8584,6 @@ export default {
   },
 };
 ```
-
-
-
-
-
-
 
 ## Vue实战项目：Webpack登录验证后路由至列表页
 
