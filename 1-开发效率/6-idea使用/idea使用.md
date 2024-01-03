@@ -77,11 +77,11 @@
 | --------------------------- | ------------------------ |
 | 选中文本大小写的切换        | ctrl+shift+u             |
 | 折叠/展开所有方法的具体实现 | ctrl+shift+ -/ +         |
-| 复制光标所在行到下一行      | ctrl+d                   |
+| 复制光标所在行到下一行      | **ctrl+d**               |
 | 光标直接跳到下一行          | **shift + enter**        |
 | 光标直接跳到上一行          | ctrl +alt+ enter         |
 | 只能向上/下移动一行代码     | ctrl+shift+↑/↓  (不推荐) |
-| 可以向上/下移动一行或者多行 | alt+shift+↑/↓            |
+| 可以向上/下移动一行或者多行 | **alt+shift+↑/↓**        |
 | 多光标                      | Alt + 按住鼠标左键拖动   |
 
 ### 方法相关
@@ -259,3 +259,62 @@ c + j
 2，@MapperSecan注解是不是没加？（SpringBoot启动类中开启mapper接口的扫描）；
 
 3，XXXMapper.xml配置中parameterType如果是类类型，看类名是不是写错了；
+
+
+
+# SPRING BOOT测试–如何禁用DEBUG和INFO日志
+
+要禁用日志，请关闭`application.properties`和`logback-test.xml`的`logging.level`
+
+## 1.1关闭登录`application.properties`
+
+application.properties
+
+```bash
+logging.level.org.springframework=OFF
+logging.level.root=OFF
+```
+
+Spring横幅下方的DEBUG或INFO日志现已关闭。
+
+## 1.2在`src/test/resources`
+
+创建一个`logback-test.xml` 。 同样，请在此处关闭日志记录。
+
+![logback-test.xml](idea%E4%BD%BF%E7%94%A8.assets/320cf9bc5eb66e45889b374ba86681e2.png)
+
+logback-test.xml
+
+```markup
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <logger name="org.springframework" level="OFF"/>
+</configuration>
+```
+
+好，刚刚离开了Spring标语。
+
+Console
+
+```bash
+.   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.1.2.RELEASE)
+```
+
+## 1.3关闭Spring标语
+
+application.properties
+
+```bash
+logging.level.org.springframework=OFF
+logging.level.root=OFF
+spring.main.banner-mode=off
+```
+
+完成后，控制台现在应该为空。
