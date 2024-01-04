@@ -314,6 +314,7 @@ console.log('出错之后')
       }, time)
     })
   }
+
 const promise = doDelay(2000)
 promise.then(// promise 指定成功或失败的回调函数来获取成功的 vlaue 或失败的 reason
     value => {// 成功的回调函数 onResolved, 得到成功的 value

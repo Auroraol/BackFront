@@ -143,9 +143,7 @@ class Lesson3TestApplicationTests {
 				default:
 					System.out.println("无效的选择");
 					break;
-
 			}
 		}
 	}
 }
-

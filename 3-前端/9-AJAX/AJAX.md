@@ -974,6 +974,33 @@ axios({
 ## 通用模版(推荐):crossed_swords:
 
 ```js
+//  http://localhost/system/user/20
+export function delUser(userId) {
+  return request({
+    url: '/system/user/' + userId,
+    method: 'delete'
+  })
+}
+```
+
+```js
+// http://localhost/system/user/resetPwd?userId=22?password=123456
+export function resetUserPwd(userId, paspasswordsword) {
+  const data = {
+    userId,
+    password
+  }
+  return request({
+    url: '/system/user/resetPwd',
+    method: 'put',
+    data: data
+  })
+}
+```
+
+**总结**
+
+```js
 axios发送get请求：
 axios.get('url地址', { params: {请求的参数对象}}).then(function(res){
         //.then()表示成功的回调

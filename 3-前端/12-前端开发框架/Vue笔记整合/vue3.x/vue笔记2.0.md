@@ -389,148 +389,6 @@ export default {
 
 ![img](vue%E7%AC%94%E8%AE%B0.assets/1646014123006-822f11ee-c90b-454d-bff5-92bfbc8f82b8.png)
 
-# Vue.js命名风格指南 
-
-## 命名分类
-
-现在常用的vue命名规范无外乎四种：
-
-- `camelCase`(驼峰式 )
-- `kebab-case`(短横线连接式)
-- `PascalCase`(帕斯卡命名式)
-- `Snake`(下划线连接式)
-
-## 文件夹命名
-
-如果你展开 `node_modules` 中的项目依赖，你会发现，几乎所有的项目文件夹命名都是 `kebab-case` 命名的，使用`kebab-case`命名的文件夹比`camelCase`命名的文件夹看起来更清晰。
-
-属于components文件夹下的子文件夹，也统一使用 `kebab-case` 的风格。
-
-## 组件命名
-
-1、自定义组件名必须是**多个单词组合**的，并且是**完整的单词**而不是单词的缩写。
-
-```js
-// 错误
-components/
-|- sd-settings.vue
-|- u-prof-opts.vue
-
-// 正确
-components/
-|- student-dashboard-settings.vue
-|- user-profile-options.vue
-```
-
-(**推荐**)这里全部使用`kebab-case`格式，主要是后面很多会使用到`kebab-case`格式，方便记忆。
-
-2、应用特定样式和约定的**基础组件** (也就是展示类的、无逻辑的或无状态的组件) 应该全部以一个特定的前缀开头，比如 `Base`、`App` 或 `V`。而且一般放在`全局注册`，因为会被频繁使用。
-
-```js
-// 错误
-components/
-|- MyButton.vue
-|- VueTable.vue
-|- Icon.vue
-
-// 正确
-components/
-|- BaseButton.vue
-|- BaseTable.vue
-|- BaseIcon.vue
-```
-
-3、组件名中的**单词顺序**
-
-组件名应该以高级别的 (通常是一般化描述的) 单词开头，以**描述性的修饰词结尾**。
-
-```js
-// 错误
-components/
-|- ClearSearchButton.vue
-|- RunSearchButton.vue
-|- SearchInput.vue
-
-// 正确
-components/
-|- SearchButtonClear.vue
-|- SearchButtonRun.vue
-|- SearchInputQuery.vue
-```
-
-4、在JS中的组件名大小写
-
-也就是在注册组件的时候，全部使用 `PascalCase` 格式。
-
-```js
-import MyComponent from './my-component.vue'
-
-export default {
-  name: 'MyComponent',
-  components:{MyComponent}
-}
-```
-
-5、html模板中的组件命名
-
-(**推荐**)不管是单标签还是双标签，全部使用 `kebab-case` 格式，主要是为了方便。
-
-```html
-<!--全部使用kebab-case格式-->
-<my-component />
-<my-component></my-component>
-```
-
-6、prop名称的大小写
-
-在子组件html中传入prop的为`kebab-case`格式，子组件接收方采用 `camelCase` 格式。
-
-```js
-// 错误
-<welcome-message greetingText="hi"/>
-    
-props: {
-  'greeting-text': String
-}
-
-// 正确
-<welcome-message greeting-text="hi"/>
-    
-props: {
-  greetingText: String
-}
-```
-
-7、组件事件命名
-
-统一使用 `kebab-case` 格式，并且以`动词`结尾。
-
-```js
-// 正确
-this.$emit('dom-resize');
-this.$emit('api-load');
-```
-
-## 命名总结
-
-1、采用`kebab-case`命名的：
-
-- 文件夹
-- 单文件组件
-- 组件在html模板中使用(`<my-component></my-component>`)
-- 在模板中prop传入属性到子组件(`<my-componnet set-text="hello"/>`)
-- 所有事件名(`this.$emit('api-reload')`)
-
-2、采用`PascalCase`命名：
-
-- 公共基础组件(`MfcSelect`)
-- js中components注册组件时(`import MyComponent from './my-component.vue'`)
-- 组件的name属性(`name: 'MyComponent'`)
-
-3、采用`camelCase` 命名：
-
-- 子组件接收prop属性
-
 # Vue2
 
 Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进式框架。与其它大型框架不同的是，Vue 被设计为可以自底向上逐层应用。Vue 的核心库只关注视图层，不仅易于上手，还便于与第三方库或既有项目整合。另一方面，当与现代化的工具链以及各种支持类库结合使用时，Vue 也完全能够为复杂的单页应用提供驱动。
@@ -598,7 +456,15 @@ Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进
 
 注意：Vue中有很多的指令，且形式都是：v-????
 
-### 综合代码
+### 综合
+
+
+
+
+
+
+
+函数代码
 
 ```html
 <!DOCTYPE html>
@@ -10007,6 +9873,36 @@ export default {
 ```
 
 
+在 Vue.js 中，创建 Vuex store 有两种常见的方式，具体取决于使用的 Vue 版本。
+
+1. **Vue 3 使用 `createStore`：**
+
+   ```
+   import { createStore } from "vuex";
+   
+   const store = createStore({
+     // Vuex store 配置
+   });
+   ```
+
+   Vue 3 引入了 `createStore` 函数，用于创建 Vuex store。这是 Composition API 的一部分，与 Vue 3 的其他部分（如组件）一起使用。`createStore` 的使用方式更符合 Composition API 的设计理念。
+
+2. **Vue 2 使用 `new Vuex.Store`：**
+
+   ```
+   eimport Vuex from "vuex";
+   import Vue from "vue";
+   
+   Vue.use(Vuex);
+   
+   const store = new Vuex.Store({
+     // Vuex store 配置
+   });
+   ```
+
+   在 Vue 2 中，使用 `new Vuex.Store` 创建 Vuex store。在这个版本中，需要先通过 `Vue.use(Vuex)` 使用 Vuex 插件。
+
+总的来说，主要的区别在于创建 Vuex store 的方式，其中 Vue 3 引入了 `createStore` 作为 Composition API 的一部分，而 Vue 2 使用 `new Vuex.Store` 并需要通过 `Vue.use(Vuex)` 先安装 Vuex 插件。
 
 ##  Vuex 4
 
@@ -12720,6 +12616,39 @@ npm install element-plus --save
 
 ![image-20231123110217653](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231123110217653.png)
 
+# Vue3 高级语法（一）—— h函数、jsx
+
+```js
+<script>
+import {h, ref} from "vue";
+
+export default {
+  setup() {
+    const counter = ref(0)
+    return () => {
+      return h('div', {class: 'app'}, [
+        h('h2', null, `当前计数：${counter.value}`),
+        h('button', {
+          onClick: () => counter.value++
+        }, '+1'),
+        h('button', {
+          onClick: () => counter.value--
+        }, '-1')
+      ])
+    }
+  }
+}
+</script>
+<style scoped>
+</style>
+```
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20240104152444682.png" alt="image-20240104152444682" style="zoom:67%;" />
+
+
+
+
+
 
 
 # vue-cli vue3引入Element-plus
@@ -13239,3 +13168,19 @@ export default defineConfig({
 # html模板资源转为vue项目
 
 [如何将html模板资源转为vuecli项目_html转vue-CSDN博客](https://blog.csdn.net/gxlzhhx/article/details/122922153)
+
+
+
+# 每个组件的文件夹下都有一个index.vue的意义
+
+```vue
+import my from '../components/my/index.vue'
+```
+
+等价于
+
+```vue
+import my from '../components/my.vue'
+```
+
+可以这样引入吧，还有每个组件都单独一个文件夹，可以从文件目录结构上隔离组件间依赖吧，显得结构清晰吧，大项目可以，小的项目就感觉有点多余了。太多的index.vue其实也影响代码可读性吧，具体看项目取舍吧。

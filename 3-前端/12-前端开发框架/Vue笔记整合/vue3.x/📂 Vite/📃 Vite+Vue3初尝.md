@@ -19,8 +19,9 @@
 - [GitHub：Vite App](https://github.com/vitejs/create-vite-app)
 
 <a name="QNiKZ"></a>
+
 ## 二、创建一个Vite+Vue3项目
-<a name="OGCep"></a>
+
 ### 创建Vite1.x项目
 使用yarn：
 ```bash
@@ -37,7 +38,6 @@ $ npm install
 $ npm run dev
 ```
 
-<a name="UusFt"></a>
 ### 创建Vite2.x项目
 使用最新版的vite脚手架创建项目的时候会报一个警告：
 ```bash
@@ -74,7 +74,6 @@ yarn build
 ```
 ![image.png](https://cdn.nlark.com/yuque/0/2020/png/2213540/1602208927538-771d728c-490b-4e26-b8a2-3131556acc95.png#align=left&display=inline&height=218&originHeight=218&originWidth=476&size=17264&status=done&style=none&width=476)
 
-<a name="T09A2"></a>
 ## 三、Vue3新特性
 
 - [Vue3 中文文档 - GitHub](https://github.com/vuejs/docs-next-zh-cn)
