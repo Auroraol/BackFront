@@ -1,0 +1,53 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+
+          <!--    拓展配置方式（推荐）-->
+          <!-- 配置SpringMVC的前端控制器，对浏览器发送的请求统一进行处理 -->
+    <!--处理中文乱码-->
+    <filter>
+      <filter-name>encodingFilter</filter-name>
+      <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+      <init-param>
+        <param-name>encoding</param-name>
+        <param-value>UTF-8</param-value>
+      </init-param>
+      <init-param>
+        <param-name>forceEncoding</param-name>
+        <param-value>true</param-value>
+      </init-param>
+    </filter>
+  <filter-mapping>
+    <filter-name>encodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <servlet>
+  <servlet-name>springMVC</servlet-name>
+  <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  <!-- 通过初始化参数指定SpringMVC配置文件的位置和名称 -->
+  <init-param>
+    <!-- contextConfigLocation为固定值 -->
+    <param-name>contextConfigLocation</param-name>
+    <!-- 使用classpath:表示从类路径查找配置文件，例如maven工程中的src/main/resources -->
+    <param-value>classpath:springMVC.xml</param-value>
+  </init-param>
+  <!--
+       作为框架的核心组件，在启动过程中有大量的初始化操作要做
+      而这些操作放在第一次请求时才执行会严重影响访问速度
+      因此需要通过此标签将启动控制DispatcherServlet的初始化时间提前到服务器启动时
+  -->
+  <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+  <servlet-name>springMVC</servlet-name>
+  <!--
+      设置springMVC的核心控制器所能处理的请求的请求路径
+      /所匹配的请求可以是/login或.html或.js或.css方式的请求路径
+      但是/不能匹配.jsp请求路径的请求
+  -->
+  <url-pattern>/</url-pattern>
+  </servlet-mapping>
+</web-app>

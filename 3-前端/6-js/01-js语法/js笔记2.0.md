@@ -186,11 +186,16 @@ function test1(a,b,...rest){
 ```js
 let user = {
     name: '小明',
-    // function xxx() {} 的简化写法  (推荐)
+    // 普通函数 es6写法 仅仅是function xxx() {} 的简化写法  (推荐)
     walk() {
         console.log(this.name);  //小明
     },
+    // 普通函数 es5写法    
+    setName: function (name) {
+      this.name = this.name;
+    },
     // 箭头函数  在字面量对象中使用箭头函数会导致 this 指向错误。
+    // 一个参数的时候()可省
     eat:()=>{
         console.log(this.name)   //undefined
     },

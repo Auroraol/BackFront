@@ -868,6 +868,36 @@ $.ajax({
 
 axios 官网：https://www.npmjs.com/package/axios
 
+Axios是一个基于Promise的[HTTP客户端](https://so.csdn.net/so/search?q=HTTP客户端&spm=1001.2101.3001.7020)，用于浏览器和Node.js环境中发起HTTP请求。它有许多强大的特性，下面将介绍Axios的七大特性。
+
+1. 支持浏览器和[Node.js](https://so.csdn.net/so/search?q=Node.js&spm=1001.2101.3001.7020)
+
+Axios既可以在浏览器中使用，也可以在Node.js环境中使用，提供了统一的API用于发起HTTP请求。
+
+2. Promise支持
+
+Axios基于Promise实现异步操作，使得处理复杂的请求和响应更加简单和直观。
+
+3. 拦截请求和响应
+
+Axios允许你在请求和响应被发送或接收时拦截它们，这样你可以进行自定义的处理，例如在请求发送前设置token，在响应处理后统一处理错误信息等。
+
+4. 取消请求
+
+Axios支持取消请求的功能，当某个请求已经不再需要时可以取消正在进行的HTTP请求，避免产生无效的请求。
+
+5. 自动转换JSON数据
+
+Axios会自动将JSON数据转换成JavaScript对象，方便处理和操作。
+
+6. 客户端防御XSRF
+
+Axios能够保护客户端免受跨站请求伪造（XSRF）的攻击。
+
+7. 多种请求方式
+
+Axios支持多种[HTTP请求方式](https://so.csdn.net/so/search?q=HTTP请求方式&spm=1001.2101.3001.7020)，包括GET、POST、PUT、DELETE等，满足各种场景下的需求。
+
 下载: [axios.js](axios.js)
 
 ```js

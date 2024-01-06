@@ -10476,6 +10476,7 @@ const MyComponent = {
   			//计算属性——完整写法（考虑读和写）
   			person.fullName = computed({
   				get(){
+                      // 监听person.firstName 和 person.lastName
   					return person.firstName + '-' + person.lastName
   				},
   				set(value){
@@ -11882,6 +11883,44 @@ const sum1 = (a, b) => {
 
 例子1
 
+使用时建议 `把 script 写在 template上面`
+
+```vue
+<script setup>
+import { ref } from 'vue'
+// 组件：引用后不需要注册
+import MyComponent from './MyComponent.vue'
+
+// 变量  可以不写ref和reactive
+const count = ref(0)    
+const msg = 'Hello!'
+
+// 函数被模板访问不需要this
+function log() {
+  // 函数中访问变量不需要this
+  console.log(msg)
+}
+
+// 计算属性
+const hCurrentTime = computed(() => {
+  return formatAxis(new Date());
+});
+    
+// 生命周期
+onMounted(() => {
+  console.log(count.value)
+})
+</script>
+
+<template>
+  <button @click="count++">{{ count }}</button>
+  <button @click="log">{{ msg }}</button>
+  <MyComponent />
+</template>
+```
+
+例子2
+
 ```vue
 <template>
 <div>{{count}}</div>
@@ -11898,7 +11937,7 @@ const dec = () => { count.value-- }
 </script>
 ```
 
-例子2
+例子3
 
 ```vue
 <template>
@@ -11963,6 +12002,8 @@ import MyComponent from './MyComponent.vue'
   <MyComponent />
 </template>
 ```
+
+在 `<script setup>` 中，你不需要手动使用 `ref` 包装变量，因为 Vue 3 的 `<script setup>` 已经自动将变量包装成响应式对象。因此，直接使用 `const path = '...'` 就足够了。
 
 ### 四、传参
 
@@ -12405,6 +12446,42 @@ onUpdated(() => {
 <style scoped>
  
 </style>
+```
+
+### 十一、总结  TODO
+
+```vue
+<script setup>
+import { ref } from 'vue'
+// 组件：引用后不需要注册
+import MyComponent from './MyComponent.vue'
+
+// 变量  可以不写ref和reactive
+const count = ref(0)    
+const msg = 'Hello!'
+
+// 函数被模板访问不需要this
+function log() {
+  // 函数中访问变量不需要this
+  console.log(msg)
+}
+
+// 计算属性
+const hCurrentTime = computed(() => {
+  return formatAxis(new Date());
+});
+    
+// 生命周期
+onMounted(() => {
+  console.log(count.value)
+})
+</script>
+
+<template>
+  <button @click="count++">{{ count }}</button>
+  <button @click="log">{{ msg }}</button>
+  <MyComponent />
+</template>
 ```
 
 # $ref语法糖
@@ -13184,3 +13261,11 @@ import my from '../components/my.vue'
 ```
 
 可以这样引入吧，还有每个组件都单独一个文件夹，可以从文件目录结构上隔离组件间依赖吧，显得结构清晰吧，大项目可以，小的项目就感觉有点多余了。太多的index.vue其实也影响代码可读性吧，具体看项目取舍吧。
+
+# vue3 踩坑Cannot read property ‘url‘ of undefined
+
+引入组件提示Cannot read property ‘url’ of undefined
+研究了一下午 发现 运行vue项目的时候会自己生成一个缓存目录
+在vue项目里面新加 编辑或者移动组件路径后会读取不到
+解决办法需要重启vue项目
+

@@ -213,7 +213,111 @@ export default {
 - **$router**为VueRouter实例，比如想要导航到不同URL，则使用`$router.push`方法
 - **$route**为当前router跳转对象，里面可以获取name、path、query、params等
 
+### vue3
+
+在Vue 3中，`$route`对象通常与Vue Router关联，通常在组件的生命周期钩子中访问。
+
+1. 方法1  **`<script setup>` 中:**
+
+   ```vue
+   <template>
+     <div>
+       <h2>当前路由信息</h2>
+       <p>路径：{{ currentRoutePath }}</p>
+     </div>
+   </template>
+   
+   
+   
+   <script setup>
+   import { onMounted, ref } from 'vue';
+   import { useRoute } from 'vue-router';
+   
+   const route = useRoute();
+   
+   const currentRoutePath = ref('');
+   currentRoutePath.value = route.path;
+   console.log('当前路由路径：', currentRoutePath.value);
+   
+   </script>
+   
+   // script setup 中使用
+   ```
+
+   - 当使用`<script setup>`语法时，这特别有用。
+   - 在 `<script setup>` 语法中，不能直接使用 `$route`
+
+2. 方法2  **直接在模板中:**
+
+   - 如果不在`setup`函数内，可以直接在模板中访问`$route`，无需使用`this`。
+
+   ```vue
+   <template>
+     <div>
+       <h2>当前路由信息</h2>
+       <p>路径：{{ $route.path }}</p>
+       <p>参数：{{ $route.params }}</p>
+       <p>查询参数：{{ $route.query }}</p>
+     </div>
+   </template>
+   
+   <script setup>
+   </script>
+   
+   // 可以直接在模板中
+   ```
+
+   - 这等同于在模板中使用`this.$route`。
+
+3. 非`<script setup>`中
+
+   ```vue
+   <script>
+   import { onMounted, getCurrentInstance } from 'vue';
+   
+   export default {
+     name: 'MyComponent',
+   
+     setup() {
+       const instance = getCurrentInstance();
+   
+       onMounted(() => {
+         // 
+         console.log('当前路由路径：', instance.proxy.$route.path);
+       });
+   
+       return {};
+     },
+   };
+   </script>
+   ```
+
+### vue2
+
+==在Vue.js 2中，this.$route 可以在Vue组件的任何生命周期钩子函数和方法中被调用。和vue3有很大区别==
+
+   ```js
+   export default {
+     mounted() {
+       console.log(this.$route.path); // 在mounted钩子函数中获取当前路由的路径
+     },
+     methods: {
+       navigateToHome() {
+         if (this.$route.path !== '/home') {
+           this.$router.push('/home'); // 通过this.$route执行路由跳转
+         }
+       }
+     },
+     computed: {
+       isAboutPage() {
+         return this.$route.path === '/about'; // 通过计算属性获取当前路由是否是/about
+       }
+     }
+   }
+   ```
+
 ## 三、路由状态管理
+
 [vuex-router-sync](https://www.npmjs.com/package/vuex-router-sync) 是一款将 vue-router 的 `$route` 属性同步到 vuex 中 state 的插件, 可以通过操作路由改变状态管理, 方便监视路由变化。
 
 使用方式：
@@ -635,17 +739,7 @@ pages/Detail.vue
 } 
 ```
 
-
-
-
-
 ![image-20231201102352825](%F0%9F%93%83%20Vue%20Router%203.assets/image-20231201102352825.png)
-
-App.vue
-
-```
-
-```
 
 index.js
 
@@ -1772,3 +1866,64 @@ Webpack 会将任何一个异步模块与相同的块名称组合到相同的异
    1. ```activated```路由组件被激活时触发。
    2. ```deactivated```路由组件失活时触发。
 
+
+
+## 十九、综合[只针对vue3]
+
+### `$route`对象
+
+#### 方法1
+
+**route  路由**
+
+![image-20240106223844261](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106223844261.png)
+
+**路由视图**
+
+![image-20240106223720567](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106223720567.png)
+
+**调用结果**
+
+![image-20240106224329140](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106224329140.png)
+
+#### 方法2
+
+**route  路由**
+
+![image-20240106223825682](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106223825682.png)
+
+**路由视图**
+
+![image-20240106224000062](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106224000062.png)
+
+**调用结果**
+
+![image-20240106224152687](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106224152687.png)
+
+### /参数
+
+**route  路由**
+
+![image-20240106221922018](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106221922018.png)
+
+**路由视图**
+
+![image-20240106221854558](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106221854558.png)
+
+**调用结果**
+
+![image-20240106223404276](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106223404276.png)
+
+### ?参数
+
+**route  路由**
+
+![image-20240106223253763](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106223253763.png)
+
+**路由视图**
+
+![image-20240106223212216](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106223212216.png)
+
+**调用结果**
+
+![image-20240106223438136](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106223438136.png)
