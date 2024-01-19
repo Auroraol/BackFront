@@ -1,0 +1,12 @@
+flowable:
+    async-executor-activate: true
+server:
+    port: 8080
+spring:
+    application:
+        name: flowable
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        password: 741106
+        url: jdbc:mysql://127.0.0.1:3306/flowable_demo?autoReconnect=true&useUnicode=true&characterEncoding=utf-8&&zeroDateTimeBehavior=CONVERT_TO_NULL&&serverTimezone=GMT%2B8&&nullCatalogMeansCurrent=true
+        username: root

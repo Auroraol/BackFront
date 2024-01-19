@@ -62,6 +62,42 @@ artifactid： xianyu.dev  和   artifactid： xianyu.prod
 第二段：开发环境dev，还是，生产环境prod
 ```
 
+## Entity、PO、VO、BO、DTO用法
+
+### 一、Entity
+
+实体，和[PO](https://so.csdn.net/so/search?q=PO&spm=1001.2101.3001.7020)的功能类似，和数据表一一对应，一个Entity对应一张表
+entity里的每一个字段，与数据库相对应
+
+### 二、PO
+
+Persistent Object持久化对象，跟数据库导入记录数据一一对应的映射关系。
+一个P0对应一个表或多个表联合查询, Entity是一个特殊的PO
+
+### 三、VO
+
+View Object对应页面显示的数据对象，可以和表对应，也可以不对应。控制层与视图层进行传输交换。
+
+### 四、BO
+
+Business object业务对象、一个复杂的业务，往往包含多个小业务
+
+例如，一个订单信息BO，可能包含，1.订单基础信息（购买人，时间，状态等基础信息） 2.订单支付信息 3.订单[优惠券信息 4.订单收货信息 5.订单售后信息 6.订单退款信息等。
+
+把一个个订单信息对应一个个PO，组装到一起是BO.
+
+### 五、DTO
+
+Data Transfer Object数据传输对象，服务之间数据传输对象，仅仅包括调用方想要的数据对象，
+可以由PO、Entity转换得到
+
+POJO（Plain Ordinary Java Object无规则简单Java对象）不与数据库打交道的简单对象。
+POJO是DTO/BO/VO的统称
+
+下面是各对象应用：
+
+![image-20240119130343054](spring%20boot3.assets/image-20240119130343054.png)
+
 # SpringBoot3-快速入门
 
 [(79条消息) java: 错误: 无效的源发行版:17_无效的源发行版17_G666666_的博客-CSDN博客](https://blog.csdn.net/G666666_/article/details/128127980)
@@ -5725,7 +5761,7 @@ public class LoginController {
 
 # 整合Swagger3.0详细使用
 
-==springboot3 + Swagger3.0 会报错能官方更新吧==
+==springboot3 + Swagger3.0 会报错看官方更新==
 
 ## 一、简介
 

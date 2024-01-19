@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.notebook</groupId>
+        <artifactId>Springboot-Notebook</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.shardingsphere101</groupId>
+    <artifactId>shardingsphere101</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>shardingsphere101</name>
+    <packaging>pom</packaging>
+
+    <properties>
+        <java.version>8</java.version>
+        <shardingsphere.version>5.2.0</shardingsphere.version>
+        <mybatis.plus.version>3.5.3.1</mybatis.plus.version>
+    </properties>
+
+    <modules>
+        <module>shardingsphere-2fastcode</module>
+        <module>shardingsphere-default-strategy</module>
+    </modules>
+
+    <dependencies>
+
+        <!-- MyBatis Plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatis.plus.version}</version>
+        </dependency>
+
+        <!-- 必须引入的包 mysql -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.0.32</version>
+        </dependency>
+
+        <!-- 必须引入的包 ShardingSphere -->
+        <dependency>
+            <groupId>org.apache.shardingsphere</groupId>
+            <artifactId>shardingsphere-jdbc-core-spring-boot-starter</artifactId>
+            <version>${shardingsphere.version}</version>
+        </dependency>
+
+    </dependencies>
+</project>

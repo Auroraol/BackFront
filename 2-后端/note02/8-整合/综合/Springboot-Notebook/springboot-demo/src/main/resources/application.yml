@@ -1,0 +1,26 @@
+server:
+  port: 6666
+
+
+spring:
+  # 数据库连接信息
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/db_1?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 741106
+  #配置jpa
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+
+
+#  ddl-auto的配置：
+#  create----每次运行该程序，没有表格会新建表格，表内有数据会清空
+#  create-drop----每次程序结束的时候会清空表
+#  update----每次运行程序，没有表格会新建表格，表内有数据不会清空，只会更新
+#  validate----运行程序会校验数据与数据库的字段类型是否相同，不同会报错

@@ -157,7 +157,7 @@ Redis版本迭代推演介绍：
 
 一般不采用, 下载地址：https://github.com/zkteco-home/redis-windows
 
-### linux安装
+### linux安装:crossed_swords:
 
 #### 安装
 
@@ -292,7 +292,7 @@ services:
       - 6379:6379
 ```
 
-### 使用redis-cli连接Redis
+#### 使用redis-cli连接Redis
 
 进去Redis容器的内部
 
@@ -4481,7 +4481,7 @@ cluster.c源码分析一下
 
 # 十五、  SpringBoot集成Redis
 
-### 总概述
+## 总概述
 
 jedis-lettuce-RedisTemplate三者的联系
 
@@ -4655,7 +4655,7 @@ spring.redis.database=0
 #修改为自己真实IP
 spring.redis.host=127.0.0.1
 spring.redis.port=6379
-spring.redis.password=123456
+spring.redis.password=741106
 spring.redis.lettuce.pool.max-active=8
 spring.redis.1ettuce.pool.max-wait=-1ms
 spring.redis.1ettuce.pool.max-idle=8
@@ -4664,7 +4664,11 @@ spring.redis.lettuce.pool.min-idle=0
 
 业务类
 
-- 配置类(解决RedisTemplate使用的是JDK序列化方式（默认）惹的祸)
+- config 
+
+  配置类(解决RedisTemplate使用的是JDK序列化方式（默认）惹的祸)
+
+  ==可能出现springboot版本不匹配问题==
 
   ```java
   package com.luojia.redis7_study.config;
@@ -4997,7 +5001,7 @@ org.springframework.data.redis.serializer.StringRedisSerializer，字符串和�
 
 #### JSON序列话方式
 
-##### GenericJackson2JsonRedisSerializer
+##### GenericJackson2JsonRedisSerializer(推荐)
 
 org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer 使用Jackson 实现JSON的序列化方式，
 
@@ -5055,7 +5059,7 @@ public class RedisConfig {
         return template;
     }
  
-    Jackson2JsonRedisSerializer
+    //Jackson2JsonRedisSerializer
     //@Bean
     //@ConditionalOnMissingBean(name = "redisTemplate")
     //public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {

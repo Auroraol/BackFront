@@ -19,8 +19,6 @@
 -Deditable.java.test.console=true
 ```
 
-
-
 # idea重启
 
 如下图所示
@@ -318,3 +316,7 @@ spring.main.banner-mode=off
 ```
 
 完成后，控制台现在应该为空。
+
+
+
+[异常处理——SpringBoot项目启动后直接退出Process finished with exit code 1_springboot 启动直接结束打印错误信息-CSDN博客](https://blog.csdn.net/moneyshi/article/details/108437054?ops_request_misc={"request_id"%3A"162054562916780264021383"%2C"scm"%3A"20140713.130102334.pc_all."}&request_id=162054562916780264021383&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_v2~times_rank-10-108437054.first_rank_v2_pc_rank_v29&utm_term=进程已结束，退出代码为+1+idea)
