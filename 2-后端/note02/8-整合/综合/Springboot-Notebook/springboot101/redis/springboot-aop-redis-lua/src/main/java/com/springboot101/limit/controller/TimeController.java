@@ -1,6 +1,7 @@
 package com.springboot101.limit.controller;
 
 import com.alibaba.fastjson2.JSON;
+import com.springboot101.limit.dao.OrderInfoDao;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,52 +13,41 @@ import java.util.Date;
 
 /**
  
- * @Description:
+ * @Description: 用于演示处理时间字段的不同情况。
  */
 @Controller
 public class TimeController {
 
+    /**
+     * 映射 GET 请求 "/timeTest" 到此方法，演示在视图中处理时间字段。
+     *
+     * @param model 用于在视图中传递数据的 Model 对象。
+     * @return 返回视图名称 "index"。
+     */
     @GetMapping("/timeTest")
     public String timeTest(Model model) {
-        OrderInfo order = new OrderInfo();
+        OrderInfoDao order = new OrderInfoDao();
         order.setCreateTime(LocalDateTime.now());
         order.setUpdateTime(new Date());
+        System.out.println(order.getCreateTime());
+        System.out.println(order.getCreateTime());
+
         model.addAttribute("order",order);
         System.out.println(JSON.toJSONString(order));
         return "index";
     }
 
+    /**
+     * 映射 GET 请求 "/timeTest1" 到此方法，演示在 JSON 响应中处理时间字段。
+     *
+     * @return 返回包含时间字段的 OrderInfo 对象，将以 JSON 格式响应。
+     */
     @GetMapping("/timeTest1")
     @ResponseBody
-    public OrderInfo timeTest1() {
-        OrderInfo order = new OrderInfo();
+    public OrderInfoDao timeTest1() {
+        OrderInfoDao order = new OrderInfoDao();
         order.setCreateTime(LocalDateTime.now());
         order.setUpdateTime(new Date());
         return order;
-    }
-
-    public class OrderInfo implements Serializable{
-
-        //@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd")
-        private LocalDateTime createTime;
-
-        //@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-        private Date updateTime;
-
-        public LocalDateTime getCreateTime() {
-            return createTime;
-        }
-
-        public void setCreateTime(LocalDateTime createTime) {
-            this.createTime = createTime;
-        }
-
-        public Date getUpdateTime() {
-            return updateTime;
-        }
-
-        public void setUpdateTime(Date updateTime) {
-            this.updateTime = updateTime;
-        }
     }
 }

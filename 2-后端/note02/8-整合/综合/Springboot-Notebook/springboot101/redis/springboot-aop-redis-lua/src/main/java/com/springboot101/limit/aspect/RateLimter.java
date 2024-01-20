@@ -1,4 +1,4 @@
-package com.springboot101.limit.api;
+package com.springboot101.limit.aspect;
 
 import com.springboot101.limit.enmu.LimitType;
 
@@ -6,14 +6,14 @@ import java.lang.annotation.*;
 
 /**
  * @author xiaofu
- * @description 自定义限流注解
+ * @description redis限流注解
  * @date 2020/4/8 13:15
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface Limit {
+public @interface RateLimter {
 
     /**
      * 名字
@@ -44,4 +44,10 @@ public @interface Limit {
      * 限流的类型(用户自定义key 或者 请求ip)
      */
     LimitType limitType() default LimitType.CUSTOMER;
+
+    /**
+     * 返回值
+     * @return
+     */
+    String message() default "false";
 }

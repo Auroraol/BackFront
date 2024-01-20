@@ -1,15 +1,12 @@
-# springboot-aop-redis-lua
-springboot-aop-redis-lua  实现的分布式限流方案
+# springboot + redis整合
 
-## springboot + redis整合
-
-###  redis
+##  redis
 
 具体细节参考: 
 
 <img src="README.assets/image-20240119153134142.png" alt="image-20240119153134142" style="zoom:67%;" />
 
-#### 更改Redis配置文件
+### 更改Redis配置文件
 
 1. bind配置请注释掉
 
@@ -25,7 +22,7 @@ springboot-aop-redis-lua  实现的分布式限流方案
 
    ![image-20231010193546859](README.assets/image-20231010193546859.png)
 
-#### 启动
+### 启动
 
 ```shell
 root@lfj-virtual-machine:/myredis# redis-server /myredis/redis.conf 
@@ -38,9 +35,9 @@ root@lfj-virtual-machine:/myredis# redis-cli -a 741106 -p 6379 -h 192.168.200.13
 + 741106为 redis密码
 + 6379为redis端口号
 
-### springboot
+## springboot
 
-#### 配置文件
+### 配置文件
 
 ```properties
 # ===========================redis单机===========================
@@ -55,7 +52,7 @@ spring.redis.1ettuce.pool.max-idle=8
 spring.redis.lettuce.pool.min-idle=0
 ```
 
-#### pom
+### pom
 
 部分
 
@@ -71,7 +68,7 @@ spring.redis.lettuce.pool.min-idle=0
  </dependency>
 ```
 
-#### config
+### config
 
 两种方法都行
 
@@ -155,7 +152,7 @@ public class RedisConfig {
 //}
 ```
 
-#### controller
+### controller
 
 ```java
 package com.springboot101.limit.controller;
@@ -188,7 +185,7 @@ public class OrderController {
 
 ```
 
-#### service
+### service
 
 ```java
 package com.springboot101.limit.service;
@@ -232,7 +229,7 @@ public class OrderService {
 
 ```
 
-### **运行结果**
+## **运行结果**
 
 输入: `http://localhost:8888/order/add`结果如下:
 
@@ -249,5 +246,48 @@ public class OrderService {
 
 ![image-20240119153642691](README.assets/image-20240119153642691.png)
 
-## 实现的分布式限流方案
+# springboot-aop-redis-lua
 
+springboot-aop-redis-lua  实现的分布式限流方案。除了缓存之外，有时候会拿Redis做分布式锁。
+
+## 需求
+
+**需求：XX接口访问量太大，需要在一定时间内不让那么多的请求进来**
+
+实现原理：
+
+```
+用Redis作为限流组件的核心的原理,将接口名称当Key,一段时间内访问次数为value,同时设置该Key过期时间。
+限制 XX接口在TT时间内访问次数
+第一次访问 操作redis，key：接口名称 value：次数 expire设置过期时间 TT
+第二次访问 操作redis, value + 1，如果过期则按照第一次处理
+通过lua脚本 来保证原子性
+```
+
+使用Lua脚本(推荐)
+
+1. 减少网络开销: 不使用 Lua 的代码需要向 Redis 发送多次请求, 而脚本只需一次即可, 减少网络传输;
+2. 原子操作: Redis 将整个脚本作为一个原子执行, 无需担心并发, 也就无需事务;
+3. 复用: 脚本会永久保存 Redis 中, 其他客户端可继续使用.
+
+Redis添加了对Lua的支持，能够很好的满足原子性、事务性的支持，让我们免去了很多的异常逻辑处理。
+
+## 单个模块中的接口
+
+
+
+
+
+
+
+**运行结果**
+
+![image-20240120161132131](README.assets/image-20240120161132131.png)
+
+![img](https://img-blog.csdnimg.cn/20200607201757927.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxOTMzNzA5,size_16,color_FFFFFF,t_70)
+
+
+
+
+
+多个模块中的接口都要限流的话 则需要整理成一个 starter 避免写重复代码

@@ -320,3 +320,22 @@ spring.main.banner-mode=off
 
 
 [异常处理——SpringBoot项目启动后直接退出Process finished with exit code 1_springboot 启动直接结束打印错误信息-CSDN博客](https://blog.csdn.net/moneyshi/article/details/108437054?ops_request_misc={"request_id"%3A"162054562916780264021383"%2C"scm"%3A"20140713.130102334.pc_all."}&request_id=162054562916780264021383&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_v2~times_rank-10-108437054.first_rank_v2_pc_rank_v29&utm_term=进程已结束，退出代码为+1+idea)
+
+
+
+
+
+
+
+# idea插件之：Grep Console 控制台输出最美日志颜色主题
+
+##### 颜色参数
+
+| 日志级别 | 前景色  | 背景色  |
+| -------- | ------- | ------- |
+| Error    | #FF0000 | #370000 |
+| Warn     | #FFC033 | #1A0037 |
+| Info     | #00FFF3 | 无      |
+| Debug    | #808080 | 无      |
+
+![image-20240120191801945](idea%E4%BD%BF%E7%94%A8.assets/image-20240120191801945.png)

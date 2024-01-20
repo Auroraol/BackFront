@@ -1,4 +1,4 @@
-package com.springboot101.formatting.config;
+package com.springboot101.limit.config;
 
 
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -16,10 +16,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
 /**
- * 第一种全局时间格式化
+ * 全局时间格式化
  */
 @JsonComponent
-public class DateFormatConfig1 {
+public class DateFormatConfig{
 
     @Value("${spring.jackson.date-format:yyyy-MM-dd HH:mm:ss}")
     private String pattern;

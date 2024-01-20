@@ -12,15 +12,21 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
- 
- * @Description:
+
+ * @Description:  演示方法  用于在 Redis 中添加大量键值对
  */
 @Controller
 public class RedisController {
 
     @Autowired
-    private RedisTemplate<String, Serializable> redisTemplate;
+    private RedisTemplate redisTemplate;
+//    private RedisTemplate<String, Serializable> redisTemplate;
 
+    /**
+     * 映射 GET 请求 "/addKey" 到此方法，用于在 Redis 中添加大量键值对。
+     *
+     * @return 返回 null，因为这是一个演示方法，不返回实际内容。
+     */
     @GetMapping("/addKey")
     @ResponseBody
     public String addkey() {
@@ -29,7 +35,7 @@ public class RedisController {
 
             redisTemplate.opsForValue().set("test_key_" + i, i);
         }
+        System.out.println("end");
         return null;
     }
-
 }

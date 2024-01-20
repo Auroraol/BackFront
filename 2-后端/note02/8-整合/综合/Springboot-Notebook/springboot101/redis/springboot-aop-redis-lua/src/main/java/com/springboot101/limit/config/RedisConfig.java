@@ -1,13 +1,21 @@
 package com.springboot101.limit.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import static java.time.Duration.ZERO;
 
 /**
  * @Author: LFJ
@@ -15,6 +23,35 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @Configuration
 public class RedisConfig {
+
+	@Bean
+	public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+		RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig().entryTtl(ZERO);
+		return RedisCacheManager.builder(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory))
+				.cacheDefaults(redisCacheConfiguration).build();
+	}
+//
+//	@Bean
+//	public LettuceConnectionFactory lettuceConnectionFactory() {
+//		RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration("localhost", 6379);
+//		return new LettuceConnectionFactory(redisStandaloneConfiguration);
+//	}
+
+//	@Bean
+//	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+//		// 1.创建 redisTemplate 模版
+//		RedisTemplate<String, Object> template = new RedisTemplate<>();
+//		// 2.关联 redisConnectionFactory
+//		template.setConnectionFactory(redisConnectionFactory);
+//		// 3.创建 序列化类
+//		GenericToStringSerializer genericToStringSerializer = new GenericToStringSerializer(Object.class);
+//		// 6.序列化类，对象映射设置
+//		// 7.设置 value 的转化格式和 key 的转化格式
+//		template.setValueSerializer(genericToStringSerializer);
+//		template.setKeySerializer(new StringRedisSerializer());
+//		template.afterPropertiesSet();
+//		return template;
+//	}
 
 	/**
 	 * *redis序列化的工具定置类，下面这个请一定开启配置
@@ -48,31 +85,31 @@ public class RedisConfig {
 	}
 //
  }
-//@Configuration
-//public class RedisConfig {
-//
-//	//GenericJackson2JsonRedisSerializer
-//	@Bean
-//	@ConditionalOnMissingBean(name = "redisTemplate")
-//	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory){
-//		RedisTemplate<String, Object> template = new RedisTemplate<>();
-//		template.setConnectionFactory(factory);
-//
-//		//String的序列化方式
-//		StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-//		// 使用GenericJackson2JsonRedisSerializer 替换默认序列化(默认采用的是JDK序列化)
-//		GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
-//
-//		//key序列化方式采用String类型
-//		template.setKeySerializer(stringRedisSerializer);
-//		//value序列化方式采用jackson类型
-//		template.setValueSerializer(genericJackson2JsonRedisSerializer);
-//
-//		//hash的key序列化方式也是采用String类型
-//		template.setHashKeySerializer(stringRedisSerializer);
-//		//hash的value也是采用jackson类型
-//		template.setHashValueSerializer(genericJackson2JsonRedisSerializer);
-//		template.afterPropertiesSet();
-//		return template;
-//	}
-//}
+////@Configuration
+////public class RedisConfig {
+////
+////	//GenericJackson2JsonRedisSerializer
+////	@Bean
+////	@ConditionalOnMissingBean(name = "redisTemplate")
+////	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory){
+////		RedisTemplate<String, Object> template = new RedisTemplate<>();
+////		template.setConnectionFactory(factory);
+////
+////		//String的序列化方式
+////		StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+////		// 使用GenericJackson2JsonRedisSerializer 替换默认序列化(默认采用的是JDK序列化)
+////		GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
+////
+////		//key序列化方式采用String类型
+////		template.setKeySerializer(stringRedisSerializer);
+////		//value序列化方式采用jackson类型
+////		template.setValueSerializer(genericJackson2JsonRedisSerializer);
+////
+////		//hash的key序列化方式也是采用String类型
+////		template.setHashKeySerializer(stringRedisSerializer);
+////		//hash的value也是采用jackson类型
+////		template.setHashValueSerializer(genericJackson2JsonRedisSerializer);
+////		template.afterPropertiesSet();
+////		return template;
+////	}
+////}

@@ -84,12 +84,6 @@ Redis提供list和Set操作，这使得Redis能作为一个很好的消息队列
 
 ![](03-Redis.assets/4.小总结.jpg)
 
-
-
-
-
-
-
 # 三、Redis安装
 
 **官网地址:** 

@@ -5,7 +5,8 @@
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
 </head>
 <body>
-<p th:text="${order.createTime}"/>
+<p th:text="${#temporals.formatISO(order.createTime)}"/>
 <p th:text="${order.updateTime}"/>
+<span th:text="${#temporals.format(order.createTime, 'dd-MM-yyyy HH:mm')}"></span>
 </body>
 </html>

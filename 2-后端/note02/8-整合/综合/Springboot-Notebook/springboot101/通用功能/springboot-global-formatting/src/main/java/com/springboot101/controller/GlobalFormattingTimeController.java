@@ -23,6 +23,8 @@ public class GlobalFormattingTimeController {
         OrderDTO dto = new OrderDTO();
         dto.setCreateTime(LocalDateTime.now());
         dto.setUpdateTime(new Date());
+        System.out.println(dto.getCreateTime());
+        System.out.println(dto.getCreateTime());
 
         log.info(JSON.toJSONString(dto));
         return dto;

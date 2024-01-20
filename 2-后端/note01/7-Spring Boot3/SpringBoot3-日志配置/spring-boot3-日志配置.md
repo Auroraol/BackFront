@@ -145,6 +145,18 @@ logging.pattern.file=%d{yyyy-MM-dd} === [%thread] === %-5level === %logger{50} =
 | warn     | 警告，使用较多。                                            |
 | error    | 错误信息，使用较多。                                        |
 
+SpringBoot日志**默认级别是** **INFO**。 日志的默认显示级别是`info`，则只会显示`info`、`warn`、`error`级别的日志，不会显示`trace`、`debug`级别的日志。
+
+在application.properties/yaml中配置logging.level.<logger-name>=<level>指定日志级别
+
+```properties
+#默认所有日志没有精确指定级别就使用root的默认级别
+logging.level.root=info
+
+#精确调整某个包下的日志级别
+logging.level.com.atguigu.logging.controller=info
+```
+
 ### 输出格式
 
 我们可以通过以下常用日志参数对日志的输出格式进行修改，如下表。 
@@ -272,20 +284,6 @@ logging.pattern.dateformat=yyyy-MM-dd HH:mm:ss.SSS
 ```
 
 ![image-20231019155250132](spring-boot3-日志配置.assets/image-20231019155250132.png)
-
-### 日志级别
-
-SpringBoot日志**默认级别是** **INFO**
-
-在application.properties/yaml中配置logging.level.<logger-name>=<level>指定日志级别
-
-```properties
-#默认所有日志没有精确指定级别就使用root的默认级别
-logging.level.root=info
-
-#精确调整某个包下的日志级别
-logging.level.com.atguigu.logging.controller=info
-```
 
 ### 日志分组
 

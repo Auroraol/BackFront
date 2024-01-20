@@ -6,6 +6,8 @@
 
 SpringBoot 整合 Spring、SpringMVC、MyBatis 进行数据访问场景开发
 
+在 MyBatis 3.3.0 版本及以后，对于 MyBatis 实体类不再强制要求手动实现 `Serializable` 接口。不再需要为你的 MyBatis 实体类显式添加 `implements Serializable`。
+
 ### 1. 创建SSM整合项目
 
 ```xml
@@ -515,6 +517,8 @@ public class SpringBackEndApplication {
 
 ### 时间数据
 
+#### 方法1:  @JsonFormat 注解
+
 <strong  style="color:red">手动添加 @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")</strong>
 
 ```java
@@ -557,6 +561,92 @@ public class Timetest implements Serializable {
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }
+```
+
+#### 方法2: 配置类+@JsonFormat 注解 [推荐]
+
+使用 `@JsonComponent` 注解自定义一个全局格式化类，分别对 `Date`(旧的 API，不建议在新代码中使用) 和 `LocalDate` 类型做格式化处理。
+
+搭配`@JsonFormat` 注解的优先级比较高，会以 `@JsonFormat` 注解的时间格式为主。
+
+**编写配置类**
+
+```java
+/**
+ * 全局时间格式化
+ */
+@JsonComponent
+public class DateFormatConfig{
+
+    @Value("${spring.jackson.date-format:yyyy-MM-dd HH:mm:ss}")
+    private String pattern;
+
+    /**
+
+     * @description date 类型全局时间格式化
+     * @date 2020/8/31 18:22
+     */
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilder() {
+
+        return builder -> {
+            TimeZone tz = TimeZone.getTimeZone("UTC");
+            DateFormat df = new SimpleDateFormat(pattern);
+            df.setTimeZone(tz);
+            builder.failOnEmptyBeans(false)
+                    .failOnUnknownProperties(false)
+                    .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                    .dateFormat(df);
+        };
+    }
+
+    /**
+
+     * @description LocalDate 类型全局时间格式化
+     * @date 2020/8/31 18:22
+     */
+    @Bean
+    public LocalDateTimeSerializer localDateTimeDeserializer() {
+        return new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(pattern));
+    }
+
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer(
+            @Autowired LocalDateTimeSerializer localDateTimeSerializer) {
+        return builder -> builder.serializerByType(LocalDateTime.class, localDateTimeSerializer);
+    }
+}
+```
+
+测试
+
+```java
+@Data
+public class OrderDTO {
+    private LocalDateTime createTime;    // yyyy-MM-dd HH:mm:ss
+
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd")
+    private Date updateTime;  //yyyy-MM-dd
+}
+```
+
+注意: 其中的日期字段并没有被更新。
+
+```java
+public OrderDTO timeTest(OrderDTO orderDTO) {
+    OrderDTO dto = new OrderDTO();
+    dto.setCreateTime(LocalDateTime.now());
+    dto.setUpdateTime(new Date());
+    // 其中的日期字段并不会更新
+    System.out.println(dto.getCreateTime());  //2024-01-20T15:13:49.662446900
+    System.out.println(dto.getCreateTime());  //2024-01-20T15:13:49.662446900
+    
+    return dto; // 添加这行，将新创建的 OrderDTO 返回给调用方
+}
+
+OrderDTO dto = timeTest();
+System.out.println(dto.getCreateTime());  //2024-01-20 15:13:49.662446900
+System.out.println(dto.getCreateTime());  //2024-01-20
 ```
 
 ### CRUD接口方式
@@ -1955,6 +2045,10 @@ public class DynamicSwitchController {
 
 # SpringBoot 整合 JPA
 
+具体代码见:
+
+<img src="SpringBoot3-%E6%95%B0%E6%8D%AE%E8%AE%BF%E9%97%AE.assets/image-20240120144148147.png" alt="image-20240120144148147" style="zoom:67%;" />
+
 ## **表结构**
 
 ```sql
@@ -2193,6 +2287,61 @@ public List<Spu> findByTitle(String title);
 **6.** 使用@Param命名化参数
 
 ```java
-    @Query(value = "select s from Spu s where s.title in (:titles)")
-    List<Spu> findByTitle(@Param("titles") List<String> titles);
+@Query(value = "select s from Spu s where s.title in (:titles)")
+List<Spu> findByTitle(@Param("titles") List<String> titles);
 ```
+
+# 实现Serializable接口的作用和必要性(了解)
+
+显式添加 `implements Serializable`:
+
++ 存储到数据库
++ 网络传输
+
+注意: 
+
++ 如果网络传输也就是前后端联调使用地是json字符串也不用序列化，
+
++ 存储mysql和redis的时候mysql会自己映射以及redis的也有自己的一套序列化方式，比如在config类里定义redisTemplate的序列化方式
+
+在 MyBatis 3.3.0 版本及以后，对于 MyBatis 实体类不再强制要求手动实现 `Serializable` 接口。你不再需要为你的 MyBatis 实体类显式添加 `implements Serializable`。
+
+```java
+public class User implements Serializable {
+
+    private int id;
+
+//    transient 标记的字段不会参与序列化
+//    private transient String name;
+
+    private String name;
+
+    private int age;
+
+    private String address;
+
+    private static final ObjectStreamField[] serialPersistentFields = {
+            new ObjectStreamField("name", String.class),
+            new ObjectStreamField("age", Integer.class)
+    };
+
+    ...
+
+}
+```
+
+比如一个对象
+
+```
+@Entity
+@Table(name = "test", schema = "example")
+public class Test implements Serializable{
+    private int id;
+    private String name;
+    ……
+}
+```
+
+如果没有用implements Serializable时，数据以此Test对象封装存进数据库，当要取出时，即使**SQL**在数据库中能正确返回数据，但sessionFactory.getCurrentSession().createNativeQuery(**SQL**,Test.class).list()返回的数据中字段内容都是空（数据条目数量正常不受影响），从而会导致诸如Method threw 'javax.persistence.PersistenceException' exception.等错误。
+
+总而言之，就是保障数据完璧归赵的取或读。
