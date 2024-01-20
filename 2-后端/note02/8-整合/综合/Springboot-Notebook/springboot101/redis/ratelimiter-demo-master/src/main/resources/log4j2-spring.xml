@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="info">
+
+	<properties>
+		<property name="LOG_PATH">/data/online/boot/logs/ratelimiter-demo</property>
+		<property name="LOG_NAME">ratelimiter-demo</property>
+	</properties>
+	<appenders>
+		<console name="console" target="SYSTEM_OUT">
+			<patternLayout
+				pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread][%file:%line] - %msg%n" />
+		</console>
+		<RollingRandomAccessFile name="ProductionLog" 	 fileName="${LOG_PATH}/${LOG_NAME}.log"
+								 filePattern="${LOG_PATH}/${LOG_NAME}.%d{yyyy-MM-dd}.log">
+			<PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%X{uuid}] %level  [%thread][%file:%line] - %msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1"    modulate="true" />
+			</Policies>
+		</RollingRandomAccessFile>
+	</appenders>
+	<loggers>
+		<root level="info">
+			<appenderRef ref="console" />
+			<appenderRef ref="ProductionLog" />
+		</root>
+		<logger name="com.crayon" level="debug"/>
+	</loggers>
+</configuration>
+
+

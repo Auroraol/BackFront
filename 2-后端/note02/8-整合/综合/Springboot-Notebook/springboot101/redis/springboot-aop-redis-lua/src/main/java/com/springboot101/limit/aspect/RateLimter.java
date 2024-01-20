@@ -5,9 +5,7 @@ import com.springboot101.limit.enmu.LimitType;
 import java.lang.annotation.*;
 
 /**
- * @author xiaofu
  * @description redis限流注解
- * @date 2020/4/8 13:15
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -31,12 +29,12 @@ public @interface RateLimter {
     String prefix() default "";
 
     /**
-     * 给定的时间范围 单位(秒)
+     * 过期时间，单位秒
      */
     int period();
 
     /**
-     * 一定时间内最多访问次数
+     * 单位时间限制通过请求数
      */
     int count();
 
@@ -47,7 +45,6 @@ public @interface RateLimter {
 
     /**
      * 返回值
-     * @return
      */
     String message() default "false";
 }
