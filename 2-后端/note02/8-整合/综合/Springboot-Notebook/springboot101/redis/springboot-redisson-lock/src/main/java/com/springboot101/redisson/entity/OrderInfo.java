@@ -1,18 +1,23 @@
 package com.springboot101.redisson.entity;
 
+import lombok.Data;
 import org.redisson.api.annotation.REntity;
 import org.redisson.api.annotation.RId;
 import org.redisson.api.annotation.RIndex;
 
 /**
- 
- * @Description:
+
+ * @Description: 订单信息
  */
-@REntity
+@REntity   //Redis的基础上实现的
+@Data
 public class OrderInfo {
 
     @RId
     private Integer id;
+
+    @RIndex
+    private String productId;
 
     @RIndex
     private String name;
@@ -20,27 +25,9 @@ public class OrderInfo {
     @RIndex
     private Integer age;
 
-    public Integer getId() {
-        return id;
-    }
+    @RIndex
+    private Integer productQuantity;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
+    @RIndex
+    private Integer price = 10;
 }

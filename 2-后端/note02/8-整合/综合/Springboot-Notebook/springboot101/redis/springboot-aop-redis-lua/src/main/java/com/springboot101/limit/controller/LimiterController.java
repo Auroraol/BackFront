@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RestController
 public class LimiterController {
 
-    // 用于测试
+    // 用于测试, 写的不好
     // 原子整数用于跟踪每个端点的请求计数
     private static final AtomicInteger ATOMIC_INTEGER_1 = new AtomicInteger();
     private static final AtomicInteger ATOMIC_INTEGER_2 = new AtomicInteger();

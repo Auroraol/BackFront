@@ -2291,6 +2291,82 @@ public List<Spu> findByTitle(String title);
 List<Spu> findByTitle(@Param("titles") List<String> titles);
 ```
 
+## 基本使用
+
+###  实体类
+
+```java
+package com.springboot101.po;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.util.Date;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity   //实体类注解，自动建表必须添加
+@Table(name = "t_user")  //设置生成的表名,不添加默认表名为实体类名
+public class User {
+
+    @Id   //标注主键
+    @GeneratedValue(strategy = GenerationType.AUTO)   //id自增策略
+    private Long id;
+
+    private String name;
+
+    private Integer age;
+
+    private String email;
+
+    @Column(name = "create_time")  //设置生成的字段名,不添加默认字段为变量名
+    private Date createTime;
+
+    @Column(name = "update_time")
+    private Date updateTime;
+}
+```
+
+### 编写xxxRepository
+
+```java
+package com.springboot101.repository;
+
+import com.springboot101.po.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+}
+```
+
+### service
+
+```java
+package com.springboot101.service;
+
+import com.springboot101.po.User;
+import com.springboot101.repository.UserRepository;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+
+@Component
+public class UserService {
+
+    @Resource
+    private UserRepository userRepository;
+
+
+    public void insertUser(User user){
+
+        userRepository.save(user);
+    }
+}
+```
+
 # 实现Serializable接口的作用和必要性(了解)
 
 显式添加 `implements Serializable`:
@@ -2345,3 +2421,37 @@ public class Test implements Serializable{
 如果没有用implements Serializable时，数据以此Test对象封装存进数据库，当要取出时，即使**SQL**在数据库中能正确返回数据，但sessionFactory.getCurrentSession().createNativeQuery(**SQL**,Test.class).list()返回的数据中字段内容都是空（数据条目数量正常不受影响），从而会导致诸如Method threw 'javax.persistence.PersistenceException' exception.等错误。
 
 总而言之，就是保障数据完璧归赵的取或读。
+
+# 其他
+
+手动写的实体类
+
+```java
+@REntity   //Redis的基础上实现的
+@Data
+public class OrderInfo {
+
+    @RId
+    private Integer id;
+
+    @RIndex
+    private String name;
+
+    @RIndex
+    private Integer age;
+}
+```
+
+service
+
+```java
+@Autowired
+OrderInfo orderInfo;  无法自动装配。找不到 'OrderInfo' 类型的 Bean。
+```
+
+推荐使用
+
+```
+OrderInfo orderInfo = new OrderInfo();
+```
+

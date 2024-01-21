@@ -126,14 +126,13 @@ public class RateLimterAspect {
                 key = StringUtils.upperCase(method.getName());
         }
         // key拼接前缀
-        ImmutableList<String> keys = ImmutableList.of(StringUtils.join(rateLimiter.prefix(), key));
+        //ImmutableList<String> keys = ImmutableList.of(StringUtils.join(rateLimiter.prefix(), key));
 
-        // 执行Lua脚本
         //执行Lua脚本
         List<String> keyList = new ArrayList<>();
 
         // 设置key值为注解中的值
-        keyList.add(key);
+        keyList.add(StringUtils.join(rateLimiter.prefix(), key));
 
         //调用脚本并执行
         try {

@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  
- * @Description:
+ * @Description:使用了 Redisson 框架的 RLiveObjectService，
+ * 该框架提供了一种将 Java 对象持久化到 Redis 中并与之保持同步的机制
  */
 @Controller
 @RequestMapping
@@ -26,6 +27,8 @@ public class LiveObjectController {
     public String reduceStock() {
 
         RLiveObjectService service = redissonClient.getLiveObjectService();
+
+        // 创建 OrderInfo 对象
         OrderInfo orderInfo = new OrderInfo();
         orderInfo.setId(1);
         orderInfo.setName("小富111");

@@ -31,10 +31,10 @@ public class LockController {
     @GetMapping("/reduceStock2")
     @ResponseBody
     public String reentrantLock(String order) {
-
         RLock reentrantLock = redissonClient.getLock(order);
         try {
             if (reentrantLock.tryLock(100, 8, TimeUnit.SECONDS)) {
+                //
                 System.out.println(Thread.currentThread().getName() + "---" + order + "---" + "加锁成功");
                 Thread.currentThread().sleep(10000);
                 return "YES";
@@ -58,7 +58,7 @@ public class LockController {
 
         RLock reentrantLock = redissonClient.getLock(order);
         try {
-            // 100尝试加锁的时间 ，10锁过期时间
+            // 尝试加锁，最多等待100秒，上锁以后10秒自动解锁
             if (reentrantLock.tryLock(100, 10, TimeUnit.SECONDS)) {
                 //Thread.currentThread().sleep(10000);
                 System.out.println(order + "加锁成功");
@@ -91,6 +91,7 @@ public class LockController {
         } catch (Exception e) {
             reentrantLock.unlock();
         } finally {
+            // 必执行
             reentrantLock.unlock();
         }
     }

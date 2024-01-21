@@ -3,5 +3,5 @@ spring:
     redisson:
       config: "classpath:redisson.yml"
 server:
-  port: 8083
+  port: 8080
 

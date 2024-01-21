@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @Author: LFJ
  * @Date: 2024-01-19 14:47
- * @Description:  演示方法
+ * @Description:  测试redis连接的演示方法
  */
 @RestController
 public class OrderController {

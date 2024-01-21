@@ -80,12 +80,6 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
 
 至于销毁，是在容器关闭时调用的，详见 `ConfigurableApplicationContext#close()`
 
-
-
-
-
-
-
 # 三、@Bean注解总结[核心]
 
 + Spring的@Bean注解用于告诉方法，产生一个Bean对象，然后这个Bean对象交给Spring管理。 产生这个Bean对象的方法Spring只会调用一次，随后这个Spring将会将这个Bean对象放在自己的IOC容器中。

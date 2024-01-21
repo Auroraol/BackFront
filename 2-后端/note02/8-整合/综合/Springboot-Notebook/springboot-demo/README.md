@@ -243,3 +243,83 @@ public List<Spu> findByTitle(String title);
 ```
 
 **6.** 使用@Param命名化参数
+
+
+
+
+## 基本使用
+
+###  实体类
+
+```java
+package com.springboot101.po;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.util.Date;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity   //实体类注解，自动建表必须添加
+@Table(name = "t_user")  //设置生成的表名,不添加默认表名为实体类名
+public class User {
+
+    @Id   //标注主键
+    @GeneratedValue(strategy = GenerationType.AUTO)   //id自增策略
+    private Long id;
+
+    private String name;
+
+    private Integer age;
+
+    private String email;
+
+    @Column(name = "create_time")  //设置生成的字段名,不添加默认字段为变量名
+    private Date createTime;
+
+    @Column(name = "update_time")
+    private Date updateTime;
+}
+```
+
+### 编写xxxRepository
+
+```java
+package com.springboot101.repository;
+
+import com.springboot101.po.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+}
+```
+
+### service
+
+```java
+package com.springboot101.service;
+
+import com.springboot101.po.User;
+import com.springboot101.repository.UserRepository;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+
+@Component
+public class UserService {
+
+    @Resource
+    private UserRepository userRepository;
+
+
+    public void insertUser(User user){
+
+        userRepository.save(user);
+    }
+}
+
+```
