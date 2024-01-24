@@ -21,7 +21,6 @@
         <!-- redis -->
         <module>redis/springboot-aop-redis-lua</module>
         <module>redis/springboot-redisson-lock</module>
-        <module>redis/zengtengpeng-test</module>
 
 
         <!-- 低代码 -->

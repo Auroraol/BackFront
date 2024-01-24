@@ -32,7 +32,7 @@ public class RedissonConfig {
         return Redisson.create();}
     **/
 
-    // 推荐一下方式
+    // 推荐方式
     @Bean(destroyMethod = "shutdown")
     public RedissonClient redissonClient() throws IOException {
         Config config = Config.fromYAML(new ClassPathResource("redisson.yml").getInputStream());

@@ -60,7 +60,8 @@ public class RedissonConfig {
 //    }
 
     @Bean(destroyMethod = "shutdown")
-    public RedissonClient redissonClient(){
-        return Redisson.create();
+    public RedissonClient redissonClient() throws IOException {
+        Config config = Config.fromYAML(new ClassPathResource("redisson.yml").getInputStream());
+        return Redisson.create(config);
     }
 }

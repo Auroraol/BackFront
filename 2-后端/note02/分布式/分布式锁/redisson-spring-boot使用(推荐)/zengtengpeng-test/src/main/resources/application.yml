@@ -16,6 +16,7 @@
 #spring:
 #    # redis配置
 #    redis:
-  # 会出现问题, 建议直接写配置类
-  #    redisson:
-  #        config: classpath:redisson-single.yml
+##   会出现问题, 建议直接写配置类
+#      redisson:
+#        config: classpath:redisson-single.yml
+

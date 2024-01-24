@@ -44,8 +44,8 @@ spring:
         max-idle: 8
         min-idle: 0
         redis:
-    redisson:
-      config: classpath:redisson-loc.yml
+#    redisson:
+#      config: classpath:redisson-loc.yml
 
 logging:
   level:
