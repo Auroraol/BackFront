@@ -24,12 +24,15 @@ import static java.time.Duration.ZERO;
 @Configuration
 public class RedisConfig {
 
+	/*
+	这种配置适用于需要使用 Redis 作为缓存存储，且希望缓存的数据一直有效的情况。
 	@Bean
 	public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
 		RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig().entryTtl(ZERO);
 		return RedisCacheManager.builder(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory))
 				.cacheDefaults(redisCacheConfiguration).build();
 	}
+	*/
 //
 //	@Bean
 //	public LettuceConnectionFactory lettuceConnectionFactory() {

@@ -1,0 +1,19 @@
+swagger:
+  show: true
+  
+server:
+  port: 1100
+  jsp-servlet:
+    init-parameters.development: true
+  tomcat:
+    uriEncoding: UTF-8
+    
+spring:
+  application:
+    name: fbslock-uat
+  mvc:
+    view:
+      suffix: .jsp
+
+cxf:
+  path: /webservice

@@ -1136,8 +1136,6 @@ public class AppConfig {
 
 **问题**：配置多以后难阅读和修改，**层级结构辨识度不高**
 
-
-
 YAML 是 "YAML Ain't a Markup Language"（YAML 不是一种标记语言）。在开发的这种语言时，YAML 的意思其实是："Yet Another Markup Language"（是另一种标记语言）。
 
 - 设计目标，就是**方便人类读写**
@@ -1152,15 +1150,15 @@ YAML 是 "YAML Ain't a Markup Language"（YAML 不是一种标记语言）。在
 - 缩进的空格数目不重要，只要**相同层级**的元素**左侧对齐**即可
 - **# 表示注释**，从这个字符一直到行尾，都会被解析器忽略。
 
-
-
 支持的写法：
 
 - **对象**：**键值对**的集合，如：映射（map）/ 哈希（hash） / 字典（dictionary）
 - **数组**：一组按次序排列的值，如：序列（sequence） / 列表（list）
 - **纯量**：单个的、不可再分的值，如：字符串、数字、bool、日期
 
-### 例子1
+### 例子1(基本使用)
+
+使用的是@ConfigurationProperties的方法和例子2一样
 
 配置类
 
@@ -1248,7 +1246,7 @@ person:
     c2: {name: 小绿,age: 2} #对象也可用{}表示
 ```
 
-### 例子2(配置类)
+### 例子2(@ConfigurationProperties)
 
 ```yml
 # JWT配置
@@ -1298,10 +1296,9 @@ public class JwtService {
         // 使用配置参数进行JWT操作
     }
 }
-
 ```
 
-### 例子3(注解)
+### 例子3(@value)
 
 ```yml
 # JWT配置
@@ -6098,6 +6095,8 @@ public class ApiUiConfigApiUiConf {
 # 读取配置文件常用方式
 
 [Spring Boot读取配置文件常用方式](https://blog.csdn.net/Alian_1223/article/details/118891954)
+
+参考:  YAML配置文件的文章
 
 ## @ConfigurationProperties方式(推荐)
 

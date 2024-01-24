@@ -329,7 +329,7 @@ spring.main.banner-mode=off
 
 # idea插件之：Grep Console 控制台输出最美日志颜色主题
 
-##### 颜色参数
+ 颜色参数
 
 | 日志级别 | 前景色  | 背景色  |
 | -------- | ------- | ------- |
@@ -339,3 +339,29 @@ spring.main.banner-mode=off
 | Debug    | #808080 | 无      |
 
 ![image-20240120191801945](idea%E4%BD%BF%E7%94%A8.assets/image-20240120191801945.png)
+
+# 重装IDEA同步个人配置
+
+1.首先将本地的设置上传到云端
+
+![image-20240121202226144](idea%E4%BD%BF%E7%94%A8.assets/image-20240121202226144.png)
+
+2.勾选了`Auto Sync`：自动同步
+
+![image-20240121202409411](idea%E4%BD%BF%E7%94%A8.assets/image-20240121202409411.png)
+
+3.点击小云朵
+
+![image-20240121202542016](idea%E4%BD%BF%E7%94%A8.assets/image-20240121202542016.png)
+
+只有修改这里的配置才可以进行同步
+
+
+
+# Redis Helper 插件
+
+![image-20240121202919321](idea%E4%BD%BF%E7%94%A8.assets/image-20240121202919321.png)
+
+效果
+
+![image-20240121203413745](idea%E4%BD%BF%E7%94%A8.assets/image-20240121203413745.png)

@@ -121,6 +121,8 @@ public class FaceEngineServiceImpl implements FaceEngineService {
                     log.info("相似度：{}", faceSimilar.getScore());
                     if (faceSimilar.getScore() >= 0.8) {
                         user.setFirstLogin(false);
+                        // 更新用户
+                        user = userDao.save(user);
                         log.info("老用户");
                         return user;
                     }

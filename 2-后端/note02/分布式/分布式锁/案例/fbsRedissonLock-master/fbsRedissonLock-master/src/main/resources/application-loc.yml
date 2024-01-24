@@ -1,0 +1,55 @@
+swagger:
+  show: true
+  
+server:
+  port: 1100
+  jsp-servlet:
+    init-parameters.development: true
+  tomcat:
+    uriEncoding: UTF-8
+    
+spring:
+  devtools: 
+    add-properties: true
+  application:
+    name: fbslock-loc
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+  mvc:
+    view:
+      suffix: .jsp
+  datasource:
+    url: jdbc:mysql://localhost:3306/local_dev?useServerPrepStmts=true&cachePrepStmts=true&prepStmtCacheSize=500&prepStmtCacheSqlLimit=2048&useLocalSessionState=true&useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      max-active: 5
+      min-idle: 1
+  #    hikari:
+  #      maxLifetime: 1765000 #一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟，建议设置比数据库超时时长少30秒以上
+  #      maximumPoolSize: 5 #连接池中允许的最大连接数。缺省值：10；推荐的公式：((core_count * 2) + effective_spindle_count)
+
+  redis:
+    database: 0
+    host: localhost
+    password:
+    port: 6379
+    ssl: false
+    lettuce:
+      pool:
+        max-wait: -1ms
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        redis:
+    redisson:
+      config: classpath:redisson-loc.yml
+
+logging:
+  level:
+    web: DEBUG
+    
+cxf:
+  path: /webservice

@@ -29,6 +29,20 @@ root@lfj-virtual-machine:/myredis# redis-server /myredis/redis.conf
 root@lfj-virtual-machine:/myredis# redis-cli -a 741106 -p 6379 -h 192.168.200.134 --raw
 ```
 
+例子
+
+```shell
+lfj@lfj-virtual-machine:/myredis$ sudo su root
+[sudo] password for lfj: 
+root@lfj-virtual-machine:/myredis# redis-server /myredis/redis.conf
+root@lfj-virtual-machine:/myredis# ps -aux|grep redis
+root        4705 49.2  1.0  98656 43396 ?        Ssl  11:06   0:01 redis-server *:6379
+root        4713  0.0  0.0  12116   660 pts/0    S+   11:06   0:00 grep --color=auto redis
+root@lfj-virtual-machine:/myredis# redis-cli -a 741106 -p 6379 -h 192.168.200.134 --raw
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+192.168.200.134:6379> 
+```
+
 注意: 
 
 + 192.168.200.134为linux的ip地址
@@ -248,7 +262,7 @@ public class OrderService {
 
 # springboot-aop-redis-lua(分布式限流)
 
-springboot-aop-redis-lua  实现的分布式限流方案。除了缓存之外，有时候会拿Redis做分布式锁。
+springboot-aop-redis-lua  实现的分布式限流方案。
 
 ## 需求
 
@@ -753,6 +767,8 @@ public class RateLimiterAutoConfiguration {
 
 # springboot-redisson-lock(分布式锁)
 
+除了缓存之外，有时候会拿Redis做分布式锁。
+
 ## pom 
 
 ```xml
@@ -768,6 +784,36 @@ public class RateLimiterAutoConfiguration {
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <version>2.3.1.RELEASE</version>
         </dependency>
+```
+
+**redisson.yaml**
+
+```
+singleServerConfig:
+  idleConnectionTimeout: 10000
+  pingTimeout: 1000
+  connectTimeout: 10000
+  timeout: 3000
+  retryAttempts: 3
+  retryInterval: 1500
+  subscriptionsPerConnection: 5
+  clientName: null
+  address: "redis://192.168.200.134:6379"
+  subscriptionConnectionMinimumIdleSize: 1
+  subscriptionConnectionPoolSize: 50
+  connectionMinimumIdleSize: 32
+  connectionPoolSize: 64
+  database: 14
+  
+# 设置线程数为0
+threads: 0
+# 设置Netty线程数为0
+nettyThreads: 0
+# 配置Codec为JsonJacksonCodec
+codec:
+  class: "org.redisson.codec.JsonJacksonCodec"
+# 配置传输模式为NIO
+transportMode: "NIO"
 ```
 
 以下是其中的一些关键配置项的解释：
@@ -787,6 +833,35 @@ public class RateLimiterAutoConfiguration {
 - `connectionMinimumIdleSize`: 连接的最小空闲连接数。
 - `connectionPoolSize`: 连接的连接池大小。
 - `database`: Redis 数据库的编号
+
+**application.yml**
+
+```
+  # redis单机
+  redis:
+    database: 14
+    host: 192.168.200.134
+    password: 741106
+    port: 6379
+    lettuce:
+      pool:
+        max-wait: -1ms
+        max-active: 20
+        min-idle: 0
+        max-idle: 8
+    redisson:
+      config: classpath:redisson.yaml  # 指定了 Redisson 的配置文件路径
+
+```
+
+**关键配置属性**：
+
+- `maxTotal`：对象池中可分配的最大对象数（包括空闲和正在使用的对象）。
+- `maxIdle`：对象池中的最大空闲对象数。
+- `minIdle`：对象池应该保留的最小空闲对象数。
+- `blockWhenExhausted`：指定在对象池耗尽时，`borrowObject` 方法是否应该阻塞。
+- `maxWaitMillis`：当 `blockWhenExhausted` 为 true 时，`borrowObject` 方法应该阻塞的最长时间。
+- `testOnBorrow`、`testOnReturn`、`testWhileIdle`：布尔标志，指示在借用、归还或空闲时是否验证对象。
 
 ## 基本使用
 
@@ -849,13 +924,7 @@ public class DistributedLockServer {
 }
 ```
 
-
-
-
-
-建议使用[分布式锁 (github.com)](https://github.com/z744489075/redisson-spring-boot-starter)
-
-
+建议使用
 
 
 

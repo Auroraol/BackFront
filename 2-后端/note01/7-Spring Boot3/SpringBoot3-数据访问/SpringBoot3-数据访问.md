@@ -1,6 +1,20 @@
-# 3、SpringBoot3-数据访问
+# 持久化框架-JPA & MyBatis
 
-##  [MyBatis-Plus官方](https://baomidou.com/)
+## 1. 选择JPA：
+
+- 当您的项目需要遵循Java的标准规范，并且希望代码更加面向对象时，JPA可能是更好的选择。
+- 如果您的团队对ORM框架有经验，可以更容易地上手JPA。
+- 当您希望更少地编写SQL查询并且使用JPQL进行查询时，JPA可能更适合。
+
+## 2. 选择MyBatis：
+
+- 如果您的项目需要执行复杂的SQL查询或需要更多的性能控制，MyBatis可能是更好的选择。
+- 如果您的团队对SQL编写和数据库性能优化有丰富的经验，可以考虑使用MyBatis。
+- 当您需要处理与数据库交互更多细节时，MyBatis可以提供更灵活的选择。
+
+# SpringBoot 整合 MyBatis
+
+[MyBatis-Plus官方](https://baomidou.com/)
 
 ## 整合SSM场景——方式一
 
@@ -563,6 +577,34 @@ public class Timetest implements Serializable {
 }
 ```
 
+1. **@JsonFormat**:
+
+   - **作用**：用于在 JSON 序列化和反序列化时指定日期时间的格式。
+   - **使用场景**：通常在实体类的日期时间字段上使用，以控制将对象转换为 JSON 字符串或从 JSON 字符串转换为对象时的日期格式。
+
+   示例：
+
+   ```
+   @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
+   private Date myDate;
+   ```
+
+   这里的 `@JsonFormat` 指定了日期时间的格式为 "yyyy-MM-dd HH:mm"，并设置了时区为 "GMT+8"。
+
+2. **@DateTimeFormat**:
+
+   - **作用**：用于在 Web 请求中将前端传递的日期时间字符串转换为后端的 `Date` 或 `LocalDateTime` 对象。
+   - **使用场景**：通常在 Controller 层的请求参数上使用，用于处理前端传递的日期时间字符串。
+
+   示例：
+
+   ```
+   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+   private Date myDate;
+   ```
+
+   这里的 `@DateTimeFormat` 指定了日期时间的格式为 "yyyy-MM-dd HH:mm:ss"，用于处理前端传递的字符串。
+
 #### 方法2: 配置类+@JsonFormat 注解 [推荐]
 
 使用 `@JsonComponent` 注解自定义一个全局格式化类，分别对 `Date`(旧的 API，不建议在新代码中使用) 和 `LocalDate` 类型做格式化处理。
@@ -1042,7 +1084,7 @@ date_format(日期，'格式')：将日期按照格式进行插入或者返回�
 注意：如果{0}替换为实际值，可能会造成sql注入。
 ```
 
-
+**总结**
 
 ```java
 public class SelectTest {
@@ -2098,7 +2140,7 @@ public class MetaGroupPO {
 
 **详细说明**
 
-@Column注解：
+@Column注解： 可以不加
 
 ```
 @Column注释定义了将成员属性映射到关系表中的哪一列和该列的结构信息，属性如下：
@@ -2124,6 +2166,17 @@ public class MetaGroupPO {
 ```
 
 其中与@Id一起使用的还有另外两个注解：@GeneratedValue、@GenericGenerator，参考[@GeneratedValue与@GenericGenerator](https://blog.csdn.net/u011781521/article/details/72210980)
+
+1. **@CreatedDate**:
+   - **框架**：Spring Data JPA 提供。
+   - **作用**：用于标注实体对象的创建时间字段，通常与 Spring Data JPA 的 `@EntityListeners(AuditingEntityListener.class)` 配合使用，实现在实体对象创建时自动填充创建时间的功能。
+2. **@LastModifiedDate**:
+   - **框架**：Spring Data JPA 提供。
+   - **作用**：标注实体对象的最后修改时间字段，通常与 Spring Data JPA 的 `@EntityListeners(AuditingEntityListener.class)` 配合使用，实现在实体对象修改时自动填充最后修改时间的功能。
+
+
+
+
 
 ## JPA的Repository详解
 
@@ -2366,6 +2419,8 @@ public class UserService {
     }
 }
 ```
+
+# TODO
 
 # 实现Serializable接口的作用和必要性(了解)
 

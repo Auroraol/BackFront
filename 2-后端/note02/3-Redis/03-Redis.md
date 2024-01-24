@@ -205,6 +205,14 @@ redis-server /myredis/redis.conf
 
 注意:   /myredis/redis.conf 是自己写的配置文件,一般不修改源配置文件
 
+查看是否启动成功
+
+```
+ps -aux|grep redis
+```
+
+![在这里插入图片描述](03-Redis.assets/20200529175822395.png)
+
 #### 使用redis-cli连接Redis
 
 ```
@@ -217,6 +225,21 @@ redis-cli -a 741106 -p 6379
 
 + 741106表示密码
 +  6379表示端口号, 默认就是6379
+
+总结
+
+```shell
+lfj@lfj-virtual-machine:/myredis$ sudo su root
+[sudo] password for lfj: 
+root@lfj-virtual-machine:/myredis# redis-server /myredis/redis.conf
+root@lfj-virtual-machine:/myredis# ps -aux|grep redis
+root        4705 49.2  1.0  98656 43396 ?        Ssl  11:06   0:01 redis-server *:6379
+root        4713  0.0  0.0  12116   660 pts/0    S+   11:06   0:00 grep --color=auto redis
+root@lfj-virtual-machine:/myredis# redis-cli -a 741106 -p 6379 -h 192.168.200.134 --raw
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+192.168.200.134:6379> 
+
+```
 
 #### 关闭&退出
 
@@ -614,7 +637,7 @@ KV模式不变，但V是一个键值对  Map<String, Map<Object, Object>>
 
 #### 1.hset/hget/hmset/hmget/hgetall/hdel
 
-<img src="03-Redis.assets/image-20231007223917084.png" alt="image-20231007223917084" style="zoom:80%;" />
+<img src="03-Redis.assets/image-20240121194715864.png" alt="image-20240121194715864" style="zoom:67%;" />
 
 #### 2.hlen
 

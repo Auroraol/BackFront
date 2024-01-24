@@ -1,0 +1,58 @@
+server:
+  port: 6666
+  servlet:
+    context-path: /
+
+spring:
+  # 数据源
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/redis_demo?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: 741106
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.jdbc.Driver
+    logSlowSql: true
+  jpa:
+    # 显示sql
+    show-sql: false
+    # 自动生成表结构
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+#  redis:
+#    redis:
+#      cluster:
+#        nodes: 192.168.200.134:6379, 10.211.55.4:6380, 10.211.55.4:6381
+#      lettuce:
+#        pool:
+#          min-idle: 0
+#          max-idle: 8
+#          max-active: 20
+  # redis单机
+  redis:
+    database: 14
+    host: 192.168.200.134
+    password: 741106
+    port: 6379
+    lettuce:
+      pool:
+        max-wait: -1ms
+        max-active: 20
+        min-idle: 0
+        max-idle: 8
+    # 会出现问题, 建议直接写配置类
+    # redisson:
+    #   config: classpath:redisson.yaml
+
+# 日志
+logging:
+  # 输出级别
+  level:
+    root: info
+  file:
+    # 指定路径
+    path: redis-logs
+    # 最大保存天数
+    max-history: 7
+    # 每个文件最大大小
+    max-size: 5MB

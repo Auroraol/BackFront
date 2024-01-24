@@ -1,0 +1,38 @@
+server:
+  port: 18005
+  servlet:
+    context-path: /digital-service
+spring:
+  application:
+    name: digital-service
+  # redis配置
+  redis:
+    host: 192.168.200.134
+    port: 6379
+    # 密码进行AES加密的
+    password: 1STNG5CKc4Uar9rZYxrGFw==
+    redisson:
+      config: classpath:redisson-single.yml
+
+    # 设置lettuce连接池需引入 commons-pool2依赖
+    lettuce:
+      pool:
+        # 连接池最大连接数（使用负值表示没有限制）
+        max-active: 200
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1
+        # 连接池中的最大空闲连接
+        max-idle: 10
+        # 连接池中的最小空闲连接
+        min-idle: 0
+
+# knife4j配置
+knife4j:
+  # 开启增强配置
+  enable: true
+  # 如果为true则开启生产环境屏蔽
+  production: false
+  basic:
+    enable: true
+    username: ${spring.application.name}
+    password: 123
