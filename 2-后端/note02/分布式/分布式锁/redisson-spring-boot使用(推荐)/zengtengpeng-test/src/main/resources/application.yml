@@ -1,22 +1,2 @@
-#redis:
-#    database: 14
-#    host: 192.168.200.134
-#    password: 741106
-#    port: 6379
-#    lettuce:
-#        pool:
-#            max-wait: -1ms
-#            max-active: 20
-#            min-idle: 0
-#            max-idle: 8
-#    redisson:
-#        singleServerConfig:
-#            address: 192.168.200.134:6379
-
-#spring:
-#    # redis配置
-#    redis:
-##   会出现问题, 建议直接写配置类
-#      redisson:
-#        config: classpath:redisson-single.yml
-
+server:
+  port: 8080

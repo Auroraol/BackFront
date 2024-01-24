@@ -50,7 +50,6 @@ public class OrderServerImpl implements OrderServer {
             boolean locked = lock.tryLock(10,10, TimeUnit.SECONDS);
 
             if (locked) {
-                //lock.lock(10, TimeUnit.SECONDS);
                 // 3.获取锁成功，执行需要加锁保护的业务逻辑
                 int stock = stockService.get(productId).getStockNum();
                 log.info("剩余库存：{}", stock);

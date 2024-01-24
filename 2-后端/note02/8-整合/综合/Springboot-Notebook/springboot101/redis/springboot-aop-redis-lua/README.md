@@ -769,7 +769,7 @@ public class RateLimiterAutoConfiguration {
 
 除了缓存之外，有时候会拿Redis做分布式锁。
 
-## pom 
+## pom
 
 ```xml
         <!-- Redis-Redisson分布式锁依赖-->
@@ -924,9 +924,9 @@ public class DistributedLockServer {
 }
 ```
 
-建议使用
+详细见
 
-
+<img src="README.assets/image-20240124163617924.png" alt="image-20240124163617924" style="zoom: 67%;" />
 
 
 

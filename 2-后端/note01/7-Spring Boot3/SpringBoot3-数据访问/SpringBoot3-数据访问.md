@@ -2420,7 +2420,9 @@ public class UserService {
 }
 ```
 
-# TODO
+参考
+
+<img src="SpringBoot3-%E6%95%B0%E6%8D%AE%E8%AE%BF%E9%97%AE.assets/image-20240124213604318.png" alt="image-20240124213604318" style="zoom:67%;" />
 
 # 实现Serializable接口的作用和必要性(了解)
 
