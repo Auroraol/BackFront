@@ -293,6 +293,46 @@ ptions选项作用大致如下：
 
 #### ①  pom.xml
 
+**其核心引入:**
+
+```xml
+        <!-- mysql -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+        </dependency>	    
+    	<!-- mybatisplus+数据库相关开始-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-core</artifactId>
+            <version>3.5.3.1</version>
+        </dependency>
+	    <!--使用mybatisplus常用CRUD接口方式,可以不用写sql语句-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.5.3.1</version>
+        </dependency>
+		<!--使用mybatisplus代码生成器, 具体用法见官网-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-generator</artifactId>
+            <version>3.5.3.1</version>
+        </dependency>
+    	 <!--mybatisplus+数据库相关结束-->
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+```
+
+全部内容
+
 ```xml
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -385,44 +425,6 @@ ptions选项作用大致如下：
     </build>
 
 </project>
-```
-
-**其核心引入:**
-
-```xml
-    <!-- mysql -->
-    <dependency>
-        <groupId>com.mysql</groupId>
-        <artifactId>mysql-connector-j</artifactId>
-    </dependency>	    
-    <!-- mybatisplus+数据库相关开始-->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-core</artifactId>
-            <version>3.5.3.1</version>
-        </dependency>
-	    <!--使用mybatisplus常用接口,可以不用写sql语句-->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.5.3.1</version>
-        </dependency>
-		<!--使用mybatisplus代码生成器, 具体用法见官网-->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-generator</artifactId>
-            <version>3.5.3.1</version>
-        </dependency>
-        <!--mybatisplus+数据库相关结束-->
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
 ```
 
 #### ②  **mapper包**
@@ -577,34 +579,6 @@ public class Timetest implements Serializable {
 }
 ```
 
-1. **@JsonFormat**:
-
-   - **作用**：用于在 JSON 序列化和反序列化时指定日期时间的格式。
-   - **使用场景**：通常在实体类的日期时间字段上使用，以控制将对象转换为 JSON 字符串或从 JSON 字符串转换为对象时的日期格式。
-
-   示例：
-
-   ```
-   @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
-   private Date myDate;
-   ```
-
-   这里的 `@JsonFormat` 指定了日期时间的格式为 "yyyy-MM-dd HH:mm"，并设置了时区为 "GMT+8"。
-
-2. **@DateTimeFormat**:
-
-   - **作用**：用于在 Web 请求中将前端传递的日期时间字符串转换为后端的 `Date` 或 `LocalDateTime` 对象。
-   - **使用场景**：通常在 Controller 层的请求参数上使用，用于处理前端传递的日期时间字符串。
-
-   示例：
-
-   ```
-   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-   private Date myDate;
-   ```
-
-   这里的 `@DateTimeFormat` 指定了日期时间的格式为 "yyyy-MM-dd HH:mm:ss"，用于处理前端传递的字符串。
-
 #### 方法2: 配置类+@JsonFormat 注解 [推荐]
 
 使用 `@JsonComponent` 注解自定义一个全局格式化类，分别对 `Date`(旧的 API，不建议在新代码中使用) 和 `LocalDate` 类型做格式化处理。
@@ -691,7 +665,13 @@ System.out.println(dto.getCreateTime());  //2024-01-20 15:13:49.662446900
 System.out.println(dto.getCreateTime());  //2024-01-20
 ```
 
-### CRUD接口方式
+### mybatis中parameterType别名图
+
+![image-20230921195943952](SpringBoot3-数据访问.assets/image-20230921195943952.png)
+
+### 单表查询
+
+#### 方式一:  CRUD接口方式
 
 [MyBatis-Plus（九）Service的CRUD接口1：基本查询_listbyids_Zack_tzh的博客-CSDN博客](https://blog.csdn.net/Zack_tzh/article/details/107528997)
 
@@ -1005,86 +985,48 @@ public class BootWebAdminApplicationTest {
 }
 ```
 
-### mybatis中parameterType别名图
-
-![image-20230921195943952](SpringBoot3-数据访问.assets/image-20230921195943952.png)
-
-### 单表查询
-
-#### 条件构造器方式
+#### 方式二:  条件构造器方式
 
 ![image-20231002145521470](SpringBoot3-数据访问.assets/image-20231002145521470.png)
 
 ![image-20231002145432486](SpringBoot3-数据访问.assets/image-20231002145432486.png)
 
-例子
+##### **写法**
+
+**Java的传统写法**
 
 ```java
-/**
-     * 1、名字中包含雨并且年龄小于40
-     *     name like '%雨%' and age<40
-     */
-    @Test
-    public void selectByWrapper() {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("name", "雨").lt("age", 40);
-
-        List<User> userList = userMapper.selectList(queryWrapper);
-        userList.forEach(System.out::println);
-    }
-    /**
-     * 2、名字中包含雨年并且龄大于等于20且小于等于40并且email不为空
-     *    name like '%雨%' and age between 20 and 40 and email is not null
-     */
-    @Test
-    public void selectByWrapper2() {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("name", "雨").between("age" ,20 ,40).isNotNull("email");
-
-        List<User> userList = userMapper.selectList(queryWrapper);
-        userList.forEach(System.out::println);
-    }
-
-    /**
-     * 3、名字为王姓或者年龄大于等于25，按照年龄降序排列，年龄相同按照id升序排列
-     *    name like '王%' or age>=25 order by age desc,id asc
-     */
-    @Test
-    public void selectByWrapper3() {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.likeRight("name", "王").or().gt("age", 25).orderByDesc("age").orderByAsc("id");
-
-        List<User> userList = userMapper.selectList(queryWrapper);
-        userList.forEach(System.out::println);
-    }
+public AjaxResult selectStudentByNumber(@RequestBody Student student) {
+    // 1. 定义条件构造器
+    // 要使用哪个表进行查询，那么<>内就填写哪个类
+    QueryWrapper<Student> qw = new QueryWrapper();
+    // 2. 构造条件构造器
+    // 第一个变量是书库据表中的字段，第二个变量是sql语句查询中要查找的值
+    qw.eq("stu_number", student.getStuNumber());
+    
+    // 3. 查询
+    // 在result内，就进行完了查询
+    List<Student> result = studentService.list(qw);
+    // 4. 返回
+    return AjaxResult.success(result);
+}
 ```
 
-4、创建日期为2019年2月14日并且直属上级为名字为王姓
-
-> date_format(create_time,‘%Y-%m-%d’)=‘2019-02-14’ and manager_id in (select id from user where name like ‘王%’)
+**lambda表达式方式(推荐)**
 
 ```java
-apply(sql,prams)
-inSql("字段",sql子查询)
-
-
-
-QueryWrapper<User> queryWrapper = new QueryWrapper<User>();
-queryWrapper.apply("date_format(create_time,'%Y-%m-%d') = {0}","2019-02-14").inSql("manager_id","select id from user where name like '王%' ");
-List<User> userList = userMapper.selectList(queryWrapper);
-userList.forEach(System.out::println);
-
-// 此处写法存在sql注入问题，不建议使用
-userQuery.apply("date_format(create_time,'%Y-%m-%d')='2019-02-14' or true or true").inSql("manager_id","select id from user where name like '王%'");
-
-queryWrapper.apply("phone","888888").inSql("username","select username from user where id = 3");
-
-date_format(日期，'格式')：将日期按照格式进行插入或者返回。例如：date_format(now(),'%Y-%m-%d')。
-动态条件构造器：apply。范围条件构造器：insql。
-注意：如果{0}替换为实际值，可能会造成sql注入。
+public AjaxResult selectStudentByNumber(@RequestBody Student student) {
+    // 1.定义条件构造器
+    LambdaQueryWrapper<Student> lqw = new LambdaQueryWrapper<Student>().eq(Student::getStuNumber,stuNumber);
+     // 2. 查询
+    List<Student> result = studentService.list(lqw);
+    return AjaxResult.success(result);
+}
 ```
 
-**总结**
+[MyBatis-Plus——条件构造器_mybatis-plus条件构造器-CSDN博客](https://blog.csdn.net/Yangyeon_/article/details/129452576)
+
+##### **总结**
 
 ```java
 public class SelectTest {
@@ -1290,6 +1232,7 @@ public class SelectTest {
     /**
      * 实体类作为条件构造器
      * 默认是等值查询，可以在实体类属性中设置自定义条件
+     * 获取用户名以 "刘" 开头、年龄小于 32 并且 manager_id 字段等于 "1088248166370832385" 的用户列表。
      */
     @Test
     public void selectList_entity() {
@@ -1304,7 +1247,7 @@ public class SelectTest {
     }
 
     /**
-     * allEq
+     * allEq  全部等王
      */
     @Test
     public void selectList_allEq() {
@@ -1478,80 +1421,7 @@ public class SelectTest {
 > .or(s->s.likeRight(Student::getName,"张")));
 > ```
 
-
-
-##### **使用条件构造器进行查询**
-
-1. Java的传统写法
-
-```java
-public AjaxResult selectStudentByNumber(@RequestBody Student student) {
-    // 1. 定义条件构造器
-    // 要使用哪个表进行查询，那么<>内就填写哪个类
-    QueryWrapper<Student> qw = new QueryWrapper();
-    // 2. 构造条件构造器
-    // 第一个变量是书库据表中的字段，第二个变量是sql语句查询中要查找的值
-    qw.eq("stu_number", student.getStuNumber());
-    
-    // 3. 查询
-    // 在result内，就进行完了查询
-    List<Student> result = studentService.list(qw);
-    // 4. 返回
-    return AjaxResult.success(result);
-}
-```
-
-1. [lambda表达式](https://so.csdn.net/so/search?q=lambda表达式&spm=1001.2101.3001.7020)方式(推荐)
-
-```java
-public AjaxResult selectStudentByNumber(@RequestBody Student student) {
-    // 1.定义条件构造器
-    LambdaQueryWrapper<Student> lqw = new LambdaQueryWrapper<Student>().eq(Student::getStuNumber,stuNumber);
-     // 2. 查询
-    List<Student> result = studentService.list(lqw);
-    return AjaxResult.success(result);
-}
-```
-
-##### allEq：全部等于
-
-```plaintext
-// params : key为数据库字段名,value为字段值
-allEq(Map<R, V> params)
-```
-
-> 举例：
-> allEq({id:1,name:"某某",age:null})--->id = 1 and name = '某某' and age is null
-
-代码演示：
-
-```java
-/**
- * SQL:SELECT * FROM student WHERE (stu_name = ? AND id = ?)
- */
-public AjaxResult selectStudent(@RequestBody Student student) {
-        QueryWrapper qw = new QueryWrapper();
-        Map map = new HashMap<>();
-        map.put("id","2");
-        map.put("stu_name","某某");
-        qw.allEq(map);
-        List<User> list = studentService.list(qw);
-        return AjaxResult.success(list);
-}
-```
-
-##### eq：等于 =
-
-```java
-eq(R column, Object val)
-```
-
-> 举例：
-> eq("name", "某某")--->name = '某某'
-
-[MyBatis-Plus——条件构造器_mybatis-plus条件构造器-CSDN博客](https://blog.csdn.net/Yangyeon_/article/details/129452576)
-
-#### 使用注解方式
+#### 方式三:  使用注解方式
 
 mapper中使用注解的方式:
 
@@ -1566,13 +1436,13 @@ void updateUser(User user);
 void deleteUser(Long id);
 ```
 
-#### 使用xml方式
+#### 方式四:  使用xml方式
 
 比较简单一般由插件直接生成
 
 ### 多表查询
 
-代码见[代码experiment02](C:\Users\16658\Documents\GitHub\java_note\note\spring boot3\sql\experiment02)
+代码见[代码experiment02](https://github.com/Auroraol/BackFront/tree/master/2-后端/note01/7-Spring Boot3/sql/experiment02))
 
 MP提供了大量单表查询的方法，但是没有多表的操作，所以涉及到多表的查询时，需要我们自己实现
 
@@ -1788,7 +1658,7 @@ public class MybatisPlusConfig {
 }
 ```
 
-**查询**
+**排序查询**
 
 ```java
 public void sortUsersInfo(String column, int ascending) {
@@ -2173,10 +2043,6 @@ public class MetaGroupPO {
 2. **@LastModifiedDate**:
    - **框架**：Spring Data JPA 提供。
    - **作用**：标注实体对象的最后修改时间字段，通常与 Spring Data JPA 的 `@EntityListeners(AuditingEntityListener.class)` 配合使用，实现在实体对象修改时自动填充最后修改时间的功能。
-
-
-
-
 
 ## JPA的Repository详解
 

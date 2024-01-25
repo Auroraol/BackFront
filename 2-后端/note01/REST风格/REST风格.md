@@ -22,7 +22,7 @@ REST 约束有以下优点
 
 REST 使用 HTTP 动词或方法对资源进行操作。 POST、GET、PUT 和 DELETE 方法分别执行 CREATE、READ、UPDATE 和 DELETE 操作。
 
-## 一、URL 设计
+## 一、URL 设计:crossed_swords:
 
 ### 1.1 动词 + 谓语
 

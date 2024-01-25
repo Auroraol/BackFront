@@ -1,4 +1,4 @@
-# 一、引言
+#  一、引言
 
 模块之间的耦合度多高，导致一个模块宕机后，全部功能都不能用了，并且同步通讯的成本过高，用户体验差。
 
@@ -426,7 +426,7 @@ channel.queueBind("pubsub-queue2","pubsub-exchange","");
 
 ![image-20231016170442645](04-RabbitMQ.assets/image-20231016170442645.png)
 
-**在consumer服务中, 编写配置类(后面都用注解的方式, 但是配置类推荐)**
+**在consumer服务            中, 编写配置类(后面都用注解的方式, 但是配置类推荐)**
 
 | ![image-20231016170947777](04-RabbitMQ.assets/image-20231016170947777.png) |
 | ------------------------------------------------------------ |
@@ -631,8 +631,6 @@ spring:
     username: itcast # 用户名
     password: 123321 # 密码
 ```
-
-
 
 然后在consumer服务的`cn.itcast.mq.listener`包中新建一个类SpringRabbitListener，代码如下：
 
