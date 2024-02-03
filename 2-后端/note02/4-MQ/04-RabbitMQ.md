@@ -99,7 +99,7 @@ ens33: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
 使用`Docker Compose`部署`RabbitMQ`很方便。如果部署出现问题，可以通过查看容器的日志来发现问题。
 
 ```shell
-docker logs rabbitmq
+docker logs mq
 ```
 
 ## 集群部署
@@ -674,7 +674,7 @@ Work queues，也被称为（Task queues），任务模型。简单来说就是*
 @Test
 public void testWorkQueue() throws InterruptedException {
     // 队列名称
-    String queueName = "simple.queue";
+    String queueName = "work.queue";
     // 消息
     String message = "hello, message_";
     for (int i = 0; i < 50; i++) {
@@ -690,13 +690,13 @@ public void testWorkQueue() throws InterruptedException {
 要模拟多个消费者绑定同一个队列，我们在consumer服务的SpringRabbitListener中添加2个新的方法：
 
 ```java
-@RabbitListener(queues = "simple.queue")
+@RabbitListener(queues = "work.queue")
 public void listenWorkQueue1(String msg) throws InterruptedException {
     System.out.println("消费者1接收到消息：【" + msg + "】" + LocalTime.now());
     Thread.sleep(20);
 }
 
-@RabbitListener(queues = "simple.queue")
+@RabbitListener(queues = "work.queue")
 public void listenWorkQueue2(String msg) throws InterruptedException {
     System.err.println("消费者2........接收到消息：【" + msg + "】" + LocalTime.now());
     Thread.sleep(200);
@@ -749,8 +749,6 @@ Work模型的使用：
   - Topic：通配符，把消息交给符合routing pattern（路由模式） 的队列
 - Consumer：消费者，与以前一样，订阅队列，没有变化
 - Queue：消息队列也与以前一样，接收消息、缓存消息。
-
-
 
 **Exchange（交换机）只负责转发消息，不具备存储消息的能力**，因此如果没有任何队列与Exchange绑定，或者没有符合路由规则的队列，那么消息会丢失！
 
@@ -883,8 +881,6 @@ public void listenFanoutQueue2(String msg) {
 - Queue
 - FanoutExchange
 - Binding
-
-
 
 ### 6.3.2. Direct
 
@@ -1130,7 +1126,31 @@ public void testSendObjectQueue() {
 }
 ```
 
-# 七、RabbitMQ整合SpringBoot:crossed_swords:
+## 问题
+
+启动项目后，发现MQ报错，出现异常
+
+![img](04-RabbitMQ.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xvdmVMaWZlTG92ZUNvZGluZw==,size_16,color_FFFFFF,t_70.png)
+
+网上找了一圈，发现与这个报错类似
+
+> Caused by: com.[rabbitmq](https://so.csdn.net/so/search?q=rabbitmq&spm=1001.2101.3001.7020).client.ShutdownSignalException: channel error; protocol method: #method<channel.close>(reply-code=406, reply-text=PRECONDITION_FAILED - inequivalent arg 'auto_delete' for exchange 'ltc_business_Customer' in vhost '/': received 'false' but current is 'true', class-id=40, method-id=10)
+
+ 原因是：
+
+Rabbitmq服务器上已经存在同样名称的队列和exchange了，但是和你在程序里设置的属性不一样而引起的错误。
+
+解决方案一
+
+登录Rabbitmq服务器管理界面
+
+- 把rabbitmq上已存在的队列和exchange删掉
+
+解决方案二
+
+- 把已经存在的队列和exchange属性都改成一致的
+
+# 七、RabbitMQ整合SpringBoot
 
 ## 7.1 SpringBoot整合RabbitMQ
 
@@ -1542,3 +1562,280 @@ public void getMessage(String msg, Channel channel, Message message) throws IOEx
     }
 }
 ```
+
+# 十、总结
+
+## 综合代码
+
+具体代码见:
+
+<img src="04-RabbitMQ.assets/image-20240203203013457.png" alt="image-20240203203013457" style="zoom:67%;" />
+
+### **Publisher**
+
+> 发送消息
+
+```java
+package cn.itcast.mq.spring;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
+public class SpringAmqpTest {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @DisplayName("BasicQueue 简单队列模型")
+    @Test
+    public void testSendMessage2SimpleQueue() {
+        // 队列名称
+        String queueName = "simple.queue";
+        // 消息
+        String message = "hello, spring amqp!";
+        // 发送消息
+        rabbitTemplate.convertAndSend(queueName, message);
+    }
+
+    @DisplayName("WorkQueue 任务模型")
+    @Test
+    public void testSendMessage2WorkQueue() throws InterruptedException {
+        String queueName = "work.queue";
+        String message = "hello, message__";
+        for (int i = 1; i <= 10; i++) {
+            rabbitTemplate.convertAndSend(queueName, message + i);
+            Thread.sleep(20);
+        }
+    }
+
+    @DisplayName("发布/订阅模型 ---- Fanout")
+    @Test
+    public void testSendFanoutExchange() {
+        // 交换机名称
+        String exchangeName = "itcast.fanout";
+        // 消息
+        String message = "hello, every one!";
+        // 发送消息
+        rabbitTemplate.convertAndSend(exchangeName, "", message);
+    }
+
+    @DisplayName("发布/订阅模型 ---- direct")
+    @Test
+    public void testSendDirectExchange() {
+        // 交换机名称
+        String exchangeName = "itcast.direct";
+        // 消息
+        String message = "hello, red!";
+        // 发送消息
+        rabbitTemplate.convertAndSend(exchangeName, "red", message);
+    }
+
+    @DisplayName("发布/订阅模型 ---- topic")
+    @Test
+    public void testSendTopicExchange() {
+        // 交换机名称
+        String exchangeName = "itcast.topic";
+        // 消息
+        String message = "今天天气不错，我的心情好极了!";
+        // 发送消息
+        rabbitTemplate.convertAndSend(exchangeName, "china.weather", message);
+    }
+}
+
+```
+
+### Consumer
+
+> 接受消息
+
+在发布/订阅模型中:
+
++  交换机-fanout 是基于配置类声明 
++  交换机-topic和direct 基于注解声明队列和交换机
+
+```java
+package cn.itcast.mq.listener;
+
+import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalTime;
+import java.util.Map;
+
+@Component
+public class SpringRabbitListener {
+
+     //BasicQueue 简单队列模型
+     @RabbitListener(queues = "simple.queue")
+     public void listenSimpleQueue(String msg) {
+         System.out.println("消费者接收到simple.queue的消息：【" + msg + "】");
+     }
+
+    //WorkQueue 任务模型
+    @RabbitListener(queues = "work.queue")
+    public void listenWorkQueue1(String msg) throws InterruptedException {
+        System.out.println("消费者1接收到work.queue消息：【" + msg + "】" + LocalTime.now());
+        Thread.sleep(20);
+    }
+
+    @RabbitListener(queues = "work.queue")
+    public void listenWorkQueue2(String msg) throws InterruptedException {
+        System.err.println("消费者2接收work.queue到消息：【" + msg + "】" + LocalTime.now());
+        Thread.sleep(200);
+    }
+
+    //发布/订阅模型 ---- fanout
+    // 基于配置类声明队列和交换机
+    @RabbitListener(queues = "fanout.queue1")
+    public void listenFanoutQueue1(String msg) {
+
+         System.out.println("消费者接收到fanout.queue1的消息：【" + msg + "】");
+    }
+    @RabbitListener(queues = "fanout.queue2")
+    public void listenFanoutQueue2(String msg) {
+        System.out.println("消费者接收到fanout.queue2的消息：【" + msg + "】");
+    }
+
+    //发布/订阅模型 ---- direct
+    //基于注解声明队列和交换机
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "direct.queue1"),
+            exchange = @Exchange(name = "itcast.direct", type = ExchangeTypes.DIRECT),
+            key = {"red", "blue"}
+    ))
+    public void listenDirectQueue1(String msg){
+        System.out.println("消费者接收到direct.queue1的消息：【" + msg + "】");
+    }
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "direct.queue2"),
+            exchange = @Exchange(name = "itcast.direct", type = ExchangeTypes.DIRECT),
+            key = {"red", "yellow"}
+    ))
+    public void listenDirectQueue2(String msg){
+        System.out.println("消费者接收到direct.queue2的消息：【" + msg + "】");
+    }
+
+    //发布/订阅模型 ---- topic
+    //基于注解声明队列和交换机
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "topic.queue1"),
+            exchange = @Exchange(name = "itcast.topic", type = ExchangeTypes.TOPIC),
+            key = "china.#"
+    ))
+    public void listenTopicQueue1(String msg){
+        System.out.println("消费者接收到topic.queue1的消息：【" + msg + "】");
+    }
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "topic.queue2"),
+            exchange = @Exchange(name = "itcast.topic", type = ExchangeTypes.TOPIC),
+            key = "#.news"
+    ))
+    public void listenTopicQueue2(String msg){
+        System.out.println("消费者接收到topic.queue2的消息：【" + msg + "】");
+    }
+
+    @RabbitListener(queues = "object.queue")
+    public void listenObjectQueue(Map<String,Object> msg){
+        System.out.println("接收到object.queue的消息：" + msg);
+    }
+}
+
+```
+
+**Config**
+
+ 交换机-fanout 是基于配置类声明写法如下 
+
+```java
+package cn.itcast.mq.config;
+
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class FanoutConfig {
+    /**
+     * 声明交换机
+     * @return Fanout类型交换机
+     */
+    @Bean
+    public FanoutExchange fanoutExchange(){
+        return new FanoutExchange("itcast.fanout");
+    }
+
+    /**
+     * 第1个队列
+     */
+    @Bean
+    public Queue fanoutQueue1(){
+        return new Queue("fanout.queue1");
+    }
+
+    /**
+     * 绑定队列和交换机
+     */
+    @Bean
+    public Binding fanoutBinding1(Queue fanoutQueue1, FanoutExchange fanoutExchange){
+        return BindingBuilder
+                .bind(fanoutQueue1)
+                .to(fanoutExchange);
+    }
+
+    /**
+     * 第2个队列
+     */
+    @Bean
+    public Queue fanoutQueue2(){
+        return new Queue("fanout.queue2");
+    }
+
+    /**
+     * 绑定队列和交换机
+     */
+    @Bean
+    public Binding fanoutBinding2(Queue fanoutQueue2, FanoutExchange fanoutExchange){
+        return BindingBuilder
+                .bind(fanoutQueue2)
+                .to(fanoutExchange);
+    }
+
+    @Bean
+    public Queue objectQueue(){
+        return new Queue("object.queue");
+    }
+}
+
+```
+
+## 运行结果
+
+**确保rabbitmq上已存在队列**
+
+![image-20240203202213448](04-RabbitMQ.assets/image-20240203202213448.png)
+
+**消费者发起消息**
+
+![image-20240203202310153](04-RabbitMQ.assets/image-20240203202310153.png)
+
+**生产者接受消息**
+
+![image-20240203202449807](04-RabbitMQ.assets/image-20240203202449807.png)

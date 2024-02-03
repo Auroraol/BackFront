@@ -12,12 +12,20 @@ springboot工程, 默认自动引入
 </dependency>
 ```
 
+确保 Spring Boot Starter Test 包含对 JUnit 5 的依赖。
+
 ## 基本使用
 
  <font color = red>在spring测试中不要使用静态变量或者main方法！！尽量把方法定义成public方法</font>
 
+ 确保测试方法的命名以 `test` 开头，并且符合命名规范。
+
 ```java
-@RunWith(SpringRunner.class)
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class TestServiceImplTest {
     @Autowired

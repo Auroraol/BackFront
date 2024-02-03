@@ -1,0 +1,11 @@
+spring:
+    rabbitmq:
+        host: 192.168.200.134
+        port: 5672
+        listener:
+            simple:
+                acknowledge-mode: manual
+                retry:
+                    enabled: true
+        username: admin
+        password: admin
