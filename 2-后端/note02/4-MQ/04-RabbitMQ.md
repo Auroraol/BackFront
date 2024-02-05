@@ -1150,6 +1150,12 @@ Rabbitmq服务器上已经存在同样名称的队列和exchange了，但是和�
 
 - 把已经存在的队列和exchange属性都改成一致的
 
+
+
+
+
+
+
 # 七、RabbitMQ整合SpringBoot
 
 ## 7.1 SpringBoot整合RabbitMQ
@@ -1303,11 +1309,9 @@ public void getMessage(String msg, Channel channel, Message message) throws IOEx
 
 RabbitMQ的事务：事务可以保证消息100%传递，可以通过事务的回滚去记录日志，后面定时再次发送当前消息。事务的操作，效率太低，加了事务操作后，比平时的操作效率至少要慢100倍。
 
-RabbitMQ除了事务，还提供了Confirm的确认机制，这个效率比事务高很多。
+RabbitMQ除了事务，还提    供了Confirm的确认机制，这个效率比事务高很多。
 
 ### 8.1.1 普通Confirm方式
-
-
 
 ```java
 //3.1 开启confirm
@@ -1571,9 +1575,7 @@ public void getMessage(String msg, Channel channel, Message message) throws IOEx
 
 <img src="04-RabbitMQ.assets/image-20240203203013457.png" alt="image-20240203203013457" style="zoom:67%;" />
 
-### **Publisher**
-
-> 发送消息
+### **生产者—发送消息**
 
 ```java
 package cn.itcast.mq.spring;
@@ -1653,9 +1655,7 @@ public class SpringAmqpTest {
 
 ```
 
-### Consumer
-
-> 接受消息
+### 消费者—接受消息
 
 在发布/订阅模型中:
 
@@ -1839,3 +1839,49 @@ public class FanoutConfig {
 **生产者接受消息**
 
 ![image-20240203202449807](04-RabbitMQ.assets/image-20240203202449807.png)
+
+
+
+
+
+
+
+配置
+
+```
+spring.rabbitmq.publisher-confirms：
+
+说明：启用生产者消息确认模式。
+值：true 或 false，表示是否启用发布者消息确认。
+默认值：false。
+解释：如果设置为 true，则启用生产者消息确认模式，即生产者将收到关于消息是否成功发送到 RabbitMQ 的确认回调。
+spring.rabbitmq.publisher-returns：
+
+说明：启用生产者消息返回模式。
+值：true 或 false，表示是否启用发布者消息返回。
+默认值：false。
+解释：如果设置为 true，则启用生产者消息返回模式，即当消息无法被路由到队列时，RabbitMQ 会将消息返回给生产者。
+spring.rabbitmq.listener.simple.acknowledge-mode：
+
+说明：设置消费者消息确认模式。
+值：auto、manual 或 none。
+默认值：auto。
+解释：auto 表示自动确认模式，manual 表示手动确认模式，none 表示不确认模式。手动确认模式需要在消息处理完成后手动确认消息，以告知 RabbitMQ 消息已被处理。
+spring.rabbitmq.listener.simple.retry.enabled：
+
+说明：启用或禁用消息消费失败时的重试机制。
+值：true 或 false。
+默认值：false。
+解释：如果设置为 true，则启用消息消费失败时的重试机制。在消息处理失败时，消息将被重新投递到队列，并根据重试配置进行重试。
+spring.rabbitmq.listener.simple.concurrency：
+
+说明：设置消费者的并发消费者数量。
+默认值：1。
+解释：指定消费者的并发消费者数量。在处理消息的情况下，可以使用多个线程并发处理消息。
+spring.rabbitmq.listener.simple.max-concurrency：
+
+说明：设置消费者的最大并发消费者数量。
+默认值：1。
+解释：指定消费者的最大并发消费者数量。当消息量较大时，可以限制并发消费者的数量，以避免过度消耗系统资源。
+```
+

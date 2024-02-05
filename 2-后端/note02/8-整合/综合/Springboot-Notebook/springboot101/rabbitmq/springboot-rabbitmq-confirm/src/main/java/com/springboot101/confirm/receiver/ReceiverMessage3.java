@@ -2,9 +2,9 @@ package com.springboot101.confirm.receiver;
 
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.annotation.*;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -16,8 +16,12 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-@RabbitListener(queues = "fanout.queue1")
-public class ReceiverMessage {
+@RabbitListener(bindings = @QueueBinding(
+        value = @Queue(name = "direct.queue1"),
+        exchange = @Exchange(name = "jindao.direct", type = ExchangeTypes.DIRECT),
+        key = {"confirm.direct.queue1", "confirm.direct.queue2"}
+))
+public class ReceiverMessage3 {
 
     @RabbitHandler
     public void processHandler1(String msg, Channel channel, Message message) throws IOException {

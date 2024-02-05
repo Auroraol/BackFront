@@ -2,10 +2,9 @@ spring:
     rabbitmq:
         host: 192.168.200.134
         port: 5672
-        listener:
-            simple:
-                acknowledge-mode: manual
-                retry:
-                    enabled: true
         username: admin
         password: admin
+        #    高级发布确认 发布消息成功后将会触发回调方法
+        publisher-confirm-type: correlated
+        #    消息回退 当消息未路由至队列时触发,确保消息发送失败后可以重新返回到队列中,当消息无法被路由到队列时，RabbitMQ 会将消息返回给生产者
+        publisher-returns: true

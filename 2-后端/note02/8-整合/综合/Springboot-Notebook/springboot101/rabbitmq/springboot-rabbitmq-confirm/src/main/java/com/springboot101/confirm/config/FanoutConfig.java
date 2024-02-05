@@ -10,23 +10,33 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
-public class QueueConfig {
+public class FanoutConfig {
+    /**
+     * 声明交换机
+     * @return Fanout类型交换机
+     */
+    @Bean
+    public FanoutExchange fanoutExchange() {
+        return new FanoutExchange("confirm.fanout");
+    }
 
+    /**
+     * 第1个队列
+     */
     @Bean(name = "confirmTestQueue")
     public Queue confirmTestQueue() {
-        return new Queue("confirm_test_queue", true, false, false);
+        return new Queue("fanout.queue1", true, false, false);
     }
 
-    @Bean(name = "confirmTestExchange")
-    public FanoutExchange confirmTestExchange() {
-        return new FanoutExchange("confirmTestExchange");
-    }
 
+    /**
+     * 绑定队列和交换机
+     */
     @Bean
     public Binding confirmTestFanoutExchangeAndQueue(
-            @Qualifier("confirmTestExchange") FanoutExchange confirmTestExchange,
+            @Qualifier("fanoutExchange") FanoutExchange fanoutExchange,
             @Qualifier("confirmTestQueue") Queue confirmTestQueue) {
-        return BindingBuilder.bind(confirmTestQueue).to(confirmTestExchange);
+        return BindingBuilder.bind(confirmTestQueue).to(fanoutExchange);
     }
 }
 

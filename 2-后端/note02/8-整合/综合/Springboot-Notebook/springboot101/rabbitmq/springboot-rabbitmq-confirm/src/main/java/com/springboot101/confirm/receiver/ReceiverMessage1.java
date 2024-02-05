@@ -16,33 +16,13 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-@RabbitListener(queues = "confirm_test_queue")
+@RabbitListener(queues = "fanout.queue1")
 public class ReceiverMessage1 {
 
     private int retryNum = 5;
 
     private int currentNum = 0;
 
-
-//    @RabbitHandler
-//    public void processHandler(String msg, Channel channel, Message message) throws IOException {
-//
-//        try {
-//            log.info("消费者 2 号收到：{}", msg);
-//
-//            int a = 1 / 0;
-//
-//            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-//
-//        } catch (Exception e) {
-//
-//            if (currentNum <= 1000) {
-//
-//                channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
-//            }
-//            currentNum++;
-//        }
-//    }
 
     @RabbitHandler
     public void processHandler(CorrelationData correlationData , String msg, Channel channel, Message message) throws IOException {

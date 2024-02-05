@@ -2102,7 +2102,7 @@ public class test1 {
 
 @[PostConstruct](https://so.csdn.net/so/search?q=PostConstruct&spm=1001.2101.3001.7020)是Java自带的注解，在方法上加该注解会在项目启动的时候执行该方法，在spring容器初始化的时候执行该方法。
 
-从Java EE5规范开始，Servlet中增加了两个影响[Servlet生命周期](https://so.csdn.net/so/search?q=Servlet生命周期&spm=1001.2101.3001.7020)的注解，@PostConstruct和@PreDestroy，这两个注解被用来修饰一个非静态的void（）方法。
+从Java EE5规范开始，Servlet中增加了两个影响[Servlet生命周期](https://so.csdn.net/so/search?q=Servlet生命周期&spm=1001.2101.3001.7020)的注解，@PostConstruct和@PreDestroy，这两个注解被用来修饰一个非静态的void（）方法。只会执行一次。这可以确保初始化代码在Bean实例化之后立即执行，并且不会重复执行。
 
 **语法：**
 
