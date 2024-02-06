@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 /**
-
+ *基于注解声明队列和交换机
  * @description 接受消息,消息消费
  * @date 2020/6/29 16:31
  */
@@ -21,13 +21,13 @@ import java.io.IOException;
         exchange = @Exchange(name = "jindao.direct", type = ExchangeTypes.DIRECT),
         key = {"confirm.direct.queue1", "confirm.direct.queue2"}
 ))
-public class ReceiverMessage3 {
+public class ReceiverMessage2 {
 
     @RabbitHandler
     public void processHandler1(String msg, Channel channel, Message message) throws IOException {
 
         try {
-            log.info("消费者 1 号收到：{}", msg);
+            log.info("接受到的队列direct.queue1消息：{}",msg);
 
             //TODO 具体业务
 

@@ -32,6 +32,7 @@ public class TestErrorController {
 
     /*
     * 向交换机中发送消息，指定错误的routingkey,模拟触发队列回退消息并重发消息。
+    * RabbitMQ 在将消息退回后，仍然可以确认消息已经被发送到交换机，只是没有找到匹配的队列而已。
     */
     @GetMapping("/TestErrorController2/{message}")
     public void sendConfirmMsg2(@PathVariable String message){

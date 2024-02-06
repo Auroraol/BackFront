@@ -28,7 +28,6 @@ public class ConfirmCallbackService implements RabbitTemplate.ConfirmCallback, R
         rabbitTemplate.setReturnsCallback(this::returnedMessage);
     }
 
-
     /*交换机确认回调
     1.交换机收到了消息 触发回调
     1.1 correlationData(我们在发消息的时候自己创建的) 消息的ID以及消息内容

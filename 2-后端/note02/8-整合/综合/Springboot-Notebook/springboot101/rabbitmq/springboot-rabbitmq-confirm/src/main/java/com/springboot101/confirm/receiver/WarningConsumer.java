@@ -19,6 +19,6 @@ public class WarningConsumer {
     @RabbitListener(queues = MqConfirmConfig.WARNING_QUEUE_NAME)
     public void receiveWarningMsg(Message message){
         String msg=new String(message.getBody());
-        log.error("Warning!:发现不可路由消息：{}",msg);
+        log.warn("Warning!:发现不可路由消息：{}",msg);
     }
 }

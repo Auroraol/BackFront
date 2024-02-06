@@ -24,7 +24,7 @@ public class TestSuccessController {
     @GetMapping("/TestSuccessController1/{message}")
     public void sendConfirmMsg1(@PathVariable String message){
         //向一个存在的交换机发送消息
-        sendMessage.sendMessage("confirm.fanout", "confirm_test_queue",  message);
+        sendMessage.sendMessage(MqConfirmConfig.CONFIRM_EXCHANGE, MqConfirmConfig.CONFIRM_EXCHANGE_ROUTING_KEY,  message);
     }
 
     //回退消息并重发

@@ -12,13 +12,11 @@ import javax.annotation.Resource;
 import java.util.UUID;
 
 /**
- 
- * @Description:
+ * @Description: rabbitTemplate.convertAndSend封装
  */
 @Slf4j
 @Component
 public class SendMessage {
-
     @Resource
     private RabbitTemplate rabbitTemplate;
 
