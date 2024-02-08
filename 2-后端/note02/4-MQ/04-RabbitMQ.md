@@ -1840,13 +1840,27 @@ public class FanoutConfig {
 
 ![image-20240203202449807](04-RabbitMQ.assets/image-20240203202449807.png)
 
+# 十一、配置
 
+```yaml
+spring:
+    rabbitmq:
+        host: 192.168.200.134
+        port: 5672
+        username: admin
+        password: admin
+        #    高级发布确认 发布消息成功后将会触发回调方法
+        publisher-confirm-type: correlated
+        #    消息回退 当消息未路由至队列时触发,确保消息发送失败后可以重新返回到队列中,当消息无法被路由到队列时，RabbitMQ 会将消息返回给生产者
+        publisher-returns: true
+        virtual-host: /  #虚拟主机
+        #    auto 表示自动确认模式，manual 表示手动确认模式，none 表示不确认模式。手动确认模式需要在消息处理完成后手动确认消息，以告知 RabbitMQ 消息已被处理。
+        listener:
+            simple:
+                acknowledge-mode : manual
+```
 
-
-
-
-
-配置
+…
 
 ```
 spring.rabbitmq.publisher-confirms：

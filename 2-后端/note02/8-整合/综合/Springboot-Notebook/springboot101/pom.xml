@@ -30,7 +30,6 @@
         <!-- 其他功能 -->
         <module>webhook/springboot-webhook-wechat</module>
         <module>人脸识别/springboot-detect-faces</module>
-        <module>去水印/springboot-douyin-watermark</module>
         <module>实时推送/springboot-realtime-data</module>
         <module>工作流/springboot-work-flowable</module>
         <module>工作流/springboot-work-flowable2</module>
@@ -48,12 +47,14 @@
         <module>通用功能/springboot-delayqueue</module>
         <module>通用功能/springboot-env-variables</module>
         <module>通用功能/springboot-global-formatting</module>
-        <module>通用功能/springboot-jasypt</module>
         <module>通用功能/springboot-banner</module>
 
         <!-- 接口文档 -->
         <module>接口文档/springboot-swagger</module>
         <module>接口文档/springboot-knife4j</module>
+
+        <!-- 数据加密 -->
+        <module>敏感数据的保护伞/springboot-jasypt</module>
 
         <!-- 设计模式 -->
         <module>设计模式/springboot-design-chain</module>

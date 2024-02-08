@@ -2128,7 +2128,7 @@ public void init(){}
 @AfterReturning -- 后置增强，相当于AfterReturningAdvice，方法退出时执行
 @AfterThrowing -- 异常抛出增强，相当于ThrowsAdvice
 @After -- final增强，不管是抛出异常或者正常退出都会执行
-@Around -- 环绕增强，相当于MethodInterceptor 
+@Around -- 环绕增强，相当于MethodInterceptor, if
 
 ### **AOP五种通知工作**
 
@@ -2515,3 +2515,331 @@ public class TestController {
 控制台打印
 
 ![image-20240119212558464](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20240119212558464.png)
+
+## 案例2
+
+```java
+package com.springboot101.limit.aspect;
+
+import com.springboot101.limit.enmu.LimitType;
+
+import java.lang.annotation.*;
+
+/**
+ * @description redis限流注解
+ */
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Documented
+public @interface RateLimter {
+
+    /**
+     * 名字
+     */
+    String name() default "";
+
+    /**
+     * key
+     */
+    String key() default "";
+
+    /**
+     * Key的前缀
+     */
+    String prefix() default "";
+
+    /**
+     * 过期时间，单位秒
+     */
+    int period();
+
+    /**
+     * 单位时间限制通过请求数
+     */
+    int count();
+
+    /**
+     * 限流的类型(用户自定义key 或者 请求ip)
+     */
+    LimitType limitType() default LimitType.CUSTOMER;
+
+    /**
+     * 返回值
+     */
+    String message() default "false";
+}
+
+```
+
+
+
+```java
+package com.springboot101.limit.aspect;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.RateLimiter;
+import com.springboot101.limit.enmu.LimitType;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.scripting.support.ResourceScriptSource;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+
+/**
+ * @description 限流切面实现
+ * @date 2020/4/8 13:04
+ */
+@Aspect
+@Configuration
+@Slf4j
+public class RateLimterAspect {
+
+    private static final Logger logger = LoggerFactory.getLogger(RateLimterAspect.class);
+
+    private static final String UNKNOWN = "unknown";
+
+    @Resource
+    private  RedisTemplate redisTemplate;
+
+    private DefaultRedisScript<Long> getRedisScript;
+
+    @PostConstruct
+    public void init() {
+        getRedisScript = new DefaultRedisScript<>();
+        getRedisScript.setResultType(Long.class);
+        getRedisScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("rateLimter.lua")));
+        log.info("RateLimterAspect[分布式限流处理器]脚本加载完成");
+    }
+
+//    private final RedisTemplate<String, Serializable> limitRedisTemplate;
+
+//    public LimitInterceptor(@Autowired RedisTemplate redisTemplate) {
+//        this.limitRedisTemplate = redisTemplate;
+//    }
+
+//    @Autowired
+//    public LimitInterceptor(RedisTemplate<String, Serializable> limitRedisTemplate) {
+//        this.limitRedisTemplate = limitRedisTemplate;
+//    }
+
+    /**定义切入点----以aspect包下带有 @RateLimter注解 的方法*/
+    @Pointcut("@annotation(com.springboot101.limit.aspect.RateLimter)")
+    public void rateLimiter() {}
+
+    @Around("@annotation(rateLimiter)")
+    public Object around(ProceedingJoinPoint proceedingJoinPoint, RateLimter rateLimiter) throws Throwable {
+        if (log.isDebugEnabled()){
+            log.debug("RateLimterAspect[分布式限流处理器]开始执行限流操作");
+        }
+
+        MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();
+        if (!(signature instanceof MethodSignature)) {
+            throw new IllegalArgumentException("the Annotation @RateLimter must used on method!");
+        }
+
+        Method method = signature.getMethod();
+        /*
+        RateLimter limitAnnotation = method.getAnnotation(RateLimter.class);
+        // 注解参数
+        LimitType limitType = limitAnnotation.limitType();
+        String name = limitAnnotation.name();
+        String key;
+        int limitPeriod = limitAnnotation.period();
+        int limitCount = limitAnnotation.count();
+        if (log.isDebugEnabled()){
+            log.debug("RateLimterAspect[分布式限流处理器]参数值为-limitPeriod={},limitCount={}", limitPeriod, limitCount);
+        }
+         */
+        // @RateLimter注解携带的参数
+        LimitType limitType = rateLimiter.limitType();
+        String name = rateLimiter.name();
+        String key;
+        int limitPeriod = rateLimiter.period();
+        int limitCount = rateLimiter.count();
+        if (log.isDebugEnabled()){
+            log.debug("RateLimterAspect[分布式限流处理器]参数值为-limitPeriod={},limitCount={}", limitPeriod, limitCount);
+        }
+        // 限流提示语
+        String message = rateLimiter.message();
+        if (StringUtils.isEmpty(message)) {
+            message = "false";
+        }
+        /**
+         * 根据限流类型获取不同的key ,如果不传我们会以方法名作为key
+         */
+        switch (limitType) {
+            case IP:
+                key = getIpAddress();
+                break;
+            case CUSTOMER:
+                key = rateLimiter.key();
+                break;
+            default:
+                key = StringUtils.upperCase(method.getName());
+        }
+        // key拼接前缀
+        //ImmutableList<String> keys = ImmutableList.of(StringUtils.join(rateLimiter.prefix(), key));
+
+        //执行Lua脚本
+        List<String> keyList = new ArrayList<>();
+
+        // 设置key值为注解中的值
+        keyList.add(StringUtils.join(rateLimiter.prefix(), key));
+
+        //调用脚本并执行
+        try {
+            Long result = (Long) redisTemplate.execute(getRedisScript, keyList, limitPeriod, limitCount);
+            if (result != null && result == 0) {
+                String msg = "由于超过单位时间=" + limitPeriod + "-允许的请求次数=" + limitCount + "[触发限流]";
+                log.debug(msg);
+                if (!message.equals("false"))
+                    return message;
+                else
+                    throw new RuntimeException("你已被列入黑名单");
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("RateLimterAspect[分布式限流处理器]限流执行结果-result={},请求[正常]响应", result);
+            }
+            return proceedingJoinPoint.proceed();
+        }catch (Throwable e) {
+            if (e instanceof RuntimeException) {
+                throw new RuntimeException(e.getLocalizedMessage());
+            }
+            throw new RuntimeException("server exception");
+        }
+
+    /**
+     * 获取客户端 IP 地址。
+     *
+     * @return 客户端 IP 地址。
+     */
+    public String getIpAddress() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+    }
+}
+```
+
+## 案例3
+
+部分代码
+
+```java
+
+	//在切面中实现加密和解密的功能，并确保在调用目标方法之前和之后都执行这些操作
+	@Around("@annotation(pointCut)")
+	public Object around(ProceedingJoinPoint joinPoint, EncryptMethod pointCut) throws Throwable {
+		// 获取 @EncryptMethod 中的 type 参数值
+		String type = pointCut.type();
+		switch (type) {
+			case ENCRYPT:
+				// 执行加密操作
+				return encrypt(joinPoint);
+			case DECRYPT:
+				// 执行解密操作
+				return decrypt(joinPoint);  //环绕方法中返回值: 目标方法的执行结果
+			default:
+				// 如果类型不匹配，则返回 null 或其他适当的值
+				return null;
+		}
+	}
+
+	public Object encrypt(ProceedingJoinPoint joinPoint) throws Throwable {
+		// 获取目标方法的参数
+		Object[] args = joinPoint.getArgs();
+		try {
+			// 如果方法有参数
+			if (args.length != 0) {
+				for (int i = 0; i < args.length; i++) {
+					Object o = args[i];
+					// 如果参数是字符串类型，则对其进行加密
+					if (o instanceof String) {
+						args[i] = encryptValue(o);
+					} else {
+						// 如果参数不是字符串类型，则调用 handler 方法对其进行加密处理
+						args[i] = handler(o, EncryptConstant.ENCRYPT);
+					}
+					//TODO 其余类型自己看实际情况加
+				}
+			}
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+
+		// 调用目标方法，并传入修改后的参数
+		// 这样方法内部就能直接获取方法的参数加密后的值,
+		// 不这样做方法内部方法的参数不会加密,只有返回值是加密后的 例子如下
+        /*
+            @EncryptMethod()
+            @PostMapping("/dataEnc")
+            @ResponseBody
+            public Object testEncrypt(@RequestParam @EncryptField String username) {
+                System.out.println("加密后的username：" + username); // 实际没打印加密后的
+                return username;  // 返回值是加密后的
+            }
+        */
+		Object result = joinPoint.proceed(args);
+		return result;
+	}
+
+	public Object decrypt(ProceedingJoinPoint joinPoint) {
+		Object result = null;
+		try {
+			// 执行被切入的方法，并获取方法返回值
+			Object obj = joinPoint.proceed();
+			// 检查返回值是否为空
+			if (obj != null) {
+				// 如果返回值是字符串类型
+				if (obj instanceof String) {
+					// 解密字符串类型的返回值
+					result = decryptValue(obj);
+				} else {
+					// 如果返回值不是字符串类型，调用handler方法处理返回值
+					result = handler(obj, EncryptConstant.DECRYPT);
+				}
+				//TODO 其余类型自己看实际情况加
+			}
+		} catch (Throwable e) {
+			// 捕获异常并打印堆栈信息
+			e.printStackTrace();
+		}
+		// 返回解密后的结果
+		return result;
+	}
+```
+
