@@ -1064,45 +1064,127 @@ library:
 
 ### 5.1  @value(常用)
 
-使用 @Value("${property}") 读取比较简单的配置信息：
+## @Value方式
 
 properties文件
 
-```properties
-robot.name=小红
+```yml
+# JWT配置
+jwt:
+  secret: "!Q@W#E$R^Y&U"
+  issuer: "HZSTYGZPT"
+  expire-date: 3600000
 ```
 
 使用
 
 ```java
-@Value("${robot.name}")
-private String naem;    // name ={robot.name}
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+@Service
+public class JwtService {
+    @Value("${jwt.secret}")
+    private String secret;
+
+    @Value("${jwt.issuer}")
+    private String issuer;
+
+    @Value("${jwt.expire-date}")
+    private Long expireDate;
+
+    public void someMethod() {
+        // 使用配置参数进行JWT操作
+        System.out.println("Secret: " + secret);
+        System.out.println("Issuer: " + issuer);
+        System.out.println("Expire Date: " + expireDate);
+    }
+}
 ```
 
 ### 5.2  @ConfigurationProperties(常用)
 
-通过@ConfigurationProperties读取配置信息并与 bean 绑定。
+## @ConfigurationProperties方式(推荐)
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-configuration-processor</artifactId>
+    <optional>true</optional>
+</dependency>
+```
+
+properties文件
+
+```yml
+# JWT配置
+jwt:
+  secret: "!Q@W#E$R^Y&U"
+  issuer: "HZSTYGZPT"
+  expire-date: 3600000
+  app:
+  	micro-applet:
+  		app-id: wx4etd7e3803c6c555
+  		secret-id: e6fa5627cc57437ac8cbe5e988288f80
+```
+
+注意: 
+
++ <font color = red>.properties类型文件映射规则，短横线(-)后面的首个字母会变成大写，同时注意有内部类时的写法</font>
+
++ 如果有内部类对象，加上@Data，不然无法映射数据
++ 配置类上记得加上@Component注解
+
+配置类
 
 ```java
+package com.xxx.xxx.config.properties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
 @Component
-@ConfigurationProperties(prefix = "library")
-class LibraryProperties {
-    @NotEmpty
-    private String location;
-    private List<Book> books;
-    @Setter
-    @Getter
-    @ToString
-    static class Book {
-        String name;
-        String description;
+@Data
+@ConfigurationProperties(prefix = "jwt")
+public class JwtProperties {
+    private String secret;
+    private String issuer;
+    private Long expireDate;
+    
+    private App app;
+    @Data
+    public static class App {
+        private MicroApplet microApplet;
+
+        @Data
+        public static class MicroApplet {
+            private String appId = "";
+            private String secretId = "";
+        }
     }
-  省略getter/setter
-  ......
 }
 ```
 
-你可以像使用普通的 Spring bean 一样，将其注入到类中使用。
+使用
+
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class JwtService {
+
+    @Autowired
+    private JwtProperties jwtProperties;
+
+    public void someMethod() {
+        
+        // 使用配置参数进行JWT操作
+        String secret = jwtProperties.getSecret();
+        String issuer = jwtProperties.getIssuer();
+        Long expireDate = jwtProperties.getExpireDate();
+    }
+}
+```
 
 ### 5.3  PropertySource（不常用）
 

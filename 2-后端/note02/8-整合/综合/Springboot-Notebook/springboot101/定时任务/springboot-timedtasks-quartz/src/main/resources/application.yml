@@ -1,0 +1,20 @@
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        type: com.zaxxer.hikari.HikariDataSource
+        password: 741106
+        url: jdbc:mysql://localhost:3306/quartz
+        username: root
+
+#mybatis-plus配置
+mybatis-plus:
+    mapper-locations: classpath*:/mapper/*.xml
+    configuration:
+        # sql日志
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#数据库备份文件夹路径
+backup:
+    folder: C:\\Users\\16658\\Documents\\GitHub\\BackFront\\2-后端\\note02\\8-整合\\综合\\Springboot-Notebook\\springboot101\\定时任务\\springboot-timedtasks-quartz
+# 备份数据库名称
+dbName: quartz

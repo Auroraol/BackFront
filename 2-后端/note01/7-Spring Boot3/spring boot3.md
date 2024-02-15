@@ -6142,12 +6142,16 @@ public class JwtProperties {
     private String issuer;
     private Long expireDate;
     
-    private MicroApplet microApplet;
-
+    private App app;
     @Data
-    public static class MicroApplet {
-        private String appId = "";
-        private String secretId = "";
+    public static class App {
+        private MicroApplet microApplet;
+
+        @Data
+        public static class MicroApplet {
+            private String appId = "";
+            private String secretId = "";
+        }
     }
 }
 ```

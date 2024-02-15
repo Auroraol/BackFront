@@ -9,10 +9,18 @@ spring:
     username: root
     password: CODE(yTDT90o8m/N9uwVvJybwjg==)
 
-mybatis:
-  mapper-locations: classpath:/mapper/*.xml
+#mybatis:
+#  mapper-locations: classpath:/mapper/*.xml
+#  configuration:
+#    map-underscore-to-camel-case: true
+
+#mybatis-plus配置
+mybatis-plus:
+  type-aliases-package: com.example.demo.domain
+  mapper-locations: classpath*:/mapper/*Mapper.xml
   configuration:
-    map-underscore-to-camel-case: true
+    # sql日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 jasypt:
   encryptor:

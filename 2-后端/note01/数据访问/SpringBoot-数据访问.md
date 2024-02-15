@@ -293,6 +293,8 @@ ptions选项作用大致如下：
 
 #### ①  pom.xml
 
+出现问题: [DataSource dataSource中dataSource下方报红线 和 com.zaxxer.hikari.hikaridatasource 报红](https://blog.csdn.net/liu_xin_xin/article/details/119613612)
+
 **其核心引入:**
 
 ```xml
@@ -431,6 +433,8 @@ ptions选项作用大致如下：
 
 **添加@Mapper注解**
 
+注意: 有时候需要在主类添加@MapperScan("com.quartz.demo.mapper") // 指定mapper接口所在的包
+
 #### ③  更新配置
 
 ```properties
@@ -441,12 +445,33 @@ spring.datasource.url=jdbc:mysql://localhost:3306/mybatis
 spring.datasource.username=root
 spring.datasource.password=741106
 
+#mybatis配置
+#指定mapper映射文件位置
 mybatis.mapper-locations=classpath:/mapper/*.xml
-
+#参数项调整,打开驼峰命名规则
 mybatis.configuration.map-underscore-to-camel-case=true
 
 # web 端口
 server.port=9000
+```
+
+或者
+
+```yaml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://IP:PORT/DB_NAME?useUnicode=yes&characterEncoding=UTF8&useSSL=false&serverTimezone=CTT&allowMultiQueries=true
+       type: com.zaxxer.hikari.HikariDataSource
+    username: 用户名
+    password: 密码
+    
+#mybatis-plus配置
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    # sql日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 ```
 
 不需要写返回值，只需要写方法名就能够快速生成CRUD

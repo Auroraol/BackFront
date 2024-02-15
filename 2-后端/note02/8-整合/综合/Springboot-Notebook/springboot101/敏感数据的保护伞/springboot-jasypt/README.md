@@ -442,6 +442,15 @@ public class Users implements Serializable {
 
 http://localhost:9000/encryptor/dataEnc?username=123456
 
+```
+{
+"userId": 123,
+"mobile": "1234567890",    // 需要加密
+"address": "123 Main St",  // 需要加密
+"age": "25"
+}
+```
+
 ![image-20240208170900952](README.assets/image-20240208170900952.png)
 
 ![image-20240208121144608](README.assets/image-20240208121144608.png)

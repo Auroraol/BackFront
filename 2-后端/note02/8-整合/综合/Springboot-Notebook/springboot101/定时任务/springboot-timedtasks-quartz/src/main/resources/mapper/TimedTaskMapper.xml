@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quartz.demo.mapper.TimedTaskMapper">
+
+    <resultMap id="BaseResultMap" type="com.quartz.demo.entity.TimedTask">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="taskId" column="task_id" jdbcType="INTEGER"/>
+            <result property="jobGroup" column="job_group" jdbcType="VARCHAR"/>
+            <result property="executionTime" column="execution_time" jdbcType="TIMESTAMP"/>
+            <result property="cron" column="cron" jdbcType="VARCHAR"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="deleteFlag" column="delete_flag" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,task_id,job_group,
+        execution_time,cron,name,
+        create_time,update_time,delete_flag
+    </sql>
+
+    <delete id="deleteByTaskId">
+        update t_timed_task
+        set delete_flag = 1
+        where task_id = #{taskId}
+    </delete>
+
+    <select id="selectByTaskId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_timed_task
+        where
+        task_id = #{taskId,jdbcType=NUMERIC}
+    </select>
+</mapper>

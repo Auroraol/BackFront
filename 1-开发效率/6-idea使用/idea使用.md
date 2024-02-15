@@ -1,4 +1,4 @@
-# IDEA显示service服务
+# Springboot中yml文件没有叶子图标的解决IDEA显示service服务
 
 [IDEA显示services服务_idea 显示service_追求卓越583的博客-CSDN博客](https://blog.csdn.net/zhuiqiuzhuoyue583/article/details/128952012)
 
@@ -365,3 +365,86 @@ spring.main.banner-mode=off
 效果
 
 ![image-20240121203413745](idea%E4%BD%BF%E7%94%A8.assets/image-20240121203413745.png)
+
+
+
+
+
+# Springboot中配置文件没有叶子图标的解决
+
+## Springboot中yml文件没有叶子图标
+
+### 详情描述
+
+如下图所示，log4j.yml文件并没有spring的叶子图标，这样用起来没有代码提示很不方便 
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/2023091811261331.png)
+
+**解决方法：**
+
+如下图所示
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/2023091811261332.png)
+
+ ![img](idea%E4%BD%BF%E7%94%A8.assets/2023091811261433.png)
+
+ ![img](idea%E4%BD%BF%E7%94%A8.assets/2023091811261434.png)
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/2023091811261435.png)
+
+ 原文参考：[springboot 如何解决yml没有spring的小叶子标志](https://www.jb51.net/article/242152.htm)
+
+如果是在maven多模块项目，要保证 spring-boot-starter 引入包的依赖
+
+```
+<``dependency``>``  ``<``groupId``>org.springframework.boot</``groupId``>``  ``<``artifactId``>spring-boot-starter</``artifactId``>``</``dependency``>
+```
+
+
+
+## Spring配置文件（.yml）图标不是绿色小叶子
+
+
+
+### 问题展示
+
+项目的 `yml `文件一直不显示绿色小叶子，显示文本类型或者下图类型，影响项目启动运行。
+
+先看一下我之前的 `yml `格式
+
+![yml](idea%E4%BD%BF%E7%94%A8.assets/2023091811291236.png)
+
+
+
+### 问题解决
+
+点击进入 `Setting `设置
+
+![yml](idea%E4%BD%BF%E7%94%A8.assets/2023091811291237.png)
+
+ctrl+alt+s 选择 `plugins `查看是否下载 `yaml `插件
+
+![yml](idea%E4%BD%BF%E7%94%A8.assets/2023091811291238.png)
+
+ctrl+alt+s ，去 `File Types `查看yml后缀名（我这里已加上了 `*.yml `）
+
+![yml](idea%E4%BD%BF%E7%94%A8.assets/2023091811291339.png)
+
+点击 `+ `可以添加文件后缀
+
+![yml](idea%E4%BD%BF%E7%94%A8.assets/2023091811291340.png)
+
+问题解决了
+
+![yml](idea%E4%BD%BF%E7%94%A8.assets/2023091811291341.png)
+
+注：必要时可以 `Rubuild Project`
+
+![yml](idea%E4%BD%BF%E7%94%A8.assets/2023091811291342.png)
+
+
+
+## 总结
+
+
+

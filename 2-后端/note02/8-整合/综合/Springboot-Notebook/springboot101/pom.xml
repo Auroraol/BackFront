@@ -44,7 +44,6 @@
         <!-- 通用功能 -->
         <module>通用功能/springboot-aop-unifiedlog</module>
         <module>通用功能/springboot-database-doc</module>
-        <module>通用功能/springboot-delayqueue</module>
         <module>通用功能/springboot-env-variables</module>
         <module>通用功能/springboot-global-formatting</module>
         <module>通用功能/springboot-banner</module>
@@ -64,6 +63,11 @@
 
         <!-- 数据库相关 -->
         <module>数据库/springboot-dynamic-datasource</module>
+
+        <!-- 定时任务 -->
+        <module>定时任务/springboot-delayqueue</module>
+        <module>定时任务/springboot-timedtasks-quartz</module>
+
     </modules>
 
     <properties>
