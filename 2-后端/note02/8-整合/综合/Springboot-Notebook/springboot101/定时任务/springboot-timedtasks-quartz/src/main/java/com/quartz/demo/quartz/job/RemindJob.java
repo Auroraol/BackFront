@@ -1,21 +1,18 @@
-package com.quartz.demo.task;
+package com.quartz.demo.quartz.job;
 
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.stereotype.Service;
 
 /**
- * @program: vehicle-remote-control
- * @description:    执行定时任务
- * @create: 2019-09-06 17:10
- * @author: zhoujy
+ * 执行定时任务
+ * @Author: LFJ
+ * @Date: 2024-02-15 17:37
  */
 @Slf4j
-@Service
-public class RemindTask extends QuartzJobBean {
+public class RemindJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {

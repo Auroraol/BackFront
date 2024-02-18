@@ -1,9 +1,9 @@
 package com.quartz.demo.config;
 
-import org.quartz.Scheduler;
+import org.quartz.Trigger;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.ApplicationContext;
@@ -28,7 +28,7 @@ import java.util.Properties;
  * @Description:
  */
 @Configuration
-public class ConfigureQuartz {
+public class QuartzConfig {
     @Bean
     public JobFactory jobFactory(ApplicationContext applicationContext) {
         AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
@@ -51,6 +51,7 @@ public class ConfigureQuartz {
             factory.setDataSource(dataSource);
             factory.setJobFactory(jobFactory);
             factory.setQuartzProperties(quartzProperties());
+
         } catch (Exception e) {
             e.printStackTrace();
         }

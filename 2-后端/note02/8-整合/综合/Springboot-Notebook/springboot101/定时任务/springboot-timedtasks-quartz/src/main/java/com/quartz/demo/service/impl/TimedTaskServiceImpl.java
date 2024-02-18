@@ -1,7 +1,8 @@
 package com.quartz.demo.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.quartz.demo.task.RemindTask;
+import com.quartz.demo.quartz.job.RemindJob;
 import com.quartz.demo.entity.Task;
 import com.quartz.demo.entity.TimedTask;
 import com.quartz.demo.pojo.AddRequest;
@@ -10,12 +11,14 @@ import com.quartz.demo.service.TaskService;
 import com.quartz.demo.service.TimedTaskService;
 import com.quartz.demo.mapper.TimedTaskMapper;
 import com.quartz.demo.utils.DateUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,6 +27,8 @@ import java.util.List;
 * @description 针对表【t_timed_task】的数据库操作Service实现
 * @createDate 2024-02-09 18:12:48
 */
+
+@Slf4j
 @Service
 public class TimedTaskServiceImpl extends ServiceImpl<TimedTaskMapper, TimedTask>
     implements TimedTaskService{
@@ -85,11 +90,17 @@ public class TimedTaskServiceImpl extends ServiceImpl<TimedTaskMapper, TimedTask
 
 		Scheduler scheduler = schedulerFactoryBean.getScheduler();
 
-		//
+		//如果定时任务时间小于当前时间则退出
+		Date date1 =DateUtil.date();
+		Date date2 =DateUtil.parse(executionTime);
+		if (DateUtil.compare(date1,date2) > 0) {
+			log.info("当前时间:" + date1 + " > 定时任务时间:" + date2 + "不执行");
+			return;
+		}
 
 		// 创建Cron触发器
 		CronScheduleBuilder cronScheduleBuilder =
-				CronScheduleBuilder.cronSchedule(DateUtils.timeToCron(executionTime));  //使用Cron表达式设置触发器的调度规则
+				CronScheduleBuilder.cronSchedule(DateUtils.timeToCron(executionTime));  //[重要] 使用Cron表达式设置触发器的调度规则
 		CronTrigger trigger = TriggerBuilder.newTrigger()
 				.withIdentity(type + taskId, "remind") // 标识符唯一性
 				.withSchedule(cronScheduleBuilder)
@@ -99,7 +110,7 @@ public class TimedTaskServiceImpl extends ServiceImpl<TimedTaskMapper, TimedTask
 				.build();
 
 		// 创建任务
-		JobDetail jobDetail = JobBuilder.newJob(RemindTask.class)   //指定任务实例为RemindTask类
+		JobDetail jobDetail = JobBuilder.newJob(RemindJob.class)   //[重要] 指定任务实例为RemindTask类
 				.usingJobData("taskId", taskId)
 				.usingJobData("taskName", taskName)
 				.usingJobData("execution", executionTime)
@@ -169,10 +180,7 @@ public class TimedTaskServiceImpl extends ServiceImpl<TimedTaskMapper, TimedTask
 		for(TimedTask timedTask : timedTaskList){
 			// 尝试删除Quartz作业
 			boolean isJobDeleted = scheduler.deleteJob(JobKey.jobKey(timedTask.getName(), "remind"));
-			if (isJobDeleted) {
-				// 如果成功删除了作业，则从数据库中删除相应的TimedTask记录
-				deleteByTaskId(id);
-			}
+			// TODO 更新数据库
 		}
 		resultBO.setSucceed(true);
 		resultBO.setMsg("删除定时任务成功!");

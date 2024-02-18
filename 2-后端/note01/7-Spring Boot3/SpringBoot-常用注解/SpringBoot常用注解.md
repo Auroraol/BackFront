@@ -1064,8 +1064,6 @@ library:
 
 ### 5.1  @value(常用)
 
-## @Value方式
-
 properties文件
 
 ```yml

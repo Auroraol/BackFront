@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Map;
@@ -20,22 +21,24 @@ import cn.hutool.core.date.DateUtil;
  */
 @Slf4j
 @Service
-public class IQuartzSqlServiceImpl implements IQuartzSqlService {
+public class IQuartzSqlServiceImpl implements IQuartzSqlService, Serializable {
 
 	// 使用@Value注解来注入数据库连接信息
-	@Value("${spring.datasource.username}")
+	@Value("${backup.username}")
 	private String userName;
 
-	@Value("${spring.datasource.password}")
+	@Value("${backup.password}")
 	private String passWord;
 
-	@Value("${dbName}")
+	@Value("${backup.dbName}")
 	private String dbName;
+
+	@Value("${backup.day}")
+	private int day;
 
 	// 指定数据库备份资源路径
 	@Value("${backup.folder}")
 	private String backupFolderPath;
-
 
 	@Override
 	public void mysqlBackupTask() {
@@ -86,7 +89,7 @@ public class IQuartzSqlServiceImpl implements IQuartzSqlService {
 					// 计算文件夹名字所表示的日期与当前日期之间的天数差
 					// 保存的是7天内的备份，因此7天前的备份会被删除
 					long betweenDay = DateUtil.between(date1, date2, DateUnit.DAY);
-					if (betweenDay > 7) {
+					if (betweenDay > day) {
 						File[] subFiles = file.listFiles();
 						for (File subFile : subFiles) {
 							subFile.delete();

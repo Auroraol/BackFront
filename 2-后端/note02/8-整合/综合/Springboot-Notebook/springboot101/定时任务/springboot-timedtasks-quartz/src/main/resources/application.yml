@@ -13,8 +13,15 @@ mybatis-plus:
         # sql日志
         log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-#数据库备份文件夹路径
+#备份数据库
 backup:
+    # 备份文件夹路径
     folder: C:\\Users\\16658\\Documents\\GitHub\\BackFront\\2-后端\\note02\\8-整合\\综合\\Springboot-Notebook\\springboot101\\定时任务\\springboot-timedtasks-quartz
-# 备份数据库名称
-dbName: quartz
+    # 备份数据库名称
+    dbName: quartz
+    # 数据库账号
+    username: root
+    # 数据库密码
+    password: 741106
+    # 备份数据库保存天数
+    day: 7
