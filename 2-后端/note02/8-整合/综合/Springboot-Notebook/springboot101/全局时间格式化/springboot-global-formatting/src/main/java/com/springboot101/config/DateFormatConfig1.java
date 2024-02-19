@@ -1,4 +1,4 @@
-package com.springboot101.formatting.config;
+package com.springboot101.config;
 
 
 import com.fasterxml.jackson.databind.SerializationFeature;

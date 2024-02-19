@@ -45,7 +45,6 @@
         <module>通用功能/springboot-aop-unifiedlog</module>
         <module>通用功能/springboot-database-doc</module>
         <module>通用功能/springboot-env-variables</module>
-        <module>通用功能/springboot-global-formatting</module>
         <module>通用功能/springboot-banner</module>
 
         <!-- 接口文档 -->
@@ -67,6 +66,10 @@
         <!-- 定时任务 -->
         <module>定时任务/springboot-delayqueue</module>
         <module>定时任务/springboot-timedtasks-quartz</module>
+
+        <!-- 全局时间格式化 -->
+        <module>全局时间格式化/springboot-global-formatting</module>
+
 
     </modules>
 
