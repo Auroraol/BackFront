@@ -65,7 +65,7 @@ X-HTTP-Method-Override: PUT
 
 为了统一起见，建议都使用复数 URL，比如`GET /articles/2`要好于`GET /article/2`。
 
-### 1.5 避免多级 URL
+### 1.5 避免多级 URL:crossed_swords:
 
 常见的情况是，资源需要多级分类，因此很容易写出多级的 URL。更好的做法是，除了第一级，其他级别都用查询字符串表达。
 

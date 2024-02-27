@@ -940,3 +940,9 @@ public class VehicleJobController {
 默认启动定时数据库备份功能
 
 ![image-20240218154252442](README.assets/image-20240218154252442.png)![image-20240218161235041](README.assets/image-20240218161235041.png)
+
+# 参考
+
+[实现数据库定期备份和定期删除（Quartz和Schedule两种方式实现)](https://blog.csdn.net/luomaCLX/article/details/127630105)
+
+[springboot + mybatis-plus + quaryz 数据库持久化任务调度](https://blog.csdn.net/qq_39091806/article/details/123723224)

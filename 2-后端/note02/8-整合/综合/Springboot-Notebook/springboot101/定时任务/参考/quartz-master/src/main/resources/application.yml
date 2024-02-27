@@ -1,0 +1,47 @@
+mybatis:
+    type-aliases-package: com.quartz.demo.pojo
+server:
+    connection-timeout: 600000
+    port: 2080
+spring:
+    datasource:
+        driverClassName: com.mysql.jdbc.Driver
+        password: 741106
+        sql-script-encoding: utf-8
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://127.0.0.1:3306/quartz?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&useSSL=true&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+        username: root
+    jpa:
+        database: MYSQL
+        hibernate:
+            ddl-auto: update
+    quartz:
+        jdbc:
+            comment-prefix: '#'
+            initialize-schema: never
+        job-store-type: jdbc
+        properties:
+            org:
+                quartz:
+                    dataSource:
+                        quartzDataSource:
+                            URL: jdbc:mysql://127.0.0.1:3306/quartz
+                            driver: com.mysql.jdbc.Driver
+                            password: 741106
+                            user: root
+                    jobStore:
+                        class: org.quartz.impl.jdbcjobstore.JobStoreTX
+                        clusterCheckinInterval: 10000
+                        driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+                        isClustered: true
+                        useProperties: false
+                    scheduler:
+                        instanceId: AUTO
+                        instanceIdGenerator:
+                            class: org.quartz.simpl.SimpleInstanceIdGenerator
+                        instanceName: AdminClusteredScheduler
+                    threadPool:
+                        class: org.quartz.simpl.SimpleThreadPool
+                        threadCount: 50
+                        threadPriority: 5
+                        threadsInheritContextClassLoaderOfInitializingThread: true
