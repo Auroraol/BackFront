@@ -1,25 +1,3 @@
-<div align="center">
-    <p style="font-size:25px;font-weight: 800;">Springboot-Notebook</p>
-</div>
-<div align="center" style="text-align:center;margin-top:30px;margin-bottom:20px">
-   <a style="padding-left:10px"><img src="https://img.shields.io/github/stars/chengxy-nds/Springboot-Notebook"/></a>
-   <a style="padding-left:10px"><img src="https://img.shields.io/github/forks/chengxy-nds/Springboot-Notebook?color=red&logo=red"/></a>
-   <a style="padding-left:10px" href="https://mp.weixin.qq.com/s/iogZNJ392dPuWZx_GSD4UA"><img src="https://img.shields.io/static/v1?label=%E5%85%AC%E4%BC%97%E5%8F%B7&message=%E7%A8%8B%E5%BA%8F%E5%91%98%E5%B0%8F%E5%AF%8C&color=success&&logo=wechat"/></a>
-   <a style="padding-left:10px" href="https://mp.weixin.qq.com/s/iogZNJ392dPuWZx_GSD4UA"><img src="https://img.shields.io/static/v1?label=%E5%BE%AE%E4%BF%A1&message=xinzhifu521&color=success&&logo=wechat"/></a>
-</div>
-
-> 本项目全部案例详细教程，同步在 个人公众号：**程序员小富** , 欢迎关注交流指正，加群学习
-
-<div style="text-align:">
-<img src='wx/gonghao.jpg' width="200" height="200">
-</div>
-
-![](wx/person.png)
-[**作者小富，目前就职某大厂，点击一起来了解下**](https://mp.weixin.qq.com/s?__biz=MzAxNTM4NzAyNg==&mid=2247500646&idx=1&sn=5a0993997dc1fc609da4eda5ba610681&chksm=9b86539bacf1da8d2bc22b569d27e1b7b85a21a0ec7d5a5f4a6660148a5f40f076e2d42e4885&token=1045698719&lang=zh_CN#rd)
-
----
-
-
 ### 介绍
 
 **Springboot-Notebook** 一个以 `springboot` 为基础开发框架，
@@ -41,23 +19,10 @@
 消息推送  | 7种实时消息推送
 更多 | ......
 
-### 面试八股
-
-- 《spring cloud alibaba 微服务全家桶》
-
-- 《面试笔记》
-
-- 《LeetCode算法笔记》
-
-
-**获取方式**：[公众号：**程序员小富** , 回复 **1222**](https://mp.weixin.qq.com/s?__biz=MzAxNTM4NzAyNg==&mid=2247500646&idx=1&sn=5a0993997dc1fc609da4eda5ba610681&chksm=9b86539bacf1da8d2bc22b569d27e1b7b85a21a0ec7d5a5f4a6660148a5f40f076e2d42e4885&token=1045698719&lang=zh_CN#rd)
-
 
 ### 电子书
 
 [**2000本电子书 下载**](https://github.com/chengxy-nds/Firebook-Library)
-
-![](wx/book.png)
 
 ### 优质文章精选
 
@@ -138,7 +103,7 @@
 - [4万字硬核剖析，Kafka 面试 30问( 高级篇)](https://mp.weixin.qq.com/s/rRypyd-ipelJAgB9WNv_dA)
 - [未读消息（小红点），前端 与 RabbitMQ 实时消息推送实践，贼简单~](https://mp.weixin.qq.com/s/U-fUGr9i1MVa4PoVyiDFCg)
   (`springboot-mqtt-messagepush`)
-- [springboot + rabbitmq 用了消息确认机制，感觉掉坑里了](https://mp.weixin.qq.com/s/me1bfFwzQDAn7EDOgoR65g)
+- [springboot + rabbitmq 用了消息确认机制](https://mp.weixin.qq.com/s/me1bfFwzQDAn7EDOgoR65g)
   (`springboot-rabbitmq-confirm`)
 - [我也没想到 springboot + rabbitmq 做智能家居，会这么简单](https://mp.weixin.qq.com/s/udFE6k9pPetIWsa6KeErrA) (`springboot-rabbitmq-mqtt`)
 
@@ -189,21 +154,3 @@
 ### 求职
 
 - [看了 100多份简历后，想给找工作的程序员几点建议](https://mp.weixin.qq.com/s/iVBbzaNpC--Tk6c-JfwtUQ)
-
-
-
-
-## springboot 101
-
-
-springboot 101 一个全新的免费 springboot 专栏，旨在让新手Java开发者可以快速上手实战，整个专栏分为基础篇和高级篇两大块。
-
-
-
-
-> 欢迎关注公众号、或者添加个人微信：xinzhifu521，加群学习
-
-<div style="text-align:">
-<img src='wx/gonghao.jpg' width="200" height="200">
-<img src='wx/wx.jpg' width="200" height="200">
-</div>

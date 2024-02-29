@@ -298,7 +298,14 @@ ptions选项作用大致如下：
 **其核心引入:**
 
 ```xml
-        <!-- mysql -->
+        <!--用于 DataSource.class 和 使用JdbcTemplate, 一般不需要添加
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+		-->
+
+		<!-- mysql -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>

@@ -15,14 +15,14 @@
 //import java.util.*;
 //
 ///**
-//
+// * 公众号：程序员小富
 // */
 //@Configuration
 //public class ShardingConfiguration {
 //
 //    /**
 //     * 配置分片数据源
-//    
+//     * 公众号：程序员小富
 //     */
 //    @Bean
 //    public DataSource getShardingDataSource() throws SQLException {
@@ -61,7 +61,7 @@
 //
 //    /**
 //     * 配置数据源1
-//    
+//     * 公众号：程序员小富
 //     */
 //    public DataSource dataSource0() {
 //        HikariDataSource dataSource = new HikariDataSource();
@@ -74,7 +74,7 @@
 //
 //    /**
 //     * 配置数据源2
-//    
+//     * 公众号：程序员小富
 //     */
 //    public DataSource dataSource1() {
 //        HikariDataSource dataSource = new HikariDataSource();
@@ -87,7 +87,7 @@
 //
 //    /**
 //     * 配置分片算法
-//    
+//     * 公众号：程序员小富
 //     */
 //    private Map<String, AlgorithmConfiguration> getShardingAlgorithms() {
 //        Map<String, AlgorithmConfiguration> shardingAlgorithms = new LinkedHashMap<>();

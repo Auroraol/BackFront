@@ -1,21 +1,25 @@
 package com.shardingsphere_101.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * 订单实体类
  */
-@NoArgsConstructor
-@TableName("t_order")
 @Data
-public class Order {
+@TableName("t_order")
+@NoArgsConstructor
+public class Order implements Serializable {
 
-    private Long id;
+    @TableId(type = IdType.AUTO)
+    private Long Id;
     private Long orderId;
     private String orderNumber;
     private Long customerId;

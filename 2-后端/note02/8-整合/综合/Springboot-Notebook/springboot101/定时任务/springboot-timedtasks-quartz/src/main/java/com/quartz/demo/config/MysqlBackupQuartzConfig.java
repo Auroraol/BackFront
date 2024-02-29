@@ -34,7 +34,7 @@ public class MysqlBackupQuartzConfig {
 		JobDataMap jobDataMap = new JobDataMap();
 		jobDataMap.put("quartzSqlService", iQuartzSqlService);
 		return JobBuilder.newJob(MysqlBackupJob.class) //[重要] 指定任务实例为MysqlBackupJob类
-				.withIdentity("mysqlBackupJobDetail", MYSQL_BACKUP_JOB_GROUP_NAME)
+				.withIdentity("mysqlBackupJobDetail", MYSQL_BACKUP_JOB_GROUP_NAME) // name, group
 				.usingJobData(jobDataMap)
 				.storeDurably()
 				.build();

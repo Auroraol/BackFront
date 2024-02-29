@@ -27,14 +27,14 @@ class ShardingSphereApplicationTests {
     }
 
     /**
-     * t_user 未做分库分表的表，插入数据验证示例
+     * t_user 未做分库分表的表，插入数据验证示例, 未分片的表默认会使用第一个数据源作为默认数据源，也就是 `datasource.names` 第一个。
      */
     @Test
     void saveDefaultUserSharding() {
         User user = new User();
-        user.setUName("公众号：程序员小富");
+        user.setUName("金刀");
         user.setUAge(12);
-        user.setUAddress("宇宙商场");
+        user.setUAddress("搜索");
         user.setCreateTime(new Date());
         user.setDateTime(new Date());
         userRepository.save(user);

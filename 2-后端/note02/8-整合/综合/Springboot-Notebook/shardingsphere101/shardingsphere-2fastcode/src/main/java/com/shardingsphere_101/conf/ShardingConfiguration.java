@@ -13,15 +13,13 @@
 //import java.sql.SQLException;
 //import java.util.*;
 //
-///**
-//
+///**使用JAVA编码方式实现分库分表
 // */
 //@Configuration
 //public class ShardingConfiguration {
 //
 //    /**
 //     * 配置分片数据源
-//    
 //     */
 //    @Bean
 //    public DataSource getShardingDataSource() throws SQLException {
@@ -49,7 +47,7 @@
 //
 //    /**
 //     * 配置数据源1
-//    
+//     * 
 //     */
 //    public DataSource dataSource0() {
 //        HikariDataSource dataSource = new HikariDataSource();
@@ -62,7 +60,7 @@
 //
 //    /**
 //     * 配置数据源2
-//    
+//     * 
 //     */
 //    public DataSource dataSource1() {
 //        HikariDataSource dataSource = new HikariDataSource();
@@ -75,7 +73,7 @@
 //
 //    /**
 //     * 配置分片算法
-//    
+//     * 
 //     */
 //    private Map<String, AlgorithmConfiguration> getShardingAlgorithms() {
 //        Map<String, AlgorithmConfiguration> shardingAlgorithms = new LinkedHashMap<>();

@@ -33,7 +33,7 @@ public class ScrewApplicationTests {
         // 生成文件配置
         EngineConfig engineConfig = EngineConfig.builder()
                 // 生成文件路径，自己mac本地的地址，这里需要自己更换下路径
-                .fileOutputDir("D:/")
+                .fileOutputDir("C:\\Users\\16658\\Documents\\GitHub\\BackFront\\2-后端\\note02\\8-整合\\综合\\Springboot-Notebook\\springboot101\\通用功能\\springboot-database-doc\\doc")
                 // 打开目录
                 .openOutputDir(false)
                 // 文件类型
