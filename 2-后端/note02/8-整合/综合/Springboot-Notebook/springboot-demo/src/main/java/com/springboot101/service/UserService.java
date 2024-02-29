@@ -14,7 +14,7 @@ public class UserService {
 
 
     public void insertUser(User user){
-
         userRepository.save(user);
+
     }
 }

@@ -340,7 +340,7 @@ spring.main.banner-mode=off
 
 ![image-20240120191801945](idea%E4%BD%BF%E7%94%A8.assets/image-20240120191801945.png)
 
-# 重装IDEA同步个人配置
+# IDEA同步个人配置
 
 1.首先将本地的设置上传到云端
 
@@ -443,8 +443,6 @@ ctrl+alt+s ，去 `File Types `查看yml后缀名（我这里已加上了 `*.yml
 ![yml](idea%E4%BD%BF%E7%94%A8.assets/2023091811291342.png)
 
 
-
-## 总结
 
 
 

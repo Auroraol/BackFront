@@ -59,13 +59,134 @@ X-HTTP-Method-Override: PUT
 > - /createNewCar
 > - /deleteAllRedCars
 
-### 1.4 复数 URL
+推荐使用 使用kebab-case（短横线小写隔开形式）
+
+### 1.4  对URL使用kebab-case（短横线小写隔开形式)
+
+例如，如果你想要获得订单列表
+
+不应该：
+
+```
+/systemOrders
+/system_orders
+```
+
+应该：
+
+```
+/system-orders
+```
+
+### 1.5 指向集合使用复数名称
 
 常见的操作是读取一个集合，比如`GET /articles`（读取所有文章），这里明显应该是复数。
 
 为了统一起见，建议都使用复数 URL，比如`GET /articles/2`要好于`GET /article/2`。
 
-### 1.5 避免多级 URL:crossed_swords:
+例如，如果你想获得系统的所有用户
+
+不应该：
+
+```
+GET /user
+GET /User
+```
+
+应该：
+
+```
+GET /users
+```
+
+### 1.6  参数使用camelCase（驼峰形式）
+
+例如，如果你想从一个特定的商店购买产品。
+
+不应该：
+
+```
+/system-orders/{order_id}
+/system-orders/{OrderId}
+```
+
+应该：
+
+```
+/system-orders/{orderId}
+```
+
+### 1.7 URL以集合开始，以标识符结束
+
+如果要保持概念的单一性和一致性。
+
+不应该：
+
+```
+GET /shops/:shopId/category/:categoryId/price
+```
+
+应该：
+
+```
+GET /shops/:shopId/
+GET /category/:categoryId
+```
+
+###  1.8 让动词远离你的资源URL:crossed_swords:
+
+不要在URL中使用动词来表达你的意图。相反，使用适当的HTTP方法来描述操作。
+
+不应该：
+
+```
+POST /updateuser/{userId}
+GET /getusers
+```
+
+应该：
+
+```
+PUT /user/{userId}
+```
+
+### 1.9 对非资源URL使用动词
+
+如果你有一个端点，它只返回一个操作。在这种情况下，你可以使用动词。
+
+例如，如果你想要向用户重新发送警报。
+
+应该：
+
+```
+POST /alarm/245743/resend
+```
+
+请记住，这些不是我们的CRUD操作。相反，它们被认为是在我们的系统中执行特定工作的函数。
+
+### 2.0 JSON属性使用camelCase(驼峰形式)
+
+如果你正在构建一个请求体或响应体为JSON的系统，那么属性名应该使用驼峰大小写。
+
+不应该：
+
+```
+{
+   user_name: "Mohammad Faisal"
+   user_id: "1"
+}
+```
+
+应该：
+
+```
+{
+   userName: "Mohammad Faisal"
+   userId: "1"
+}
+```
+
+### 2.1 避免多级 URL:crossed_swords:
 
 常见的情况是，资源需要多级分类，因此很容易写出多级的 URL。更好的做法是，除了第一级，其他级别都用查询字符串表达。
 
@@ -166,7 +287,7 @@ public class AuthorController {
 }
 ```
 
-### 1.6 REST使用:crossed_swords:
+### 2.2 REST使用:crossed_swords:
 
 ------
 
@@ -464,3 +585,137 @@ Content-Type: application/json
 
 [RESTful API  (hellowac.github.io)](https://hellowac.github.io/fastapi-best-practices-zh-cn/http/restapibsetp/#四参考链接)
 
+# 五、 使用API设计工具
+
+有许多好的API设计工具用于编写好的文档，例如：
+
+- **API蓝图**：https://apiblueprint.org/
+- **Swagger**：https://swagger.io/
+
+![图片](REST%E9%A3%8E%E6%A0%BC.assets/640.png)
+
+拥有良好而详细的文档可以为API使用者带来良好的用户体验。
+
+# 六、URL设计补充
+
+##  使用简单序数作为版本
+
+始终对API使用版本控制，并将其向左移动，使其具有最大的作用域。版本号应该是v1，v2等等。
+
+应该：http://api.domain.com/v1/shops/3/products
+
+始终在API中使用版本控制，因为如果API被外部实体使用，更改端点可能会破坏它们的功能。
+
+## 在你的响应体中包括总资源数
+
+如果API返回一个对象列表，则响应中总是包含资源的总数。你可以为此使用total属性。
+
+不应该：
+
+```
+{
+  users: [ 
+     ...
+  ]
+}
+```
+
+应该：
+
+```
+{
+  users: [ 
+     ...
+  ],
+  total: 34
+}
+```
+
+## 接受limit和offset参数
+
+在GET操作中始终接受limit和offset参数。
+
+应该：
+
+```
+GET /shops?offset=5&limit=5
+```
+
+这是因为它对于前端的分页是必要的。
+
+## 获取字段查询参数
+
+返回的数据量也应该考虑在内。添加一个fields参数，只公开API中必需的字段。
+
+例子：
+
+只返回商店的名称，地址和联系方式。
+
+```
+GET /shops?fields=id,name,address,contact
+```
+
+在某些情况下，它还有助于减少响应大小。
+
+## 不要在URL中通过认证令牌
+
+这是一种非常糟糕的做法，因为url经常被记录，而身份验证令牌也会被不必要地记录。
+
+不应该：
+
+```
+GET /shops/123?token=some_kind_of_authenticaiton_token
+```
+
+相反，通过头部传递它们：
+
+```
+Authorization: Bearer xxxxxx, Extra yyyyy
+```
+
+此外，授权令牌应该是短暂有效期的。
+
+## 验证内容类型
+
+服务器不应该假定内容类型。
+
+例如，如果你接受**application/x-www-form-urlencoded**，那么攻击者可以创建一个表单并触发一个简单的POST请求。
+
+因此，始终验证内容类型，如果你想使用默认的内容类型，请使用：
+
+```
+content-type: application/json
+```
+
+## 对CRUD函数使用HTTP方法
+
+HTTP方法用于解释CRUD功能。
+
+**GET**：检索资源的表示形式。看
+
+**POST**：创建新的资源和子资源。放
+
+**PUT**：更新现有资源。改
+
+**PATCH**：更新现有资源，它只更新提供的字段，而不更新其他字段。 更
+
+**DELETE**：删除已存在的资源。删
+
+##  在嵌套资源的URL中使用关系
+
+以下是一些实际例子：
+
+- **GET /shops/2/products**：从shop 2获取所有产品的列表。
+- **GET /shops/2/products/31**：获取产品31的详细信息，产品31属于shop 2。
+- **DELETE /shops/2/products/31**：应该删除产品31，它属于商店2。
+- **PUT /shops/2/products/31**：应该更新产品31的信息，只在resource-URL上使用PUT，而不是集合。
+- **POST /shops**：应该创建一个新的商店，并返回创建的新商店的详细信息。在集合url上使用POST。
+
+# 七、黄金法则
+
+如果您对API格式的决定有疑问，这些黄金规则可以帮助我们做出正确的决定。
+
+- 扁平比嵌套好。
+- 简单胜于复杂。
+- 字符串比数字好。
+- 一致性比定制更好。

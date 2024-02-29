@@ -68,10 +68,7 @@
 ### 性能优化
 
 - [1000w+ 数据，查询速度提升60倍，SQL 优化就是这么神奇](https://mp.weixin.qq.com/s/MmKB597kFYTaX8adVUyw2g)
-- [设计 API 的 22 条最佳实践，实用！](https://mp.weixin.qq.com/s/YgaYLyqCJQ-bXoA5F5ygxg)
 - [线上又 OOM 了 ，就这样那样搞定了](https://mp.weixin.qq.com/s/_3qjISGb26f4dMkf51hzbw)
-- [碰到了一位狠人，这脑洞太秀了！](https://mp.weixin.qq.com/s/iCcwDgQuVTcNQqEalSQHNQ)
-- [明明还有空间，硬盘却写不进去了！](https://mp.weixin.qq.com/s/PPFZbyDfZLYn8HTPr3yzWA)
 - [6 个 Java 工具，轻松分析定位 JVM 问题！](https://mp.weixin.qq.com/s/BSuj7MrDQb8qR_lppTCq2g)
 
 ### 分库分表(Sharding-JDBC)
@@ -135,7 +132,7 @@
 
 ### 干货、工具
 
-- [手写一个抖音视频去水印工具，千万别刚一个程序员](https://mp.weixin.qq.com/s/Cq6_oQdHqr5_zsBc68Xn5Q) (`springboot-douyin-watermark`)
+- [手写一个抖音视频去水印工具](https://mp.weixin.qq.com/s/Cq6_oQdHqr5_zsBc68Xn5Q) (`springboot-douyin-watermark`)
 - [基于 Java 实现的人脸识别功能（附源码`)](https://mp.weixin.qq.com/s/noTX_dlhGCPmf7B1xAcS-A)
 - [实用！8个 chrome插件玩转GitHub，单个文件下载小意思](https://mp.weixin.qq.com/s/ulRsWrtdlA2A5MmCdQo_aw)
 - [10个 我经常逛的国外技术社区，真的受益匪浅！](https://mp.weixin.qq.com/s/irNZLVilr2x7krCz2SylOA)
@@ -147,7 +144,6 @@
 - [一个让学 Git 命令变的好玩又有趣的神奇网站](https://mp.weixin.qq.com/s/vcVOR7Ng4Zu2ImagDlrLPw)
 - [灰度发布、蓝绿发布、滚动发布，有什么区别？这下明白了](https://mp.weixin.qq.com/s/gecVbHj_51On8OEPDWMInw)
 - [这些年我用过的 6个API 接口文档平台，真的好用](https://mp.weixin.qq.com/s/hy0DbltE61nmsfuQLLTOwg)
-- [我试了试用 SQL查 Linux日志，好用到飞起](https://mp.weixin.qq.com/s/wLnZYFUj9LLvV41ZBUJykAs)
 - [拉仇恨！webhook + 企业微信 给同事做了个代码提交监听工具](https://mp.weixin.qq.com/s/GYLWccRxAsJlLPeI2vfuRQ)
 - [10个解放双手的 IDEA 插件，这些代码真不用手写（第二弹）](https://mp.weixin.qq.com/s/rBhBiyNQ7hFnK-ryQvCO7g)
 
