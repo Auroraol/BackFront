@@ -126,7 +126,7 @@ this.$emit('api-load');
 
 - 文件夹
 - 单文件组件
-- 组件在html模板中使用(`<my-component></my-component>`)
+- **组件在html模板<template>中使用(`<my-component></my-component>`)**
 - 在模板中prop传入属性到子组件(`<my-componnet set-text="hello"/>`)
 - 所有事件名(`this.$emit('api-reload')`)
 

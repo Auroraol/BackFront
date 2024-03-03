@@ -412,10 +412,10 @@ function clearCookie(name) {
          1. 获取cookie:由请求对象来实现
                                   				2.  操作cookie：包括增删改 由响应对象来实现
 
-               		2. ###### session的用法：只能服务端操作，仅仅是存在在服务端
-               	
-               			1.  获取由请求对象来获取
-               			2.  操作由请求对象来操作
+                     		2. ###### session的用法：只能服务端操作，仅仅是存在在服务端
+                     	
+                     			1.  获取由请求对象来获取
+                     			2.  操作由请求对象来操作
 
 ###### 4.原理解答=>
 
@@ -1950,4 +1950,71 @@ server.listen(8080, () => {
 ```
 
 这个示例中，我们使用Node.js内置的`http`模块创建了一个HTTP服务器，当我们访问服务器时，会返回一个`Hello, World!`的字符串。我们通过`require()`函数引入了内置模块`http`，然后使用它创建了我们的服务器。
+
+
+
+# nodejs 版本管理工具 nvm
+
+## nvm use version 报错 exit stauts 1 乱码
+
+**nvm文件未安装在根目录下所导致!**
+
+1、控制面板，程序删除 [nvm](https://so.csdn.net/so/search?q=nvm&spm=1001.2101.3001.7020)
+2、检查环境变量是否有残余变量，有的话就删除。如下图
+
+![img](nodejs%E4%BD%BF%E7%94%A8.assets/c6a7575914ca19f7a09b209e683d274f.png)
+
+
+
+ 3、重新安装 nvm。放在C盘或者D盘的根目录下（重点！），如下图
+
+![img](nodejs%E4%BD%BF%E7%94%A8.assets/08d90821fcded5dbee6c264bd57dd351.png)
+
+4、[nodejs安装](https://so.csdn.net/so/search?q=nodejs安装&spm=1001.2101.3001.7020)在哪就随个人习惯。
+
+<img src="nodejs%E4%BD%BF%E7%94%A8.assets/image-20240302135737637.png" alt="image-20240302135737637" style="zoom:80%;" />
+
+*5、*使用nvm use 切换node环境。记得在**cmd管理员窗口**操作
+
++ 1）安装路径是否包含中文
+
++ 2）安装路径有空格
+
++ 3）cmd使用是否是管理员方式打开
+
+*6、验证 在任意路径下能找到nvm*
+
+![image-20240302135833264](nodejs%E4%BD%BF%E7%94%A8.assets/image-20240302135833264.png)
+
+##  使用
+
+#### 下载 nodejs
+
+```
+nvm install [nodejs版本号]
+```
+
+输入：nvm install 16.20.0
+
+<img src="nodejs%E4%BD%BF%E7%94%A8.assets/image-20240302135501205.png" style="zoom:67%;" />
+
+#### 3、下载完成后查看已安装的 nodejs 版本
+
+```
+nvm ls
+```
+
+![image-20240302135523088](nodejs%E4%BD%BF%E7%94%A8.assets/image-20240302135523088.png)
+
+星号所标记的就是我们目前所使用的 node 版本
+
+#### 4、切换使用的 node 版本
+
+```
+nvm use [nodejs版本号]
+```
+
+<img src="nodejs%E4%BD%BF%E7%94%A8.assets/image-20240302135625166.png" style="zoom: 67%;" />
+
+这样就将 node 版本从 16.20.0 切换到20.10.0了，通过 nvm 我们修改node版本就变得非常方便了，nvm会去修改电脑的环境变量，而不用自己去修改。
 

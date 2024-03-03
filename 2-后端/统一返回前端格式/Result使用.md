@@ -15,6 +15,110 @@
 
 <img src="Result%E4%BD%BF%E7%94%A8.assets/image-20240125194932672.png" alt="image-20240125194932672" style="zoom: 60%;" />
 
+# 使用注解，统一参数校验
+
+一个需求：实现一个注册用户的功能，在controller 层，他会先进行校验参数，如下：
+
+```
+@RestController
+@RequestMapping
+public class UserController {
+
+    @RequestMapping("addUser")
+    public String addUser(UserParam userParam) {
+
+        if (StringUtils.isEmpty(userParam.getUserName())) {
+            return "用户名不能为空";
+        }
+        if (StringUtils.isEmpty(userParam.getPhone())) {
+            return "手机号不能为空";
+        }
+        if (userParam.getPhone().length() > 11) {
+            return "手机号不能超过11";
+        }
+        if (StringUtils.isEmpty(userParam.getEmail())) {
+            return "邮箱不能为空";
+        }
+
+        //省略其他参数校验
+
+        //todo 插入用户信息表
+        return "SUCCESS";
+    }
+
+}
+```
+
+一个需求：编辑用户信息。实现编辑用户信息前，也是先校验信息，如下：
+
+```
+    @RequestMapping("editUser")
+    public String editUser(UserParam userParam) {
+
+        if (StringUtils.isEmpty(userParam.getUserName())) {
+            return "用户名不能为空";
+        }
+        if (StringUtils.isEmpty(userParam.getPhone())) {
+            return "手机号不能为空";
+        }
+        if (userParam.getPhone().length() > 11) {
+            return "手机号不能超过11";
+        }
+        
+        if (StringUtils.isEmpty(userParam.getEmail())) {
+            return "邮箱不能为空";
+        }
+
+        //省略其他参数校验
+
+        //todo 编辑用户信息表
+        return "SUCCESS";
+    }
+```
+
+可以使用注解的方式，来进行参数校验，这样代码更加简洁，也方便统一管理。
+
+实际上， `spring boot`有个`validation`的组件，我们可以拿来即用。引入这个包即可：
+
+```xml
+ <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+ </dependency>
+```
+
+引入包后，参数校验就非常简洁啦，如下：
+
+```java
+public class UserParam {
+
+    @NotNull(message = "用户名不能为空")
+    private String userName;
+
+    @NotNull(message = "手机号不能为空")
+    @Max(value = 11)
+    private String phone;
+
+    @NotNull(message = "邮箱不能为空")
+    private String email;
+```
+
+然后在`UserParam`参数对象中，加入`@Validated`注解，把错误信息接收到`BindingResult`对象，代码如下：
+
+```java
+    @RequestMapping("addUser")
+    public String addUser(@Validated UserParam userParam, BindingResult result) {
+        
+        List<FieldError> fieldErrors = result.getFieldErrors();
+        if (!fieldErrors.isEmpty()) {
+            return fieldErrors.get(0).getDefaultMessage();
+        }
+
+        //todo 插入用户信息表
+        return "SUCCESS";
+    }
+```
+
 # 统一响应格式封装
 
 ## 统一管理响应状态码

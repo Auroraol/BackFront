@@ -423,7 +423,7 @@ export const enum Names {
 
 <img src="https://img-blog.csdnimg.cn/ebce61813bfc40fe8b96dd5b1f754c58.gif#pic_center" style="zoom:80%;" >
 
-### 方式五： action 方式
+### 方式五： action 方式(推荐)
 
 这个方式我们需要借助 actions 来实现，所以说我们需要去 store 文件夹下的 index.ts 文件中写一个 action。
 

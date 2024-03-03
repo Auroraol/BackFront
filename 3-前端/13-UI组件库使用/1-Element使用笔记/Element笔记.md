@@ -68,6 +68,219 @@ html, body {
 }
 ```
 
+# 布局使用
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/Auroraol/embed/OJGPBXm?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/Auroraol/pen/OJGPBXm">
+  Untitled</a> by Aurora  (<a href="https://codepen.io/Auroraol">@Auroraol</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+```vue
+<script src="//unpkg.com/vue@2/dist/vue.js"></script>
+<script src="//unpkg.com/element-ui@2.15.14/lib/index.js"></script>
+<div id="app">
+<template>
+<!-- 头部 -->
+<div class="content">
+<el-row style="margin-bottom: 0;">
+<el-col :span="24">
+<div class="top bg-purple-dark"></div>
+</el-col>
+</el-row>
+</div>
+<!-- 中间 -->
+<div class="card">
+<el-row>
+<el-col :span="12">
+<div class="double bg-purple"></div>
+</el-col>
+<el-col :span="12">
+<div class="double bg-purple-light"></div>
+</el-col>
+</el-row>
+<el-row>
+  
+<el-col :span="8">
+<div class="card3 bg-purple" style="margin-right: 36px;"> </div>
+</el-col>
+<el-col :span="8">
+<div class="card3 bg-purple-light" style="margin-right: 36px;"></div>
+</el-col>
+<el-col :span="8">
+<div class="card3 bg-purple"></div>
+</el-col>
+</el-row>
+</div>
+<!-- 尾部 -->
+<div class="end">
+<el-row style="margin-bottom: 0;">
+<el-col :span="24">
+<div class="end bg-purple-dark"></div>
+</el-col>
+</el-row>
+</div>
+
+</template>
+ </div>
+```
+
+```
+@import url("//unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css");
+.el-row {
+margin-bottom: 20px;
+&:last-child {
+margin-bottom: 0;
+}
+}
+.el-col {
+border-radius: 4px;
+}
+.card{
+margin-top: 20px;
+margin-left: 70px;
+margin-right: 70px;
+}
+.double {
+border-radius: 4px;
+min-height: 50px;
+}
+.card3 {
+border-radius: 4px;
+min-height: 490px;
+}
+.top, .end {
+border-radius: 4px;
+min-height: 50px;
+}
+.bg-purple-dark {
+background: #99a9bf;
+}
+.bg-purple {
+background: #d3dce6;
+}
+.bg-purple-light {
+background: #e5e9f2;
+}
+.row-bg {
+padding: 10px 0;
+background-color: #f9fafc;
+}
+```
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/640.png)
+
+# Layout布局
+
+## 一、el-row和el-col可以很好的控制块级、行级布局，建议：在div中嵌套el-row。el-row和div
+
+类似，div的很多css属性在el-row中都可以使用，el-col则不一定。
+
+## 二、el-col之间的间距问题：
+
+### 1、el-col之间设置间距有两种方法：
+
+####  1）使用el-row自带的gutter：gutter生成的间距如果长度不够会外扩，如：
+
+```cobol
+ <el-row>
+                  <el-col :span="6" class="col">无间距第一个</el-col>
+                  <el-col :span="6" class="col">无间距第二个</el-col>
+                  <el-col :span="6" class="col">无间距第三个</el-col>
+                  <el-col :span="6" class="col">无间距第四个</el-col>
+                </el-row>
+                <el-row :gutter="20">
+                  <el-col :span="6" class="col">第一个</el-col>
+                  <el-col :span="6" class="col">第二个</el-col>
+                  <el-col :span="6" class="col">第三个</el-col>
+                  <el-col :span="6" class="col">第四个</el-col>
+                </el-row>
+ 
+ 
+ 
+ .col {
+            border: 1px solid black;
+          }
+```
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/20210114153935596.png)
+
+####  2）css设置边距：而css生成的间距长度不够会换行，如：
+
+```cobol
+ <el-row>
+                  <el-col :span="6" class="col">无间距第一个</el-col>
+                  <el-col :span="6" class="col">无间距第二个</el-col>
+                  <el-col :span="6" class="col">无间距第三个</el-col>
+                  <el-col :span="6" class="col">无间距第四个</el-col>
+                </el-row>
+               
+                <el-row>
+                  <el-col :span="6" class="col" style="margin-left:20px">第一个</el-col>
+                  <el-col :span="6" class="col" style="margin-left:20px">第二个</el-col>
+                  <el-col :span="6" class="col" style="margin-left:20px">第三个</el-col>
+                  <el-col :span="6" class="col" style="margin-left:20px">第四个</el-col>
+                </el-row>
+ 
+ 
+ .col {
+            border: 1px solid black;
+          }
+```
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/2021011415445460.png)
+
+### 2、间距对齐方式
+
+将 `type` 属性赋值为 'flex'，可以启用 flex 布局，并可通过 `justify` 属性来指定 start, center, end, space-between, space-around 其中的值来定义子元素的排版方式。
+
+下面以space-between对齐方式为例：
+
+#### 1）gutter的间距：仍是超出：
+
+```cobol
+ <el-row>
+                  <el-col :span="6" class="col">无间距第一个</el-col>
+                  <el-col :span="6" class="col">无间距第二个</el-col>
+                  <el-col :span="6" class="col">无间距第三个</el-col>
+                  <el-col :span="6" class="col">无间距第四个</el-col>
+                </el-row>
+                <el-row :gutter="20" type="flex" justify="space-between">
+                  <el-col :span="6" class="col">第一个</el-col>
+                  <el-col :span="6" class="col">第二个</el-col>
+                  <el-col :span="6" class="col">第三个</el-col>
+                  <el-col :span="6" class="col">第四个</el-col>
+                </el-row>
+```
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/20210114155547886.png)
+
+#### 2）css的间距：不换行了：
+
+```cobol
+ <el-row type="flex" justify="space-between">
+                  <el-col :span="6" class="col" style="margin-left:20px">第一个</el-col>
+                  <el-col :span="6" class="col" style="margin-left:20px">第二个</el-col>
+                  <el-col :span="6" class="col" style="margin-left:20px">第三个</el-col>
+                  <el-col :span="6" class="col" style="margin-left:20px">第四个</el-col>
+                </el-row>
+```
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/20210114155653264.png)
+
+再把第一个col的左间距去掉
+
+```cobol
+ <el-row type="flex" justify="space-between">
+                  <el-col :span="6" class="col">第一个</el-col>
+                  <el-col :span="6" class="col" style="margin-left:20px">第二个</el-col>
+                  <el-col :span="6" class="col" style="margin-left:20px">第三个</el-col>
+                  <el-col :span="6" class="col" style="margin-left:20px">第四个</el-col>
+                </el-row>
+```
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/20210114155804292.png)
+
 # 输入框
 
 默认 占满一行,通过width改变所占大小

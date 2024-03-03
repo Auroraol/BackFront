@@ -9,7 +9,6 @@ declare module '@vue/runtime-core' {
     ElBacktop: typeof import('element-plus/es')['ElBacktop']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
     ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
-    ElButton: typeof import('element-plus/es')['ElButton']
     Menu: typeof import('./components/Menu/Menu.vue')['default']
     MovieList: typeof import('./components/MovieList/MovieList.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

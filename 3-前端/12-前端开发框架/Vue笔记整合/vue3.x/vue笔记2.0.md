@@ -11494,7 +11494,7 @@ ref: modalOpen = false
     		<h3>我是App组件</h3>
     		<Suspense>
     			<template v-slot:default>
-    				<Child/>
+    				<Child/>  //需要异步加载
     			</template>
     			<template v-slot:fallback>
     				<h3>加载中.....</h3>
@@ -13252,6 +13252,7 @@ export default defineConfig({
 
 ```vue
 import my from '../components/my/index.vue'
+或import my from '../components/my'
 ```
 
 等价于

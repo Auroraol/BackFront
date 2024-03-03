@@ -388,7 +388,7 @@ const toPage = (url) => {
 </script>
 ```
 
-直接书写路径：
+直接书写路径： 路由地址什么啥就是什么
 ```javascript
 router.push('路由地址')
 router.push('/home')
@@ -1927,3 +1927,6 @@ Webpack 会将任何一个异步模块与相同的块名称组合到相同的异
 **调用结果**
 
 ![image-20240106223438136](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106223438136.png)
+
+
+

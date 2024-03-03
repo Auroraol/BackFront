@@ -27,14 +27,6 @@ const routes = [
     },
   },
   {
-    path: "/vuex",
-    component: () => import("/@/pages/vuex/vuex.vue"),
-    meta: {
-      loading: true,
-      title: "vuex",
-    },
-  },
-  {
     path: "/vaxiso",
     component: () => import("/@/pages/vaxiso/vaxiso.vue"),
     meta: {
