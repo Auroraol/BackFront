@@ -10533,7 +10533,7 @@ const MyComponent = {
   	console.log('person的job变化了',newValue,oldValue)
   },{immediate:true,deep:true})
   
-  //特殊情况
+  //特殊情况 对象中的某个属性
   watch(()=>person.job,(newValue,oldValue)=>{
       console.log('person的job变化了',newValue,oldValue)
   },{deep:true}) //此处由于监视的是reactive素定义的对象中的某个属性，所以deep配置有效

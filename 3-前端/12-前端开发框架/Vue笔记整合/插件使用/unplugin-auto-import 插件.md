@@ -1,5 +1,7 @@
  **Vue自动导入神器 unplugin-auto-import 支持非预设库**
 
+conponents中的组件可以自动导入, vue自带的库也能自动导入, 也可以配置第三方库的导入
+
 # 使用效果
 
 以 Vue 为例，在没有使用自动导入前，需要手写以下的 `import` 语句：

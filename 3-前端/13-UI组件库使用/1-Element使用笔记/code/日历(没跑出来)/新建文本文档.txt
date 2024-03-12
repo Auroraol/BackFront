@@ -1,0 +1,18 @@
+const DateList = []; // Define your DateList data here
+const getDay = (date) => {
+     return parseInt(date.split('-')[2], 10).toString(); // Remove leading zeros
+
+};
+
+const parseTime = (date, format) => {
+ const time = new Date(date);
+    const year = time.getFullYear();
+    const month = (time.getMonth() + 1).toString().padStart(2, '0');
+    const day = time.getDate().toString().padStart(2, '0');
+    return format.replace('{y}', year).replace('{m}', month).replace('{d}', day);
+};
+
+//日期上面的点击事件方法
+const getShow = (date) => {
+  // Implement your getShow method logic here
+};

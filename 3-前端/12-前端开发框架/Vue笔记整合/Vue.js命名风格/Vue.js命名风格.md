@@ -129,6 +129,7 @@ this.$emit('api-load');
 - **组件在html模板<template>中使用(`<my-component></my-component>`)**
 - 在模板中prop传入属性到子组件(`<my-componnet set-text="hello"/>`)
 - 所有事件名(`this.$emit('api-reload')`)
+- **使用组件    <user-cpn></user-cpn>**
 
 2、采用`PascalCase`命名：
 
@@ -140,4 +141,32 @@ this.$emit('api-load');
 
 - 子组件接收prop属性
 
+4、view路由视图  用`kebab-case`命名的
+
+5、index.vue  统一使用小写
+
+# 项目结构
+
 <img src="Vue.js%E5%91%BD%E5%90%8D%E9%A3%8E%E6%A0%BC.assets/image-20240104130850947.png" alt="image-20240104130850947" style="zoom:67%;" />
+
+命名方式种类：helloVue(Camel Case即驼峰命名法)，HelloVue（PascalCase即帕斯卡命名法）
+为了以防万一，命名的时候统一使用帕斯卡命名法
+但是在使用的时候统一使用 kebab-case命名方法
+
+**view里面可以创建 components里面写view的具体 实现**
+
+![image-20240303235557690](Vue.js%E5%91%BD%E5%90%8D%E9%A3%8E%E6%A0%BC.assets/image-20240303235557690.png)
+
+**components文件交 主要写公共功能**
+
+![image-20240303235607989](Vue.js%E5%91%BD%E5%90%8D%E9%A3%8E%E6%A0%BC.assets/image-20240303235607989.png)
+
+
+
+
+
+或者
+
+view就是视图
+
+components文件写视图的具体实现

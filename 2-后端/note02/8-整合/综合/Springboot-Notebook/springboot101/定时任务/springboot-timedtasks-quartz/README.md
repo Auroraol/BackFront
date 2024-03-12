@@ -128,7 +128,7 @@ spring:
         driver-class-name: com.mysql.cj.jdbc.Driver
         type: com.zaxxer.hikari.HikariDataSource
         password: 741106
-        url: jdbc:mysql://localhost:3306/quartz
+        url: jdbc:mysql://localhost:3306/quartz  
         username: root
 
 #mybatis-plus配置
@@ -189,7 +189,7 @@ spring.quartz.properties.org.quartz.threadPool.threadPriority=5
 spring.quartz.properties.org.quartz.threadPool.threadsInheritContextClassLoaderOfInitializingThread=true
 
 
-# 数据源连接信息，quartz默认使用c3p0数据源可以被自定义数据源覆盖
+# 数据源连接信息，quartz默认使用c3p0数据源可以被自定义数据源覆盖, 
 spring.quartz.properties.org.quartz.dataSource.quartzDataSource.driver=com.mysql.jdbc.Driver
 spring.quartz.properties.org.quartz.dataSource.quartzDataSource.URL=jdbc:mysql://127.0.0.1:3306/quartz
 spring.quartz.properties.org.quartz.dataSource.quartzDataSource.user=root

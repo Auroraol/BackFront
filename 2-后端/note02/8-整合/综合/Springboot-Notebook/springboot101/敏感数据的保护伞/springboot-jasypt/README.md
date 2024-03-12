@@ -1,4 +1,4 @@
-# 敏感数据的保护伞——SpringBoot集成jasypt
+# 敏感数据的保护伞——SpringBoot2集成jasypt
 
 ## 需要加密的信息
 
@@ -29,7 +29,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
     </dependency>
-
+	<!--自定义注解-->
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-aop</artifactId>
@@ -494,3 +494,10 @@ java -cp  D:\maven_lib\org\jasypt\jasypt\1.9.3\jasypt-1.9.3.jar org.jasypt.intf.
 + maven包路径 D:\maven_lib\org\jasypt\jasypt\1.9.3\jasypt-1.9.3.jar 
 + input  待加密文本
 + password 秘钥文本
+
+
+
+
+
+# 问题
+

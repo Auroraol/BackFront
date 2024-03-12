@@ -1,5 +1,5 @@
 // 模块 API
-import { request } from '/@/utils/network/axios'
+import { request } from '../../utils/network/方式1/axios'
 import { HitokotoType } from './data'
 
 export async function getUserInfo(c: string):Promise<HitokotoType>{

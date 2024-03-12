@@ -430,7 +430,7 @@ public ResponseEntity deleteUser(@PathVariable(value = "userId") Long userId){
 | @PathVariable | 动态参数 (PathVariable 不带?)                                |
 | @RequestBody  | 传递对象,  比如: 前端发送json封装的对象给后端，后端使用java对象来接收(传递对象)反之也可以用它 |
 
-#### 4.1 @PathVariable("xxx")
+#### 4.1 @PathVariable("xxx")     /
 
 PathVariable 不带?  
 
@@ -459,7 +459,7 @@ public List<Teacher> getKlassRelatedTeachers(
 
 那么后端服务获取到的数据就是：klassId=123456,  type=web
 
-#### 4.2 @RequestParam("xxx")
+#### 4.2 @RequestParam("xxx")   ?
 
 RequestParam  带?  可以设置默认值, 不传值
 
@@ -565,7 +565,7 @@ public Result<?> getUserListPage(@RequestParam(value = "username", required = fa
 
 <font color=red>@RequestBody主要用来接收前端传递给后端的json字符串中的数据的(请求体中的数据的)，所以只能发送POST请求。[@RequestBody只能和@PostMapping使用]</font>
 
-使用默认submit提交 的HTML表单数据，默认使用application/x-www-form-urlencoded或multipart/form-data作为Content-Type。是不能使用这个的RequestBody 
+注意:   使用默认submit提交 的HTML表单数据，默认使用application/x-www-form-urlencoded或multipart/form-data作为Content-Type。是不能使用这个的RequestBody, 使用 
 
 axios方式发起的ajax请求, 在post方式下, 提交的数据自动转成json, 不需要手动转换, 其他方式需要
 
@@ -637,6 +637,28 @@ public Map<String, Object> login(XUser user) {
 测试效果
 
 ![image-20230923094816855](SpringBoot常用注解.assets/image-20230923094816855.png)
+
+补充:
+
+前端发送json
+
+```
+{
+"username": "lfj",
+"password": "123456"
+}
+```
+
+后端
+
+```java
+@PostMapping("/login")
+public ResponseResult<Token> userLogin(@RequestBody Map<String, String> loginData) {
+		String username = loginData.get("username");
+		String password = loginData.get("password");
+		return userService.usernameLogin(username, password);
+}
+```
 
 ### 后端传值
 
@@ -1100,9 +1122,7 @@ public class JwtService {
 }
 ```
 
-### 5.2  @ConfigurationProperties(常用)
-
-## @ConfigurationProperties方式(推荐)
+### 5.2 @ConfigurationProperties方式(推荐)
 
 ```xml
 <dependency>

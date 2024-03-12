@@ -451,3 +451,87 @@ ctrl+alt+s ，去 `File Types `查看yml后缀名（我这里已加上了 `*.yml
 有时候项目运行之后会产生一些缓存，影响项目文件的提交和程序的运行，这时候我们可以清理项目的缓存并重启以消除这些影响。可以尝试清除调度程序的缓存或重新启动调度程序，以确保它不再尝试查找这个不存在的类。
 
 方式：点击idea的左上角file---选择Invalidate caches即可刷新项目和清除项目缓存并重启。
+
+
+
+# 修改重命名一个项目工程名称
+
+#### 1. 修改项目根目录文件夹名称
+
+在操作系统里，将根目录的文件夹名称从web-basic改为pts8000。
+修改之后，使用Idea的Open工具，打开项目的根目录，进入项目中，可以看到已经有两处名称修改过来了，如下：
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/148d20ece6614e027ed02ef1f09ee2c4.png)
+
+
+
+#### 2.修改项目名称。
+
+使用rename来修改项目名字：在项目名称上右键->Refactor->Rename…
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/1ae81440a0aa71ad2d040bf2e301c5ed.png)
+
+然后修改为pts8000
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/a53045ba47d5ba86a58cd95f7723ad25.png)
+
+#### 3.修改Java文件下的包名称：
+
+然后同样的，使用Rename修改包名称：
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/d196c6c0dd452fca331f208ceba7c840.png)
+
+修改为pts8000，会提示你是修改文件夹名称还是修改包名称，选择修改包名称，然后点击下方控制台弹出的Do Refactor按钮，确认修改所有的。
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/b91aea391b72f9c4cc9ae28131aa0061.png)
+
+
+修改名称，然后点击Refactor
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/d109df9fb3d38939f26b1b822f7164e5.png)
+
+然后选择Do Refactor。
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/3b61407c1255b33faa95193e5a9ce1db.png)
+
+#### 4. 修改启动类名称
+
+然后修改启动类名称，改为WebBasicApplication。修改后会自动找出来启动类所被引用的代码段，找出需要修改的地方，全部选择即可，然后点击修改：
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/b24a62f8fbe25a326546a4fd27d3cb47.png)
+
+#### 5.修改Pom.xml文件
+
+接下来修改pom.xml文件中的artifactId和name两个标签，groupId标签的内容也可以修改一下，改为自己想要的，比如com.xjgc.pts8000。
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/309b6cfa1147969aba69e5cd49d22d53.png)
+
+#### 6.修改项目调试启动名称。
+
+然后点击项目调试运行的地方，Edit Configurations…
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/185e7f44986ada07273aa5e6b97e77f8.png)
+
+修改Name属性，点击OK：
+
+![img](idea%E4%BD%BF%E7%94%A8.assets/b1410d7f816d25094197a97a53bc7d05.png)
+
+#### 7.修改application.properties文件
+
+最后修改application.properties文件
+修改
+
+```delphi
+spring.application.name=web-basic
+```
+
+改为
+
+```cobol
+spring.application.name=pts8000
+```
+
+项目所有名称修改完毕，启动运行检查项目是否能够正常启动，项目名称修改完成。
+
+# bean对象注入报错
+

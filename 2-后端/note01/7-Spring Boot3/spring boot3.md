@@ -3622,6 +3622,15 @@ public class MyUserHandler {
 2. Jwt+redis
 3. redis  + UUID
 
+登录成功一般会保存
+
+```
+localStorage.setItem('userAccount', window.btoa(JSON.stringify(accountInfo)))
+pinia.sessionInfo = window.btoa(JSON.stringify(accountInfo))
+```
+
+
+
 # Spring-Boot-操作-Redis内存数据库
 
 在 Redis 出现之前，缓存框架各种各样，有了 Redis ，缓存方案基本上都统一了

@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="zh-CN">
+ <head>
+  <meta charset="utf-8">
+  <link rel="canonical" href="https://blog.csdn.net/rookien_/article/details/135839800">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="report" content="{&quot;pid&quot;: &quot;blog&quot;, &quot;spm&quot;:&quot;1001.2101&quot;}">
+  <meta name="referrer" content="always">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <link rel="alternate" media="handheld" href="#">
+  <meta name="shenma-site-verification" content="5a59773ab8077d4a62bf469ab966a63b_1497598848">
+  <meta name="applicable-device" content="pc">
+  <link href="https://g.csdnimg.cn/static/logo/favicon32.ico" rel="shortcut icon" type="image/x-icon">
+  <title>记录改造elementui日历组件实例（日报月报）_elementui 日历组件改造-CSDN博客</title>
+  <meta name="keywords" content="elementui 日历组件改造">
+  <meta name="csdn-baidu-search" content="{&quot;autorun&quot;:true,&quot;install&quot;:true,&quot;keyword&quot;:&quot;elementui 日历组件改造&quot;}">
+  <meta name="description" content="文章浏览阅读669次，点赞11次，收藏9次。以上是实践中我对日月历的改造实现过程，我通过这篇文记录下来，希望也能给看到的码友们一些灵感和启发。_elementui 日历组件改造">
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/css/detail_enter-38ddee24dc.min.css">
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/themesSkin/skin-1024/skin-1024-ecd36efea2.min.css">
+  <meta name="toolbar" content="{&quot;type&quot;:&quot;0&quot;,&quot;fixModel&quot;:&quot;1&quot;}">
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/public/sandalstrap/1.4/css/sandalstrap.min.css">
+  <style>
+        .MathJax, .MathJax_Message, .MathJax_Preview{
+            display: none
+        }
+    </style>
+ </head>
+ <body class="nodata " style="">
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/pc/css/blog_code-01256533b5.min.css">
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/chart-3456820cac.css">
+  <link rel="stylesheet" href="https://g.csdnimg.cn/lib/swiper/6.0.4/css/swiper.css"><div class="main_father clearfix d-flex justify-content-center mainfather-concision" style="height:100%;"><div class="container clearfix container-concision" id="mainBox">
+    <main>
+     <div class="blog-content-box"><div class="article-header-box"><div class="article-header"><div class="article-title-box">
+         <h1 class="title-article" id="articleContentId">记录改造elementui日历组件实例（日报月报）</h1></div><div class="article-info-box"><div class="article-bar-top"><img class="article-type-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/original.png" alt=""><div class="bar-content"><a class="follow-nickName " href="https://blog.csdn.net/rookien_" target="_blank" rel="noopener" title="@mimin">@mimin</a> <img class="article-time-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newUpTime2.png" alt=""> <span class="time">已于&nbsp;2024-01-25 15:49:14&nbsp;修改</span>
+           <div class="read-count-box"><img class="article-read-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/articleReadEyes2.png" alt=""> <span class="read-count">阅读量669</span> <a id="blog_detail_zk_collection" class="un-collection" data-report-click="{&quot;mod&quot;:&quot;popu_823&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4232&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img class="article-collect-img article-heard-img un-collect-status isdefault" style="display:inline-block" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollect2.png" alt=""> <img class="article-collect-img article-heard-img collect-status isactive" style="display:none" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollectionActive2.png" alt=""> <span class="name">收藏</span> <span class="get-collection"> 9 </span> </a>
+            <div class="read-count-box is-like"><img class="article-read-img article-heard-img" style="display:none" id="is-like-imgactive-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Active.png" alt=""> <img class="article-read-img article-heard-img" style="display:block" id="is-like-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Black.png" alt=""> <span class="read-count" id="blog-digg-num">点赞数 11 </span></div></div></div></div><div class="blog-tags-box"><div class="tags-box artic-tag-box"><span class="label">文章标签：</span> <a rel="nofollow" data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;elementui&quot;,&quot;ab&quot;:&quot;new&quot;,&quot;extra&quot;:&quot;{\&quot;searchword\&quot;:\&quot;elementui\&quot;}&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=elementui&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank">elementui</a> <a rel="nofollow" data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;javascript&quot;,&quot;ab&quot;:&quot;new&quot;,&quot;extra&quot;:&quot;{\&quot;searchword\&quot;:\&quot;javascript\&quot;}&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=javascript&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank">javascript</a> <a rel="nofollow" data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;前端&quot;,&quot;ab&quot;:&quot;new&quot;,&quot;extra&quot;:&quot;{\&quot;searchword\&quot;:\&quot;前端\&quot;}&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=%E5%89%8D%E7%AB%AF&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank">前端</a></div></div><div class="up-time">
+          <span>于&nbsp;2024-01-25 15:08:40&nbsp;首次发布</span></div><div class="slide-content-box"><div class="article-copyright"><div class="creativecommons">
+            版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。</div><div class="article-source-link">
+            本文链接：<a href="https://blog.csdn.net/rookien_/article/details/135839800" target="_blank">https://blog.csdn.net/rookien_/article/details/135839800</a></div></div></div><div class="operating"><a class="href-article-edit slide-toggle">版权</a></div></div></div></div><div id="blogHuaweiyunAdvert"></div>
+      <article class="baidu_pl"><div id="article_content" class="article_content clearfix">
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/kdoc_html_views-1a98987dfd.css">
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-044f2cf1dc.css"><div id="content_views" class="htmledit_views">
+         <h4>前言&nbsp;</h4>
+         <p style="text-align:center;"><img alt="" src="https://img-blog.csdnimg.cn/direct/4adf94353a634c9c8daa0b266ee48c07.png"></p>
+         <p>任务是要做一个日报月报的填写和展示，以上是做出来的效果图，以下是任务要点：</p>
+         <p>1.左边是日历（月历）展示，有上月今天下月和全部（点击右边会显示所有日报数据）供用户选择。</p>
+         <p>2.右边是切换选择后对应日报月报的卡片展示区域，</p>
+         <p>3.左边日历（月历）上对应日期有日报月报数据的会特殊显示（绿色圈），点击日期右边能获取到对应日期的日报月报数据</p>
+         <p>4.初始左边日历（月历）显示的是本月存在日报数据，初始右边显示的是全部日报数据</p>
+         <h2>1.改造elementui&nbsp;calendar日历组件</h2>
+         <blockquote>
+          <p>基础日历显示如下</p>
+         </blockquote>
+         <p style="text-align:center;"><img alt="" height="420" src="https://img-blog.csdnimg.cn/direct/81789de5ee014dacbdf71b235465f5d6.png" width="535"></p>
+         <p>所以得用样式穿透实现相应的效果，这里我是循环匹配需要高亮显示的日期，进行覆盖显示（如果码友大大们有更好显示高亮日期的写法，分享分享啊），其中DateList是初始化页面时获取的当月日报（上面前言<strong>要点中的第四点</strong>）。其中parseTime是时间格式化的方法，getShow是加在日期上面的点击事件方法，getDay是格式化日期的方法（去0）。</p>
+         <pre class="set-code-show"><code class="language-javascript">&lt;template&gt;
+&lt;div class="calendar"&gt;
+                        &lt;el-calendar v-model="value" style="width:355px ; height: 400px;"&gt;
+                            &lt;div slot="dateCell" slot-scope="{ data }"&gt;
+                                &lt;div style="position:relative"&gt;
+                                    &lt;div class="calendar-day" @click="getShow(parseTime(data.day, '{y}-{m}-{d}'))"&gt;{<!-- -->{
+                                        getDay(data.day) }}&lt;/div&gt;
+                                    &lt;div v-for="(item, index) in DateList" :key="index"&gt;
+                                        &lt;div v-if="data.day.split('-')[1] == item.date.split('-')[1]"&gt;
+                                            &lt;div v-if="item.date.split('-')[2] == data.day.split('-')[2]" class="li-01"
+                                                style="position: absolute;top: 0;left: 0px;width: 100%;"
+                                                @click="getShow(parseTime(data.day, '{y}-{m}-{d}'))"&gt;
+                                                {<!-- -->{ getDay(data.day) }}
+                                            &lt;/div&gt;
+                                        &lt;/div&gt;
+                                        &lt;div v-else&gt;
+                                        &lt;/div&gt;
+                                    &lt;/div&gt;
+                                &lt;/div&gt;
+                            &lt;/div&gt;
+                        &lt;/el-calendar&gt;
+&lt;/div&gt;
+&lt;/template&gt;
+&lt;style lang="scss" scoped&gt;
+.li-01 {
+    width: 31px !important;
+    height: 31px;
+    background: #fff !important;
+    color: #001529 !important;
+    border: 1.5px solid #25de9d;
+    border-radius: 15px;
+    margin-left: 50%;
+    transform: translate(-15px);
+    line-height: 30px;
+    text-align: center;
+    font-size: 16px;
+    top: 5px;
+}
+
+::v-deep .el-calendar-table tr td:first-child {
+    border-left: none !important
+}
+
+::v-deep .el-calendar-table tr:first-child td {
+    border-top: none;
+}
+
+::v-deep .el-calendar-table td {
+    border-bottom: none;
+    border-right: none;
+    vertical-align: top;
+    -webkit-transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease;
+}
+
+::v-deep .el-calendar-table .el-calendar-day {
+    width: 45px;
+    height: 45px;
+}
+
+.calendar {
+    width: 355px;
+    display: block;
+    float: left;
+    margin: 0px
+}
+
+.calendar-day {
+    text-align: center;
+    line-height: 30px;
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgb(172, 165, 165);
+    border-radius: 50%;
+}
+
+::v-deep .el-calendar-table thead th {
+    padding: 12px 0;
+    color: #606266;
+    font-weight: normal;
+    background-color: #f8f4f4;
+}
+&lt;/style&gt;</code></pre>
+         <blockquote>
+          <p>&nbsp;以上可以实现效果</p>
+         </blockquote>
+         <p class="img-center"><img alt="" src="https://img-blog.csdnimg.cn/direct/c54d6fe4e75c496f9cc590794e0c85a9.png"></p>
+         <p>其中我们要改变一般日历组件上面的布局和内容，加上全部按钮，如下</p>
+         <p style="text-align:center;">&nbsp;<img alt="" src="https://img-blog.csdnimg.cn/direct/6b4b52a1645745268fe1b3cfa97f6246.png"></p>
+         <p>&nbsp;这里我们得在页面初始化的时候给日历组件添加<strong>全部</strong>按钮元素和给元素添加点击事件代码如下</p>
+         <pre class="set-code-show"><code class="language-javascript">created(){
+            const groupbtn = document.querySelector('.el-button-group')
+            const child = document.createElement('button')
+            child.innerHTML = `全部`
+            child.setAttribute('class', 'el-button el-button--plain el-button--mini')
+            groupbtn.appendChild(child)
+            child.addEventListener("click", () =&gt; {
+                this.$set(this.queryParams, 'date', '')
+                this.getList()
+            });
+},</code></pre>
+         <p>同理，组件上的其他三个按钮也要加上点击事件（上月，今天，下月）</p>
+         <pre class="set-code-show"><code class="language-javascript">created() {
+
+        this.$nextTick(() =&gt; {
+
+            let prevBtn = document.querySelector('.el-calendar__button-group .el-button-group&gt;button:nth-child(1)');
+            prevBtn.addEventListener('click', () =&gt; {
+                this.getInit(this.parseTime(this.value, '{y}-{m}')) //获取左边日历上显示日报日期的方法
+                this.getShow(this.parseTime(this.value, '{y}-{m}')) //获取右边卡片内容数据的方法
+            })
+            let nextBtn = document.querySelector('.el-calendar__button-group .el-button-group&gt;button:nth-child(3)');
+            nextBtn.addEventListener('click', () =&gt; {
+                this.getInit(this.parseTime(this.value, '{y}-{m}'))
+                this.getShow(this.parseTime(this.value, '{y}-{m}'))
+            })
+            let todayBtn = document.querySelector(
+                ".el-calendar__button-group .el-button-group&gt;button:nth-child(2)"
+            );
+            todayBtn.addEventListener("click", () =&gt; {
+                this.getInit(this.parseTime(this.value, '{y}-{m}'))
+                this.getShow(this.parseTime(this.value, '{y}-{m}-{d}'))
+            });
+            const groupbtn = document.querySelector('.el-button-group')
+            const child = document.createElement('button')
+            child.innerHTML = `全部`
+            child.setAttribute('class', 'el-button el-button--plain el-button--mini')
+            groupbtn.appendChild(child)
+            child.addEventListener("click", () =&gt; {
+                this.$set(this.queryParams, 'date', '')
+                this.getList()
+            });
+        })
+
+    },</code></pre>
+         <p>&nbsp;如此，日历就改造完成了</p>
+         <p style="text-align:center;"><img alt="" src="https://img-blog.csdnimg.cn/direct/033783de0c0849e4a755646d742f7dfb.png"></p>
+         <h2>2.月历实现</h2>
+         <p style="text-align:center;">&nbsp;<img alt="" src="https://img-blog.csdnimg.cn/direct/1feab8a4a5e6498095aff8b1e5d804a4.png"></p>
+         <p></p>
+         <p>月历我是自己手写实现的，代码如下:</p>
+         <p>其中</p>
+         <p>style="{ backgroundColor: yearformat + '-' + nawmonthFormat == inityear + '-' + item ? '#f2f8fe' : '', color: yearformat + '-' + nawmonthFormat == inityear + '-' + item ? '#1890ff' : '' }"是判断是否是当月，当月的月期特殊标明。</p>
+         <p>:class="monthData.indexOf(`${item}`) != -1 ? 'itemmonthA' : 'itemmonth'" 是判断是否是有数据的月份</p>
+         <blockquote>
+          <p>yearformat&nbsp; &nbsp;//是点击月历中的上一年下一年按钮，可能会变化的年份</p>
+          <p>inityear&nbsp; &nbsp; &nbsp; &nbsp; //是现在的年份</p>
+          <p>nawmonthFormat //现在的月份，</p>
+         </blockquote>
+         <pre class="set-code-show"><code class="language-html">&lt;div class="calendar"&gt;
+&lt;el-row :gutter="10"&gt;
+      &lt;el-col :span="15"&gt;
+            &lt;el-row style="height: 30px;border: 1px solid #dfdfdf; border-radius: 2px;"&gt;
+                   &lt;el-col :span="3" class="leftClass" @click.native="getpreYear"&gt;
+                         &lt;i style="font-size: 20px; font-weight: bold;" class="el-icon-arrow-left"&gt;&lt;/i&gt;
+                   &lt;/el-col&gt;
+                   &lt;el-col :span="18" class="centerYear"&gt;{<!-- -->{ yearformat }}年&lt;/el-col&gt;
+                   &lt;el-col :span="3" class="rightClass" @click.native="getNextYear"&gt;
+                         &lt;i style="font-size: 20px; font-weight: bold;" class="el-icon-arrow-right"&gt;&lt;/i&gt;
+                   &lt;/el-col&gt;
+             &lt;/el-row&gt;
+                   &lt;/el-col&gt;
+       &lt;el-col :span="9"&gt;
+             &lt;div class="tobackNawYear" @click="inityearformat"&gt;
+                 返回本年
+             &lt;/div&gt;
+             &lt;div class="AllClass" @click="getAll"&gt;
+                  全部
+             &lt;/div&gt;
+        &lt;/el-col&gt;
+&lt;/el-row&gt;
+&lt;div class="monthList"&gt;
+      &lt;div @click="getshowmonthData(item)" :class="monthData.indexOf(`${item}`) != -1 ? 'itemmonthA' : 'itemmonth'" :style="{ backgroundColor: yearformat + '-' + nawmonthFormat == inityear + '-' + item ? '#f2f8fe' : '', color: yearformat + '-' + nawmonthFormat == inityear + '-' + item ? '#1890ff' : '' }" v-for="(item, index) in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]" :key="index"&gt;{<!-- -->{ item }}月
+      &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+
+&lt;style lang="scss" scoped&gt;
+.tobackNawYear {
+    display: block;
+    float: left;
+    cursor: pointer;
+    width: 50%;
+    height: 30px;
+    border: 1.2px solid #dcdfe6;
+    border-radius: 2px;
+    text-align: center;
+    color: #606266;
+    line-height: 30px;
+    font-size: 13px;
+}
+
+.tobackNawYear:hover {
+    border: 1.2px solid #badeff;
+    background-color: #e8f4ff;
+    color: #1890ff;
+}
+
+.AllClass {
+    cursor: pointer;
+    display: block;
+    float: left;
+    width: 38%;
+    margin-left: 4%;
+    height: 30px;
+    border: 1.2px solid #dcdfe6;
+    border-radius: 2px;
+    text-align: center;
+    color: #606266;
+    line-height: 30px;
+    font-size: 13px;
+}
+
+.AllClass:hover {
+    border: 1.2px solid #badeff;
+    background-color: #e8f4ff;
+    color: #1890ff;
+}
+
+.centerYear {
+    text-align: center;
+    line-height: 30px;
+    color: #666666;
+}
+
+.leftClass {
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background-color: #f7f4f4;
+}
+
+.rightClass {
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background-color: #f7f4f4;
+}
+.monthList {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+
+    .itemmonth {
+        cursor: pointer;
+        width: 50px;
+        height: 45px;
+        margin-right: 9px;
+        margin-top: 20px;
+        border: #dfdfdf 1.5px solid;
+        border-radius: 3.35px;
+        text-align: center;
+        line-height: 45px;
+        font-size: 14px;
+        color: #6a655f;
+    }
+
+    .itemmonthA {
+        cursor: pointer;
+        width: 50px;
+        height: 45px;
+        margin-right: 9px;
+        margin-top: 20px;
+        border: #65cea7 1.5px solid;
+        border-radius: 3.35px;
+        text-align: center;
+        line-height: 45px;
+        font-size: 14px;
+        color: #6a655f;
+    }
+
+    .itemmonthA:hover {
+        background-color: #f2f8fe;
+    }
+
+    .itemmonth:hover {
+        background-color: #f2f8fe;
+    }
+}
+&lt;/style&gt;
+
+</code></pre>
+         <h2>总结</h2>
+         <p>以上是实践中我对日月历的改造实现过程，我通过这篇文记录下来，希望也能给看到的码友们一些灵感和启发。</p></div></div>
+      </article> <img src="https://img-home.csdnimg.cn/images/20211209110851.png" alt="pdf_watermark" width="0" height="0" style="display: none"><div class="print_watermark"></div><div class="print_watermark_info">
+       <p>内容来源：csdn.net</p>
+       <p>作者昵称：@mimin</p>
+       <p>原文链接：https://blog.csdn.net/rookien_/article/details/135839800</p>
+       <p>作者主页：https://blog.csdn.net/rookien_</p></div>
+      <style>
+    .print_watermark, .print_watermark_info {
+      display: none
+    }
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact; /* Chrome, Safari */
+        color-adjust: exact; /* Firefox */
+        background-image: none !important;
+      }
+      * {
+        -webkit-print-color-adjust: exact;
+      }
+      .blog-content-box {
+        padding: 0;
+      }
+      .blog-content-box .article-header .article-info-box > div:not(.article-bar-top){
+        display: none !important;
+      }
+      .blog-content-box .article-header .article-info-box  .article-bar-top img{
+          display:none
+      }
+      .blog-content-box .article-header .article-info-box > .article-bar-top .bar-content > *:not(.follow-nickName):not(.time){
+          display: none !important;
+      }
+      .print_watermark {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: 999;
+        background-image: url('https://img-home.csdnimg.cn/images/20211209110851.png');
+        background-size: 180px auto;
+        background-repeat: repeat;
+      }
+      .print_watermark_info {
+        display: block;
+        position: fixed;
+        bottom: 16px;
+        right: 0;
+        z-index: 1000;
+        color: #e8e8ed;
+        font-size: 12px;
+        ocapity: .5
+      }
+      @page {
+        margin: 0 10mm 10mm;
+        size: landscape;
+      }
+      body, article {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #csdn-toolbar,.main_father > *:not(#mainBox), .csdn-side-toolbar, .main_father aside {
+        display: none !important;
+      }
+      .main_father > #mainBox {
+        width: unset
+      }
+      .main_father > #mainBox > main > *:not(.blog-content-box){
+        display: none !important;
+      }
+    }
+  </style></div>
+    </main></div><div class="recommend-right align-items-stretch clearfix" id="rightAside" data-type="recommend"></div></div>
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/chart.css">
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/codesnippet/lib/highlight/styles/atom-one-light.css">
+ </body> 
+</html>

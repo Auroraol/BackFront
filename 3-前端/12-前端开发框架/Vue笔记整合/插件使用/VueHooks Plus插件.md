@@ -1,5 +1,29 @@
 官网:  [✨ 特性 | VueHook Plus (gitee.io)](https://inhiblab-core.gitee.io/docs/hooks/guide/)
 
+# 规范
+
+业务场景示例[#](https://inhiblab-core.gitee.io/docs/hooks/useRequest/guide/#业务场景示例)
+
+业务场景：假设存在一个首页业务模块，需要在首页获取某个用户的基本信息
+
+## 目录结构[#](https://inhiblab-core.gitee.io/docs/hooks/useRequest/guide/#目录结构)
+
+```
+.
+├── src
+│   ├── network
+│   │    ├── axios.ts
+│   ├── views
+│   │    ├── home
+│   │    │    ├── Home.vue
+│   │    │    ├── Home.less
+│   │    │    ├── services.ts  // 模块 API
+│   │    │    └── data.d.ts    // 模块 TS 类型
+│   ├── services  
+│   │   └── api.ts // 全局公共的 API
+└── typings.d.ts   // 全局公共的 TS 类型声明
+```
+
 # [useRequest](https://inhiblab-core.gitee.io/docs/hooks/useRequest/basic/#userequest-基础用法)
 
 介绍 `useRequest` 最核心，最基础的能力。
