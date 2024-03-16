@@ -3522,15 +3522,167 @@ $(function() {
 
 > ```
 > var fn = function () {
->  console.log(fn)
+> console.log(fn)
 > }
 > fn()
 > 
 > var obj = { //对象变量不能产生局部作用域,所以会找到全局去,导致报错
->  fn2: function () {
->   console.log(fn2)
->   //console.log(this.fn2)
->  }
+> fn2: function () {
+> console.log(fn2)
+> //console.log(this.fn2)
+> }
 > }
 > obj.fn2()
 > ```
+
+
+
+
+
+# [JS中Cookie、localStorage、sessionStorage三者的区别](https://www.cnblogs.com/Z_66/p/12021299.html)
+
+cookie：大小4k，一般由服务器生成，可设置失效时间，关闭浏览器后失效，与服务器通信时：每次都会携带HTTP头中，如果使用cookie保存过多数据会带来性能问题
+
+localhostStorage：大小5M，只要不手动删除，存储的是永久数据，与服务器通信时： 仅在客户端（即浏览器）中保存，不参与和服务器的通信。
+
+sessionStorage：大小5M，存放临时数据，仅在当前会话有效，关闭页面或浏览器后被清除，与服务器通信时： 仅在客户端（即浏览器）中保存，不参与和服务器的通信。
+
+ 
+
+其中, 易用性:
+
+　　　　**Cookie** 需要程序员自己来封装，原生的cookie接口不够友好
+
+　　　　**localStorage 和 sessionStorage** 原生接口可以接受，可以封装来对Object和Array有更好的支持。并且，不能夸浏览器，可以跨窗口
+
+
+
+##### Cookie的使用
+
+- Cookie简介：
+  Cookie，有时也用其复数形式 [Cookies](https://link.jianshu.com/?t=http://baike.baidu.com/subview/1311/6319629.htm)，指某些网站为了辨别用户身份、进行 session 跟踪而储存在用户本地终端上的数据（通常经过加密）。定义于 RFC2109 和 2965 中的都已废弃，最新取代的规范是 RFC6265[1]。（可以叫做浏览器缓存）（百科上的正经解释，反正我也找不到更好的解释了n.n）
+- Cookie需要放在服务器环境下,所以首先自己需要配置一个服务器，可以用Wampserver（需要手动开启）也可以用AppServ（默认开启），安装完成后打开[http://localhost/](https://link.jianshu.com/?t=http://localhost/) 去看看服务器有没有装成功。
+- 使用Cookie需要注意:
+  （小 生存生命周期）
+  1.放在服务器环境
+  2.不安全
+  3.大小4k
+  4.cookie取出来的东西都是字符串
+  5.生存生命周期 默认的就是浏览器关闭
+- Cookie的基本用法
+  1.存Cookie: document.cookie='212';
+  2.取Cookie: alert(document.cookie);
+  3.存Cookie有 name和 value 两个值
+  document.cookie='name=value';
+  4.expires:设置过期时间
+  var oDate=new Date();
+  oDate.setDate(oDate.getDate()+3); document.cookie='a=212;expires='+oDate;
+  5.path: /(根目录) 默认存在当前目录
+  document.cookie='b=212;path=/;expires='+oDate;
+  6.domain: 存域名（放一级域名）
+  document.cookie='a=212;domain=[www.baidu.com;expires='+oDate](https://link.jianshu.com/?t=http://www.baidu.com;expires='+oDate);
+- 设置Cookie
+
+
+
+```jsx
+function setCookie(name,value,iDay){
+   /*当时间参数存在的时候*/
+   if(iDay){
+      /*设置过期时间*/
+      var oDate=new Date();
+      oDate.setDate(oDate.getDate()+iDay); 
+     document.cookie=name+'='+value+';path=/;expires='+oDate;
+   }else{
+      /*否者默认浏览器关闭过期*/ 
+     document.cookie=name+'='+value+';path=/;';  
+ }
+};
+```
+
+- 获取Cookie
+
+
+
+```jsx
+function getCookie(name){
+   /*将获取到的字符串变成数组纯在arr中*/
+   /*得到的数据格式是这样的a=11; b=12*/
+   var arr=document.cookie.split('; ');
+    for (var i=0;i<arr.length;i++) {
+      /*再拆分一次*/
+      var arr2=arr[i].split('=');
+      //判断arr2[0]是否是要读取的Cookie
+      if(arr2[0]==name){
+         return arr2[1];
+      }
+   }
+   return '';
+}
+```
+
+- 删除Cookie
+
+
+
+```jsx
+function removeCookie(name){
+   /*当设置的时间小于0，就可以移除cookie*/
+   setCookie(name,'任意值',-10);
+}
+```
+
+封装好的在这里[https://github.com/youfrweb/Cookie/blob/master/cookie.js](https://link.jianshu.com/?t=https://github.com/youfrweb/Cookie/blob/master/cookie.js)
+
+##### localStorage的使用
+
+- localStorage也是用于本地处存储的，和Cookie有些区别：
+  本地存储cookie localStorage 兼容性 IE7+
+  如何查看 localStorage
+  F12-application（resource）->localStorage 存储 localStorage.a =12; 注意存储进去的都是 字符串
+- localStorage的存取
+  有两种方法：
+  1.常用写法
+
+
+
+```csharp
+    localStorage.a='aaa';//存
+    localStorage.a;//取
+```
+
+2.标准方法
+
+
+
+```bash
+存：（标准模式）
+loaclStorage.setItem('abc','wel');
+取：（标准模式）
+loaclStorage.getItem('abc');
+删：移除某项
+localStorage.removeItem('abc');
+全部清空（基本不用）
+localStorage.clear();
+```
+
+***可以直接用loaclStorage.key = value，因为localStorage是一个对象
+注意：以上是localStorage的基本用法，他的跨页面通信的用法在这：[http://www.jianshu.com/p/22d9f1574688](https://www.jianshu.com/p/22d9f1574688)
+
+#### Cookie和localStorage的区别
+
+localStorage与cookie相似，可以替代cookie
+
+
+
+```csharp
+                cookie                 localStorage
+大小：         4k                          5M           之内安全    
+兼容性：       ie6+                        ie7+    
+是否走网络：    是                            否    
+过期时间：    expires会话结束（session） 
+一直存在，除非手动清除                
+必须浏览器关闭            
+ loaclStorage.removeItem('abc');     
+  loaclStorage.clear();//一般不要用
+```

@@ -1051,9 +1051,59 @@ public AjaxResult selectStudentByNumber(@RequestBody Student student) {
     // 1.定义条件构造器
     LambdaQueryWrapper<Student> lqw = new LambdaQueryWrapper<Student>().eq(Student::getStuNumber,stuNumber);
      // 2. 查询
-    List<Student> result = studentService.list(lqw);
+    List<Student> result = studentService.list(lqw);  //在studentService具体实现中写this就行了 this.list(lqw);
     return AjaxResult.success(result);
 }
+```
+
+用法
+
+```java
+/**
+ * SQL:SELECT * FROM student WHERE (stu_name = ? AND id = ?)
+ */
+public AjaxResult selectStudent(@RequestBody Student student) {
+        QueryWrapper qw = new QueryWrapper();
+        Map map = new HashMap<>();
+        map.put("id","2");
+        map.put("stu_name","某某");
+        qw.allEq(map);
+        List<User> list = studentService.list(qw);
+        return AjaxResult.success(list);
+}
+```
+
+```java
+ LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getAge, 3);
+        List<User> userList = userMapper.selectList(wrapper);
+
+        userList.forEach(user -> {
+            System.out.println(user);
+            user.setName("testWlw1131-4");
+            user.setUpdateTime(null);
+            user.setCreateTime(null);
+            //userMapper.updateById(user);
+        });
+
+        //mybatis-plus 自带的批量更新
+        //userService.updateBatchById(userList,2);
+        userService.updateBatchById(userList);
+        
+Execute SQL：
+    UPDATE
+        user 
+    SET
+        name='testWlw1131-4',
+        age=3,
+        email='1903202403@qq.com',
+        version=8,
+        update_time='2021-11-13 20:12:49.602' 
+    WHERE
+        id=1413764856826785803 
+        AND version=7 
+        AND deleted=0
+
 ```
 
 [MyBatis-Plus——条件构造器_mybatis-plus条件构造器-CSDN博客](https://blog.csdn.net/Yangyeon_/article/details/129452576)

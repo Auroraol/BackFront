@@ -19,7 +19,7 @@ const anotherGlobalVar = 20;
 **建议使用 `匿名函数` 或 `箭头函数` 来定义函数**：
 
 ```js
-//方法1:   匿名函数
+//方法1:   匿名函数, 调用的方式，函数调用必须写到函数体下面
 const sum = function(a, b) {
 	return a + b;
 }

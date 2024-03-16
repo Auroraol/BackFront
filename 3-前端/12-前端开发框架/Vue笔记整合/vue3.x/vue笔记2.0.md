@@ -10296,7 +10296,7 @@ const MyComponent = {
 
 #### 1.data属性
 
-#####  ref函数
+#####  ref函数  .value
 
 - 作用: 定义一个<strong style="color:#DD5145">基本类型</strong>响应式的数据
 - 语法: ```const xxx = ref(initValue)``` 
@@ -11005,7 +11005,7 @@ setup支持接收参数，第一个参数是props，接收来自父组件的传�
 
 **响应式对象转为普通对象**
 
-- toRaw：
+- **toRaw：**
   - 作用：将一个由```reactive```生成的<strong style="color:orange">响应式对象</strong>转为<strong style="color:orange">普通对象</strong>。
   - 使用场景：用于读取响应式对象对应的普通对象，对这个普通对象的所有操作，不会引起页面更新。
 - markRaw：
@@ -12426,7 +12426,7 @@ onBeforeMount(() => {
   console.log("渲染之前", demo);
 })
  
-// 页面渲染之后
+// 页面渲染之后, 初始化
 onMounted(() => {
   console.log("渲染之后", demo);
 })
@@ -12483,6 +12483,156 @@ onMounted(() => {
   <MyComponent />
 </template>
 ```
+
+### 十二、属性
+
+#### 1.data 响应属性(const)
+
+##### ① ts中只读 ——对象用reactive, 基础类型用ref
+
+```vue
+<template>
+    <form class="box">
+        <div class="iptUser">
+            <label for="username">用户名</label>
+            <!--双向绑定-->
+            <el-input
+            v-model.trim="logInfo.username"    
+            maxlength="16"
+            placeholder="输入用户名"
+            show-word-limit
+            type="text"
+            name="username"
+            />
+        </div>
+        <div class="iptUser">
+            <label for="password">密码</label>
+            <el-input
+                      v-model.trim="logInfo.password"
+                      maxlength="16"
+                      placeholder="输入密码"
+                      show-word-limit
+                      type="text"
+                      name="password"
+                      :show-password="true"
+                      />
+        </div>
+        </form>
+</template>
+
+<script setup lang="ts">
+import { onMounted, reactive, ref, toRaw } from "vue";
+    
+//登录信息
+const logInfo = reactive({
+  username: "",
+  password: "",
+});
+    
+
+const login = async () => {
+  const userLogInfo = toRaw(logInfo); // 将一个由生成的响应式转化为对象普通对象
+  const { data, error, loading, run } = useRequest(getSysLogin, {
+    manual: true, 
+    onSuccess: (data) => {
+      if (data.code === 400002) {
+        alert("账号不存在");
+      } else if (data.code === 400004) {
+        alert("账户密码不匹配");
+      } else if (data.code === 200000) {
+        localStorage.setItem("accessToken", data.data.accessToken);
+        localStorage.setItem("refreshToken", data.data.refreshToken);
+ 
+        getInformation();
+        router.replace("/index");
+      }
+    },
+    onError: (error) => {
+      alert(error);
+    },
+  });
+
+  run(userLogInfo);
+};   
+</script>
+```
+
+##### ② ts中读写 ref
+
+```vue
+<template>
+<div class="headBox">
+    <!--单向绑定-->
+    <img :src="userInfo.avatarimgurl" alt="none" class="defaultHead" /> 
+</div>
+</template>
+
+<script setup lang="ts">
+import { onMounted, reactive, ref, toRaw } from "vue";
+    
+const userInfo = ref<UserType>({
+  id: -1,
+  phone: "",
+  username: "account",
+  password: "password",
+  gender: "",
+  nickname: "nickName",
+  birthday: "",
+  email: "",
+  personalbrief: "",
+  avatarimgurl: "",
+  recentlylanded: "",
+}); //给一个初始值作为key，当请求到数据时更新这个变量，key也就随之更新，就会更新dom
+
+
+onMounted(async () => {
+  // 赋值  
+  userInfo.value = JSON.parse(decodeURIComponent(pinia.getUserInfo()!));
+});
+</script>    
+```
+
+重写赋值依然使用const定义的原因:
+
++ 此const非彼const!  Vue 3  const 来声明变量时会自动处理成响应式数据, 通过 .value 属性修改数据
+
++ 使用 const 来声明 userInfo 是更好的选择。这是因为 userInfo 是一个响应式引用（通过 ref 创建），而实际上并不是在重新赋值 userInfo 这个引用本身，而是在修改它所指向的值（通过 .value 属性）。即使在后续的代码中，您需要更新 userInfo 所持有的值，使用 const 也是完全合适的，因为您只是修改了 userInfo 的内部状态，而不是重新赋予 userInfo 一个全新的引用。
+
+#### 2.计算属性（computed函数）
+
+**计算属性（Computed Property）**：
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+const count = ref(0);
+
+// 计算属性
+const doubleCount = computed(() => count.value * 2);
+</script>
+```
+
+在这个示例中，doubleCount 是一个计算属性，它的值是 count 的值乘以 2。每当 count 的值发生变化时，doubleCount 会自动更新。
+
+#### 3.监视属性（watch函数）
+
+**监视属性（Watch Property）**：
+
+```vue
+<script setup lang="ts">
+import { ref, watch } from 'vue';
+
+const count = ref(0);
+
+// 监视属性
+watch(count, (newValue, oldValue) => {
+    console.log(`count 值从 ${oldValue} 变为 ${newValue}`);
+});
+</script>
+```
+
+在这个示例中，我们使用 watch 函数来监视 count 的变化。每当 count 的值发生变化时，回调函数会被调用，可以在回调函数中执行相应的操作。
 
 # $ref语法糖
 

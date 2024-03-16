@@ -366,7 +366,7 @@ run主动发送请求在这个例子中，我们通过 run 来修改用户名，
 
 <img src="VueHooks%20Plus%E6%8F%92%E4%BB%B6.assets/image-20240104222348672.png" alt="image-20240104222348672" style="zoom:67%;" />
 
-#### **例子**
+#### **例子1**
 
 **data.d.ts**
 
@@ -455,6 +455,180 @@ const { data, error, loading, run } =  useRequest(getUserInfo,{
 
 run('b')
 </script>
+```
+
+#### 例子2
+
+```tsx
+const getInformation = () => {
+  const { data: responseData, run: infoRun } = useRequest(getUserInfo, {
+    onSuccess: (responseData) => {
+      if (responseData && responseData.data) {
+        // console.table(responseData.data);
+        const userAccount = window.encodeURIComponent(
+          JSON.stringify(responseData.data)
+        );
+        // console.log(userAccount);
+        // 保存到浏览器和pinia中
+        localStorage.setItem("userInfo", userAccount);
+        pinia.setUserInfo(userAccount);
+      } else {
+        console.error("未获取到有效的用户信息数据");
+      }
+    },
+  });
+
+  infoRun();
+};
+```
+
+#### 例子3
+
+##### post
+
+```tsx
+
+//
+export async function getSysLogin(data: any){
+  return request<ResponseResult>(import.meta.env.VITE_APP_BASE_API + '/login/web', {
+    method: 'post',
+    data: data,
+    // headers: {
+    //   'Content-Type': 'application/json'
+    // }
+  })
+}
+/* POST http://localhost:9000/login/web
+响应结果如下:
+{
+    "code": 200000,
+    "data": {
+        "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyQ29udGV4dCI6IntcImlkXCI6XCIxXCIsXCJpc1N1cGVyXCI6ZmFsc2UsXCJsb25nVGVybVwiOmZhbHNlLFwibmlja05hbWVcIjpcImxmalwiLFwicm9sZVwiOjEsXCJ1c2VybmFtZVwiOlwibGZqXCJ9Iiwic3ViIjoibGZqIiwiZXhwIjoxNzEwNzY4NzgwfQ.fqFWSfSznm0dwZg6LSEmOO2VeiWs-ZtO4Vr0MeZPoOM",
+        "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyQ29udGV4dCI6IntcImlkXCI6XCIxXCIsXCJpc1N1cGVyXCI6ZmFsc2UsXCJsb25nVGVybVwiOmZhbHNlLFwibmlja05hbWVcIjpcImxmalwiLFwicm9sZVwiOjEsXCJ1c2VybmFtZVwiOlwibGZqXCJ9Iiwic3ViIjoibGZqIiwiZXhwIjoxNzExNDU5OTgxfQ.qnHTwncQSG8F4kSunz5eCbcSHZon9BFpKPCeQKETqxk"
+    },
+    "message": "响应成功"
+}
+*/
+```
+
+
+
+```tsx
+//点击登录
+const login = async () => {
+  const userLogInfo = toRaw(logInfo); // 将一个由生成的响应式转化为对象普通对象
+  // 发起请求
+  const { data, error, loading, run } = useRequest(getSysLogin, {
+    manual: true, // 手动触发请求
+    devKey: "demo1", // 开发者密钥
+    onSuccess: (data) => {
+      //注意: 在手动触发的情况下, ts中使用data,error,....中的属性
+      if (data.code === 400002) {
+        alert("账号不存在");
+      } else if (data.code === 400004) {
+        alert("账户密码不匹配");
+      } else if (data.code === 200000) {
+        //前端接收到JWT后，将其存储在本地
+        localStorage.setItem("accessToken", data.data.accessToken);
+        localStorage.setItem("refreshToken", data.data.refreshToken);
+        // 得到用户信息
+        getInformation();
+        router.replace("/index");
+      }
+    },
+    onError: (error) => {
+      alert(error);
+    },
+  });
+
+  run(userLogInfo);
+};
+```
+
+**后端**
+
+```java
+	@PostMapping("/web")
+	public ResponseResult<Token> userLogin(@RequestBody Map<String, String> loginData) {
+		String username = loginData.get("username");
+		String password = loginData.get("password");
+		return sysLoginService.login(username, password);
+	}
+```
+
+
+
+##### get
+
+```tsx
+export async function getUpdateNickName(userName: string, nickName:string){
+  return request<ResponseResult>(import.meta.env.VITE_APP_BASE_API + '/user/nickName', {
+    method: 'get',
+    params : {
+      userName,
+      nickName
+    },
+    needToken: true  //需要请求头携带token, 后端好进行认证
+  }) 
+}
+/**
+ *GET http://localhost:9000/user/nickName?username=lfj&nickName=ssss
+ {
+    "code": 200000,
+    "data": "success",
+    "message": "响应成功"
+}
+ */
+```
+
+
+
+```tsx
+//点击注册
+const register = async () => {
+  const registerform = toRaw(registerInfo); // 将一个由生成的响应式转化为对象普通对象
+  if (registerform.password.length < 6 || registerform.username.length < 6) {
+    alert("用户名和密码都不能小于6位");
+  } else {
+    if (registerform.password === registerform.againPassword) {
+      // 发起请求
+      const { data, run } = useRequest(getSysRegister, {
+        manual: true, // 手动触发请求
+        onSuccess: (data) => {
+          if (data.code === 200000) {
+            alert("注册成功!");
+            name.value = false;
+          } else if (data.code === 400005) {
+            alert("用户名已被注册");
+          } else {
+            alert("失败了..");
+          }
+        },
+        onError: (error) => {
+          alert(error);
+        },
+      });
+
+      run(registerform)
+    } else {
+      alert("两次输入的密码不一致 ");
+    }
+  }
+};
+
+```
+
+
+
+**后端**
+
+```java
+	@GetMapping("/nickName")
+	public ResponseResult<String> updateNickName(
+		@RequestParam("username") String userName,
+		@RequestParam("nickName") String nickName) {
+		return userService.updateTruename(userName, nickName);
+	}
 ```
 
 
