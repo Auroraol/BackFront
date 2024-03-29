@@ -182,6 +182,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
+//@JsonInclude(JsonInclude.Include.NON_NULL)  //即值为null的字段不返回
 public class ResponseResult<T>{
 	private int code;
 	private T data;
@@ -196,6 +197,19 @@ public class ResponseResult<T>{
 	 */
 	public static <T> ResponseResult<T> success(T data) {
 		return success(data, ResponseCodeEnum.SUCCESS.getMessage());
+	}
+    
+    	/**
+	 * 响应成功的方法
+	 *
+	 * @param
+	 * @return 响应实体 {code: xxx, message: xxx}
+	 */
+	public static <T> ResponseResult<T> success() {
+		ResponseResult<T> result = new ResponseResult<>();
+		result.setCode(ResponseCodeEnum.SUCCESS.getCode());
+		result.setMessage(ResponseCodeEnum.SUCCESS.getMessage());
+		return result;
 	}
 
 	/**
@@ -528,7 +542,7 @@ public class ResponseUtil {
 	static final String CONTENT_TYPE = "application/json;charset=UTF-8";
 
 	/**
-	 * 输出前端内容以及状态指定
+	 * 自定义输出前端内容以及状态
 	 *
 	 * @param response
 	 * @param status
@@ -600,7 +614,6 @@ public class ResponseUtil {
 	}
 
 }
-
 ```
 
 使用

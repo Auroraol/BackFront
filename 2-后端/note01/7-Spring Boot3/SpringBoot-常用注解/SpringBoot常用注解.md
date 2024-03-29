@@ -344,6 +344,73 @@ public class AppConfig {
 
 [总结](./@Bean注解.md)
 
+### 2.8 使用ApplicationContextAware
+
+- `@Autowire` 适用于大多数场景，当无法满足装配条件时，系统启动将报异常。适用于那些我们自己管理的Bean。
+
+-  `applicationContext.getBean(name);` 适用于手动获取。适用那些最终使用者可能不是我们自己的情况
+
+  ApplicationContextAware 是一个接口，它提供一个方法 setApplicationContext ，当 spring 注册完成之后，会把 ApplicationContext 对象以参数的方式传递到方法里，在方法里我们可以实现自己的逻辑，去获取自己的 bean，当前对接的断言等；
+
+  一般用在被封装的工具包， starter 包中，方便给其它开发人员调用
+
+`applicationContext`场景如下
+
+**1.做一个公共jar类发布 提供给其他项目组使用的场景**
+
+**2.项目工程内，通用工具类utils，比如一些时间类，调用类等**
+
+既然是工具类，那么使用方法肯定是 类.方法名直接使用，也就是需要[静态方法](https://so.csdn.net/so/search?q=静态方法&spm=1001.2101.3001.7020)，此时如果需要注入一些service类，就不能用注解了。但是一般就是类.方法名直接使用
+
+@Autowired只能在调用[自动装配](https://so.csdn.net/so/search?q=自动装配&spm=1001.2101.3001.7020)对象的对象的方法不是静态方法时使用，因为静态方法能在对象没[实例化](https://so.csdn.net/so/search?q=实例化&spm=1001.2101.3001.7020)时调用，但此时自动装配对象还未装配。
+
+ApplicationContext().getBean()则所用情况都可以使用，尤其在静态方法中，只能用这种方法
+
+例子
+
+```java
+public abstract class BaseSmsCodeServiceImpl implements SmsCodeService{
+        
+	@Autowired
+	private StringRedisTemplate redisTemplate;
+}
+```
+
+等价
+
+```java
+public abstract class BaseSmsCodeServiceImpl implements SmsCodeService,
+	InitializingBean, ApplicationContextAware 
+    
+    private ApplicationContext applicationContext; //Spring的ApplicationContext的持有者,可以获取spring容器中的bean
+
+    private StringRedisTemplate redisTemplate;
+        
+//从应用程序上下文中获取 StringRedisTemplate 类型的 Bean，并进行必要的校验，确保该 Bean 的正确性和可用性
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		if (this.applicationContext == null) {
+			this.applicationContext = applicationContext;
+		}
+	}
+
+// 在读取配置文件后
+	@Override
+	public void afterPropertiesSet() {
+		if (this.redisTemplate == null) {
+			this.redisTemplate = applicationContext.getBean(StringRedisTemplate.class);
+		}
+		Assert.notNull(this.redisTemplate, "There is no one available StringRedisTemplate bean");
+	}
+}
+```
+
+implements  ApplicationContextAware 了也可以使用getBean()去拿到Bean相关的东西
+
+```java
+applicationContext.getBean(rateLimiter.extra())
+```
+
 ## 3、处理常见的 HTTP 请求类型
 
 | 注解            | 说明                        |
@@ -421,6 +488,112 @@ public ResponseEntity deleteUser(@PathVariable(value = "userId") Long userId){
 ## 4、传值
 
 <strong style="color:red">注意: 一些注解是前后端发分离项目使用</strong>
+
+### axios中get/post请求方式
+
+![image-20240322212114235](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20240322212114235.png)
+
+####  get请求
+
+**params**
+
+![image-20240326225858933](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20240326225858933.png)
+
+例子
+
+```js
+// method
+const params = {
+    id: '123456789',
+    name: '张三'
+}
+test(params)
+
+// api
+export function test (params) {
+  return axios({
+    url: url,
+    method: 'GET',
+    params: params
+  })
+}
+
+// 后台
+@GetMapping("/test")
+public Result test(@RequestParam Map<String, Object> map) {
+    return Res.ok();
+}
+```
+
+####  post请求
+
+ **params**
+
+![image-20240326225836095](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20240326225836095.png)
+
+例子
+
+```js
+// method
+const params = {
+    id: '123456789',
+    name: '张三'
+}
+test(params)
+
+// api
+export function test (params) {
+  return axios({
+    url: url,
+    method: 'POST',
+    params: params
+  })
+}
+
+// 后台
+@PostMapping("/test")
+public Result test(@RequestParam Map<String, Object> map) {
+    return Res.ok();
+}
+
+```
+
+**data**
+
+![image-20240326225819562](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20240326225819562.png)
+
+例子
+
+```js
+// 实体类
+@Data
+public class TestEntity {
+    Long id;
+    String name;
+}
+
+// method
+const params = {
+    id: '123456789',
+    name: '张三'
+}
+test(params)
+
+// api
+export function test (params) {
+  return axios({
+    url: url,
+    method: 'POST',	
+    data: params
+  })
+}
+
+@PostMapping("/test")
+public Result test(@RequestBody TestEntity testEntity) {
+    return Res.ok();
+}
+
+```
 
 ### 前端传值
 
@@ -511,6 +684,8 @@ getUserList () {
 
 ##### 后端接口
 
+注:  两个参数的时候可以这样@RequestParam Map<String, Object> map
+
 ```java
 @GetMapping("/user/list")
 public Result<?> getUserListPage(@RequestParam(value = "username", required = false) String username,
@@ -559,6 +734,8 @@ public Result<?> getUserListPage(@RequestParam(value = "username", required = fa
 
 ![image-20230925142927286](SpringBoot常用注解.assets/image-20230925142927286.png)
 
+
+
 #### 4.3 @RequestBody
 
 用于读取 Request 请求（可能是 POST,PUT,DELETE,GET 请求）的 body 部分并且Content-Type 为 application/json 格式的数据，接收到数据之后会自动将数据绑定到 Java 对象上去。系统会使用HttpMessageConverter或者自定义的HttpMessageConverter将请求的 body 中的 json 字符串转换为 java 对象。
@@ -581,14 +758,14 @@ axios方式发起的ajax请求, 在post方式下, 提交的数据自动转成jso
 	}
 ```
 
-##### 两种形式
+##### 三种形式
 
 + json
 + 对象
 
-###### 对象
+###### json —— 对象
 
-> 前端传入User对象
+> 前端传入对象
 
  **前端接口**
 
@@ -647,7 +824,7 @@ public Map<String, Object> login(XUser user) {
 
 ![image-20230923094816855](SpringBoot常用注解.assets/image-20230923094816855.png)
 
-###### json
+###### json —— 两个变量
 
 > 前端发送json数据, 仅限两个
 
@@ -668,6 +845,92 @@ public ResponseResult<Token> userLogin(@RequestBody Map<String, String> loginDat
 		String username = loginData.get("username");
 		String password = loginData.get("password");
 		return userService.usernameLogin(username, password);
+}
+```
+
+###### 表单默认方式
+
+表单提交的默认方式(`<input type="submit" value="提交"/>`)
+
+```html
+<form action="${pageContext.request.contextPath}/orderInfo"  <!--请求url-->
+      method="post">
+    <table border="1">
+        <tr>
+            <td colspan="2">
+                订单id:<input type="text" name="orderId" value="1">
+            </td>
+        </tr>
+        <tr>
+            <td>商品Id</td>
+            <td>商品名称</td>
+        </tr>
+        <tr>
+            <td>
+                <input name="productInfo.proId" value="1"  <!--属性-->
+                       type="text">
+            </td>
+            <td>
+                <input name="productInfo.proName"
+                       value="三文鱼" type="text">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input name="productInfo.proId" value="2"
+                       type="text">
+            </td>
+            <td>
+                <input name="productInfo.proName" value="红牛"
+                       type="text">
+            </td>
+        </tr>
+    </table>
+	<!--表单默认方式-->
+    <input type="submit" value="提交"/>
+	<!--axios方式发起的ajax请求-->
+	<button onclick="submitOrder()">提交</button>
+</form>
+```
+
+Controller层只能使用@RequestParam
+
+```java
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.HashMap;
+
+@Controller
+@RequestMapping("/orderInfo")
+public class OrderController {
+
+    @PostMapping
+    public String handleOrderInfo(@RequestParam String orderId,
+                                  @RequestParam HashMap<String, String> productInfo) {
+
+        // Create Order object
+        Order order = new Order();
+        order.setOrderId(orderId);
+
+        // Create Product objects and add them to the order
+        HashMap<String, Product> products = new HashMap<>();
+        for (String key : productInfo.keySet()) {
+            Product product = new Product();
+            product.setProId(productInfo.get(key));
+            product.setProName(productInfo.get("productInfo.proName"));
+            products.put(key, product);
+        }
+
+        order.setProductInfo(products);
+
+        // You can now process the order object as needed (e.g., save to a database)
+
+        // Redirect to a success page or return a response
+        return "redirect:/successPage";
+    }
 }
 ```
 
@@ -1230,7 +1493,7 @@ class WebSite {
 }
 ```
 
-## 6、参数校验
+## 6、参数校验(常用)
 
 数据的校验的重要性就不用说了，即使在前端对数据进行校验的情况下，我们还是要对传入后端的数据再进行一遍校验，避免用户绕过浏览器直接通过一些 HTTP 工具直接向后端请求一些违法数据。
 
@@ -1242,11 +1505,27 @@ SpringBoot 项目的 spring-boot-starter-web 依赖中已经有 hibernate-valida
 
 <img src="SpringBoot常用注解.assets/image-20230925151012885.png" alt="image-20230925151012885" style="zoom: 67%;" />
 
-
-
 非 SpringBoot 项目需要自行引入相关依赖包，这里不多做讲解
 
 需要注意的是： 所有的注解，推荐使用 JSR 注解，即javax.validation.constraints，而不是org.hibernate.validator.constraints
+
+(1) 一般spring-boot-starter-web会自动传入hibernate-validator依赖6.0.1版本:
+
+```XML
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+```
+
+（2）如果没有，就手动传入
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+```
 
 ### 6.1   常用的字段验证的注解
 
@@ -1269,11 +1548,13 @@ SpringBoot 项目的 spring-boot-starter-web 依赖中已经有 hibernate-valida
 
 ### 6.2. 验证请求体
 
+1.声明需要被校验的字段
+
 ```java
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Validated
+@Validated        //
 public class Person {
     @NotNull(message = "classId 不能为空")  // 表示classId必须不会空
     private String classId;
@@ -1289,7 +1570,7 @@ public class Person {
 }
 ```
 
-我们在需要验证的参数上加上了`@Valid`注解，如果验证失败，它将抛出`MethodArgumentNotValidException`
+2.在controller上声明需要对数据进行校验(在需要验证的参数上加上了`@Valid`注解)，如果验证失败，它将抛出`MethodArgumentNotValidException`
 
 ```java
 @RestController
@@ -1302,9 +1583,7 @@ public class PersonController {
 }
 ```
 
-### 6.3. 验证请求参数(常用)
-
-@Validated 告诉 Spring 去校验方法参数
+### 6.3. 验证请求参数
 
 ```java
 @RestController
@@ -1312,13 +1591,235 @@ public class PersonController {
 @Validated
 public class PersonController {
     @GetMapping("/person/{id}")
-    public ResponseEntity<Integer> getPersonByID(@Valid @PathVariable("id") @Max(value = 5,message = "超过 id 的范围了") Integer id) {
+    public ResponseEntity<Integer> getPersonByID(@DecimalMax(0) @Max(value = 5,message = "超过 id 的范围了")  @PathVariable("id") Integer id) {
         return ResponseEntity.ok().body(id);
     }
 }
 ```
 
-### 7、全局处理 Controller 层异常
+### 6.4 自定义(例子1)
+
+##### 一、注解定义
+
+要实现扩展 validate 框架的注解比较简单，直接在注解上添加 @Constraint 并指定校验的实现类即可
+
+```java
+@Inherited
+@Target({PARAMETER})
+@Retention(RUNTIME)
+@Documented
+@Constraint(validatedBy = {MultipartFilesValidator.class, MultipartFileValidator.class})
+public @interface MultipartFileVerify {
+
+    String message() default "文件校验失败";
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
+
+    /**
+     * 文件类型限制
+     */
+    FileType[] value() default {};
+
+    /**
+     * 不允许上传的文件类型，不指定则不作限制
+     */
+    FileType[] notAllow() default {};
+
+    /**
+     * 文件大小限制，小于 0 表示不作限制；单位：千字节（KB）
+     */
+    long maxSize() default -1L;
+}
+12345678910111213141516171819202122232425262728
+```
+
+message、groups、[payload](https://so.csdn.net/so/search?q=payload&spm=1001.2101.3001.7020) 为必须项，其他的为自定义，此自定义注解的意思是该注解的只能用在 PARAMETER（方法参数） 上，并且为运行时可用，有两个校验类，分别为多文件 `MultipartFilesValidator` 与 单文件 `MultipartFileValidator` 校验实现。
+
+##### 二、校验类实现
+
+校验类必须实现 `ConstraintValidator` 接口
+
+![image-20220409012014198](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/23b3c7461d630aa5f25750c14d90ad5b.png)
+
+[泛型](https://so.csdn.net/so/search?q=泛型&spm=1001.2101.3001.7020) A 表示自定义注解，T 表示你校验类需要传递的参数。
+
+单文件校验类的实现
+
+```java
+/**
+ * 单个 MultipartFile 校验
+ */
+public class MultipartFileValidator implements ConstraintValidator<MultipartFileVerify, MultipartFile> {
+    @Resource
+    private AbstractMultipartFileValidator abstractMultipartFileValidator;
+
+    private MultipartFileVerify multipartFileValid;
+
+    @Override
+    public void initialize(MultipartFileVerify constraintAnnotation) {
+        this.multipartFileValid = constraintAnnotation;
+    }
+
+    
+    @Override
+    public boolean isValid(MultipartFile value, ConstraintValidatorContext context) {
+        if (value == null) {
+            return true;
+        }
+        return abstractMultipartFileValidator.isFileValid(multipartFileValid, value);
+    }
+}
+12345678910111213141516171819202122
+```
+
+多文件校验的实现
+
+```java
+/**
+ * 兼容多 MultipartFile 校验
+ */
+public class MultipartFilesValidator implements ConstraintValidator<MultipartFileVerify, MultipartFile[]> {
+
+    @Resource
+    private AbstractMultipartFileValidator abstractMultipartFileValidator;
+
+    private MultipartFileVerify multipartFileValid;
+
+    @Override
+    public void initialize(MultipartFileVerify constraintAnnotation) {
+        this.multipartFileValid = constraintAnnotation;
+    }
+
+    @Override
+    public boolean isValid(MultipartFile[] value, ConstraintValidatorContext context) {
+        if (value == null || value.length == 0) {
+            return true;
+        }
+        for (MultipartFile multipartFile : value) {
+            if (!abstractMultipartFileValidator.isFileValid(multipartFileValid, multipartFile)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+12345678910111213141516171819202122232425262728
+```
+
+写两个校验类是因为 ConstraintValidator 在校验时只能传一个参数呀，当同时上传多个文件就不能满足了，接口的方法参数类型必须与 ConstraintValidator T 泛型一致才行。这样就扩展出了一个文件校验的注解，AbstractMultipartFileValidator 这个抽象类作用是在责任链中校验传过来的文件格式是否一致。
+
+### 6.5 自定义(例子2)
+
+##### 自定义注解
+
+```java
+@Target({ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Constraint(
+    validatedBy = {MobileNoValidator.class}  // 指定校验的实现类
+)
+public @interface MobileNo {
+    boolean nullable() default false;
+
+    boolean blankable() default false;
+    
+    // 下面的message, groups和payload也是必须添加的
+    String message() default "手机号格式不正确";
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
+}
+```
+
+该自定义注解类中用到了四种元注解，最后一个注解@Constraint表示校验此注解的校验器类，可以多个。值得一提的是除了自定义的message、nullable和blankable属性外，下面的groups和payload也是必须添加的。
+
+##### 注解校验类
+
+```java
+//  ConstraintValidator<自定义注解类, 校验的数据类型>  
+public class MobileNoValidator implements ConstraintValidator<MobileNo, String> {
+    private boolean nullable;
+    private boolean blankable;
+    private String message;
+
+    public MobileNoValidator() {
+    }
+
+    //初始化方法
+    @Override
+    public void initialize(MobileNo constraintAnnotation) {
+        this.nullable = constraintAnnotation.nullable();
+        this.message = constraintAnnotation.message();
+        this.blankable = constraintAnnotation.blankable();
+    }
+
+    //自定义的校验逻辑 isValid(校验的数据, ConstraintValidatorContext context)
+    @Override
+    public boolean isValid(String value, ConstraintValidatorContext context) {
+        if (value == null) {
+            if (!this.nullable) {
+                //禁止默认消息返回
+                context.disableDefaultConstraintViolation();
+                //自定义返回消息
+                context.buildConstraintViolationWithTemplate("手机号不能为空").addConstraintViolation();
+                return false;
+            } else {
+                return true;
+            }
+        } else if (value.length() == 0) {
+            if (!this.blankable) {
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate("手机号不能为空白").addConstraintViolation();
+                return false;
+            } else {
+                return true;
+            }
+        } else if (!AppUtils.isMobile(value)) {
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate((String)StringUtils.defaultIfBlank(this.message, "手机号格式不对")).addConstraintViolation();
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+```
+
+### 6.6 封住全局异常处理器
+
+单独拦截参数校验的异常：`javax.validation.ConstraintViolationException`，`org.springframework.web.bind.MethodArgumentNotValidException`
+
+```java
+     /**
+     * RequestParam 参数格式校验不通过 异常
+     * @return
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ApiResponse handleConstraintViolationException(ConstraintViolationException ex) {
+        Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
+        List<ConstraintViolation<?>> list = new ArrayList<>(constraintViolations);
+        ConstraintViolation<?> constraintViolation = list.get(0);
+        return new ApiResponse(INVALID_REQUEST.getErrorCode(),constraintViolation.getMessage());
+    }
+    
+ 	/**
+     *  RequestBody 参数校验不通过 异常
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ApiResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        BindingResult bindingResult = ex.getBindingResult();
+        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+        return new ApiResponse(INVALID_REQUEST.getErrorCode(),fieldErrors.get(0).getDefaultMessage());
+    }
+```
+
+## 7、全局处理 Controller 层异常
 
 Spring 项目必备的全局处理 Controller 层异常
 
@@ -1641,22 +2142,30 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
 ## 9、事务 @Transactional
 
+**添加位置**
+
+1. 接口实现类或接口实现方法上，而不是接口类中。
+2. 访问权限：public 的方法才起作用。@Transactional 注解应该只被应用到 public 方法上，这是由 Spring [AOP](https://so.csdn.net/so/search?q=AOP&spm=1001.2101.3001.7020) 的本质决定的。
+3. 系统设计：将标签放置在需要进行事务管理的方法上，而不是放在所有接口实现类上：只读的接口就不需要事务管理，由于配置了@Transactional就需要AOP拦截及事务的处理，可能影响系统性能。
+
 在要开启事务的方法上使用@Transactional注解即可!
 
-```
+```java
 @Transactional(rollbackFor = Exception.class)
 public void save() {
   ......
 }
 ```
 
-我们知道 Exception 分为运行时异常 RuntimeException 和非运行时异常。在@Transactional注解中如果不配置rollbackFor属性,那么事物只会在遇到RuntimeException的时候才会回滚,加上rollbackFor=Exception.class,可以让事物在遇到非运行时异常时也回滚。
+ Exception 分为运行时异常 RuntimeException 和非运行时异常。在@Transactional注解中如果不配置rollbackFor属性,那么事物只会在遇到RuntimeException的时候才会回滚,加上rollbackFor=Exception.class,可以让事物在遇到非运行时异常时也回滚。
 
 @Transactional 注解一般用在可以作用在类或者方法上。
 
-●作用于类：当把@Transactional 注解放在类上时，表示所有该类的public 方法都配置相同的事务属性信息。
++ 作用于类：当把@Transactional 注解放在类上时，表示所有该类的public 方法都配置相同的事务属性信息。
 
-●作用于方法：当类配置了@Transactional，方法也配置了@Transactional，方法的事务会覆盖类的事务配置信息。
++ 作用于方法：当类配置了@Transactional，方法也配置了@Transactional，方法的事务会覆盖类的事务配置信息。
+
+[@Transactional 详解-CSDN博客](https://blog.csdn.net/jiangyu1013/article/details/84397366)
 
 ## 10、Json 数据处理
 
@@ -2162,19 +2671,19 @@ public class PaymentImpl {
 
 ## 13. Lombok注解
 
-**@AllArgsConstructor**  
+### **@AllArgsConstructor**  
 
 + 添加一个有参数的构造器
 
-**@NoArgsConstructor**
+### **@NoArgsConstructor**
 
 + 添加一个无参数的构造器
 
-**@Data**
+### **@Data**
 
 - 在编译时会自动加入Getter,Setter,equals,canEqual,hasCode,toString等方法
 
-**@Builder**
+### **@Builder**
 
 + Builder的作用之一是为了解决在某个类有很多构造函数的情况，也省去写很多构造函数的麻烦，在设计模式中的思想是：用一个内部类去实例化一个对象，避免一个类出现过多构造函数
 
@@ -2206,6 +2715,70 @@ public class test1 {
         System.out.println("name is"+t1.getName()+'\n'+"age is :"+t1.getAge());
  }
 ```
+
+### @EqualsAndHashCode(callSuper = true)
+
+举个简单的例子：
+这边先定义一个分类对象 Parent，有一个属性：code
+
+```handlebars
+@Data
+public class Parent {
+    /**
+     * 父类编码
+     */
+    private String code;
+}
+```
+
+再定义一个子类对象 Child，一一个属性：name
+
+```handlebars
+@Data
+public class Child extends Parent {
+    /**
+     * 子类名称
+     */
+    private String name;
+}
+```
+
+在方法中 new 两个 Child 对象：childTest1、childTest2
+对这两个 Child 对象的自有属性 name 都赋值为：Child；但是对继承的父类属性 code 进行不同的赋值
+
+```handlebars
+Child childTest1 = new Child();
+childTest1.setCode("1");
+childTest1.setName("child");
+
+Child childTest2 = new Child();
+childTest2.setCode("2");
+childTest2.setName("child");
+```
+
+根据使用过程中，这两个对象肯定是不一样的，但是，在不加 @EqualsAndHashCode(callSuper = true) 注解的情况下对这两个对象进行比较得到的结果却是 true
+
+```handlebars
+boolean isSame = Objects.equals(childTest1,childTest2);
+log.info("testEquals -> childTest1:{}, childTest2:{}", childTest1, childTest2);
+log.info("testEquals -> :{}", isSame);
+```
+
+![在这里插入图片描述](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/20210624104324895.png)
+@EqualsAndHashCode(callSuper = true) 注解的作用就是将其父类属性也进行比较，下面是 Child 类加了注解后运行的结果：
+
+```handlebars
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class Child extends Parent {
+    /**
+     * 子类名称
+     */
+    private String name;
+}
+```
+
+![在这里插入图片描述](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/20210624104351617.png)
 
 # java自带注解
 
@@ -3030,5 +3603,626 @@ public class RateLimterAspect {
 		// 返回解密后的结果
 		return result;
 	}
+```
+
+# @AliasFor
+
+### 用法1：自定义注解的属性互为别名(常用)
+
+#### 简介
+
+它可以注解到自定义注解的两个属性上，表示这两个互为别名，也就是说这两个属性其实同一个含义。
+
+- 其中一个属性名必须是"value"
+- 无论指明设置哪个属性名设置属性值，另一个属性名也是同样属性值，也可以缺省属性名。
+- 若两个都指明属性值，要求值必须相同，否则会报错。
+- 这样使用之后，@MyAnno(location="shanghai")可以直接写为：@MyAnno("shanghai");
+
+#### 代码
+
+**注解**
+
+```java
+package com.example.annotation;
+    
+import org.springframework.core.annotation.AliasFor;
+    
+import java.lang.annotation.*;
+    
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Documented
+@Inherited
+public @interface MyAnnotation {
+     @AliasFor(attribute = "location")
+     String value() default "";
+    
+     @AliasFor(attribute = "value")
+     String location() default "";
+}
+```
+
+**控制器**
+
+```java
+package com.example.controller;
+    
+import com.example.annotation.MyAnnotation;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+    
+@RestController
+@RequestMapping("/hello")
+public class HelloController {
+    
+     @MyAnnotation(value = "location")
+     /*//下边这两种写法结果与上边是相同的
+     @MyAnnotation("location")
+     @MyAnnotation(location = "location")*/
+     @RequestMapping("/test1")
+     public String test1() {
+         MyAnnotation myAnnotation = null;
+         try {
+             myAnnotation = AnnotationUtils.getAnnotation(this.getClass().getMethod("test1"), MyAnnotation.class);
+         } catch (NoSuchMethodException e) {
+             e.printStackTrace();
+         }
+    
+         return "value:" + myAnnotation.value() + ";loation:" + myAnnotation.location();
+     }
+}
+```
+
+**测试**
+
+前端访问：http://localhost:8080/hello/test1
+
+前端结果（value和location都是同一个值）
+
+### 用法2.继承父注解的属性，不重写属性名
+
+#### 简介
+
+子注解的属性值的读写，其实是对父注解的属性值的读写。（对继承的属性来说）
+
+此时，只能读写继承了的属性值。
+
+#### 代码
+
+**注解**
+
+```java
+package com.example.annotation;
+    
+import org.springframework.core.annotation.AliasFor;
+    
+import java.lang.annotation.*;
+    
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Documented
+@Inherited
+public @interface MyAnnotation {
+     @AliasFor(attribute = "location")
+     String value() default "";
+    
+     @AliasFor(attribute = "value")
+     String location() default "";
+}
+```
+
+```java
+package com.example.annotation;
+    
+import org.springframework.core.annotation.AliasFor;
+    
+import java.lang.annotation.*;
+    
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Documented
+@Inherited
+@MyAnnotation
+public @interface SubMyAnnotation {
+     @AliasFor(annotation = MyAnnotation.class)
+     String location() default "";
+    
+// 这个不能写，只能有一个与父属性名同名的属性，否则报错
+// @AliasFor(annotation = MyAnnotation.class)
+// String value() default "";
+}
+```
+
+**控制器**
+
+```java
+package com.example.annotation;
+    
+import org.springframework.core.annotation.AliasFor;
+    
+import java.lang.annotation.*;
+    
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Documented
+@Inherited
+@MyAnnotation
+public @interface SubMyAnnotation {
+     @AliasFor(annotation = MyAnnotation.class)
+     String location() default "";
+    
+// 这个不能写，只能有一个与父属性名同名的属性，否则报错
+// @AliasFor(annotation = MyAnnotation.class)
+// String value() default "";
+}
+```
+
+**测试**
+
+前端访问：http://localhost:8080/hello/test
+
+**结果**
+
+> loation(sub):location(my)
+> location:
+> location:location(my)
+
+### 用法3：继承父注解的属性，并重写属性名
+
+#### 简介
+
+子注解的属性值的读写，其实是对父注解的属性值的读写。（对重写的属性来说）
+
+无论指明设置哪个属性名设置属性值，另一个属性名也是同样属性值，不可以缺省属性名。
+
+若两个都指明属性值，要求值必须相同，否则会报错。
+
+#### 代码
+
+```java
+package com.example.annotation;
+    
+import org.springframework.core.annotation.AliasFor;
+    
+import java.lang.annotation.*;
+    
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Documented
+@Inherited
+public @interface MyAnnotation {
+     @AliasFor(attribute = "location")
+     String value() default "";
+    
+     @AliasFor(attribute = "value")
+     String location() default "";
+}
+```
+
+
+
+```java
+package com.example.annotation;
+    
+import org.springframework.core.annotation.AliasFor;
+    
+import java.lang.annotation.*;
+    
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Documented
+@Inherited
+@MyAnnotation
+public @interface SubMyAnnotation {
+     @AliasFor(attribute = "value", annotation = MyAnnotation.class)
+     String subValue() default "";
+    
+     @AliasFor(attribute = "location", annotation = MyAnnotation.class)
+     String subLocation() default "";
+    
+// subLocation属性写成下边这两种结果是一样的
+// @AliasFor(attribute = "value", annotation = MyAnnotation.class)
+// String subLocation() default "";
+    
+// @AliasFor(value = "location", annotation = MyAnnotation.class)
+// String subLocation() default "";
+//
+}
+```
+
+**控制器**
+
+```java
+package com.example.controller;
+    
+import com.example.annotation.MyAnnotation;
+import com.example.annotation.SubMyAnnotation;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+    
+@RestController
+@RequestMapping("/hello")
+public class HelloController {
+     @SubMyAnnotation(subValue = "subLocation")
+// @SubMyAnnotation(subLocation = "subLocation") //这个与上边结果相同
+// @SubMyAnnotation("subLocation") //缺省属性名会报错
+     @RequestMapping("/test")
+     public String test() {
+         SubMyAnnotation subMyAnnotation = null;
+         MyAnnotation myAnnotation = null;
+         MyAnnotation myAnnotation1 = null;
+    
+         try {
+             subMyAnnotation = AnnotationUtils.getAnnotation(this.getClass().getMethod("test"), SubMyAnnotation.class);
+             myAnnotation = AnnotationUtils.getAnnotation(this.getClass().getMethod("test"), MyAnnotation.class);
+             myAnnotation1 = AnnotatedElementUtils.getMergedAnnotation(this.getClass().getMethod("test"), MyAnnotation.class);
+         } catch (NoSuchMethodException e) {
+             e.printStackTrace();
+         }
+         return "subValue:" + subMyAnnotation.subValue() + ";subLoation:" + subMyAnnotation.subLocation() + "\n" +
+                 "value:" + myAnnotation.value() + ";location:" + myAnnotation.location() + "\n" +
+                 "value:" + myAnnotation1.value() + ";location:" + myAnnotation1.location();
+     }
+}
+```
+
+**测试**
+
+前端访问：http://localhost:8080/hello/test
+
+**结果**
+
+> subValue:subLocation;subLoation:subLocation
+> value:;location:
+> value:subLocation;location:subLocation
+
+
+
+
+
+# 补充
+
+[Springboot中常用注解@Accessors/@Data/@JsonInclude(JsonInclude.Include.NON_NULL)/@EqualsAndHashCode-CSDN博客](https://blog.csdn.net/studyday1/article/details/127067186)
+
+
+
+# 针对前端json数据
+
+## @JsonInclude注解的常用属性
+
+### 3.1 Include.NON_NULL
+
+Include.NON_NULL属性指定序列化过程中，忽略null值。
+
+```java
+public class Person {
+  private String name;
+  private Integer age;
+  private String address;
+  // getter and setter omitted
+}
+```
+
+在上面的代码中，我们希望在Java对象转换为JSON时，忽略空地址。我们可以使用@JsonInclude注解，加上Include.NON_NULL属性：
+
+```java
+public class Person {
+  private String name;
+  private Integer age;
+  
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String address;
+  // getter and setter omitted
+}
+```
+
+这样，当序列化Person对象时，如果address属性为null，则忽略address属性的序列化。
+
+### 3.2 Include.NON_EMPTY
+
+Include.NON_EMPTY属性与Include.NON_NULL类似，但只要属性值不为null、空字符串或空数组，就进行序列化。
+
+
+
+```java
+public class Person {
+  private String name;
+  private Integer age;
+  
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String address;
+  // getter and setter omitted
+}
+```
+
+Copy
+
+
+
+这样，当address属性为null、空字符串或空数组时，忽略序列化过程。
+
+### 3.3 Include.NON_DEFAULT
+
+Include.NON_DEFAULT属性仅序列化与默认值不同的属性。
+
+
+
+```java
+public class Person {
+  private String name;
+  private Integer age;
+  
+  @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+  private Boolean married = false;
+  // getter and setter omitted
+}
+```
+
+Copy
+
+
+
+在上面的代码中，married属性的默认值为false。当married属性为false时，不进行序列化。如果married属性为true，则进行序列化。
+
+### 3.4 Include.CUSTOM
+
+Include.CUSTOM属性允许开发人员使用自定义的序列化过滤器。
+
+下面的Java代码定义了一个自定义序列化过滤器，用于序列化Person类的所有属性。
+
+
+
+```java
+public static class MyCustomFilter extends SimpleBeanPropertyFilter {
+  @Override
+  public void serializeAsField(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {
+    if (include(writer)) {
+      writer.serializeAsField(pojo, jgen, provider);
+    } else if (!jgen.canOmitFields()) {
+      writer.serializeAsOmittedField(pojo, jgen, provider);
+    }
+  }
+ 
+  @Override
+  protected boolean include(PropertyWriter writer) {
+    // your custom condition here
+    return true;
+  }
+}
+```
+
+Copy
+
+
+
+然后，在Person类中使用@JsonInclude注解，指定序列化过程中使用上面定义的自定义序列化过滤器：
+
+
+
+```java
+public class Person {
+  private String name;
+  private Integer age;
+  
+  @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = MyCustomFilter.class)
+  private String address;
+  // getter and setter omitted
+}
+```
+
+Copy
+
+
+
+这样，当序列化Person对象时，就使用自定义的序列化过滤器。
+
+## @JsonSerialize和@JsonDeserialize的使用详解
+
+#### 背景：
+
+在项目中处理数据时需要对所有的金额格式化操作，具体做法是，后端接收的金额类数据单位需要由万元转换为元在存入数据库，而返回到前端的金额类数据又必须由元转换为万元返回，以便保持数据一致。
+
+如果用传统方式，在保存和返回时加上转换的处理，需要复杂且繁琐的操作，jackson提供了JsonSerialize和JsonDeserialize注解来优雅的解决这个问题，项目采用的springboot框架，而springboot框架默认配置json转换工具就是jackson。如此，使用注解解决问题很nice了。
+
+ 
+
+#### 注解简介：
+
+\1. @JsonSerialize：json序列化注解，用于字段或get方法上，作用于getter()方法，将java对象序列化为json数据。
+
+```java
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL) //include里面包含了序列化的范围和作用的规则，本行作用是属性为null的时候不进行序列化操作。
+ 
+@JsonSerialize(using = Bean.class) //Bean 为实现类,Bean需要继承JsonSerializer<>,泛型就是作用字段的类型。
+```
+
+\2. @JsonDeserialize：json[反序列化](https://so.csdn.net/so/search?q=反序列化&spm=1001.2101.3001.7020)注解，用于字段或set方法上，作用于setter()方法，将json数据反序列化为java对象。使用方法同@JsonSerialize类似。
+
+3.常用于对数据进行简单的特殊处理，比如本次项目实践用到的，对金额类数据进行格式化操作。
+
+
+
+需要注意的是，该注解只在json序列化和反序列化的时候触发，其他时候并不生效！
+
+注意：json序列化及反序列化注解通常用在前后端传值上，作用于get,set方法上，但并不是重写get,set方法，而是类似于补充，追加。
+
+理解注解的作用和触发很重要，这能帮助我们知道该怎样来使用它！
+
+ 
+
+#### 项目实践：
+
+1.使用
+
+```java
+@JsonSerialize(using = BudgetSerializer.class)
+@JsonDeserialize(using = BudgetDeserializer.class)
+private BigDecimal applyBudget;
+```
+
+由于字段用于存储金额，所以采用了BigDecimal类。
+
+2.自定义实现类
+
+首先需要自定义序列化及反序列化实现类，继承JsonSerializer<BigDecimal>类和JsonDeserializer<BigDecimal>，由于字段采用BigDecimal，所以泛型也使用BigDecimal。
+
+```
+@Slf4j
+public class BudgetSerializer extends JsonSerializer<BigDecimal> {
+ 
+    @Override
+    public void serialize(BigDecimal s, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        BigDecimal format = s;
+        if (format != null) {
+            // 元转万元
+            format = format.divide(new BigDecimal("10000"), 4, BigDecimal.ROUND_HALF_DOWN);
+            log.debug("元格式化万元：前 {}, 后 {}", s, format);
+        }
+ 
+        jsonGenerator.writeNumber(format);
+    }
+}
+```
+
+作用：在返回给前端金额参数的时候，把数据库中的数据由元格式化为万元，就是除10000的操作。
+ 
+
+```
+@Slf4j
+public class BudgetDeserializer extends JsonDeserializer<BigDecimal> {
+    @Override
+    public BigDecimal deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+        try {
+            if (jsonParser == null || jsonParser.getText() == null) {
+                return null;
+            }
+            String s = jsonParser.getText();
+            BigDecimal format = new BigDecimal(StringUtils.isBlank(s) ? "0" : s);
+ 
+            // 万元转元
+            format = format.multiply(new BigDecimal("10000"));
+            log.debug("万元格式化元：前 {}, 后 {}", s, format);
+            return format;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+作用：在后端接收前端金额参数的时候，把前端的数据由万元格式化为元，就是乘10000的操作。
+
+## @JsonIgnore的使用方法及其效果
+
+1. 作用：在json序列化时将java bean中的一些属性忽略掉，序列化和[反序列化](https://so.csdn.net/so/search?q=反序列化&spm=1001.2101.3001.7020)都受影响。
+
+2. 使用方法：一般标记在属性或者方法上，返回的json数据即不包含该属性。
+
+3. 场景模拟：
+
+   需要把一个List<HistoryOrderBean>转换成json格式的数据传递给前台。但实体类中基本属性字段的值都存储在快照属性字段中。此时我可以在业务层中做处理，把快照属性字段的值赋给实体类中对应的基本属性字段。最后，我希望返回的json数据中不包含这两个快照字段，那么在实体类中快照属性上加注解@JsonIgnore，那么最后返回的json数据，将不会包含goodsInfo和extendsInfo两个属性值。
+
+```
+public class HistoryOrderBean {
+
+    //基本属性字段
+    private String insurantName;
+    private String insuranceName;
+    private String insurancePrice;
+    private String insurancePicture;
+    private String insuranceLimit;
+
+    //快照属性字段
+    @JsonIgnore
+    private String goodsInfo;      //快照基本信息
+    @JsonIgnore  
+    private String extendsInfo;    //快照扩展属性信息
+
+}
+```
+
+4.注解失效：
+如果注解失效，可能是因为你使用的是fastJson，尝试使用对应的注解来忽略字段，注解为：@JSONField(serialize = false)，使用方法一样。
+
+
+
+# 注解顺序
+
+注意:  注解的名字字符的顺序来的。字符对应的编码小，相当于优先级值小，优先级大，先执行。
+
+但是为了美观, 统一写法顺序
+
+entity
+
+```java
+@Data
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@ApiModel(value="Client对象", description="客户端表")
+public class Client implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @ApiModelProperty(value = "id")
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+
+    @NotBlank(message = "客户端秘钥不能为空")
+    @ApiModelProperty(value = "客户端秘钥")
+    private String clientSecret;
+}
+
+```
+
+ArticleLikeServiceImpl
+
+```java
+@Log4j2
+@Service
+public class ArticleLikeServiceImpl extends ServiceImpl<ArticleLikeMapper, ArticleLike> implements IArticleLikeService {
+
+    @Autowired
+    private IArticleService articleService;
+}
+```
+
+
+
+```java
+@RestController
+@RequestMapping("/user")
+@Log4j2
+@Api(tags = "用户服务", value = "/user")
+public class ArticleLikeController extends BaseController {
+
+    @Autowired
+    private IArticleLikeService articleLikeService;
+
+    @Autowired
+    private ArticleRecommendService articleRecommendService;
+
+
+    @DeleteMapping("/cancel")
+    @ApiOperation(value = "取消文章点赞")
+    public ApiResponse cancel(@ApiParam("文章id") @NotNull(message = "文章id不能为空") @RequestParam("articleId") Integer articleId) {
+        articleLikeService.cancel(articleId);
+        articleRecommendService.asyncRefresh(articleId);
+        return createResponse();
+    }
+    
+        @PostMapping("/update")
+    @ApiOperation(value = "更新用户基本信息", notes = "需要传accessToken，请求的json中id字段必传，更新不为null的项")
+    public ApiResponse update(@Validated @RequestBody UpdateUserRequest request) {
+        userService.update(request);
+        return createResponse();
+    }
+
+}
 ```
 

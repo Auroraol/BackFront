@@ -703,7 +703,7 @@ System.out.println(dto.getCreateTime());  //2024-01-20
 
 ### 单表查询
 
-#### 方式一:  CRUD接口方式
+#### 方式一:  CRUD接口方式 - Service
 
 [MyBatis-Plus（九）Service的CRUD接口1：基本查询_listbyids_Zack_tzh的博客-CSDN博客](https://blog.csdn.net/Zack_tzh/article/details/107528997)
 
@@ -1017,7 +1017,7 @@ public class BootWebAdminApplicationTest {
 }
 ```
 
-#### 方式二:  条件构造器方式
+#### 方式二:  条件构造器方式 -Mapper
 
 ![image-20231002145521470](SpringBoot3-数据访问.assets/image-20231002145521470.png)
 
@@ -1589,6 +1589,8 @@ private List<Student> students;  //班级与学生是一对多的关系
 
 #### 使用Xml方式
 
+注意: 需要配合修改对应的实体类
+
 **多表查询:**
 
 [association]()关联 用于一对一或多对一查询
@@ -1760,6 +1762,123 @@ public void sortUsersInfo(String column, int ascending) {
     }
 }
 ```
+
+
+
+1、启用分页插件
+
+```java
+@Configuration
+public class CustomMyBatisPlusConfig {
+ 
+    /**
+     * 分页插件,一缓和二缓遵循mybatis的规则
+     */
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor(DbType.MYSQL);
+        // 设置请求的页面大于最大页后操作， true调回到首页，false 继续请求  默认false
+        // paginationInnerInterceptor.setOverflow(false);
+        // 设置最大单页限制数量，默认 500 条，-1 不受限制
+        // paginationInnerInterceptor.setMaxLimit(500L);
+        interceptor.addInnerInterceptor(paginationInnerInterceptor);
+        return interceptor;
+    }
+}
+```
+
+```java
+@Service
+public class UserService {
+
+    @Autowired
+    private UserMapper userMapper; // 假设你有一个 UserMapper 接口
+
+    public Page<User> getUserListWithPagination(int current, int size) {
+        // 创建分页对象
+        Page<User> page = new Page<>(current, size);
+
+        // 第一个参数是分页对象，第二个参数是查询条件（可以是 QueryWrapper 等）
+        // selectPage 方法会在查询时自动添加分页条件，并返回分页查询结果
+        return userMapper.selectPage(page, null);
+    }
+}
+```
+
+2、测试分页查询
+
+```java
+@Test
+public void testSelectPage(){
+    //构建分页条件第二页每页显示3条
+    Page<User> page=new Page<>(2,3);
+    //使用分页条件查询，不使用其他条件
+    userMapper.selectPage(page, null);
+    //获取分页后查询出的记录
+    List<User> records = page.getRecords();
+    records.forEach(System.out::println);
+    System.out.println("是否有下一页："+page.hasNext());
+    System.out.println("是否有上一页："+page.hasPrevious());
+    System.out.println("总记录数："+page.getTotal());
+}
+```
+
+ **例子**
+
+[Mybatis-Plus](https://so.csdn.net/so/search?q=Mybatis-Plus&spm=1001.2101.3001.7020) 中的分页查询接口主要有两个：IPage 和 Page。
+
+1. IPage 接口：
+   IPage 是 Mybatis-Plus 中的分页结果集接口，它继承了 [Mybatis](https://so.csdn.net/so/search?q=Mybatis&spm=1001.2101.3001.7020) 的 RowBounds 接口，提供了一系列的分页查询方法。该接口主要用于返回分页后的数据结果。
+2. Page 类：
+   Page 类是 IPage 接口的默认实现类，实现了 IPage 接口中的方法。在进行[分页查询](https://so.csdn.net/so/search?q=分页查询&spm=1001.2101.3001.7020)时，通常会创建一个 Page 对象，并设置相关的分页参数。
+
+以下是 IPage 和 Page 类的常用参数：
+
+- current：当前页数，必须大于等于 1，默认值为 1。
+- size：每页条数，默认值为 10。
+- total：总条数，默认值为 0。
+- records：当前页数据集合，默认值为空集合。
+- searchCount：是否进行 count 查询，默认值为 true，表示会统计总条数。
+- pages：总页数，通过计算得出。
+- optimizeCountSql：是否优化 count 查询，默认值为 true。
+- hitCount：是否对 count 进行 limit 优化，默认值为 false。
+- countId：count 查询的列名，默认为 null，表示所有列。
+- maxLimit：设置最大的 limit 查询限制，默认值为 -1，表示不限制。
+
+举个栗子：
+
+```java
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserMapper userMapper;
+
+    public IPage<User> getUserList(int currentPage, int pageSize) {
+        // 创建分页对象
+        Page<User> page = new Page<>(currentPage, pageSize);
+
+        // 构造查询条件
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.gt("age", 18);
+
+        // 执行分页查询
+        IPage<User> userPage = userMapper.selectPage(page, queryWrapper);
+
+        return userPage;
+    }
+}
+1234567891011121314151617181920212223242526
+```
+
+在这个例子中，我们通过构造一个 Page 对象来设置当前页和每页条数。然后通过 QueryWrapper 构造查询条件，在调用 `userMapper.selectPage(page, queryWrapper)` 方法进行分页查询。
 
 ## 自动配置原理
 

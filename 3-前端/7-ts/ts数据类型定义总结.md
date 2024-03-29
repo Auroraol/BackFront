@@ -215,3 +215,13 @@ const isMobile = ref(false);
 </script>
 ```
 
+
+
+# ?. 和 !
+
+```
+ config.headers!['Authorization'] = 'Bearer ' + getAccessToken();
+```
+
+1. **使用可选链操作符 ?. ，当前值有可能为空的情况下使用**
+2. `!` 表示对一个变量[断言](https://so.csdn.net/so/search?q=断言&spm=1001.2101.3001.7020)其非空，当前值一定有时使用

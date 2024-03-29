@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.TArticleMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.demo.entity.TArticle">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,title,content
+    </sql>
+
+    <!-- 自定义手动映射类型 -->
+    <resultMap id="articleWithComment" type="com.example.demo.entity.TArticle">
+        <id property="id" column="id" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <!-- collection 多表关联映射 -->
+        <collection property="commentList" ofType="com.example.demo.entity.TComment">
+            <id property="id" column="c_id" />
+            <result property="content" column="c_content" />
+            <result property="author" column="author" />
+        </collection>
+    </resultMap>
+
+
+    <select id="selectArticle" resultMap="articleWithComment">
+        SELECT a.*,c.id c_id,c.content c_content,c.author
+        FROM t_article a,t_comment c
+        WHERE a.id=c.a_id AND a.id = #{id}
+    </select>
+
+    <update id="updateArticle" parameterType="com.example.demo.entity.TArticle" >
+        UPDATE t_article
+        <set>
+            <if test="title !=null and title !=''">
+                title=#{title},
+            </if>
+            <if test="content !=null and content !=''">
+                content=#{content}
+            </if>
+        </set>
+        WHERE id=#{id}
+    </update>
+
+
+</mapper>

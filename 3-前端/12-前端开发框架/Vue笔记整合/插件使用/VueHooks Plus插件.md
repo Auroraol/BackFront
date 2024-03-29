@@ -631,6 +631,28 @@ const register = async () => {
 	}
 ```
 
+##### 路径
+
+```ts
+export async function handleRefreshToken(token:string){
+    return request<ResponseResult<TokenType>>(import.meta.env.VITE_APP_BASE_API + '/user/refresh/${token}', {
+      method: 'get',
+      needToken: false  //需要请求头携带token, 后端好进行认证
+    })
+  }
+```
+
+
+
+后端
+
+```java
+	@GetMapping("/refresh/{refreshToken}")
+	public ResponseResult<Object> refreshToken(@PathVariable String refreshToken) {
+		return this.sysLoginService.refreshToken(refreshToken);
+	}
+```
+
 
 
 ### 生命周期

@@ -782,5 +782,7 @@ src/page/system/user.vue
 
 
 
+# 路径
 
+在公共目录中的文件会在根路径下提供访问。所以，应该使用/image/imgs/portrait.jpg而不是/public/image/imgs/portrait.jpg来访问文件。
 

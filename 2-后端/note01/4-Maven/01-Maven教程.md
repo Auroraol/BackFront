@@ -1737,3 +1737,45 @@ mvn clean install -Dmaven.repo.local=/home/juven/myrepo/
 </project>
 ```
 
+# Maven打包部署
+
+```xml
+<properties>
+    <java.version>17</java.version>
+</properties>
+<!--指定打包方式-->
+<!--    <packaging>jar</packaging>  默认-->
+<packaging>war</packaging>
+
+
+
+<plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+</plugin>
+<!--报错添加-->
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>2.5</version>
+    <configuration>
+        <skipTests>false</skipTests>
+        <testFailureIgnore>true</testFailureIgnore>
+        <forkMode>once</forkMode>
+    </configuration>
+</plugin>
+```
+
+具体方法:  [Spring Boot项目打包、发布与部署](https://blog.csdn.net/Kim_Wu233/article/details/132698119)
+
+# maven打包出现 无效的标记: --release
+
+#### 检查maven的版本
+
+![在这里插入图片描述](01-Maven%E6%95%99%E7%A8%8B.assets/214ac092493648fe9b665d1c01a4ec8b.png)
+
+#### 检查项目的版本
+
+![在这里插入图片描述](01-Maven%E6%95%99%E7%A8%8B.assets/3ec82c67a55d4baf83a946c966a0657f.png)
+![在这里插入图片描述](01-Maven%E6%95%99%E7%A8%8B.assets/21d9a25489944c4a9c741e3a213adec4.png)
+![在这里插入图片描述](01-Maven%E6%95%99%E7%A8%8B.assets/5b7bba613df449d68caa49e84f92bea1.png)

@@ -80,8 +80,32 @@ const useStore = defineStore('storeId', {
       hasChanged: true,
     }
   },
+    
 })
 ```
+
+注意:
+
+对于简单的情况，比如只需要返回一个值或者简单的对象时，可以使用单行箭头函数的写法：
+
+```
+javascriptCopy Codeconst getValue = () => 42;
+const getPerson = () => ({ name: 'Alice', age: 30 });
+```
+
+这种写法简洁明了，适合于简单的场景。
+
+而对于复杂的情况，比如函数体内包含多条语句或需要进行复杂的操作时，最好使用多行箭头函数的写法：
+
+```
+javascriptCopy Codeconst calculate = (a, b) => {
+    const sum = a + b;
+    const product = a * b;
+    return { sum, product };
+};
+```
+
+这种写法更具可读性，适合于复杂的函数逻辑。
 
 ### Getter
 
@@ -247,13 +271,13 @@ import { defineStore } from "pinia";
 import { Names } from "./store_name";
 
 export const useInfoStore = defineStore(Names.TEST, {
-  state: () => {
+  state: () => ({
     return {
       //定义数据  
       name: '我是𝒆𝒅.',
       age: 10,
     }
-  },
+  }),
 
   getters: {
 	//定义计算属性
@@ -945,3 +969,355 @@ $subscribe 使用来监听的，监听 state 数据的变化，只要 state 里�
 
 
 
+[Pinia学习笔记 | 入门 - 映射辅助函数_pinia 笔记-CSDN博客](https://blog.csdn.net/qq_41370833/article/details/131702779)
+
+## 一、mapStores
+
+- 如果需要访问 store 里的大部分内容，映射 store 的每一个属性太麻烦。可以用 `mapStores()` 来 `访问整个 store`
+- 默认情况下，Pinia 会在每个 store 的 id 后面加上 `"Store"` 的后缀，所以映射后使用时，通过 `idStore.xx`
+
+```js
+import { mapStores } from 'pinia'
+
+// 给出具有以下 id 的两个 store
+const useUserStore = defineStore('user', {
+  // ...
+})
+const useCartStore = defineStore('cart', {
+  // ...
+})
+
+export default {
+  computed: {
+    // 注意，我们不是在传递一个数组，而是一个接一个的 store。
+    // 可以 id+'Store' 的形式访问每个 store 。
+    ...mapStores(useCartStore, useUserStore)
+  },
+
+  methods: {
+    async buyStuff() {
+      // 可以在任何地方使用他们！
+      if (this.userStore.isAuthenticated()) {
+        await this.cartStore.buy()
+        this.$router.push('/purchased')
+      }
+    },
+  },
+}
+```
+
+## 二、mapState
+
+- 可以使用 `mapState()` 辅助函数将 state 属性映射为 `只读的计算属性`（不再使用 mapGetters）
+
+- 使用`数组`直接 `同名映射`：…mapState(store, [‘count’])
+
+- 使用
+
+  ```
+  对象 
+  ```
+
+  可映射为
+
+  ```
+  新的名称
+  ```
+
+  ：…mapState(store, { key: value, fn (state) })
+
+  - 使用对象时， `value` 值可以是 `字符串`，可以是 `函数`；
+  - 对象内部也可以直接定义 `函数`，接收 `store` 作为参数
+
+- 见以下 4 种使用方式
+
+```js
+import { mapState } from 'pinia'
+import { useCounterStore } from '../stores/counter'
+
+export default {
+  computed: {
+    // 可以访问组件中的 this.count
+    // 与从 store.count 中读取的数据相同
+    ...mapState(useCounterStore, ['count'])
+    // 与上述相同，但将其注册为 this.myOwnName
+    ...mapState(useCounterStore, {
+      myOwnName: 'count',
+      // 你也可以写一个函数来获得对 store 的访问权
+      double: store => store.count * 2,
+      // 它可以访问 `this`，但它没有标注类型...
+      magicValue(store) {
+        return store.someGetter + this.count + this.double
+      },
+    }),
+  },
+}
+```
+
+## 三、mapWritableState
+
+- 如果你想修改这些 state 属性，使用 `mapWritableState()` 作为代替
+- 区别是 `不能` 像 mapState() 那样 `传递函数`
+
+```js
+import { mapWritableState } from 'pinia'
+import { useCounterStore } from '../stores/counter'
+
+export default {
+  computed: {
+    // 可以访问组件中的 this.count，并允许设置它。
+    // this.count++
+    // 与从 store.count 中读取的数据相同
+    ...mapWritableState(useCounterStore, ['count'])
+    // 与上述相同，但将其注册为 this.myOwnName
+    ...mapWritableState(useCounterStore, {
+      myOwnName: 'count',
+    }),
+  },
+}
+123456789101112131415
+```
+
+## 四、mapActions
+
+- 可以使用 `mapActions()` 辅助函数将 `action` 属性映射为你组件中的 `方法`
+- 同样 `不允许` 传入 `函数`
+
+```js
+import { mapActions } from 'pinia'
+import { useCounterStore } from '../stores/counter'
+
+export default {
+  methods: {
+    // 访问组件内的 this.increment()
+    // 与从 store.increment() 调用相同
+    ...mapActions(useCounterStore, ['increment'])
+    // 与上述相同，但将其注册为this.myOwnName()
+    ...mapActions(useCounterStore, { myOwnName: 'increment' }),
+  },
+}
+```
+
+# 代码分割机制案例
+
+某项目有3个store「user、job、pay」，另外有2个路由页面「首页、个人中心页」，首页用到job store，个人中心页用到了user store，分别用Pinia和Vuex对其状态管理。
+
+![image-20240328094555998](pinia.assets/image-20240328094555998.png)
+
+先看Vuex的代码分割： 打包时，vuex会把3个store合并打包，当首页用到Vuex时，这个包会引入到首页一起打包，最后输出1个js chunk。这样的问题是，其实首页只需要其中1个store，但其他2个无关的store也被打包进来，造成资源浪费。
+
+![image-20240328094752057](pinia.assets/image-20240328094752057.png)
+
+Pinia的代码分割： 打包时，Pinia会检查引用依赖，当首页用到job store，打包只会把用到的store和页面合并输出1个js chunk，其他2个store不耦合在其中。Pinia能做到这点，是因为它的设计就是store分离的，解决了项目的耦合问题。
+
+## 使用options API模式定义
+
+```vue
+// 创建小仓库
+import { defineStore } from 'pinia';
+export const useCounterStore = defineStore('counterForOptions', {
+  state: () => {
+    return { count: 1 };
+  },
+ actions:{
+        changeState(){ //通过this访问容器里的数据
+            this.count++
+        }
+    }
+  getters: {
+  	//参数state是状态数据，可选参数
+    doubleCount(state) {
+      return state.count * 2;
+    }
+     doubleCount1(state):number { //也可以使用this,但是类型推导存在问题，必须手动指定返回值类型
+      return this.count * 2;
+    }
+  }
+});
+
+```
+
+![image-20240328094951965](pinia.assets/image-20240328094951965.png)
+
+## 使用
+
+```js
+//组件内使用
+<script setup>
+//useCounterStore接收defineStore返回的函数
+import { useCounterStore } from '@/stores/counter'
+// 可以在组件中的任意位置访问 `store` 变量 ✨
+const store = useCounterStore()
+</script>
+```
+
+**组件外使用时，必须在函数内部**
+
+```js
+import { useAuthUserStore } from '@/stores/auth-user'
+
+router.beforeEach((to, from, next) => {
+	//因为路由器是在其被安装之后开始导航的
+  // 必须在函数内部使用,为确保 pinia 实例被激活
+  const authUserStore = useCounterStore()
+  if (authUserStore.loggedIn) next()
+  else next('/login')
+})
+123456789
+```
+
+##### 解构访问Pinia容器数据
+
+直接解构后的count变量会失去响应式，成为一次性数据。
+
+```java
+<script setup lang="ts">
+import {useMainStore} from '../store'
+import {storeToRefs} from 'pinia'
+const {count} = storeToRefs(useMainStore())
+/*ObjectRefImpl
+{
+    "_object": {
+        "count": 1
+    },
+    "_key": "count",
+    "__v_isRef": true
+}
+*/
+console.log(count)
+console.log(count.value) //1
+</script>
+```
+
+##### 状态更新和Actions
+
+store的`$patch()`：批量更新`state`
+
+参数可以是对象和函数(参数是state)
+
+```js
+<script setup lang="ts">
+import {useMainStore} from '../store'
+import {storeToRefs} from 'pinia'
+const mainStore = useMainStore()
+const {count} = storeToRefs(useMainStore())
+const changeCount = ()=>{
+  //方式1：最简单的方式
+  // mainStore.count++; 
+  //方式2：如果需要多个数据，建议使用$patch，批量更新
+  //mainStore.$patch({
+  //  count:mainStore.count+1,
+    //...数据名:修改后的值
+    //涉及数组很麻烦
+ // })
+  
+  //方式3:$patch(函数)其中函数的参数是state就是store的state，批量更新
+  //mainStore.$patch(state=>{
+  //  state.count++
+  //})
+
+  //方法4:逻辑比较多的时候可以封装到actions做处理,
+  mainStore.changeState()
+}
+</script>
+```
+
+也可以直接从`store`中结构`action`，因为action也被绑定在store上
+
+```js
+<script setup lang="ts">
+import {useMainStore} from '../store'
+const mainStore = useMainStore()
+const {changeState} = store
+</script>
+```
+
+##### getters使用
+
+```js
+//虽然使用了三次，但是只会调用一次，有缓存功能
+<template>
+  <div>
+   <div>{{mainStore.count }}</div>
+   <p>
+      <button @click="changeCount">修改数据</button>
+   </p>
+   <p>{{mainStore.doubleCount}}</p>
+   <p>{{mainStore.doubleCount}}</p>
+   <p>{{mainStore.doubleCount}}</p>
+  </div>
+</template>
+```
+
+![image-20240328095214868](pinia.assets/image-20240328095214868.png)
+
+
+
+
+
+# pinia 模块化和命名空间使用
+
+> pinia 介绍
+
+Pinia 最初是在 2019 年 11 月左右重新设计使用 Composition API 。从那时起，最初的原则仍然相同，但 Pinia 对 Vue 2 和 Vue 3 都有效，并且不需要您使用组合 API。
+
+官网: [pinia官网](https://pinia.web3doc.top/introduction.html)
+
+> 项目目录
+
+![image-20240329195806944](pinia.assets/image-20240329195806944.png)
+
+> 新建 `modules => common.js`
+
+```js
+import { defineStore } from "pinia"
+import { getStore } from "@/utils/storage"
+const useCommonStore = defineStore("/common", {
+  state: () => ({
+    yearNow: new Date(),
+  }),
+  getters: {},
+  actions: {},
+}
+export default useCommonStore
+```
+
+> 新建 `modules => user.js`
+
+```js
+import { defineStore } from "pinia"
+
+const useAuthUserStore = defineStore("/user", {
+  state: () => ({
+    userInfo: JSON.parse(window.localStorage.getItem("userInfo") || "{}"),
+    isLogged: false,
+  }),
+  getters: {},
+  actions: {
+    setUserInfo() {
+       console.log("getUserInfo")
+    },
+  },
+})
+export default useAuthUserStore
+```
+
+> 新建 `index.js`
+
+```js
+import useAuthUserStore from "./modules/user"
+import useCommonStore from "./modules/common"
+
+export { useAuthUserStore, useCommonStore }
+```
+
+> 使用方式
+
+```js
+<script setup>
+import { useAuthUserStore } from "@/store/index"
+const { setUserInfo } = useAuthUserStore()
+
+setUserInfo() // getUserInfo
+</script>
+```

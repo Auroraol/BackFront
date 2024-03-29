@@ -62,41 +62,7 @@ artifactid： xianyu.dev  和   artifactid： xianyu.prod
 第二段：开发环境dev，还是，生产环境prod
 ```
 
-## Entity、PO、VO、BO、DTO用法
 
-### 一、Entity
-
-实体，和[PO](https://so.csdn.net/so/search?q=PO&spm=1001.2101.3001.7020)的功能类似，和数据表一一对应，一个Entity对应一张表
-entity里的每一个字段，与数据库相对应
-
-### 二、PO
-
-Persistent Object持久化对象，跟数据库导入记录数据一一对应的映射关系。
-一个P0对应一个表或多个表联合查询, Entity是一个特殊的PO
-
-### 三、VO
-
-View Object对应页面显示的数据对象，可以和表对应，也可以不对应。控制层与视图层进行传输交换。
-
-### 四、BO
-
-Business object业务对象、一个复杂的业务，往往包含多个小业务
-
-例如，一个订单信息BO，可能包含，1.订单基础信息（购买人，时间，状态等基础信息） 2.订单支付信息 3.订单[优惠券信息 4.订单收货信息 5.订单售后信息 6.订单退款信息等。
-
-把一个个订单信息对应一个个PO，组装到一起是BO.
-
-### 五、DTO
-
-Data Transfer Object数据传输对象，服务之间数据传输对象，仅仅包括调用方想要的数据对象，
-可以由PO、Entity转换得到
-
-POJO（Plain Ordinary Java Object无规则简单Java对象）不与数据库打交道的简单对象。
-POJO是DTO/BO/VO的统称
-
-下面是各对象应用：
-
-![image-20240119130343054](spring%20boot3.assets/image-20240119130343054.png)
 
 # SpringBoot3-快速入门
 
@@ -2996,12 +2962,6 @@ iterStat 称作状态变量，属性有：
 
 **注意: java代码的修改，如果`devtools`热启动了，可能会引起一些bug，难以排查**
 
-
-
-
-
-
-
 # 6. 国际化
 
 国际化的自动配置参照`MessageSourceAutoConfiguration`
@@ -5393,27 +5353,7 @@ public Result showGoods(UserPojo user){
 
 [SpringSecurity (yuque.com)](https://www.yuque.com/aomsir/study/zdogyy#neGfS)
 
-## 安全架构
 
-### 认证： Authentication
-
-who are you?
-登录系统，用户系统
-
-认证就是让系统知道我们是谁。认证的方式有很多，常见的账号密码登录，手机验证码登录，指纹登录，刷脸登录等等
-
-![img](spring boot3.assets/1667737807166-7e3d7227-7dfd-4813-9f47-8bf22efe5f23.png)
-
-### 授权：  Authorization
-
-what are you allowed to do?
-权限管理，用户授权
-
- 授权是用户认证通过后根据用户的权限来控制用户访问资源的过程，拥有资源的访问权限则正常访问，没有权限则拒绝访问。
-
-![img](spring boot3.assets/1667737821930-2ef90891-5801-4c29-b4b4-9f4025374260.png)
-
-![image.png](spring boot3.assets/1667781052294-95ee4c11-16d2-4ed8-9cee-9b05ff52ca4b.png)
 
 扩展.权限模型
 

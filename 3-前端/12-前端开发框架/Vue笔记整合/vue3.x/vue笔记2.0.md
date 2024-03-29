@@ -12017,7 +12017,7 @@ import MyComponent from './MyComponent.vue'
 + 子传参 emit
 + 父接受参数  @参数=方法   , 注意: 参数和方法一般设置成同名的
 + 子接受参数   defineProps
-+ ![image-20231208215629688](vue%E7%AC%94%E8%AE%B02.0.assets/image-20231208215629688.png)
++ ![image-20240328212512285](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240328212512285.png)
 
 #### 例子1
 
@@ -12614,6 +12614,25 @@ const doubleCount = computed(() => count.value * 2);
 ```
 
 在这个示例中，doubleCount 是一个计算属性，它的值是 count 的值乘以 2。每当 count 的值发生变化时，doubleCount 会自动更新。
+
+```jvue
+<template>
+  <div>
+    <p>原始值: {{ originalValue }}</p>
+    <p>计算后的值: {{ computedValue }}</p>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue';
+
+const originalValue = ref(10);
+
+const computedValue = computed(() => {
+  return originalValue.value * 2;
+});
+</script>
+```
 
 #### 3.监视属性（watch函数）
 
@@ -13419,4 +13438,10 @@ import my from '../components/my.vue'
 研究了一下午 发现 运行vue项目的时候会自己生成一个缓存目录
 在vue项目里面新加 编辑或者移动组件路径后会读取不到
 解决办法需要重启vue项目
+
+
+
+# VUE页面进行路由切换时出现短暂的闪烁
+
+
 

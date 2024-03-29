@@ -93,17 +93,6 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
 **例子**
 
 ```java
-@Configuration
-public class AppConfig {
-
-    // 使用@Bean 注解表明myBean需要交给Spring进行管理
-    // 未指定bean 的名称，默认采用的是 "方法名" + "首字母小写"的配置方式
-    @Bean
-    public MyBean myBean(){
-        return new MyBean();
-    }
-}
-
 public class MyBean {
 
     public MyBean(){
@@ -112,3 +101,63 @@ public class MyBean {
 }
 ```
 
+```java
+@Configuration
+public class AppConfig {
+
+    // 使用@Bean 注解表明myBean需要交给Spring进行管理
+    // 未指定bean 的名称，默认采用的是 "方法名" + "首字母小写"的配置方式
+    @Bean
+    public MyBean myBean(){
+        /*制定化操作*/
+        return new MyBean();
+    }
+}
+```
+
+**例子**
+
+假设我们需要使用Google [Guava](https://so.csdn.net/so/search?q=Guava&spm=1001.2101.3001.7020)库中的一个名为CacheBuilder的类来创建缓存对象。
+
+我们可以通过在@Configuration注解的类中定义一个返回CacheBuilder对象的@Bean方法来将它添加到Spring的IOC容器中，例如：
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public CacheBuilder<Object, Object> cacheBuilder() {
+        return CacheBuilder.newBuilder().maximumSize(1000);
+    }
+
+    //...
+}
+
+```
+
+使用
+
+```java
+@Service
+public class MyService {
+
+    @Autowired
+    private CacheBuilder<Object, Object> cacheBuilder;
+
+    //...
+}
+```
+
+我们使用@Autowired注解将cacheBuilder Bean注入到MyService类的cacheBuilder属性中。这样，就可以在MyService类中使用Google Guava库中的CacheBuilder类来创建缓存对象了。
+
+# 四、应用
+
+## 第三方的类
+
+比如:  就是使用第三方库时, 有时候会需要编写对应的配置类
+
+## 自动读取配置, 选择使用的子类
+
+详情见 [阿里云认证](D:\PCTMoveData\Documents\GitHub\BackFront\2-后端\note02\9-云服务器\阿里云短信认证.md)
+
+<img src="@Bean%E6%B3%A8%E8%A7%A3.assets/image-20240323183324327.png" alt="image-20240323183324327" style="zoom: 80%;" />

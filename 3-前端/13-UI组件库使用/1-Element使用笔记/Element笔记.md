@@ -358,13 +358,41 @@ background-color: #f9fafc;
 
 ![image-20240308221138040](Element%E7%AC%94%E8%AE%B0.assets/image-20240308221138040.png)
 
+## el-input后面加文字
 
+> 效果图
 
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/16cf945e0e824e3d9b197706a3987c93.png)
 
+> 代码
 
+```javascript
+// 添加代码即可
+<i slot="suffix" style="font-style:normal;margin-right: 10px;">分钟</i>
+12
+// 整个代码
+  <el-form-item label="迟到时长" prop="laterTime">
+      <el-input
+         v-model="temp.laterTime"
+       >
+         <i slot="suffix" style="font-style:normal;margin-right: 10px;">分钟</i>
+      </el-input>
+   </el-form-item>
+```
 
+```html
+<el-input
+          placeholder="请输入验证码"
+          v-model="loginFormPhone.code"
+          inline-message
+          >
+    <template #suffix>
+        <i style="font-style: normal; margin-right: 10px;">获取验证码</i>
+    </template>
+</el-input>
+```
 
-
+![image-20240328203104800](Element%E7%AC%94%E8%AE%B0.assets/image-20240328203104800.png)
 
 # 分页组件el-pagination显示英文转变为中文
 
@@ -450,6 +478,38 @@ const toggle = () => {
 # 导航
 
 ![image-20231204134054875](Element%E7%AC%94%E8%AE%B0.assets/image-20231204134054875.png)
+
+
+
+```
+  <el-menu
+          :default-active="activeIndex"
+          class="el-menu-demo"
+          mode="horizontal"
+          @select="handleSelect"    
+          background-color="transparent"
+          active-text-color="#79bbff"
+        >
+          <el-menu-item index="/index">
+            <svg v-if="!isMobile" class="icon" aria-hidden="true">
+              <use xlink:href="#icon-shouye1"></use>
+            </svg>
+            首页
+          </el-menu-item>
+ </el-menu>
+ 
+ 
+ 
+const handleSelect = (index: string) => {
+  activeIndex.value = index;
+  if (index === "/xxx") {
+    // 某个页面
+  } 
+  else {
+    router.push({ path: `${index}` });
+  }
+};
+```
 
 [Elementui中El-menu导航栏-CSDN博客](https://blog.csdn.net/qq_40323256/article/details/125212606?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-125212606-blog-124561084.235^v43^pc_blog_bottom_relevance_base1&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
 
@@ -825,7 +885,104 @@ export default {
 
 userInfo的数据 
 
+### 侧边栏
 
+![image-20240318164236789](Element%E7%AC%94%E8%AE%B0.assets/image-20240318164236789.png)
+
+isCollapse控制打开或者关闭
+
+   active-text-color="#ffd04b"    文字颜色
+
+background-color="#545c64"  背景颜色
+
+```vue
+<template>
+    <el-menu
+      default-active="2"
+      class="el-menu-vertical"
+      :collapse="isCollapse"
+      @open="handleOpen"
+      @close="handleClose"
+    >
+    <el-menu-item index="1" class="titleName">
+          <el-icon><Management /></el-icon>
+          <template #title>图书借阅管理</template>
+    </el-menu-item>
+ 
+      <el-sub-menu index="2" class="menu">
+        <template #title>
+          <el-icon><Management /></el-icon>
+          <span>图书信息维护</span>
+        </template>
+          <el-menu-item index="1-1" class="menu" @click="$emit('addTab','LibrarySortEnter','图书分类录入')">图书分类录入</el-menu-item>
+          <el-menu-item index="1-2" class="menu" @click="$emit('addTab','StorePositionEnter','存放位置录入')">存放位置录入</el-menu-item>
+          <el-menu-item index="1-3" class="menu">
+<!--这里使用<router-link>，通过属性to来进行跳转，里面的name就是刚才在router.js文件中设置的，params这里包含的是路由跳转时传递的参数-->
+          <router-link
+            :to="{
+              name: 'projectGroup:alg',
+              params: { id: i.id, name: i.name },
+            }"
+            >图书录入</router-link>
+          </el-menu-item>
+      </el-sub-menu>
+ 
+      <el-sub-menu index="3" class="menu">
+        <template #title>
+          <el-icon><Management /></el-icon>
+          <span>会员信息维护</span>
+        </template>
+          <el-menu-item index="2-1" class="menu">
+               <router-link to="/vip">会员表</router-link></el-menu-item>
+      </el-sub-menu>
+      
+      <el-sub-menu index="4" class="menu">
+        <template #title>
+          <el-icon><Management /></el-icon>
+          <span>图书信息维护</span>
+        </template>
+          <el-menu-item index="3-1" class="menu">图书借阅单</el-menu-item>
+          <el-menu-item index="3-2" class="menu">借阅明细</el-menu-item>
+          <el-menu-item index="3-3" class="menu">图书归还单</el-menu-item>
+      </el-sub-menu>
+ 
+ 
+ 
+    </el-menu>
+  </template>
+  
+  <script setup>
+  import { ref,defineExpose } from 'vue'
+  import { Management } from '@element-plus/icons-vue'
+ 
+   const isCollapse = ref(false)
+  
+   const handleOpen = (key, keyPath) => {
+    console.log(key, keyPath)
+  }
+   const handleClose = (key, keyPath) => {
+    console.log(key, keyPath);
+  }
+ 
+  defineExpose({
+    isCollapse,
+})
+  </script>
+  
+  <style scoped>
+  .el-menu-vertical,.el-menu-vertical:not(.el-menu--collapse){
+    height: 100vh;
+  }
+  .titleName{
+    font-size: 24px;
+    font-weight: 600;
+  }
+  .menu{
+  font-size: 14px;
+ 
+  }
+  </style>
+```
 
 
 
@@ -1034,24 +1191,63 @@ body {
 
 [GSAP 中文教程 中文文档 ｜官方文档 官方教程翻译 ｜好奇代码出品](https://gsap.framer.wiki/)
 
-```
+```ts
 import gsap from 'gsap'
 
 const router = useRouter()
 
 onMounted(() => {
     //动画
-    gsap.from('.articleLeft', {
-        duration: .5,
+    gsap.from('.articleLeft', {  //.articleLeft选择器
+        duration: 0.5,
         x: 50,  //右向左移动  -50左向右移动
-        opacity: 0.2
+        opacity: 0.2  //透明度
     })
 })
 ```
 
 这段代码使用了GSAP动画库中的from方法，它会从指定的初始状态（在这里是x轴偏移50个单位，不透明度为0.2）开始，然后在0.5秒的持续时间内将元素动画到其初始状态。这段代码的作用是对类名为articleLeft的元素应用一个从右向左移动并逐渐显现的动画效果。
 
-
+```ts
+// 定义一个名为gsapAnimation的函数
+const gsapAnimation = () => {
+    // 创建一个GSAP动画序列
+    const tween = gsap.timeline()
+    
+    // 从初始状态开始动画'.hedaImg'元素，放大并使用弹性缓动效果
+    tween.from('.hedaImg', {
+        scale: 1.5,
+        ease: "elastic.out(1.5,0.2)",
+        duration: 1.5
+    })
+    
+    // 继续动画'.hedaImg'元素，向下移动200像素，持续时间为0.3秒
+    .from('.hedaImg', {
+        y: 200,
+        duration: 0.3
+    })
+    
+    // 动画'.head h1'元素，向下移动20像素，同时淡入显示
+    .from('.head h1', {
+        y: 20,
+        opacity: 0,
+    })
+    
+    // 动画'.info p'元素，向下移动20像素，逐个显示并淡入
+    .from('.info p', {
+        y: 20,
+        stagger: 0.1,
+        opacity: 0,
+    })
+    
+    // 动画'.bottom'元素，向下移动20像素，同时淡入显示，延迟0.3秒
+    .from('.bottom', {
+        y: 20,
+        opacity: 0,
+        delay: 0.3
+    })
+}
+```
 
 
 
@@ -1088,7 +1284,7 @@ onMounted(() => {
 
 
 
-div里标签元素居中(一般用于文字)
+div里标签元素居中(一般用于<标签>文字</标签>有文字的标签)
 
 ```
  <div style="text-align: center">
@@ -1113,6 +1309,1184 @@ div里标签元素居中(一般用于文字)
 # 日历
 
  [记录改造elementui日历组件实例（日报月报）.html](..\..\..\..\..\..\Desktop\Browser Download\记录改造elementui日历组件实例（日报月报）.html) 
+
+
+
+# 图片 + 链接
+
+```
+        <a href="https://github.com/Auroraol/my_blog">
+            <svg t="1711597890635" class="icon" viewBox="0 0 1024 1024" version="1.1"
+               </svg>
+        </a>
+```
+
+
+
+# 文字 + 链接
+
+```
+        <p>
+                仓库地址: <a href="https://github.com/Auroraol/my_blog"
+                    target="_blank">https://github.com/Auroraol/my_blog</a>
+            </p>
+```
+
+![image-20240317203716604](Element%E7%AC%94%E8%AE%B0.assets/image-20240317203716604.png)
+
+# 文字 + 图片
+
+```
+       <a href="https://github.com/Auroraol">
+          <img
+            src="https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&color=fff&width=435&lines=昨日之深渊,今日之浅谈;&center=true&size=23"
+            alt="Typing SVG"
+          />
+       </e>
+```
+
+![image-20240317213121984](Element%E7%AC%94%E8%AE%B0.assets/image-20240317213121984.png)
+
+# 头像
+
+[Avatar 头像 | Element Plus (element-plus.org)](https://element-plus.org/zh-CN/component/avatar.html)
+
+![image-20240318212628724](Element%E7%AC%94%E8%AE%B0.assets/image-20240318212628724.png)
+
+
+
+
+
+# Dropdown 下拉菜单
+
+![image-20240318215239558](Element%E7%AC%94%E8%AE%B0.assets/image-20240318215239558.png)
+
+```vue
+<template>
+  <el-dropdown @command="handleCommand">
+    <span class="el-dropdown-link">
+      Dropdown List<el-icon class="el-icon--right"><arrow-down /></el-icon>
+    </span>
+    <template #dropdown>
+      <el-dropdown-menu>
+        <el-dropdown-item command="a">Action 1</el-dropdown-item>
+        <el-dropdown-item command="b">Action 2</el-dropdown-item>
+        <el-dropdown-item command="c">Action 3</el-dropdown-item>
+        <el-dropdown-item command="d" disabled>Action 4</el-dropdown-item>
+        <el-dropdown-item command="e" divided>Action 5</el-dropdown-item>
+      </el-dropdown-menu>
+    </template>
+  </el-dropdown>
+</template>
+
+<script>
+export default {
+  methods: {
+const handleCommand = (command: string | number | object) => {
+      // 在这里处理命令事件
+      console.log('Command:', command);
+    }
+  }
+}
+</script>
+```
+
+## 搜索下拉
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/7632098d014042dea1b368d4fda05858.png)
+
+1、这样就是一个简单的[select](https://so.csdn.net/so/search?q=select&spm=1001.2101.3001.7020)+option实现的input搜索下拉列表显示的简单的一个模版
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/19273405e3b244d583d8990d305bf8fe.png)
+
+2、这样就会导致 只能选择搜索一次 第二次重新选择就会没有[下拉列表](https://so.csdn.net/so/search?q=下拉列表&spm=1001.2101.3001.7020) 那么我用了blur事件来监听下拉缩回去的时候 就将值清空重新发起请求 这样就会出来了
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/4c65d174bd7040f4ac01c3db93d5092a.png)
+
+3、但是还是会有一个问题 就是我们输入0或者1 或者没有的值搜索的时候就会 清空[输入框](https://so.csdn.net/so/search?q=输入框&spm=1001.2101.3001.7020) 并且立刻缩回去 
+
+原因：因为输入框如果没有发请求的时候会返回一个null那么下拉列表就没东西了 所以就为空了解决：
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/53c5d4ffdaa54ae0a622d12377a86c7c.png)
+
+ 当用户输入 0 或者没有的值的时候 就判断一下 如果返回数据为空 就将input 的值为空 重新发起请求 这样列表就又出来了
+
+## 去掉这个黑框
+
+在控制台查找这个元素，我们可以看见里面有这样一段样式，可以看见外边框outline自动给我们添加了1px,所以我们划过下拉框和点击都会出现这个黑框
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/9be852d5c26d48a499820159a8f77f3e.png)
+
+当前没有去掉的样式及效果
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/b931e71982ad4f00b9c5c6e7d3860050.png)
+
+ 
+
+解决的办法也很简单，将边框去掉即可，只需要添加如下代码：
+
+ :deep(:focus-visible) {
+
+ outline: none;
+
+}
+
+注意：这将完全禁用可见焦点状态的外观，包括默认的浏览器轮廓和任何自定义规则。请注意，这可能会影响可访问性，因为一些用户可能依赖这些线框来识别他们正在与哪个元素交互。因此，建议仅在必要时使用此规则，并在可能的情况下提供替代方法来指示焦点状态。
+
+改完之后效果图如下：
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/a2c10fabb58b4ea683d4bddfd82d0143.png)
+
+ 
+
+# Dialog 对话框
+
+![image-20240318221758991](Element%E7%AC%94%E8%AE%B0.assets/image-20240318221758991.png)
+
+![image-20240318221748005](Element%E7%AC%94%E8%AE%B0.assets/image-20240318221748005.png)
+
+例子
+
+```vue
+<el-dialog v-model="dialogFormVisible" title="更换昵称" width="500">
+  <el-form :model="form">
+    <el-form-item label="Promotion name" :label-width="formLabelWidth">
+      <el-input v-model="form.name" autocomplete="off" />
+    </el-form-item>
+    <el-form-item label="Zones" :label-width="formLabelWidth">
+      <el-select v-model="form.region" placeholder="Please select a zone">
+        <el-option label="Zone No.1" value="shanghai" />
+        <el-option label="Zone No.2" value="beijing" />
+      </el-select>
+    </el-form-item>
+  </el-form>
+  <template #footer>
+    <div class="dialog-footer">
+      <el-button @click="dialogFormVisible = false">取消</el-button>
+      <el-button type="primary" @click="submitForm">提交</el-button>
+    </div>
+  </template>
+</el-dialog>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      dialogFormVisible: false,
+      form: {
+        name: '',
+        region: ''
+      }
+    };
+  },
+  methods: {
+    submitForm() {
+      // 发起URL请求
+      axios.post('https://example.com/api/data', this.form)
+        .then(response => {
+          console.log('请求成功', response.data);
+          // 处理请求成功的逻辑
+        })
+        .catch(error => {
+          console.error('请求失败', error);
+          // 处理请求失败的逻辑
+        });
+      
+      this.dialogFormVisible = false; // 关闭对话框
+    }
+  }
+}
+</script>
+```
+
+# Affix 固钉
+
+```vue
+<template>
+  <el-affix>
+    <div style="background-color: #2580B3;">
+    </div>
+  </el-affix>
+</template>
+```
+
+# Autocomplete 自动补全输
+
+```vue
+<template>
+  <el-autocomplete
+    v-model="searchText"
+    :fetch-suggestions="querySearchAsync"
+    placeholder="请输入搜索内容"
+  ></el-autocomplete>
+</template>
+
+<script>
+import { ref } from 'vue';
+import axios from 'axios';
+
+export default {
+  setup() {
+    const searchText = ref('');
+    
+    const querySearchAsync = async query => {
+      try {
+        const response = await axios.get(`https://your-elasticsearch-endpoint?q=${query}`);
+        return response.data.results;
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+        return [];
+      }
+    };
+
+    return {
+      searchText,
+      querySearchAsync
+    };
+  }
+}
+</script>
+```
+
+上面的代码中，我们使用了<el-autocomplete>组件来实现搜索的动态补全功能。当用户输入内容时，会触发querySearchAsync方法来向Elasticsearch发起搜索请求，并返回搜索结果作为建议列表。你需要根据实际情况替换https://your-elasticsearch-endpoint为你的Elasticsearch端点地址，并根据Elasticsearch的API来构建搜索请求和处理返回结果。
+
+
+
+# vue3+Element plus实现登录功能
+
+![image-20240328113844266](Element%E7%AC%94%E8%AE%B0.assets/image-20240328113844266.png)
+
+
+
+## 搭建登录静态
+
+#### 1、实现左边背景和右边登录栏的总体布局布局：
+
+```javascript
+<el-row class="content">
+    <!--el-col 列： -->
+    <el-col :span="16" :xs="0" class="content-left"></el-col>
+
+    <el-col :span="8" :xs="24" class="content-right">
+<el-row>
+```
+
+#### 2、账号密码登录和手机号码登录切换使用<el-tabs>组件实现：
+
+#### 3、其他省略
+
+#### 4、全部代码：
+
+```javascript
+<template>
+  <el-row class="content">
+    <!--el-col 列： -->
+    <el-col :span="16" :xs="0" class="content-left">
+
+
+
+    </el-col>
+    <el-col :span="8" :xs="24" class="content-right">
+      <div class="loginContent">
+        <div class="loginContentTop">
+          <div class="header">
+            <div class="logo">
+              <img src="../assets/images/logo.png" alt="" class="image" />
+            </div>
+            <div class="fontSize">JinPiKa</div>
+          </div>
+          <span class="introduce">全球最大的代码托管平台</span>
+        </div>
+        <div class="loginContentForm">
+          <div class="loginMethods">
+            <el-tabs>
+              <el-tab-pane
+                label="账号密码登录"
+                class="toLogin"
+                :class="{ option: !option }"
+                @click="toOption(0)"
+              >
+                <!-- loginForm: 表单数据对象-->
+                <el-form
+                  :model="loginForm"
+                  :rules="loginFormRules"
+                  style="width: 208px"
+                >
+                  <el-form-item label="" prop="username">
+                    <el-input
+                      :prefix-icon="User"
+                      placeholder="用户名:user"
+                      v-model="loginForm.username"
+                      inline-message
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item label="" prop="password">
+                    <el-input
+                      :prefix-icon="Lock"
+                      placeholder="密码:user"
+                      show-password
+                      v-model="loginForm.password"
+                      inline-message
+                    ></el-input>
+                  </el-form-item>
+                </el-form>
+              </el-tab-pane>
+              <el-tab-pane
+                label="手机号码登录"
+                class="toLogin"
+                :class="{ option: !option }"
+                @click="toOption(0)"
+              >
+                <!-- loginForm: 表单数据对象-->
+                <el-form
+                  :model="loginFormPhone"
+                  :rules="loginFormPhoneRules"
+                  style="width: 208px"
+                  prop="phone"
+                >
+                  <el-form-item label="">
+                    <el-input
+                 :prefix-icon="User"
+                      placeholder="请输入手机号"
+                      v-model="loginFormPhone.phone"
+                      inline-message
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item label="" prop="code">
+                    <el-input
+                      :prefix-icon="Lock"
+                      placeholder="请输入验证码"
+                      v-model="loginFormPhone.code"
+                      inline-message
+                    ></el-input>
+                  </el-form-item>
+                </el-form>
+              </el-tab-pane>
+            </el-tabs>
+          </div>
+        </div>
+        <div class="loginContentButton">
+          <div class="buttonTop">
+            <el-checkbox v-model="checked" label="自动登录" size="small" />
+            <el-link type="primary" :underline="false">
+              <span style="font-size: 12px">忘记密码</span>
+            </el-link>
+          </div>
+          <el-button type="primary" class="loginButton" @click="tologin">
+            登录
+          </el-button>
+          <el-divider>
+            <span class="fengexian">其他登录方式</span>
+          </el-divider>
+          <div class="svgItems">
+            <div class="svgItem">
+              <svg-icon
+                name="zhifubao"
+                width="18px"
+                height="18px"
+                color="pink"
+              ></svg-icon>
+            </div>
+            <div class="svgItem">
+              <svg-icon
+                name="taobao"
+                width="18px"
+                height="18px"
+                color="pink"
+              ></svg-icon>
+            </div>
+            <div class="svgItem">
+              <svg-icon
+                name="weibo"
+                width="18px"
+                height="18px"
+                color="pink"
+              ></svg-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </el-col>
+  </el-row>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const loginForm = ref({
+  username: '',
+  password: ''
+});
+
+const loginFormRules = ref({
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' }
+  ]
+});
+
+const loginFormPhone = ref({
+  phone: '',
+  code: ''
+});
+
+const loginFormPhoneRules = ref({
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' }
+  ],
+  code: [
+    { required: true, message: '请输入验证码', trigger: 'blur' }
+  ]
+});
+
+const checked = ref(false);
+
+const toOption = (index) => {
+  // Your logic for switching between login options
+};
+
+</script>
+```
+
+验证图形验证码，和手机短信验证码
+
+[java+vue3实现生成、验证图形验证码，和手机短信验证码_vue3 图片验证码-CSDN博客](https://blog.csdn.net/Johnson_7/article/details/126865190?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-8-126865190-blog-132416244.235^v43^pc_blog_bottom_relevance_base1&spm=1001.2101.3001.4242.5&utm_relevant_index=11)
+
+![image-20240328195915062](Element%E7%AC%94%E8%AE%B0.assets/image-20240328195915062.png)
+
+验证码单独提取出一个组件
+
+```html
+<div>
+    <img :src="image" style="height: 60px" @click="changeImage" /><span
+      @click="changeImage">看不清点击换一张</span>
+</div>
+```
+
+
+
+```js
+  // 图片url
+  const image = ref(url.value + '/authCode/1');  // 此处为图片生成接口的完整路径
+ 
+  // 更换图片方法
+  const changeImage = () => {
+    image.value = url.value + '/authCode/' + getNowTime();
+  };
+  // 加一个当前时间，确保每次刷新都可以重新发送请求
+  function getNowTime() {
+    var date = new Date();
+    //年 getFullYear()：四位数字返回年份
+    var year = date.getFullYear(); //getFullYear()代替getYear()
+    //月 getMonth()：0 ~ 11
+    var month = date.getMonth() + 1;
+    //日 getDate()：(1 ~ 31)
+    var day = date.getDate();
+    //时 getHours()：(0 ~ 23)
+    var hour = date.getHours();
+    //分 getMinutes()： (0 ~ 59)
+    var minute = date.getMinutes();
+    //秒 getSeconds()：(0 ~ 59)
+    var second = date.getSeconds();
+ 
+    var time = '当前时间是：' + year + month + day + hour + minute + second;
+    return time;
+  }
+```
+
+form表单
+
+```html
+  const ruleFormRef = ref<FormInstance>();  
+  // 图形验证码校验规则
+  const validateCheckNum = (rule: any, value: string, callback: any) => {
+    if (value === '') {
+      callback(new Error('请输入验证码'));
+    } else {
+      // 发送校验请求
+      getImageCode(value).then((res) => {
+        if (res) {
+          callback();
+        } else {
+          callback(new Error('验证码错误'));
+        }
+      });
+    }
+  };
+  // 表单校验规则
+  const rules = reactive({
+    checkNum: [{ validator: validateCheckNum, trigger: 'blur' }]
+  });
+```
+
+
+
+
+
+```html
+<el-form-item label="手机号" prop="phoneNo">
+              <el-input v-model="registerData.phoneNo" placeholder="请输入手机号">
+                <template #prepend>
+                  <span style="width: 0px; margin: 0 0 0 -25px">+86</span>
+                </template>
+              </el-input>
+            </el-form-item>
+            <el-form-item label="手机验证码" prop="checkPhoneNo">
+              <el-input
+                v-model="registerData.checkPhoneNo"
+                placeholder="请输入手机验证码"
+                style="width: 160px"
+              /><el-button
+                :disabled="disabled"
+                type="primary"
+                style="width: 80px; margin-left: 10px"
+                @click="getCheckPhoneNo"
+                >{{ getPhoneCodeName }}</el-button
+              >
+            </el-form-item>
+            <el-form-item label="">
+              <span v-show="isCheckDesc === true" style="color: red">
+                {{checkDesc}}
+              </span>
+</el-form-item>
+```
+
+```js
+  const ruleFormRef = ref<FormInstance>();  
+  // 获取短信验证码按钮名称
+  const getPhoneCodeName = ref('获取验证码');
+  // 获取短信验证码按钮是否启用
+  const disabled = ref(false);
+  // 短信验证码按钮倒计时时间
+  const timeNum = ref(60);
+  // 发送验证码后的提示内容
+  const checkDesc = ref('验证码已发送，可能会有延迟，请注意查收');
+  // 发送验证码后的提示内容是否展示
+  const isCheckDesc = ref(false);
+  // 手机验证码校验规则
+  const validateCheckPhoneNo = (rule: any, value: string, callback: any) => {
+    if (value === '') {
+      callback(new Error('请输入手机验证码'));
+    } else {
+      receiveMessage(value).then((res) => {
+        if (res === '验证超时') {
+          callback(new Error('验证码已超时，请重新发送'));
+        } else if (res === '验证错误') {
+          callback(new Error('验证码错误，请重新输入'));
+        } else if (res === '请求体没有phoneKey的值') {
+          callback(new Error('请先发送验证码'));
+        } else {
+          isCheckDesc.value = false;
+          callback();
+        }
+      });
+    }
+  };
+  // 表单校验规则
+  const rules = reactive({
+    checkPhoneNo: [{ validator: validateCheckPhoneNo, trigger: 'blur' }],
+  });
+  // 获取手机验证码方法
+  const getCheckPhoneNo = () => {
+    const reg =
+      /^1(3[0-9]|4[01456879]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])\d{8}$/;
+    if (!reg.test(registerData.phoneNo)) {
+      ElMessage({
+        message: '请先正确输入手机号',
+        type: 'warning'
+      });
+      return;
+    }
+    disabled.value = true;
+    sendMessage(registerData.phoneNo).then((res) => {
+      if (res === '手机号格式错误') {
+        ElMessage({
+          message: '请先正确输入手机号',
+          type: 'warning'
+        });
+        disabled.value = false;
+        return;
+      } else {
+        isCheckDesc.value = true;
+        let timer = setInterval(() => {
+          --timeNum.value;
+          getPhoneCodeName.value = `重新发送 ${timeNum.value}`;
+        }, 1000);
+        setTimeout(() => {
+          clearInterval(timer);
+          timeNum.value = 60;
+          disabled.value = false;
+          getPhoneCodeName.value = '获取验证码';
+        }, 60000);
+      }
+    });
+  };
+```
+
+## 不同登录方式的切换
+
+```vue
+
+<template>
+  <div class="login_container">
+    <div class="login_logo">
+      <img />
+    </div>
+    <div class="login_box">
+      <!-- 登录表单区域 -->
+      <el-tabs :stretch="true">
+        <el-tab-pane label="账号密码登录">
+          <!-- 账号密码登录表单 -->
+          <el-form ref="pwdLoginFormRef" :model="pwdLoginForm" :rules="pwdLoginFormRules">
+            <!-- 用户名 -->
+            <el-form-item prop="username">
+              <el-input placeholder="用户名/邮箱/手机号" clearable prefix-icon="el-icon-user-solid
+" v-model="pwdLoginForm.username">
+              </el-input>
+            </el-form-item>
+            <!-- 密码 -->
+            <el-form-item prop="password">
+              <el-input placeholder="密码" type="password" show-password prefix-icon="el-icon-lock"
+                v-model="pwdLoginForm.password">
+              </el-input>
+            </el-form-item>
+            <!-- 按钮区域 -->
+            <el-form-item class="login_btns">
+              <el-button type="primary" @click="pwdLogin" :loading="loading">登录</el-button>
+              <el-button type="primary" @click='toRegister'>注册</el-button>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane label="邮箱验证登录">
+          <!-- 邮箱验证登录表单 -->
+          <el-form ref="emailLoginFormRef" :model="emailLoginForm" :rules="emailLoginFormRules">
+            <!-- 邮箱 -->
+            <el-form-item prop="email">
+              <el-input placeholder="邮箱" clearable prefix-icon="el-icon-message" v-model="emailLoginForm.email">
+              </el-input>
+            </el-form-item>
+            <!-- 邮箱验证码 -->
+            <el-form-item prop="emailCode">
+              <el-input placeholder="验证码" prefix-icon="el-icon-key" v-model="emailLoginForm.emailCode">
+                <template #append>
+                  <el-button :disabled="disabled" @click="getEmailValidateCode">{{buttonText}}
+                  </el-button>
+                </template>
+              </el-input>
+            </el-form-item>
+            <!-- 按钮区域 -->
+            <el-form-item class="login_btns">
+              <el-button type="primary" @click="emailLogin">登录</el-button>
+              <el-button type="primary" @click='toRegister'>注册</el-button>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+        <!-- <el-tab-pane label="手机验证登录"> -->
+        <!-- 手机验证登录表单 -->
+        <!-- <el-form ref="phoneLoginFormRef" :model="phoneLoginForm" :rules="phoneLoginFormRules"> -->
+        <!-- 手机号 -->
+        <!-- <el-form-item prop="phone">
+              <el-input placeholder="手机号" clearable prefix-icon="el-icon-phone" v-model="phoneLoginForm.phone">
+              </el-input>
+            </el-form-item> -->
+        <!-- 手机验证码 -->
+        <!-- <el-form-item prop="phoneCode">
+              <el-input placeholder="验证码" prefix-icon="el-icon-key" v-model="phoneLoginForm.phoneCode">
+                <template #append>
+                  <el-button>获取验证码</el-button>
+                </template>
+              </el-input>
+            </el-form-item> -->
+        <!-- 按钮区域 -->
+        <!-- <el-form-item class="login_btns">
+              <el-button type="primary" @click="phoneLogin">登录</el-button>
+              <el-button type="success" @click='toRegister'>注册</el-button>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane> -->
+      </el-tabs>
+    </div>
+    <div class="login_footer">
+      登录即表示您已阅读并同意
+      <a href="#">服务条款</a>
+    </div>
+  </div>
+</template>
+
+<script>
+  import {
+    ref,
+    reactive,
+    toRefs,
+    getCurrentInstance
+  } from 'vue'
+  import qs from 'qs'
+  import axios from 'axios'
+  import {
+    useRouter
+  } from 'vue-router'
+  export default {
+    setup() {
+      // 验证邮箱的规则
+      var checkEmail = (rule, value, cb) => {
+        // 验证邮箱的正则表达式
+        const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/
+        if (regEmail.test(value)) {
+          // 合法的邮箱
+          return cb()
+        }
+        cb(new Error('请输入合法的邮箱'))
+      }
+      // // 验证手机号的规则
+      // var checkMobile = (rule, value, cb) => {
+      //   // 验证手机号的正则表达式
+      //   const regMobile = /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
+      //   if (regMobile.test(value)) {
+      //     return cb()
+      //   }
+      //   cb(new Error('请输入合法的手机号'))
+      // }
+      const {
+        proxy
+      } = getCurrentInstance()
+      const router = useRouter()
+      const pwdLoginFormRef = ref(null)
+      const emailLoginFormRef = ref(null)
+      // const phoneLoginFormRef = ref(null)
+      const state = reactive({
+        pwdLoginForm: {
+          username: 'admin',
+          password: '123456'
+        },
+        emailLoginForm: {
+          email: '',
+          emailCode: ''
+        },
+        // phoneLoginForm: {
+        //   phone: '',
+        //   phoneCode: ''
+        // },
+        pwdLoginFormRules: {
+          username: [{
+            required: true,
+            message: '请输入你的账号',
+            trigger: 'blur'
+          }],
+          // 验证密码是否合法
+          password: [{
+            required: true,
+            message: '请输入你的密码',
+            trigger: 'blur'
+          }]
+        },
+        emailLoginFormRules: {
+          email: [{
+              required: true,
+              message: '请输入你的邮箱',
+              trigger: 'blur'
+            },
+            {
+              validator: checkEmail,
+              trigger: 'blur'
+            }
+          ],
+          emailCode: [{
+            required: true,
+            message: '请输入你获取到的验证码',
+            trigger: 'blur'
+          }]
+        },
+        // phoneLoginFormRules: {
+        //   phone: [{
+        //       required: true,
+        //       message: '请输入你的手机号',
+        //       trigger: 'blur'
+        //     },
+        //     {
+        //       validator: checkMobile,
+        //       trigger: 'blur'
+        //     }
+        //   ],
+        //   phoneCode: [{
+        //     required: true,
+        //     message: '请输入你获取到的验证码',
+        //     trigger: 'blur'
+        //   }]
+        // },
+        loading: false,
+        // 控制获取验证码
+        buttonText: '获取验证码',
+        disabled: false,
+        duration: 60,
+        timer: null
+      })
+      // 账号密码登录
+      const pwdLogin = async () => {
+        state.loading = true
+        const obj = {
+          username: state.pwdLoginForm.username,
+          password: state.pwdLoginForm.password
+        }
+        try {
+          const res = await new proxy.$request(proxy.$urls.m().pwdLogin, qs.stringify(obj)).modepost()
+          console.log(res)
+          if (res.data.success != true) {
+            new proxy.$tips(res.data.message, 'warning').mess_age()
+          } else {
+            new proxy.$tips(res.data.message, 'success').mess_age()
+            localStorage.setItem('token', res.data.data.token)
+            // 成功跳转页面
+          }
+          state.loading = false
+        } catch (e) {
+          state.loading = false
+          new proxy.$tips('服务器发生错误', 'error').mess_age()
+        }
+      }
+      // 获取邮箱验证码
+      const getEmailValidateCode = () => {
+        const obj = {
+          email: state.emailLoginForm.email
+        }
+        axios.post('requestUrl', qs.stringify(obj)).then(
+          res => {
+            if (res.data.success != true) {
+              new proxy.$tips(res.data.message, 'warning').mess_age()
+            } else {
+              console.log(res.data)
+              console.log(res.headers)
+              new proxy.$tips(res.data.message, 'success').mess_age()
+              // localStorage.setItem('token', res.data.data.token)
+              state.timer = setInterval(() => {
+                state.disabled = true
+                const tmp = state.duration--
+                state.buttonText = `${tmp}秒后重新获取`
+                if (tmp <= 0) {
+                  clearInterval(state.timer)
+                  state.duration = 60
+                  state.buttonText = '重新获取验证码'
+                  state.disabled = false
+                }
+              }, 1000)
+            }
+          })
+      }
+      // 邮箱验证登录
+      const emailLogin = async () => {
+        state.loading = true
+        const obj = {
+          email: state.emailLoginForm.email,
+          emailValidateCode: state.emailLoginForm.emailCode,
+          token: localStorage.getItem('token')
+        }
+        try {
+          const res = await new proxy.$request(proxy.$urls.m().emailLogin, qs.stringify(obj)).modepost()
+          if (res.data.success != true) {
+            new proxy.$tips(res.data.message, 'warning').mess_age()
+          } else {
+            new proxy.$tips(res.data.message, 'success').mess_age()
+            localStorage.setItem('token', res.data.data.token)
+            // 成功跳转页面
+          }
+          state.loading = false
+        } catch (e) {
+          state.loading = false
+          new proxy.$tips('服务器发生错误', 'error').mess_age()
+        }
+      }
+      // 手机号验证登录
+      // const phoneLogin = async () => {
+      //   const obj = {
+      //     phone: state.phoneLoginForm.phone,
+      //     phoneCode: state.phoneLoginForm.phoneCode
+      //   }
+      // }
+      const toRegister = () => {
+        router.push({
+          path: '/register'
+        })
+      }
+      return {
+        ...toRefs(state),
+        pwdLoginFormRef,
+        emailLoginFormRef,
+        // phoneLoginFormRef,
+        pwdLogin,
+        getEmailValidateCode,
+        emailLogin,
+        // phoneLogin,
+        toRegister
+      }
+    }
+  }
+</script>
+
+<style lang="less" scoped>
+  .login_container {
+    width: 100%;
+    height: 100%;
+    background: url(../assets/登录页面背景图.png);
+    position: fixed;
+    background-size: 100% 100%;
+  }
+
+  .login_box {
+    width: 395px;
+    height: 435px;
+    background-color: rgba(225, 225, 225, 0);
+    border: 1px solid rgba(225, 225, 225, 0);
+    box-shadow: 2px 3px 3px #aaaaaa;
+    border-radius: 5px;
+    position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .login_btns {
+    text-align: center;
+  }
+  
+  .login_footer { 
+    position: absolute;
+    left: 50%;
+    top: 70%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #ffffff;
+    width: 395px;
+    height: 30px;
+    text-align: center;
+  }
+</style>
+
+<style scoped>
+  .login_box {
+    backdrop-filter: blur(15px);
+    box-shadow: 0 0 5px #fff;
+  }
+  
+  .el-tabs >>> .el-tabs__header { 
+    padding: 5% 10% 0 10%;
+  }
+  
+  .el-tabs >>> .el-tabs__item:hover {
+      color: #fff;
+      cursor: pointer;
+  }
+  
+  .el-tabs >>> .el-tabs__item.is-active {
+      color: #c915e5;
+  }
+
+  .el-form {
+    text-align: center;
+  }
+
+  .el-form-item>>>.el-form-item__error {
+    left: 10%;
+  }
+
+  .el-input {
+    width: 80%;
+  }
+  
+  .el-input { 
+    --el-input-font-color: black;
+  }
+
+  .el-input>>>.el-input__inner {
+    background-color: rgba(225, 225, 225, 0);
+    box-shadow: 0 0 2px #fff;
+    border: 1px solid #fff;
+  }
+
+  .el-button {
+    border-radius: 10px;
+  }
+
+  .el-button--primary {
+    --el-button-font-color: #409e40;
+    --el-button-background-color: #ffffff;
+    --el-button-border-color: #409eff;
+    --el-button-hover-color: #66b1ff;
+    --el-button-active-font-color: #e6e6e6;
+    --el-button-active-background-color: #0d84ff;
+    --el-button-active-border-color: #0d84ff;
+  }
+</style>
+
+
+```
+
+ **运行后的效果**
+
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5piv5L2gWk3lk6Xlk6XlkaI=,size_16,color_FFFFFF,t_70,g_se,x_16.png)
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5piv5L2gWk3lk6Xlk6XlkaI=,size_17,color_FFFFFF,t_70,g_se,x_16.png)
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5piv5L2gWk3lk6Xlk6XlkaI=,size_15,color_FFFFFF,t_70,g_se,x_16.png)
+通过点击上面的Tabs（标签)实现三种不同的登录方式
+
+**再说一下Tabs（标签页）的属性（根据项目的实际需求添加）**
+
+通过给`el-tabs`添加`:stretch="true"`的属性值，实现撑满上方页头的功能；
+通过给`el-tabs`添加`type="border-card"`的属性值，实现带有边框的卡片风格样式；
+通过给`el-tabs`添加`type="card"`的属性值，实现卡片风格的样式；
+
+
+
+# 对齐
+
+```
+<template>
+  <div class="xxxx">
+    <div class="left-element">左侧元素</div>
+    <div class="right-element">右侧元素</div>
+  </div>
+</template>
+ 
+<style lang="less" scoped>
+.xxxx {
+  display: flex;
+  align-items: center; /* 垂直居中 */
+  
+  .left-element {
+  margin-right: 10px; /* 可以调整间距 */
+}
+ 
+.right-element {
+  margin-left: auto; /* 推到容器的右侧 */
+}
+}
+ 
+
+</style>
+```
+
+![image-20240328204513424](Element%E7%AC%94%E8%AE%B0.assets/image-20240328204513424.png)
+
+
+
+
+
+# 分割线
+
+![image-20240328205216860](Element%E7%AC%94%E8%AE%B0.assets/image-20240328205216860.png)
+
+## el-divider样式
+
+```js
+.el-divider {
+  background-color: #409eff;
+}
+ 
+.el-divider__text.is-left {
+  color: #409eff;
+  left: 0;
+  font-weight: bold;
+  margin: 0 10px;
+  padding: 0 5px;
+}
+```
+
+![image-20240328212653220](Element%E7%AC%94%E8%AE%B0.assets/image-20240328212653220.png)
+
+## 出现白色遮挡
+
+![image-20240328212706708](Element%E7%AC%94%E8%AE%B0.assets/image-20240328212706708.png)
+
+使用自定义组件
+
+```vue
+<template>
+    <div class="my-divider">
+        <div class="line" :style="{ width: leftWidth }"></div>
+        <span class="label">{{ label }}</span>
+        <div class="line" :style="{ width: rightWidth }"></div>
+    </div>
+</template>
+
+<script setup lang="ts">
+import { ref, watch } from 'vue';
+
+const props = defineProps({
+    label: {
+        type: String,
+        default: ''
+    },
+    contentPosition: {
+        type: String,
+        default: 'center'
+    }
+});
+
+const leftWidth = ref('50%');
+const rightWidth = ref('50%');
+
+const setLineWidth = () => {
+    let p = props.contentPosition;
+    switch (p) {
+        case 'center': {
+            leftWidth.value = '50%';
+            rightWidth.value = '50%';
+            break;
+        }
+        case 'left': {
+            leftWidth.value = '10%';
+            rightWidth.value = '90%';
+            break;
+        }
+        case 'right': {
+            leftWidth.value = '90%';
+            rightWidth.value = '10%';
+            break;
+        }
+    }
+};
+
+watch(() => props.contentPosition, () => {
+    setLineWidth();
+});
+
+setLineWidth();
+</script>
+
+<style lang="less" scoped>
+.my-divider {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 15px 0;
+    color: #000;
+
+    .line {
+        background: #000;
+        height: 1px;
+    }
+
+    .label {
+        width: auto;
+        padding: 0 12px;
+        text-align: center;
+        transform: translateY(-1px);
+        white-space: nowrap; // 不换行(单行)
+    }
+}
+</style>
+
+```
+
+使用
+
+```
+<my-divider content-position="center" label="其他登录方式" />
+```
+
+![image-20240328212824372](Element%E7%AC%94%E8%AE%B0.assets/image-20240328212824372.png)
 
 
 
@@ -1159,3 +2533,16 @@ span {
 ```
 
 ![image-20240305111405182](Element%E7%AC%94%E8%AE%B0.assets/image-20240305111405182.png)
+
+补充
+
+```
+整体边框: box-sizing: border-box;
+```
+
+# 大小
+
+```
+style="    width: 100%; "  // 充满整个父级
+```
+

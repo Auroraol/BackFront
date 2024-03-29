@@ -1280,7 +1280,7 @@ eureka:
 ##### 1.3.1 导入依赖
 
 ```xml
-<!--eureka客户端依赖-->
+<!--eureka客户端依赖  一般直接写在跟pom-->
 <dependency>
     <groupId>org.springframework.cloud</groupId>
     <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
