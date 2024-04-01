@@ -404,7 +404,7 @@ export const enum Names {
 
   // 方式三
   const change = () => {
-    userInfo.$patch((state) => {  // 这里传入的state就是pinia的state及main.ts中的
+    userInfo.$patch((state) => {  // 这里的state就是pinia的state
       state.age = 11  
       state.name = '𝒆𝒅.'
     })

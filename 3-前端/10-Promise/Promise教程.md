@@ -11,9 +11,9 @@ https://blog.csdn.net/weixin_44972008/article/details/113779708
 ### 概念
 
 +  Promise是`异步编程的一种解决方案`，比传统的解决方案——回调函数和事件——更合理和更强大。所谓
-+ Promise，简单说就是一个容器，里面保存着某个未来才会结束的事件（通常是一个异步操作）的结果。
-
++  Promise，简单说就是一个容器，里面保存着某个未来才会结束的事件（通常是一个异步操作）的结果。
 + 通俗讲，`Promise是一个许诺、承诺`,是对未来事情的承诺，承诺不一定能完成，但是无论是否能完成都会有一个结果。
++ Promise的用途主要是为了实现一些异步任务，当这些异步任务的结果还没有得出的时候，此时Promise对象的状态仍然为pending
 
 ### 抽象表达
 
@@ -83,8 +83,6 @@ promise对象状态改变的两种可能
 + 从pending变为rejected
 
 只要发生这两种情况的变化，就一直会保持这个结果。就算改变已经发生了，再对promise对象添加回调函数，也会立即得到这个这个结果 **`这与事件完全不同的，事件的特点是，如果你错过了他，再去监听，是得不到结果的`**
-
-
 
 # 备知识
 
@@ -433,18 +431,27 @@ mineReadFile('./resource/content.txt').then(value => {
 });
 ```
 
-### 总结
+### 总结:crossed_swords:
 
 ```javascript
-const promise = new Promise(function(resolve, reject) {
+// 定义
+const promise对象 = new Promise((resolve,reject)=>{
   // ... some code
   if (/* 异步操作成功 */){
-   
     resolve(value);
   } else {
-   
     reject(reason);
   }
+});
+
+
+//使用
+promise对象.then(
+    value=>{ 
+     // success
+    },
+    reason => {
+     // failure
 });
 ```
 
@@ -454,16 +461,6 @@ const promise = new Promise(function(resolve, reject) {
 + `reject`函数的作用是，将`Promise`对象的状态从“未完成”变为“失败”（即从 `pending` 变为 `rejected`），在**异步操作失败**时调用，并将异步操作报出的错误，作为参数`error`/`reason`传递出去。
 
 `Promise`实例生成以后，可以用`then`方法分别指定`resolved`状态和`rejected`状态的回调函数。
-
-```javascript
-promise.then(function(value) {
-   
-  // success
-}, function(reason) {
-   
-  // failure
-});
-```
 
 `then`方法可以接受**两个回调函数**作为参数。
 
@@ -580,9 +577,9 @@ promise.then(function(value) {
 
 + 返回一个新的 promise, `第一个完成`的 promise 的结果状态就是最终的结果状态,如p1延时,开启了异步,内部正常是同步进行,所以`p2>p3>p1`,结果是`P2`
 
-## Promise的几个关键问题
+## Promise核心:crossed_swords:
 
-### 1. 改变 promise 的状态?
+### 1. 改变 promise 的状态
 
 (1) resolve(value): 如果当前是 pending 就会变为 resolved
 
@@ -601,9 +598,7 @@ let p = new Promise((resolve, reject){
 })
 ```
 
-### 2. 一个 promise 指定多个成功/失败回调函数, 都会调用吗?
-
-当 promise `改变为对应状态时`都会调用,改变状态后,  多个回调函数都会调用
+### 2. 当 promise `改变为对应状态时`都会调用,改变状态后,  多个回调函数都会调用
 
 ```js
 let p = new Promise((resolve, reject) => {  resolve('OK');});
@@ -667,6 +662,18 @@ p.then(
 + 如果返回的是非 promise 的任意值, 新 promise 变为 resolved, value 为返回的值
 + 如果返回的是另一个新 promise, 此 promise 的结果就会成为新 promise 的结果
 
+1、抛出异常的  
+
++ PromiseResult结果： PromiseState为rejected,  PromiseResult为抛出的错误信息
+
+ 2、 非promise的任意值  
+
++ PromiseResult结果 ：PromiseState为fulfilled,   PromiseResult为return返回的值
+
+ 3、Promise 对象
+
++ PromiseResult的结果 取决于  此时设置的不同的状态 ，不设置的话result为pending
+
 ```js
 let p = new Promise((resolve, reject) => {
 	resolve('ok');
@@ -674,7 +681,7 @@ let p = new Promise((resolve, reject) => {
 //执行 then 方法
 let result = p.then(
     value => {
-        console.log(value);
+        console.log(value);  //ok
         // 情况1. 抛出错误 ,变为 rejected
         throw '出了问题';
         // 情况2. 返回结果是非 Promise 类型的对象,新 promise 变为 resolved  值就是返回值
@@ -686,7 +693,7 @@ let result = p.then(
     	});
  	}, 
     reason => {
-	console.warn(reason); 
+		console.warn(reason); 
 	}
 );
 ```
@@ -699,9 +706,9 @@ let result = p.then(
 error
 ```
 
-### 5.  promise 如何串连多个操作任务?
+### 5.  Promise的链式调用:crossed_swords:
 
-(1) promise 的 then()返回一个新的 promise, 可以开成 then()的链式调用
+(1) **promise 的 then()返回一个新的 promise, 可以开成 then()的链式调用**
 
 (2) 通过 then 的链式调用串连多个同步/异步任务,这样就能用`then()`将多个同步或异步操作串联成一个同步队列
 
@@ -717,7 +724,7 @@ p.then(
     }
 ).then(
     value => {
-        console.log(value);   //success
+        console.log(value);   //success  此时的值取决于上一个Promise对象的状态
     }
 ).then(
     value => { 
@@ -727,7 +734,42 @@ p.then(
 </script>
 ```
 
-### 6. promise 异常传透?
+### 6. 终止 promise 链
+
+需求:  有5个then(),但其中有条件判断,如当我符合或者不符合第三个then条件时,要直接中断链式调用,不再走下面的then
+
+(1) 当使用 promise 的 then 链式调用时, 在中间中断, 不再调用后面的回调函数
+
+(2) 办法:   `return new Promise((resolve, reject) => {});` 返回一个pending状态的promise对象, 这样后续的链式调用就不再执行
+
+```js
+<script>
+let p = new Promise((resolve, reject) => {
+    setTimeout(() => { resolve('OK');}, 1000);
+});
+
+p.then(value => {
+    console.log(111);
+    //后续的链式调用不需要再执行
+    //有且只有这一个方式 return new Promise(() => {})
+    return new Promise(() => {});
+}).then(value => { 
+    console.log(222);
+}).then(value => { 
+    console.log(333);
+}).catch(reason => {
+    console.warn(reason);
+});
+</script>
+```
+
+输出结果
+
+```
+111
+```
+
+### 7. promise 异常传透
 
 可以在每个then()的第二个回调函数中进行err处理,也可以利用异常穿透特性,到最后用`catch`去承接统一处理,两者一起用时,前者会生效(因为err已经将其处理,就不会再往下穿透)而走不到后面的catch
 
@@ -745,7 +787,7 @@ p.then(value => {
 }).then(value => {
 	console.log(222);
 }).then(value => {
-    	console.log(333);
+    console.log(333);
 }).catch(reason => {
 	console.warn(reason);      //失败啦!
 });
@@ -774,42 +816,6 @@ getJSON('./hong.json')
 ```
 
 注:可以在每个then()的第二个回调函数中进行err处理,也可以利用异常穿透特性,到最后用`catch`去承接统一处理,两者一起用时,前者会生效(因为err已经将其处理,就不会再往下穿透)而走不到后面的catch![image-20210927105504988](Promise%E6%95%99%E7%A8%8B.assets/image-20210927105504988-170307933219816.png)
-
-### 7. 中断 promise 链?
-
-在`关键问题2`中,可以得知,当promise状态改变时,他的链式调用都会生效,那如果我们有这个一个实际需求:我们有5个then(),但其中有条件判断,如当我符合或者不符合第三个then条件时,要直接中断链式调用,不再走下面的then,该如何?
-
-(1) 当使用 promise 的 then 链式调用时, 在中间中断, 不再调用后面的回调函数
-
-(2) 办法: 在回调函数中返回一个 `pendding` 状态的`promise 对象`
-
-```js
-<script>
-let p = new Promise((resolve, reject) => {
-    setTimeout(() => { resolve('OK');}, 1000);
-});
-
-p.then(value => {
-    console.log(111);
-    //有且只有这一个方式 return new Promise(() => {})
-    return new Promise(() => {});
-}).then(value => { 
-    console.log(222);
-}).then(value => { 
-    console.log(333);
-}).catch(reason => {
-    console.warn(reason);
-});
-</script>
-```
-
-输出结果
-
-```
-111
-```
-
-
 
 
 
@@ -1067,7 +1073,7 @@ p.then(value => {
 >
 > 上面代码中，Promise 指定在下一轮“事件循环”再抛出错误。到了那个时候，Promise 的运行已经结束了，所以这个错误是在 Promise 函数体外抛出的，会冒泡到最外层，成了未捕获的错误。
 
-## Ⅱ - API 用法详解
+## Ⅱ - API 用法详解:crossed_swords:
 
 > 此处将对于所有API进行详细剖析,参照资料为 [阮一峰的ES6日志](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记/Promise学习笔记)
 
@@ -1552,6 +1558,20 @@ p.then(value => {
 > // Promise.all 方法中的catch Error: 报错了
 > ```
 
+##### d)**最终的请求时间是所有请求中耗时最长的请求所用的时间**
+
+```js
+let p1 = new Promise((resolve, reject) => {
+            resolve('ok');
+})
+let p2 = Promise.resolve('success');
+let p3 = Promise.resolve('okk');
+let result = Promise.all([p1, p2, p3])
+console.log(result);
+```
+
+![image-20240331133132537](Promise%E6%95%99%E7%A8%8B.assets/image-20240331133132537.png)
+
 #### ⑤ Promise.race()
 
 > `Promise.race()`方法同样是将多个 Promise 实例，包装成一个新的 Promise 实例。
@@ -1578,7 +1598,7 @@ p.then(value => {
 > let p3 = Promise.resolve('Oh Yeah');
 > //调用
 > const result = Promise.race([p1, p2, p3]);
-> console.log(result);
+> console.log(result);  //成功状态的  success  p1 有定时器所有慢 p2 先输出
 > ```
 
 ##### b) 举个应用实🌰
@@ -1600,7 +1620,6 @@ p.then(value => {
 >
 > 上面代码中，如果 5 秒之内`fetch`方法无法返回结果，变量`p`的状态就会变为`rejected`，从而触发`catch`方法指定的回调函数。
 >
-> 是不是很好用又简单
 
 #### ⑥ Promise.allSettled()
 
@@ -1681,6 +1700,53 @@ p.then(value => {
 > ```
 >
 > 上面代码中，`Promise.all()`无法确定所有请求都结束。想要达到这个目的，写起来很麻烦，有了`Promise.allSettled()`，这就很容易了
+
+##### d)
+
+```js
+<script>
+    function ajax(url) {
+    return new Promise((resolve, reject) => {
+        let xhr = new XMLHttpRequest();
+        xhr.open('get', url, true);
+        xhr.send();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(xhr.responseText);
+                } else {
+                    reject(xhr.responseText);
+                }
+            }
+        }
+    })
+
+}
+//类比Promise下的all方法和allSettled
+// Promise.all([ajax('http://www.xiongmaoyouxuan.com/api/tabs'),
+// ajax('https://m.maizuo.com/gateway?cityId=110100&k=4770248')
+// ]).then(value => {
+//     console.log(value)
+// }).catch(error => {
+//     console.log(error);
+// })
+
+Promise.allSettled([ajax('http://www.xiongmaoyouxuan.com/api/tabs'),
+                    ajax('https://m.maizuo.com/gateway?cityId=110100&k=4770248')
+                   ]).then(value => {
+    // console.log(value)
+    let successList = value.filter(item => item.status === 'fulfilled');
+    console.log(successList)
+
+    let errorList = value.filter(item => item.status === 'rejected');
+    console.log(errorList)
+}).catch(error => {
+    console.log(error);
+})
+</script>
+```
+
+![image-20240331133244225](Promise%E6%95%99%E7%A8%8B.assets/image-20240331133244225.png)
 
 #### ⑦ Promise.any()
 
@@ -3098,29 +3164,82 @@ Promise.prototype.then = function (onResolved, onRejected) {
               // result.then(
 ```
 
-# Promise+ async + await
+#  Promise + async + await
 
-> ##### 1)Promise==>异步
+> async/await 是ES7提出的基于Promise的解决异步的最终方案。
 >
-> ##### 2)await==>异步转同步
+> ps: 
 >
-> 1. await 可以理解为是 async wait 的简写。await 必须出现在 async 函数内部，不能单独使用。
-> 2. await 后面可以跟任何的JS 表达式。虽然说 await 可以等很多类型的东西，但是它最主要的意图是用来等待 Promise 对象的状态被 resolved。如果await的是 promise对象会造成异步函数停止执行并且等待 promise 的解决,如果等的是正常的表达式则立即执行
+> axios 发送请求的结果就是是一个 Promise
 >
-> ##### 3)async==>同步转异步
->
-> 1. 方法体内部的某个表达式使用await修饰，那么这个方法体所属方法必须要用async修饰所以使用awit方法会自动升级为异步方法
->
-> ###### 4)mdn文档
->
-> 1. [async](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FWeb%2FJavaScript%2FReference%2FStatements%2Fasync_function)
-> 2. [await](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FWeb%2FJavaScript%2FReference%2FOperators%2Fawait)
+> 自己用promise封装aixos后, 不需在使用async去定义函数发送Ajax请求了, 因为封装的aixos已经实现异步了
+
+1)Promise==>异步
+
+2)await==>异步转同步
+
+1. await 可以理解为是 async wait 的简写。await 必须出现在 async 函数内部，不能单独使用。
+2. await 后面可以跟任何的JS 表达式。虽然说 await 可以等很多类型的东西，但是它最主要的意图是用来等待 Promise 对象的状态被 resolved。如果await的是 promise对象会造成异步函数停止执行并且等待 promise 的解决,如果等的是正常的表达式则立即执行
+
+ 3)async==>同步转异步
+
+1. 方法体内部的某个表达式使用await修饰，那么这个方法体所属方法必须要用async修饰所以使用awit方法会自动升级为异步方法
+
+ 4)mdn文档
+
+1. [async](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FWeb%2FJavaScript%2FReference%2FStatements%2Fasync_function)
+2. [await](https://gitee.com/link?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FWeb%2FJavaScript%2FReference%2FOperators%2Fawait)
 
 ## async函数
 
-> 1. 函数的返回值为 promise 对象
-> 2. promise 对象的结果由 async 函数执行的返回值决定
-> 3. 和then的返回规则一样
+1. **函数的返回值为 promise 对象**
+2. promise 对象的结果由 async 函数执行的返回值决定
+3. **对async函数可以直接then，返回值就是then方法传入的函数。**
+
+```js
+// async基础语法
+async function fun0(){
+    console.log(1);
+    return 1;
+}
+fun0().then(val=>{
+    console.log(val) // 1,1
+})
+
+async function fun1(){
+    console.log('Promise');
+    return new Promise(function(resolve,reject){
+        resolve('Promise')
+    })
+}
+fun1().then(val => {
+    console.log(val); // Promise Promise
+}
+```
+
+例子1
+
+```js
+//声明一个async函数
+async function main() {
+    console.log('async function');
+    //情况1：返回非promise对象数据
+    return 'hahaha';
+    //情况2：返回是promise对象数据
+    /* return new Promise((resolve, reject) => {
+		// resolve('ok');
+		reject('error');
+	}) */
+    //情况3：抛出异常
+    // throw new Error('出错啦!!!');
+}
+let result = main().then(value => {
+    console.log(value);
+});
+console.log(result);
+```
+
+例子2
 
 ```js
 async function main(){
@@ -3144,9 +3263,11 @@ console.log(result);  //失败 Error
 
 ## await表达式
 
-> 1. await 右侧的表达式一般为 promise 对象, 但也可以是其它的值
-> 2. 如果表达式是 promise 对象, await 返回的是 promise 成功的值
-> 3. 如果表达式是其它值, 直接将此值作为 await 的返回值
+1. await 右侧的表达式一般为 promise 对象, 但也可以是其它的值
+2. 如果表达式是 promise 对象, await 返回的是 promise 成功的值
+3. 如果表达式是其它值, 直接将此值作为 await 的返回值
+4. 只能放在async定义的函数内。可以理解为**等待返回成功结果**。
+5. await  就是 等待方法执行完 返回结果 这时候只用接收 就好了 .then 也是等待方法执行完 只是 await 返回的直接是数据 .then返回的是个方法 方法里面带有 数据
 
 ```js
 async function main(){
@@ -3158,9 +3279,11 @@ async function main(){
 	//1. 右侧为promise的情况
     // let res = await p;
     //console.log(res)  //ok
+                        
     //2。右侧为其他类型的数据
     // let res2 = await 20;
     //console.log(res)  //20
+                        
     //3。如果promise是失败的状态
     try{
     	let res3 = await p;
@@ -3170,6 +3293,71 @@ async function main(){
 }
 
 let result = main();
+```
+
+例子
+
+```js
+async function fun(){
+    let a = await 1;
+    let b = await new Promise((resolve,reject)=>{
+        setTimeout(function(){
+            resolve('setTimeout')
+        },3000)
+    })
+    let c = await function(){
+        return 'function'
+    }()
+    console.log(a,b,c)
+}
+fun(); // 3秒后输出： 1 "setTimeout" "function"
+```
+
+例子
+
+```js
+async function main() {
+    //1、如果await右侧为非promise类型数据
+    var rs = await 10;
+    var rs = await 1 + 1;
+    var rs = await "非常6+7";
+
+    //2、如果await右侧为promise成功类型数据
+    var rs = await new Promise((resolve, reject) => {
+        resolve('success');
+    })
+
+    //3、如果await右侧为promise失败类型数据,需要借助于try...catch捕获
+    try {
+        var rs = await new Promise((resolve, reject) => {
+            reject('error');
+        })
+        } catch (e) {
+            console.log(e);
+        }
+}
+main();
+```
+
+例子
+
+```js
+// 使用async/await获取成功的结果
+
+// 定义一个异步函数，3秒后才能获取到值(类似操作数据库)
+function getSomeThing(){
+    return new Promise((resolve,reject)=>{
+        setTimeout(()=>{
+            resolve('获取成功')
+        },3000)
+    })
+}
+
+async function test(){
+    let a = await getSomeThing();
+    console.log(a)
+}
+test(); // 3秒后输出：获取成功
 ```
 
 ## 注意
@@ -3503,3 +3691,543 @@ async function main(){
 > 首先看图:![image-20210827094130354](Promise%E6%95%99%E7%A8%8B.assets/image-20210827094130354.png)
 >
 > 可以看到 [ undefined ] 实在微任务完成后,宏任务执行前 打印
+
+# 总结
+
+
+
+## then 方法
+
+then：指定用于得到成功value的成功回调和用于得到失败reason的失败回调，**Promise的实例化对象调用Promise原型属性身上的then方法也是有返回值的，返回一个新的Promise对象**
+
+- 成功的状态：执行第一个回调函数
+- 失败的状态：执行第二个回调函数
+
+then方法返回一个Promise对象，它的的返回状态值的判断：
+
+1. 如果返回的是**非promise的任意值,** **新promise**变为`fulfilled`, **PromiseResult**为`返回的值` ,如果没有retuen 返回值 **PromiseResult**为`undefined`
+2. 如果返回的是**另一个新promise**, 此**promise的结果**就会成为`新promise的结果`
+   (当下这个新的Promise对象的状态将决定于**then方法返回的Promise对象的状态**，结果值亦然)
+3. 如果**抛出异常**, `新promise变为rejected, reason为抛出的异常`
+
+```js
+const p = new Promise((resolve,reject)=>{
+     resolve('ok');
+});
+
+let result = p.then(value=>{
+	1、throw '错误信息';// 1抛出异常 错误
+	2、return 100;  // 值可以是字符串、数字、boolean、null、undefined、数组、对象都变为PromiseResult的结果
+	3、return new Promise((resolve,reject) => {
+         // resolve();
+         // reject();
+         // throw 404;
+        result的结果 取决于  此时设置的不同的状态 ，不设置的话result为pending
+      })
+},reason=>{
+	console.log(reason);
+});
+
+console.log(result);
+1、抛出异常的结果： PromiseState为rejected   PromiseResult为抛出的错误信息
+2、 非promise的任意值  结果 ：PromiseState为fulfilled   PromiseResult为return返回的值
+3、result的结果 取决于  此时设置的不同的状态 ，不设置的话result为pending
+```
+
+# 两种方式(弃)
+
+## 实例
+
+![image-20240331221323484](Promise%E6%95%99%E7%A8%8B.assets/image-20240331221323484.png)
+
+![image-20240331221247267](Promise%E6%95%99%E7%A8%8B.assets/image-20240331221247267.png)
+
+![image-20240331221410193](Promise%E6%95%99%E7%A8%8B.assets/image-20240331221410193.png)
+
+![image-20240331201138841](Promise%E6%95%99%E7%A8%8B.assets/image-20240331201138841.png)
+
+async  —> 直接定义promise
+
+await —>   就是 等待方法(一般也是promise)执行完 返回结果 这时候只用接收 就好了
+
+ .then —>  也是等待方法执行完 只是 await 返回的直接是成功数据(错误数据用catch捕获)  .then返回的是个方法 方法里面带有 数据
+
+## 两种方式
+
+在Vue中，如果你选择使用async/await来调用后端接口，你可以在组件的方法中定义一个异步函数，并使用try/catch来处理错误。例如：
+
+```javascript
+async created() {  
+  try {  
+    const response = await axios.get('api/data');  
+    // 处理返回的数据  
+  } catch (error) {  
+    // 处理错误  
+  }  
+}
+```
+
+但是，你也可以选择使用Promise或其他[异步处理](https://so.csdn.net/so/search?q=异步处理&spm=1001.2101.3001.7020)方法，这取决于你的个人偏好和项目需求。如果你更喜欢使用Promise，你可以这样做：
+
+```javascript
+created() {  
+  axios.get('api/data')  
+    .then(response => {  
+      // 处理返回的数据  
+    })  
+    .catch(error => {  
+      // 处理错误  
+    });  
+}
+
+```
+
+无论你选择哪种方式，重要的是要正确处理异步操作，并确保在数据加载完成之前不会渲染组件或执行其他操作。
+
+## 例子1
+
+```js
+ // 密码登录
+    passwordLogin() {
+      const username = this.username
+      const password = this.password
+      if (username === '') {
+        this.$message('请输入用户名')
+        return
+      }
+      if (this.password === '') {
+        this.$message('请输入密码')
+        return
+      }
+      const params = {
+        username: username,
+        password: password
+      }
+      this.loading = true
+      new Promise(async(resolve, reject) => {      // [   ]
+        try {
+          await this.$store.dispatch('user/accountLogin', params)
+          const { roles } = await this.$store.dispatch('user/getUserInfo')
+          const accessRoutes = await this.$store.dispatch('permission/generateRoutes', roles)
+          this.$router.addRoutes(accessRoutes)
+          const checked = this.checked
+          setRemember(checked ? '1' : '0')
+          if (checked) {
+            this.$store.dispatch('login/setUsernameAndPassword', params)
+          } else {
+            this.$store.dispatch('login/clearUsernameAndPassword')
+          }
+          this.loading = false
+          this.bClose()
+          resolve()
+        } catch (error) {
+          this.loading = false
+          console.error(error)
+          reject(error)
+        }
+      })
+    },
+```
+
+```js
+
+//直接使用async
+async passwordLogin() {
+  const username = this.username
+  const password = this.password
+
+  if (username === '') {
+    this.$message('请输入用户名')
+    return
+  }
+
+  if (password === '') {
+    this.$message('请输入密码')
+    return
+  }
+
+  const params = {
+    username: username,
+    password: password
+  }
+
+  this.loading = true
+
+  try {
+    await this.$store.dispatch('user/accountLogin', params)
+    const { roles } = await this.$store.dispatch('user/getUserInfo')
+    const accessRoutes = await this.$store.dispatch('permission/generateRoutes', roles)
+    this.$router.addRoutes(accessRoutes)
+
+    const checked = this.checked
+    setRemember(checked ? '1' : '0')
+
+    if (checked) {
+      this.$store.dispatch('login/setUsernameAndPassword', params)
+    } else {
+      this.$store.dispatch('login/clearUsernameAndPassword')
+    }
+
+    this.loading = false
+    this.bClose()
+  } catch (error) {
+    console.error(error)
+    this.$message.error('登录失败，请检查用户名和密码')
+  } finally {
+    this.loading = false
+  }
+}
+```
+
+## 例子2
+
+```js
+
+// // 点击注册按钮
+// const submit = () => {
+//   const registerInfo = toRaw(registerForm); // 将一个由生成的响应式转化为对象普通对象
+//   loading.value = true; //按钮显示加载
+//   register(registerInfo).then(
+//     // 响应成功
+//     async (res) => {             //      [      ]
+//       const loginParams = {
+//         username: registerForm.username,
+//         password: registerForm.password,
+//       };
+//       // 注册成功, 发起请求登录请求获得token
+//       try {
+//         await useUserPinia.accountLogin(loginParams);
+//          await useUserPinia.getUserInfo();
+//         //  TODO const accessRoutes = await this.$store.dispatch('permission/generateRoutes', roles)
+//         // 登录成功
+//         ElMessage.success("注册成功");
+//         loading.value = false;
+//         // 跳转到首页
+//         toPage("/index");
+//       } catch (error) {
+//         loading.value = false;
+//         // 登录失败
+//         console.error("登录失败", error);
+//       }
+//     },
+//     (error) => {
+//       // 注册失败
+//       loading.value = false;
+//       console.error(error);
+//     }
+//   );
+// };
+
+
+// 直接使用async
+const submit = async () => {
+  const registerInfo = toRaw(registerForm);
+  loading.value = true;
+
+  try {
+    await register(registerInfo);
+    // 注册成功, 发起请求登录请求获得token
+    const loginParams = {
+      username: registerForm.username,
+      password: registerForm.password,
+    };
+    await useUserPinia.accountLogin(loginParams);
+    // await useUserPinia.getUserInfo();
+    //  TODO const accessRoutes = await this.$store.dispatch('permission/generateRoutes', roles)
+
+    ElMessage.success("注册成功");
+    loading.value = false;
+    // 跳转到首页
+    toPage("/index");
+  } catch (error) {
+    // 统一处理所有错误
+    loading.value = false;
+    console.error("错误原因：", error);
+  }
+};
+```
+
+## `try...catch`
+
+> await抛出异常或者返回状态变为“rejected”后，await下面那一行代码不会继续执行了
+
+1. **分开处理错误：** 如果你想针对不同的 `await` 语句执行不同的错误处理逻辑，可以将每个 `await` 语句放在单独的 `try...catch` 块中。
+
+```js
+try {
+  const result1 = await asyncFunction1();
+  // 处理 result1
+} catch (error) {
+  // 处理 asyncFunction1 的错误
+}
+
+try {
+  const result2 = await asyncFunction2();
+    
+  return Promise.resolve();  // 如果还行继续抛
+  // 处理 result2
+} catch (error) {
+  // 处理 asyncFunction2 的错误
+    
+  return Promise.reject(error) // 如果还行继续抛
+}
+```
+
+1. **统一处理错误：** 如果你想统一处理所有 `await` 语句可能抛出的错误，可以在整个 `try` 块中执行统一的错误处理逻辑。
+
+```js
+try {
+  const result1 = await asyncFunction1();
+  const result2 = await asyncFunction2();
+  // 继续处理其他结果
+} catch (error) {
+  // 统一处理所有错误
+}
+```
+
+无论你选择哪种方式，都应该根据具体情况来决定，以确保代码的可读性和健壮性
+
+
+
+## 在async函数中，如何返回resolve和reject
+
+在 `async` [函数](https://so.csdn.net/so/search?q=函数&spm=1001.2101.3001.7020)中，你不需要显式地调用 `resolve` 或 `reject`，因为 `async` 函数会自动处理它们。
+
+**返回 “解决” 和 “拒绝” 的值的方法：**
+
+1. **解决 (resolve)**:
+
+   - 在 `async` 函数中直接返回一个值，这会自动将该值包装为一个解决的 `Promise`。
+
+   ```javascript
+   async function resolveExample() {
+       return "Resolved value";  // 这等价于 Promise.resolve("Resolved value")
+   }
+   ```
+
+2. **拒绝 (reject)**:
+
+   - 在 `async` 函数中抛出一个错误，这会自动将该错误包装为一个拒绝的 `Promise`。
+
+   ```javascript
+   async function rejectExample() {
+       throw new Error("Rejected value");  // 这等价于 Promise.reject(new Error("Rejected value"))
+   }
+   ```
+
+**使用这些函数：**
+
+```js
+resolveExample()
+    .then(value => {
+        console.log(value);  // 输出: "Resolved value"
+    });
+
+rejectExample()
+    .catch(error => {
+        console.log(error.message);  // 输出: "Rejected value"
+    });
+```
+
+
+
+# 封装 axios.ts
+
+![image-20240401223739973](Promise%E6%95%99%E7%A8%8B.assets/image-20240401223739973.png)
+
+```ts
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { getAccessToken } from "/@/utils/auth";
+import { ElMessageBox, ElMessage } from "element-plus";
+
+const axiosInstance = axios.create({
+  timeout: 10000,
+  // axios中请求配置有baseURL选项,表示请求URL公共部分,每个请求将会带该部分
+  // baseURL: import.meta.env.VITE_API_URL,//配置了跨域这里不用写会冲突
+});
+
+// 请求拦截
+axiosInstance.interceptors.request.use(
+  (config) => {
+    return config;
+  },
+  (error) => {
+    // 当请求失败时做一些处理 抛出错误
+    console.log(error);
+    return Promise.reject(error);
+  }
+);
+
+// 响应拦截器
+axiosInstance.interceptors.response.use(
+  (response) => {
+    const res = response.data;   // 响应数据
+    // 确保前端得到的res都是成功响应
+    if (res.code !== 200000) {
+      // 凭证无效或过期
+      if (res.code === 400007 || res.code === 4000010) {
+        // useStore.dispatch('user/resetToken')
+        ElMessageBox.confirm("登录信息已过期", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            location.reload();
+          })
+          .catch(() => {
+            location.reload();
+          });
+      } else {
+        // 其他, 返回失败message
+        ElMessage({
+          message: res.message || "Error",
+          type: "error",
+          duration: 5 * 1000,
+        });
+      }
+      return Promise.reject(new Error(res.message || "Error"));
+    } else {
+      return res;
+    }
+  },
+  (error) => {
+    console.log("err" + error);
+    ElMessage({
+      message: error.message,
+      type: "error",
+      duration: 5 * 1000,
+    });
+    return Promise.reject(error);
+  }
+);
+
+// 给请求头添加 access_token
+const setHeaderToken = (isNeedToken: boolean) => {
+  // 请求头携带token
+  const accessToken = isNeedToken ? getAccessToken() : null;
+  if (isNeedToken) {
+    // api 请求需要携带 access_token
+    if (!accessToken) {
+      console.log("不存在 access_token 则跳转回登录页");
+    }
+    // instance.defaults.headers.common['accessToken'] 中的accessToken叫啥由后端决定
+    axiosInstance.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${accessToken}`;
+  }
+};
+
+// 定义一个泛型函数 request，用于发送 HTTP 请求
+const request = <ResponseType = unknown>(
+  url: string,
+  options?: AxiosRequestConfig<unknown>,
+  isNeedToken: boolean = false // 默认不需要 token
+): Promise<ResponseType> => {
+  // 返回一个 Promise 对象，Promise 的泛型参数是 ResponseType，即期望的响应数据类型
+  return new Promise((resolve, reject) => {
+    // 使用 axiosInstance 发送 HTTP 请求
+    setHeaderToken(isNeedToken);
+    axiosInstance({
+      url,
+      ...options, // 将传入的 options 合并到请求配置中
+    })
+      .then(
+        res => {
+        // 请求成功时，将解析后的响应数据传递给 Promise 的 resolve 函数
+        //这里的res得到响应数据  而res.data得到的是响应数据中的data属性数据
+        resolve(res.data as ResponseType);
+        //console.log(res.data);
+        // if (res.data && res.data.code === 200000) {
+        //   resolve(res.data);
+        // } else {
+        //   reject(new Error('Invalid response format'));
+        // }
+
+      })
+      .catch((err) => {
+        // 请求失败时，将错误信息传递给 Promise 的 reject 函数
+        reject(err);
+      });
+  });
+};
+
+// 有些 api 并不需要用户授权使用，则无需携带 access_token；默认不携带，需要传则设置第三个参数为 true
+const get = (url, params = {}, isNeedToken = false) => {
+  setHeaderToken(isNeedToken);
+  return axiosInstance({
+    method: "get",
+    url,
+    params,
+  });
+};
+
+const post = (url, params = {}, isNeedToken = false) => {
+  setHeaderToken(isNeedToken);
+  return axiosInstance({
+    method: "post",
+    url,
+    data: params,
+  });
+};
+
+export { axiosInstance, request, get, post };
+
+/*
+注: 上述封装抛出的是响应数据中的data属性
+
+使用
+①axiosInstance
+和axios使用一致
+
+②request
+// 定义数据响应的类型, 不定义则自动匹配,就没有自动补全提示
+interface DataResponseType {
+  // 在这里定义响应数据的结构
+}
+
+// 可选的 Axios 请求配置
+const options: AxiosRequestConfig = {
+  method: "GET", // 请求方法，例如 GET、POST 等
+  params: { // 请求参数，可以是 params、data 等
+    // 具体参数
+  },
+  // 其他 Axios 请求配置，例如 headers、timeout 等
+};
+
+// 发送请求并指定响应数据的类型
+request<DataResponseType>(url, options, isNeedToken)
+  .then((data) => {
+    // 请求成功时，处理返回的数据
+    console.log("响应数据:", data);
+  })
+  .catch((error) => {
+    // 请求失败时，处理错误信息
+    console.error("请求失败:", error);
+  });
+
+③get
+get(url, params, isNeedToken)
+  .then(response => {
+    // 处理请求成功的响应
+    console.log('GET 请求成功:', response);
+  })
+  .catch(error => {
+    // 处理请求失败
+    console.error('GET 请求失败:', error);
+  });
+
+④post
+post(url, data, isNeedToken)
+  .then(response => {
+    // 处理请求成功的响应
+    console.log('POST 请求成功:', response);
+  })
+  .catch(error => {
+    // 处理请求失败
+    console.error('POST 请求失败:', error);
+  });
+*/
+
+```
+

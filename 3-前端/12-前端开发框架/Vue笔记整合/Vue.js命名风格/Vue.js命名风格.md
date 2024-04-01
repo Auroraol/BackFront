@@ -170,3 +170,47 @@ this.$emit('api-load');
 view就是视图
 
 components文件写视图的具体实现
+
+
+
+
+
+![image-20240330155838029](Vue.js%E5%91%BD%E5%90%8D%E9%A3%8E%E6%A0%BC.assets/image-20240330155838029.png)
+
+
+
+![image-20240330155859793](Vue.js%E5%91%BD%E5%90%8D%E9%A3%8E%E6%A0%BC.assets/image-20240330155859793.png)
+
+
+
+![image-20240330155944527](Vue.js%E5%91%BD%E5%90%8D%E9%A3%8E%E6%A0%BC.assets/image-20240330155944527.png)
+
+
+
+![image-20240330160022005](Vue.js%E5%91%BD%E5%90%8D%E9%A3%8E%E6%A0%BC.assets/image-20240330160022005.png)
+
+
+
+**kebab-case:**
+
++ 路由
++ 组件使用
++ 标签 class="xxx-yyy"
+
+**小驼峰:**
+
++ 方法
++ 属性
++ index.vue
+
+**大驼峰:**
+
++ 组件
+
+**双引号:**
+
++ 标签 class="xxx-yyy"
+
+**单引号:**
+
++ `<script></script>`中

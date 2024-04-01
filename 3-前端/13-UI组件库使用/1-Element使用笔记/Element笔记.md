@@ -2369,6 +2369,23 @@ form表单
 
 
 
+```
+
+.align-container {
+  display: flex;
+  align-items: center;
+}
+
+      <div class="text align-container" >
+           <el-text class="mx-1" >注册登录即表示同意   </el-text>
+          <el-link class="btn" @click="terms">用户协议</el-link>
+          <el-text class="mx-1">和</el-text>
+          <el-link class="btn" @click="privacy"> 隐私政策</el-link>
+        </div>
+```
+
+![image-20240330184318057](Element%E7%AC%94%E8%AE%B0.assets/image-20240330184318057.png)
+
 
 
 # 分割线
@@ -2545,4 +2562,237 @@ span {
 ```
 style="    width: 100%; "  // 充满整个父级
 ```
+
+# 按钮
+
+需求: 没输入表单信息,注册按钮为灰色禁用状态. 输入后启用,点击是手指
+
+```vue
+<template>
+  <el-row class="content">
+    <el-col :span="16" :xs="0" class="content-left"> </el-col>
+    <el-col :span="8" :xs="24" class="content-right">
+      <div class="register-form">
+        <!-- ... -->
+        <div class="form-fields">
+          <!-- 输入框省略... -->
+
+          <el-button
+            size="large"
+            type="primary"
+            class="button"
+            :disabled="!isFormValid"
+            @click="submit"
+            :style="{ cursor: isFormValid ? 'pointer' : 'not-allowed' }"
+          >
+            注册
+          </el-button>
+
+          <p class="text">
+            <!-- ... -->
+          </p>
+        </div>
+      </div>
+    </el-col>
+  </el-row>
+</template>
+
+<script setup>
+import { ref, computed } from "vue";
+
+const registerForm = ref({
+  username: "",
+  mobile: "",
+  code: "",
+  password: ""
+});
+
+    // 
+const isFormValid = computed(() => {
+  return (
+    registerForm.value.username &&
+    registerForm.value.mobile &&
+    registerForm.value.code &&
+    registerForm.value.password.length >= 6
+  );
+});
+
+const submit = () => {
+  // 提交表单逻辑
+};
+
+// 其他方法省略...
+</script>
+
+<style scoped>
+/* 样式省略... */
+</style>
+
+```
+
+### 加载按钮
+
+```html
+<el-button
+  type="primary"
+  :loading="loading"
+    注册
+</el-button>
+
+const loading = ref(false)  // ture显示加载动画
+```
+
+
+
+
+
+# **Feedback 反馈组件**
+
+## Message 消息提示
+
+```js
+const open3 = () => {
+  ElMessage({
+    message: 'Warning, this is a warning message.',
+    type: 'warning',
+  })
+}
+```
+
+![image-20240330161951087](Element%E7%AC%94%E8%AE%B0.assets/image-20240330161951087.png)
+
+![image-20240330161929796](Element%E7%AC%94%E8%AE%B0.assets/image-20240330161929796.png)
+
+
+
+## 表单
+
+![image-20240330215122877](Element%E7%AC%94%E8%AE%B0.assets/image-20240330215122877.png)
+
+![image-20240330213807813](Element%E7%AC%94%E8%AE%B0.assets/image-20240330213807813.png)
+
+- `{ required: true, message: '请输入用户名', trigger: 'blur' }`: 表示用户名字段不能为空，如果用户未输入用户名并且焦点从该字段移开时（即失去焦点），会触发提示消息"请输入用户名"。
+- `{ pattern: /^[a-zA-Z][a-zA-Z0-9_]{1,15}$/, message: '用户名格式不正确', trigger: 'blur' }`: 表示用户名必须以字母开头，且只能包含字母、数字和下划线，长度为2到16个字符之间。如果用户输入的用户名不符合这个规则，失去焦点时会触发提示消息"用户名格式不正确"。
+
+确保输入字段不为空
+
++ 使用 `required: true` 
+
+正则
+
++ pattern: 正则表达式
+
+在 Element UI 的表单验证规则中，`trigger` 属性用于指定验证逻辑的触发方式，常用的触发方式包括：
+
+- `blur`: 当表单项失去焦点时触发验证逻辑。例如，用户在输入框中输入完内容后，点击其他地方使输入框失去焦点时触发验证。
+- `change`: 当表单项的值发生改变时触发验证逻辑。这包括用户输入、选择选项等操作。
+- `input`: 当用户在表单项中输入内容时即时触发验证逻辑。这个触发方式会随着用户每次输入字符而触发验证。
+- `submit`: 在表单提交时触发验证逻辑。通常用于整个表单的统一验证。
+
+
+
+
+
+```vue
+<template>
+  <el-form ref="form" :model="formData" :rules="rules" label-width="100px">
+    <el-form-item label="用户名" prop="username">
+      <el-input v-model="formData.username"></el-input>
+    </el-form-item>
+    <el-form-item label="手机号" prop="mobile">
+      <el-input v-model="formData.mobile"></el-input>
+    </el-form-item>
+    <el-form-item label="验证码" prop="code">
+      <el-input v-model="formData.code"></el-input>
+    </el-form-item>
+    <el-form-item label="密码" prop="password">
+      <el-input type="password" v-model="formData.password"></el-input>
+    </el-form-item>
+    <el-form-item>
+      <el-button type="primary" @click="submitForm">提交</el-button>
+    </el-form-item>
+  </el-form>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      formData: {
+        username: '',
+        mobile: '',
+        code: '',
+        password: ''
+      },
+      rules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { pattern: /^[a-zA-Z][a-zA-Z0-9_]{1,15}$/, message: '用户名格式不正确', trigger: 'blur' }
+        ],
+        mobile: [
+          { required: true, message: '请输入手机号', trigger: 'blur' },
+          { validator: this.validateMobile, trigger: 'blur' }
+        ],
+        code: [
+          { required: true, message: '请输入验证码', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, message: '密码不能少于6位数', trigger: 'blur' }
+        ]
+      }
+    };
+  },
+  methods: {
+    submitForm() {
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          // 表单验证通过，可以提交数据
+          // 这里可以调用 vsubmit() 方法
+          this.vsubmit();
+        } else {
+          // 表单验证不通过，不做任何操作
+        }
+      });
+    },
+    vsubmit() {
+      // 这里放置原来的验证逻辑
+      const username = this.formData.username;
+      const mobile = this.formData.mobile;
+      const code = this.formData.code;
+      const password = this.formData.password;
+
+      // 进行验证逻辑，根据需要处理错误信息
+      // 注意：这里没有对验证结果进行处理，只是简单示例
+    },
+    validateMobile(rule, value, callback) {
+      if (!value) {
+        callback(new Error('请输入手机号'));
+      } else if (!/^[1][3-9][0-9]{9}$/.test(value)) {
+        callback(new Error('手机号格式不正确'));
+      } else {
+        callback();
+      }
+    }
+  }
+};
+</script>
+
+```
+
+## 间距
+
+表单组件之间的间距可以在CSS中设置
+
+```CSS
+.el-form-item{
+    margin-bottom: 0px;
+}
+```
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/1485587-20210225172314721-1766672078.png)
+![img](Element%E7%AC%94%E8%AE%B0.assets/1485587-20210225172330388-742064165.png)
+![img](Element%E7%AC%94%E8%AE%B0.assets/1485587-20210225172342937-1771071671.png)
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/1485587-20210225172450470-878695081.png)![img](Element%E7%AC%94%E8%AE%B0.assets/1485587-20210225172501156-1417811875.png)
 

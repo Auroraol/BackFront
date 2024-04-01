@@ -1,4 +1,4 @@
-## 引言
+## [官网](https://router.vuejs.org/zh/guide/advanced/meta.html)
 
 - [vue-router 官网](https://router.vuejs.org/)
 - [vue-router 中文文档](https://router.vuejs.org/zh/)
@@ -1936,7 +1936,7 @@ router.beforeEach((to, from, next) => {
 
 在第二个例子中，无论何种情况，都在执行 `next` 后直接使用 `return`，这样能够确保后续代码不会被执行，从而避免了潜在的问题。
 
-## 十四、路由元信息
+## 十四、路由元信息:crossed_swords:
 
 定义路由的时候可以配置 `meta` 字段：
 ```javascript
@@ -1985,6 +1985,59 @@ router.beforeEach((to, from, next) => {
   }
 })
 ```
+
+### 自定义的路由元信息
+
+例如当您希望隐藏某些不重要的路由或特定权限的路由时。您可以在定义路由时添加 `hidden: true` 属性，然后在菜单组件或面包屑组件中根据路由元信息来过滤需要显示的路由。
+
+```vue
+// 在路由定义中添加 hidden 属性
+const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: Home,
+    meta: {
+      hidden: true
+    }
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: About
+  },
+  {
+    path: '/contact',
+    name: 'Contact',
+    component: Contact,
+    meta: {
+      hidden: true
+    }
+  }
+]
+
+// 在菜单组件中根据 hidden 属性来判断是否需要显示该路由
+<template>
+  <div>
+    <router-link to="/">Home</router-link>
+    <router-link v-for="route in visibleRoutes" :key="route.name" :to="route.path">{{ route.name }}</router-link>
+  </div>
+</template>
+
+<script>
+export default {
+  computed: {
+    // 过滤掉 hidden 为 true 的路由
+    visibleRoutes () {
+      return this.$router.options.routes.filter(route => !route.meta.hidden)
+    }
+  }
+}
+</script>
+
+```
+
+
 
 ## 十五、路由动画
 

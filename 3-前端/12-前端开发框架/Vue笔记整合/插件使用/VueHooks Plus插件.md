@@ -24,6 +24,63 @@
 └── typings.d.ts   // 全局公共的 TS 类型声明
 ```
 
+# 封装的axios.ts
+
+```ts
+import axios, { AxiosRequestConfig } from 'axios'
+
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
+
+const axiosInstance = axios.create({
+  timeout: 10000,
+})
+
+axiosInstance.interceptors.request.use(
+  config => {
+    return config
+  },
+  error => {
+    return Promise.reject(error)
+  },
+)
+
+axiosInstance.interceptors.response.use(
+  response => {
+    if (response?.status === 200) {
+      return Promise.resolve(response.data)
+    } else {
+      return Promise.reject(response)
+    }
+  },
+  error => {
+    if (error?.message?.includes?.('timeout')) {
+      console.log('timeout')
+    } else {
+      console.log(error)
+    }
+    Promise.reject(error)
+  },
+)
+
+const request = <ResponseType = unknown>(
+  url: string,
+  options?: AxiosRequestConfig<unknown>,
+): Promise<ResponseType> => {
+  return new Promise((resolve, reject) => {
+    axiosInstance({
+      url,
+      ...options,
+    })
+      .then(res => {
+        resolve(res.data)             // 抛出的数据就是是响应式数据, 不是定义的响应数据中的data数据
+      })
+      .catch(err => reject(err))
+  })
+}
+export { axiosInstance, request }
+
+```
+
 # [useRequest](https://inhiblab-core.gitee.io/docs/hooks/useRequest/basic/#userequest-基础用法)
 
 介绍 `useRequest` 最核心，最基础的能力。
@@ -60,8 +117,8 @@ const {
 
 | 参数         | 说明                                                         | 类型                                                         |
 | ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| data         | service 返回的数据/ 一个只读的 `Ref`，表示请求成功后返回的数据 | `Readonly<Ref<TData>>` | `undefined`                         |
-| error        | service 抛出的异常/ 一个只读的 `Ref`，表示请求失败时的错误信息 | `Readonly<Ref<Error>>` | `undefined`                         |
+| data         | service 返回的数据/ 一个只读的 `Ref`，表示请求成功后返回的数据(具体是什么看封装的axios.ts中promise抛出的是什么, 抛出的是响应数据就是响应数据, 是响应数据中的data属性就是data属性) | `Readonly<Ref<TData>>`                                       |
+| error        | service 抛出的异常/ 一个只读的 `Ref`，表示请求失败时的错误信息 | `Readonly<Ref<Error>>`                                       |
 | loading      | service 是否正在执行/ 一个只读的 `Ref`，表示请求是否正在进行中 | `Readonly<>Ref<boolean>`                                     |
 | params       | 当次执行的 service 的参数数组/ 一个只读的 `Ref`，表示当前请求的参数。比如你触发了 `run(1, 2, 3)`，则 params 等于 `[1, 2, 3]` | `Readonly<Ref<TParams | []>>`                                |
 | run          | 手动触发 service 执行，参数会传递给 service。异常自动处理，通过 `onError` 反馈 /用于手动触发请求 | `(...params: TParams) => void`                               |
@@ -966,3 +1023,203 @@ const formatData = useFormatResult(data, callback)
 ![image-20240105095600116](VueHooks%20Plus%E6%8F%92%E4%BB%B6.assets/image-20240105095600116.png)
 
 # 其他用法见官网:crown:
+
+
+
+# 防抖（Debouncing）、节流（Throttling）和轮询（Polling）
+
+1. **防抖（Debouncing）**：
+   - 在登录表单中，用户输入用户名和密码后，一般会点击登录按钮提交表单。由于用户输入的动作不会频繁触发，因此不需要防抖技术来处理用户的输入。
+   - 在一个搜索框中，用户每输入一个字符都要发送一次搜索请求，如果不加防抖，那么每输入一个字符都会触发一次搜索操作，这样会导致大量的请求发送到服务器，对服务器和用户体验都不友好。在这种情况下，可以考虑给输入框的输入事件加上防抖，确保用户停止输入一段时间后再发送搜索请求，以减少不必要的请求。
+2. **节流（Throttling）**：
+   - 节流通常用于需要在一定时间间隔内执行的操作，比如页面滚动事件、鼠标移动事件等。在登录表单中，没有类似的需要在一定时间间隔内执行的操作，因此也不需要使用节流技术。
+3. **轮询（Polling）**：
+   - 轮询通常用于定期获取服务器数据更新的场景，比如实时更新在线用户列表、聊天消息等。在登录表单中，不需要定期获取服务器数据更新，用户只需在输入完用户名和密码后点击登录按钮提交表单即可。
+
+针对登录表单这种场景，不需要加上防抖、节流和轮询这些优化技术。
+
+# axios封装:crown:
+
+```ts
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { getAccessToken } from '/@/utils/auth'
+import { ElMessageBox, ElMessage} from "element-plus";
+
+const axiosInstance = axios.create({
+  timeout: 10000,
+    // axios中请求配置有baseURL选项,表示请求URL公共部分,每个请求将会带该部分
+    // baseURL: import.meta.env.VITE_API_URL,//配置了跨域这里不用写会冲突
+});
+
+
+// 请求拦截
+axiosInstance.interceptors.request.use(
+  (config) => {
+    return config
+  },
+  (error) => {
+    // 当请求失败时做一些处理 抛出错误
+    console.log(error)
+    return Promise.reject(error);
+  }
+);
+
+// 响应拦截器
+axiosInstance.interceptors.response.use(
+  response => {
+    const res = response.data
+
+    if (res.code !== 200000) {
+      // 凭证无效或过期
+      if (res.code === 400007 || res.code === 4000010) {
+        // useStore.dispatch('user/resetToken')
+        ElMessageBox.confirm('登录信息已过期', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          location.reload()
+        }).catch(() => {
+          location.reload()
+        })  
+      } else {
+        // 其他
+        ElMessage({
+          message: res.message || 'Error',
+          type: 'error',
+          duration: 5 * 1000
+        })
+      }
+      return Promise.reject(new Error(res.message || 'Error'))
+    } else {
+      return res
+    }
+  },
+  error => {
+    console.log('err' + error)
+    ElMessage({
+      message: error.message,
+      type: 'error',
+      duration: 5 * 1000
+    })
+    return Promise.reject(error)
+  }
+)
+
+// 给请求头添加 access_token
+const setHeaderToken = (isNeedToken: boolean) => {
+  // 请求头携带token
+  const accessToken = isNeedToken ? getAccessToken() : null;
+  if (isNeedToken) {
+    // api 请求需要携带 access_token
+    if (!accessToken) {
+      console.log("不存在 access_token 则跳转回登录页");
+    }
+    // instance.defaults.headers.common['accessToken'] 中的accessToken叫啥由后端决定
+    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`
+  }
+};
+
+// 定义一个泛型函数 request，用于发送 HTTP 请求
+const request = <ResponseType = unknown>(
+  url: string,
+  options?: AxiosRequestConfig<unknown>,
+  isNeedToken: boolean = false // 默认不需要 token
+): Promise<ResponseType> => {
+  // 返回一个 Promise 对象，Promise 的泛型参数是 ResponseType，即期望的响应数据类型
+  return new Promise((resolve, reject) => {
+    // 使用 axiosInstance 发送 HTTP 请求
+    setHeaderToken(isNeedToken);
+    axiosInstance({
+      url,
+      ...options, // 将传入的 options 合并到请求配置中
+    })
+      .then((res) => {
+        // 请求成功时，将解析后的响应数据传递给 Promise 的 resolve 函数  
+        //res.data 得到响应数据
+        //console.log(res.data); 
+        resolve(res.data as ResponseType);
+      })
+      .catch((err) => {
+        // 请求失败时，将错误信息传递给 Promise 的 reject 函数
+        reject(err);
+      });
+  });
+};
+
+// 有些 api 并不需要用户授权使用，则无需携带 access_token；默认不携带，需要传则设置第三个参数为 true
+const get = (url, params = {}, isNeedToken = false) => {
+  setHeaderToken(isNeedToken);
+  return axiosInstance({
+    method: "get",
+    url,
+    params,
+  });
+};
+
+const post = (url, params = {}, isNeedToken = false) => {
+  setHeaderToken(isNeedToken);
+  return axiosInstance({
+    method: "post",
+    url,
+    data: params,
+  });
+};
+
+export { axiosInstance, request, get, post };
+
+/*
+使用
+①axiosInstance
+和axios使用一致
+
+②request
+// 定义数据响应的类型
+interface DataResponseType {
+  // 在这里定义响应数据的结构
+}
+
+// 可选的 Axios 请求配置
+const options: AxiosRequestConfig = {
+  method: "GET", // 请求方法，例如 GET、POST 等
+  params: { // 请求参数，可以是 params、data 等
+    // 具体参数
+  },
+  // 其他 Axios 请求配置，例如 headers、timeout 等
+};
+
+// 发送请求并指定响应数据的类型
+request<DataResponseType>(url, options, isNeedToken)
+  .then((data) => {
+    // 请求成功时，处理返回的数据
+    console.log("响应数据:", data);
+  })
+  .catch((error) => {
+    // 请求失败时，处理错误信息
+    console.error("请求失败:", error);
+  });
+
+③get
+get(url, params, isNeedToken)
+  .then(response => {
+    // 处理请求成功的响应
+    console.log('GET 请求成功:', response);
+  })
+  .catch(error => {
+    // 处理请求失败
+    console.error('GET 请求失败:', error);
+  });
+
+④post
+post(url, data, isNeedToken)
+  .then(response => {
+    // 处理请求成功的响应
+    console.log('POST 请求成功:', response);
+  })
+  .catch(error => {
+    // 处理请求失败
+    console.error('POST 请求失败:', error);
+  });
+*/
+```
+

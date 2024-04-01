@@ -9868,10 +9868,6 @@ export default {
 + 编写store
 + main.js注册
 
-```
-
-```
-
 
 在 Vue.js 中，创建 Vuex store 有两种常见的方式，具体取决于使用的 Vue 版本。
 
@@ -12559,6 +12555,8 @@ const login = async () => {
 
 ##### ② ts中读写 ref
 
+<span style="color:red">使用一定要用.value</span>
+
 ```vue
 <template>
 <div class="headBox">
@@ -12589,6 +12587,13 @@ onMounted(async () => {
   // 赋值  
   userInfo.value = JSON.parse(decodeURIComponent(pinia.getUserInfo()!));
 });
+    
+    
+// 点击注册按钮
+const submit = () => { 
+	const registerInfo = toRaw(registerForm.value); // 将一个由生成的响应式转化为对象普通对象
+     egister(registerInfo).then()
+}
 </script>    
 ```
 
