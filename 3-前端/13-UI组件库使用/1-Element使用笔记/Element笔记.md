@@ -394,6 +394,23 @@ background-color: #f9fafc;
 
 ![image-20240328203104800](Element%E7%AC%94%E8%AE%B0.assets/image-20240328203104800.png)
 
+## 显示眼睛
+
+ 使用 show-password 属性
+
+![image-20240403171558115](Element%E7%AC%94%E8%AE%B0.assets/image-20240403171558115.png)
+
+```
+          <el-input
+            size="large"
+            show-password
+            v-model="form.password"
+            placeholder="密码至少6位数"
+          />
+```
+
+
+
 # 分页组件el-pagination显示英文转变为中文
 
 ![image-20231127195410463](Element%E7%AC%94%E8%AE%B0.assets/image-20231127195410463.png)
@@ -1359,7 +1376,7 @@ div里标签元素居中(一般用于<标签>文字</标签>有文字的标签)
 
 # Dropdown 下拉菜单
 
-![image-20240318215239558](Element%E7%AC%94%E8%AE%B0.assets/image-20240318215239558.png)
+![image-20240402164832105](Element%E7%AC%94%E8%AE%B0.assets/image-20240402164832105.png)
 
 ```vue
 <template>
@@ -1390,6 +1407,33 @@ const handleCommand = (command: string | number | object) => {
 }
 </script>
 ```
+
+或者
+
+```vue
+<template>
+  <el-dropdown>
+    <span class="el-dropdown-link">
+      Dropdown List<el-icon class="el-icon--right"><arrow-down /></el-icon>
+    </span>
+    <template #dropdown>
+      <el-dropdown-menu>
+          <router-link to="/a">
+            <el-dropdown-item >Action 1</el-dropdown-item>
+          </router-link>
+           <router-link v to="/b">
+            <el-dropdown-item>Action 2</el-dropdown-item>
+           </router-link>
+      </el-dropdown-menu>
+    </template>
+  </el-dropdown>
+</template>
+
+<script>
+</script>
+```
+
+
 
 ## 搜索下拉
 
@@ -2689,9 +2733,62 @@ const open3 = () => {
 - `input`: 当用户在表单项中输入内容时即时触发验证逻辑。这个触发方式会随着用户每次输入字符而触发验证。
 - `submit`: 在表单提交时触发验证逻辑。通常用于整个表单的统一验证。
 
+例子
 
+```ts
+            <el-form-item label="" prop="username">
+              <el-input
+                size="large"
+                :prefix-icon="User"
+                placeholder="用户名"
+                v-model="loginForm.username"
+                inline-message
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="" prop="password">
+              <el-input
+                size="large"
+                :prefix-icon="Lock"
+                placeholder="密码"
+                show-password
+                v-model="loginForm.password"
+                inline-message
+              ></el-input>
+            </el-form-item>
+            <div class="button-top">
+              <div class="left-element">
+                <el-checkbox v-model="checked" label="记住密码" />
+              </div>
+              <div class="right-element">
+                <el-text @click="forgetClick" class="forget" type="primary"
+                  >忘记密码</el-text
+                >
+              </div>
+            </div>
+            <el-form-item>
+              <el-button
+                size="large"
+                type="primary"
+                class="button"
+                :loading="loading"
+                @click="passwordLogin"
+                :disabled="!isFormValid"
+                :style="{
+                  cursor: isFormValid ? 'pointer' : 'not-allowed',
+                }"
+              >
+                登录
+              </el-button>
+            </el-form-item>
+          </el-form>
 
+const loginFormRules = ref({
+  username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+});
+```
 
+例子
 
 ```vue
 <template>

@@ -12015,6 +12015,91 @@ import MyComponent from './MyComponent.vue'
 + 子接受参数   defineProps
 + ![image-20240328212512285](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240328212512285.png)
 
++ ![](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240402200703068.png)
+
+**不设置默认-例子**
+
+```vue
+<script setup lang="ts">
+import { defineProps } from 'vue';
+
+interface CustomData {
+  // 在这里定义自定义数据类型的属性
+  name: string;
+  age: number;
+}
+
+const props = defineProps<{
+  customContent: CustomData; // 使用自定义数据类型作为第一个 props 类型
+  otherProp: string;         // 其他 props 类型
+}>();
+</script>
+
+<template>
+  <div>
+    <h1>Custom Component</h1>
+    <!-- 在组件中处理自定义内容 -->
+    <div>{{ props.customContent }}</div>
+    <!-- 使用其他的 props -->
+    <div>{{ props.otherProp }}</div>
+  </div>
+</template>
+
+```
+
+```vue
+<template>
+  <!-- 使用组件并传入多个 props -->
+  <CustomComponent :customContent="{ name: 'John', age: 30 }" otherProp="other value" />
+</template>
+
+<script>
+import CustomComponent from './CustomComponent.vue';
+
+export default {
+  components: {
+    CustomComponent
+  }
+};
+</script>
+```
+
+**设置默认-例子**
+
+```vue
+<script setup lang="ts">
+import { defineProps } from 'vue';
+
+interface CustomData {
+  // 在这里定义自定义数据类型的属性
+  name: string;
+  age: number;
+}
+
+const props = defineProps<{
+  customContent?: CustomData;  // 使用自定义数据类型作为 props 类型
+  otherProp?: string;          // 其他 props 类型
+}>({
+  customContent: { // 自定义内容的默认值
+    name: 'Default Name',
+    age: 0
+  },
+  otherProp: 'Default Value' // 其他 props 的默认值
+});
+</script>
+
+<template>
+  <div>
+    <h1>Custom Component</h1>
+    <!-- 在组件中处理自定义内容 -->
+    <div>{{ props.customContent }}</div>
+    <!-- 使用其他的 props -->
+    <div>{{ props.otherProp }}</div>
+  </div>
+</template>
+
+```
+
 #### 例子1
 
 <strong style="color:red">父组件 ===> 子组件</strong>   defineProps
@@ -12352,6 +12437,11 @@ runSideEffectOnce()
 
 其中onBeforeUnmount, onUnmounted需要引用组件来实现调用，在子组件里面添加，在父组件中使用v-if控制这个子组件的显示和消失，就可以了。
 
+- `onBeforeMount`：在组件挂载之前调用。可以在此处进行一些初始化操作，例如获取数据。
+- `onMounted`：在组件挂载后调用。通常用于执行需要在页面渲染完成后立即执行的操作，比如发起网络请求。
+- `onBeforeUpdate`：在组件更新之前调用。适合用于在组件更新前做一些准备工作或者获取更新前的状态。
+- `onUpdated`：在组件更新之后调用。可以用于执行一些在组件更新完成后需要立即执行的操作，比如操作 DOM 元素。
+
 子组件代码：
 
 ```vue
@@ -12422,7 +12512,7 @@ onBeforeMount(() => {
   console.log("渲染之前", demo);
 })
  
-// 页面渲染之后, 初始化
+// 页面渲染之后
 onMounted(() => {
   console.log("渲染之后", demo);
 })
@@ -12591,7 +12681,7 @@ onMounted(async () => {
     
 // 点击注册按钮
 const submit = () => { 
-	const registerInfo = toRaw(registerForm.value); // 将一个由生成的响应式转化为对象普通对象
+	const registerInfo = registerForm.value; //
      egister(registerInfo).then()
 }
 </script>    
@@ -12620,7 +12710,7 @@ const doubleCount = computed(() => count.value * 2);
 
 在这个示例中，doubleCount 是一个计算属性，它的值是 count 的值乘以 2。每当 count 的值发生变化时，doubleCount 会自动更新。
 
-```jvue
+```vue
 <template>
   <div>
     <p>原始值: {{ originalValue }}</p>
@@ -12637,6 +12727,87 @@ const computedValue = computed(() => {
   return originalValue.value * 2;
 });
 </script>
+```
+
+**例子**
+
+```vue
+<script setup lang="ts">
+import { reactive,computed } from "vue";
+const onePeople = reactive({
+  name: "Sam Xiaoguai",
+  chineseName: [
+    "萨姆",
+    "小乖"
+  ]
+});
+    
+// 一个计算属性 ref
+const haveChineseName = computed<string>(() => {
+  return onePeople.chineseName.length > 0 ? "有中文名" : "没有"
+})
+
+</script>
+<template>
+  <div>
+    {{ haveChineseName }}
+  </div>
+</template>
+<style scoped></style>
+```
+
+**例子**
+
+```js
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import { mapState } from 'vue-demi';
+
+// 获取store实例
+const store = useStore();
+
+// 创建计算属性
+const doubleCount = computed(() => {
+  // 通过mapState获取userInfo等数据
+  const { userInfo, code, mes } = ...mapState(store, ['userInfo', 'code', 'mes']);
+  // 这里可以对数据进行处理
+  return {
+    userInfo,
+    code,
+    mes
+  };
+});
+</script>
+```
+
+**例子**
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+ 
+const firstName = ref('Sam')
+const lastName = ref('xiaoguai')
+const fullName = computed({
+  // getter
+  get() {
+    return firstName.value + ' ' + lastName.value
+  },
+  // setter
+  set(newValue) {
+    // 注意：我们这里使用的是解构赋值语法
+    [firstName.value, lastName.value] = newValue.split(' ')
+  }
+})
+fullName.value = "sam xiaoguai"
+</script>
+<template>
+  <div>
+    {{ fullName }}
+  </div>
+</template>
+<style scoped></style>
 ```
 
 #### 3.监视属性（watch函数）
@@ -12657,6 +12828,201 @@ watch(count, (newValue, oldValue) => {
 ```
 
 在这个示例中，我们使用 watch 函数来监视 count 的变化。每当 count 的值发生变化时，回调函数会被调用，可以在回调函数中执行相应的操作。
+
+### 十三、mixin
+
+注:  尽管在 Vue 3 中保留了 mixins 支持，但对于组件间的逻辑复用，使用组合式 API 的组合式函数是现在更推荐的方式。
+
+首先，创建一个名为 mixins.js 的文件，用于存放混入对象：
+
+```javascript
+// mixins.js
+import {
+  ref,
+  watch,
+  onMounted
+} from 'vue'
+
+export function useCounter() {
+  const count = ref(0);
+  const increment = () => {
+    count.value++;
+  };
+    
+  const mData = ref(null)
+  
+  onMounted(() => {
+    getData()
+  })
+    
+  watch(() => data, (newVal, oldVal) => {
+    console.log('watch', newVal, oldVal)
+  }, {
+    deep: true
+  })
+    
+  const getData = () => {
+    mData.value = {
+        name: 'lily',
+        age: 10
+    }
+  }
+
+   // 暴露出去
+  return {
+    count,
+    increment,
+    mData,
+    getData
+  };
+};
+```
+
+在组件中引入并使用混入：
+
+```html
+<template>
+  <div>
+    <h1>{{ count }}</h1>
+   <button @click="increment">Increment</button>
+  </div>
+    <div class="box">
+        {{mData.name}}
+    </div>
+
+</template>
+
+<script setup lang="ts">
+//// 导入
+import { useCounter } from './mixins';
+    
+//拿到数据    
+const { count, increment } = useCounter();
+
+// 拿到数据
+const { mData } = useCounter();
+console.log(mData)
+
+</script>
+```
+
+在这个例子中，我们在组件中引入了 `useCounter` 混入，并使用`<script setup>` 语法糖将其数据和方法与组件关联。当用户点击 `Increment` 按钮时，`increment`方法会被调用，从而更新 `count` 变量的值。
+
+注意事项
+
+在使用Vue 3的混入(mixins)功能时，有一些需要注意的地方：
+
+1. 冲突：如果混入(mixins)和组件本身的选项冲突，组件本身的选项将会优先生效。如果有冲突的选项，可以使用相同的名字创建组件本身的选项来覆盖混入(mixins)的选项。
+2. 生命周期钩子：Vue 3中的混入(mixins)中的生命周期钩子函数会在组件的生命周期之前调用。如果有多个混入(mixins)，它们的生命周期钩子函数将按照混入(mixins)的声明顺序依次调用。
+3. 响应式属性：Vue 3中的混入(mixins)在组件内部使用的响应式属性需要在组件内部声明，否则它们将不会被响应式地追踪。
+4. 方法和计算属性：Vue 3中的混入(mixins)中的方法和计算属性会与组件本身的方法和计算属性合并。如果有冲突的方法或计算属性，组件本身的方法和计算属性将会覆盖混入(mixins)的方法和计算属性。
+5. 全局混入(mixins)：Vue 3中已经移除了全局混入(mixins)的功能，不再推荐使用全局混入(mixins)。如果需要在多个组件中共享代码，可以考虑使用Composition API或自定义指令等其他方式。
+
+在使用Vue 3的混入(mixins)时，需要注意组件选项冲突、生命周期钩子的调用顺序、响应式属性的声明和覆盖、方法和计算属性的合并，以及全局混入(mixins)的移除。
+
+#### 例子
+
+```ts
+import { ref } from 'vue';
+import { sendCode } from '/@/api/sms/sms'; // 发送验证码的API接口
+import { validMobile } from "/@/utils/validate";
+
+// 定义 mixin 
+export function useSmsCodeMixin() {
+    
+    const codeCount = ref(0); // 使用 ref 创建响应式计时器变量
+
+    /**
+     * 
+     * @param mobile 手机号码
+     * @param timeCount 倒计时, 默认120s
+     * @returns 
+     */
+    const getCode = (mobile: any, timeCount: number = 120) => {
+       
+      if (mobile === "") {
+        ElMessage.warning("请输入手机号");
+        return;
+      }
+      if (!validMobile(mobile)) {
+        ElMessage.error("手机号格式不正确");
+        return;
+      } 
+  
+      // 倒数计时
+      codeCount.value = timeCount;
+      const timer = setInterval(() => {
+        if (codeCount.value > 0 && codeCount.value <= timeCount) {
+            codeCount.value--;
+        } else {
+          clearInterval(timer);
+        }
+      }, 1000);
+  
+      // 发送短信api
+      const params = { mobile: mobile };
+      sendCode(params)
+        .then(() => {
+          ElMessage.success('发送成功');
+        })
+        .catch((error) => {
+          ElMessage.error("发送失败");
+        });
+    };
+  
+    return {
+      codeCount,
+      getCode
+    };
+  }
+```
+
+使用
+
+```vue
+<template>       
+	<el-form-item>
+           <el-input
+            size="large"
+            v-model="form.code"
+            placeholder="请输入验证码"
+            inline-message
+          >
+            <template #suffix>
+              <i
+                v-show="!codeCount"
+                class="code"
+                style="font-style: normal; margin-right: 10px"
+                @click="sendCode"
+                >获取验证码</i
+              >
+              <el-text v-show="codeCount" type="primary"
+                >{{ codeCount }}s</el-text
+              >
+            </template>
+          </el-input>
+
+        </el-form-item>
+</template>
+ <script setup>     
+// 在 setup 中引入 mixin
+const { getCode, codeCount } = useSmsCodeMixin();
+
+const form = reactive({
+  mobile: "",
+  code: "",
+  password: "",
+  password2:""
+})
+
+
+// 发送验证码
+const sendCode = () => {
+  getCode(form.mobile)
+  
+};
+</script>
+```
 
 # $ref语法糖
 

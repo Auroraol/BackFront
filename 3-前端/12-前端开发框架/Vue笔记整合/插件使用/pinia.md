@@ -10,6 +10,8 @@ Pinia(大菠萝)是一个专门为Vue.js设计的状态管理库，它提供了�
 
 **pina  状态管理  相当于静态变量   通过 路由跳转来进行刷新页面 状态能保存。但是直接通过刷新，相当于重新部署，要保存状态只能通过浏览器（locatestorage等）**
 
+作用:   持久化是将程序数据在持久状态和瞬时状态间转换的机制。 通俗：页面刷新，数据不清零
+
 ## 安装和配置Pinia [必须]
 
 ```
@@ -740,7 +742,7 @@ export const useInfoStore = defineStore(Names.TEST, {
 
 <img src="https://img-blog.csdnimg.cn/24887a965f584489a42da56dac9bd48c.gif#pic_center" style="zoom:80%;" >
 
-## getter 方法
+## getters 方法
 
 getters 类似于 vue 里面的计算属性，可以对已有的数据进行修饰。有两种写法。
 
@@ -800,6 +802,25 @@ getters 类似于 vue 里面的计算属性，可以对已有的数据进行修�
 
 我们可以看见，点击修改 name 之后呢，getter 也会实时的去渲染出来。
 
+### 使用箭头函数(getters里推荐)
+
+```js
+export const useStore = defineStore('main', {
+  state: () => ({
+    count: 0,
+  }),
+  getters: {
+    //方式1 使用state: 自动推断出返回类型是一个 number
+    doubleCount: (state) => state.count * 2,
+      
+    //方式2 使用this:  返回类型必须明确设置
+    doublePlusOne = (): number => {
+      return this.doubleCount + 1;
+    }
+  },
+});
+```
+
 ### 可以相互调用
 
 ```javascript
@@ -817,6 +838,77 @@ getters 类似于 vue 里面的计算属性，可以对已有的数据进行修�
 保存，刷新一下看效果。
 
 <img src="https://img-blog.csdnimg.cn/0bd5162c590b4908b4634708159e86a6.gif#pic_center">
+
+### 向 getter 传递参数
+
+*Getter* 只是幕后的**计算**属性，所以不可以向它们传递任何参数。可以从 *getter* 返回一个函数，该函数可以接受任意参数：
+
+```js
+export const useStore = defineStore('main', {
+  getters: {
+    getUserById: (state) => {
+      return (userId) => state.users.find((user) => user.id === userId)
+    },
+  },
+})
+```
+
+并在组件中使用：
+
+```js
+<script setup>
+import { useUserListStore } from './store'
+const userList = useUserListStore()
+const { getUserById } = storeToRefs(userList)
+// 请注意，你需要使用 `getUserById.value` 来访问
+// <script setup> 中的函数
+</script>
+ 
+<template>
+  <p>User 2: {{ getUserById(2) }}</p>
+</template>
+```
+
+请注意，当你这样做时，**getter 将不再被缓存**，它们只是一个被你调用的函数。不过，你可以在 getter 本身中缓存一些结果，虽然这种做法并不常见，但有证明表明它的性能会更好：
+
+```typescript
+export const useStore = defineStore('main', {
+  getters: {
+    getActiveUserById(state) {
+      const activeUsers = state.users.filter((user) => user.active)
+      return (userId) => activeUsers.find((user) => user.id === userId)
+    },
+  },
+})
+```
+
+### 访问其他 store 的 getter
+
+想要使用另一个 store 的 getter 的话，那就直接在 *getter* 内使用就好：
+
+大多数时候，getter 仅依赖 state，不过，有时它们也可能会使用其他 getter。
+
+```js
+
+import { useOtherStore } from './other-store'
+ 
+export const useStore = defineStore('main', {
+  state: () => ({
+    // ...
+  }),
+  getters: {
+    otherGetter(state) {
+      const otherStore = useOtherStore()
+      return state.localData + otherStore.data
+    },
+    //或者
+    otherGetter: (state) => {
+    const otherStore = useOtherStore();
+    return state.localData + otherStore.data;
+    }
+  },
+})
+```
 
 ## API 的使用
 

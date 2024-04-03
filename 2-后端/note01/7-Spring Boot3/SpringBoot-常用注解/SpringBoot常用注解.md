@@ -4088,7 +4088,7 @@ public class BudgetSerializer extends JsonSerializer<BigDecimal> {
 ```
 
 作用：在返回给前端金额参数的时候，把数据库中的数据由元格式化为万元，就是除10000的操作。
- 
+
 
 ```
 @Slf4j
@@ -4160,9 +4160,9 @@ entity
 
 ```java
 @Data
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@Accessors(chain = true)  // //链式, enity没必要, vo可以用
+@EqualsAndHashCode(callSuper = true)  //在不加 @EqualsAndHashCode(callSuper = true) 注解的情况下对这两个对象进行比较得到的结果却是 true
+@JsonInclude(JsonInclude.Include.NON_NULL) //返回,忽略为空的
 @ApiModel(value="Client对象", description="客户端表")
 public class Client implements Serializable {
 

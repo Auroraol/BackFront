@@ -717,6 +717,7 @@ store.state.route.query  // current query (object)
 
 - `<router-link :to='...'></router-link>`
 - `<router-link :to="..." replace></router-link>`
+- 一般用于点击就为了直接跳转视图的情况
 
 直接书写路径：
 
@@ -751,17 +752,50 @@ store.state.route.query  // current query (object)
 
 ```ts
 <script setup lang="ts">
-    
+ // 引入   
 import { useRouter } from 'vue-router'
 const router = useRouter();
-const toPage = (url) => {
-  router.push(url) // 字符串形式跳转  //路由地址
-}
+// 路由跳转
+router.push(url) // 字符串形式跳转  //路由地址
 
 </script>
 ```
 
+**可以封装成Mixin(但是多此一举了)**
+
+```ts
+import { useRouter } from "vue-router";
+
+// 定义 mixin 
+export function useRouterMixin() {
+    const router = useRouter();
+    
+    // 路由跳转
+    const toPage = (url) => {
+        router.push(url); // 字符串形式跳转  //路由地址
+    };
+
+    return {
+        toPage
+    }
+}
+```
+
+使用
+
+```vue
+import { useRouterMixin } from '/@/mixins/routerMixin'
+
+// 在 setup 中引入 mixin
+const { toPage } = useRouterMixin();
+
+toPage("/reset-password");
+```
+
+**补充**
+
 直接书写路径： 路由地址什么啥就是什么
+
 ```javascript
 router.push('路由地址')
 router.push('/home')
