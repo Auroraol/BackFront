@@ -3831,7 +3831,7 @@ Student.vue组件
 </script>
 ```
 
-## ref 属性
+## ref 属性:crossed_swords:
 
 1. 被用来给元素或子组件注册引用信息（id=xxx的替代者）
 2. 应用在html标签上**获取的是真实DOM元素**，应用在组件标签上是组件实例对象（vc）
@@ -5562,8 +5562,6 @@ Vue 在插入、更新或者移除 DOM 时，提供多种不同方式的应用�
 - 在过渡钩子函数中使用 JavaScript 直接操作 DOM
 - 可以配合使用第三方 JavaScript 动画库，如 Velocity.js
 
-<a name="kkOvs"></a>
-
 ### 一、过渡的不同阶段
 
 在进入/离开的过渡中，会有 6 个 class 切换。
@@ -5615,9 +5613,9 @@ export default {
 </style>
 ```
 
-效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/jOMVmGW)
+[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/jOMVmGW)
 
-<a name="R3c0b"></a>
+
 
 ### 二、自定义过渡的类名
 
@@ -5635,7 +5633,7 @@ export default {
 
 比如：
 
-```html
+```vue
 <template lang="pug">
 div
   button(v-on:click="show = !show") Toggle
@@ -11309,8 +11307,7 @@ setup支持接收参数，第一个参数是props，接收来自父组件的传�
 
 
 
-
-## 五、新的组件
+## 五、新的组件:crossed_swords:
 
 ### 1.Fragment
 
@@ -11469,9 +11466,24 @@ ref: modalOpen = false
 
 ![GIF (5)](vue%E7%AC%94%E8%AE%B02.0.assets/GIF%20(5).gif)在CodePen中查看效果：[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/MWjeOBd)
 
-### 3.Suspense
+### 3.Suspense (常用)
 
 - 等待异步组件时渲染一些额外内容，让应用有更好的用户体验
+
+- 尽量多层封装
+
+- 异步加载通常用于加载网页中的大型媒体文件（如图片、视频）、JavaScript文件或其他资源，以提高页面加载速度和性能。以下是一些常见的内容可以使用异步加载：
+
+  1. **背景图片**：特别是高分辨率的背景图片，可以在页面加载完成后异步加载，以加快页面呈现速度。
+  2. **广告**：页面中的广告通常会增加页面加载时间，将其异步加载可以使页面更快地展示给用户，而不必等待广告加载完毕。
+  3. **JavaScript文件**：将JavaScript文件异步加载可以减少页面的初始加载时间。特别是对于较大的JavaScript文件，可以延迟加载以优化性能。
+  4. **字体文件**：对于自定义字体文件，可以使用异步加载，以避免它们阻塞页面渲染。
+  5. **社交分享按钮**：社交分享按钮通常需要从第三方服务器加载，将其异步加载可以提高页面加载速度。
+  6. **评论框架**：像Disqus这样的评论框架可以通过异步加载来延迟加载，以减少对页面加载时间的影响。
+  7. **大型媒体文件**：如视频或音频文件，可以在用户与其相关的内容交互时异步加载，而不是在页面初始加载时加载。
+  8. **地图**：集成的地图服务（如Google Maps）可以在用户需要查看地图时异步加载，而不是在页面加载时就加载地图。
+
+  总之，任何对页面加载速度有较大影响的内容都可以考虑异步加载，以提高用户体验和网站性能。
 
 - 使用步骤：
 
@@ -11574,6 +11586,26 @@ ref: modalOpen = false
 	}
 </style>
 ```
+
+### TransitionGroup 列表动画组件
+
+`<TransitionGroup>` 对一个 v-for 列表添加进入 / 离开动画的示例
+
+```ts
+<transition-group>
+     <div style="margin: 10px;" :key="item" v-for="item in list">{{ item }</div>
+</transition-group>
+
+const list = reactive<number[]>([1, 2, 4, 5, 6, 7, 8, 9])
+const Push = () => {
+    list.push(123)
+}
+const Pop = () => {
+    list.pop()
+}
+```
+
+
 
 
 
@@ -12015,7 +12047,7 @@ import MyComponent from './MyComponent.vue'
 + 子接受参数   defineProps
 + ![image-20240328212512285](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240328212512285.png)
 
-+ ![](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240402200703068.png)
++ ![image-20240405221245069](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240405221245069.png)
 
 **不设置默认-例子**
 
@@ -12810,7 +12842,9 @@ fullName.value = "sam xiaoguai"
 <style scoped></style>
 ```
 
-#### 3.监视属性（watch函数）
+#### 3.监视属性
+
+##### watch函数
 
 **监视属性（Watch Property）**：
 
@@ -12828,6 +12862,79 @@ watch(count, (newValue, oldValue) => {
 ```
 
 在这个示例中，我们使用 watch 函数来监视 count 的变化。每当 count 的值发生变化时，回调函数会被调用，可以在回调函数中执行相应的操作。
+
+```js
+watch(
+  () => Number(router.currentRoute.value.params.id),
+  (newValue, oldValue) => {
+    // 当路由参数发生变化时执行逻辑
+    id.value = newValue;
+    url.value = "http://localhost:8888/article/" + id.value;
+    initArticle();
+  }
+);
+```
+
+#####  watchEffect函数(推荐)
+
+注意函数作用域
+
+```ts
+
+watchEffect(async () => {
+    if (pinia.bodyWidth < 1050) {
+        media.value = false
+        media2.value = true
+    } else {
+        media.value = true
+        media2.value = false
+    }
+
+    //登录了!修改状态
+    if (pinia.sessionInfo) {
+        ifLog.value = false
+    } else {
+        ifLog.value = true
+    }
+})
+```
+
+```js
+
+watchEffect(async () => {
+    if (pinia.pariseOrCollection) {
+        const { data: res } = await useAxios.get('/getidarticle', {
+            params: {
+                id: props.articleInfo.id
+            }
+        })
+        //更新点赞的数据
+        pariseNum.value = res.data.parise.length
+        //更新收藏数据
+        collectionNum.value = res.data.collections.length
+    }
+
+})
+```
+
+```js
+watchEffect(() => {
+    //先清空一下数组，再计算页数
+    push.page = []
+    if (push.pageNums % 6 === 0) {
+        for (let i = 0; i < Math.floor(push.pageNums / 6); i++) {
+            push.page.push(i + 1)
+        }
+    } else {
+        for (let i = 0; i < Math.floor(push.pageNums / 6) + 1; i++) {
+            push.page.push(i + 1)
+        }
+    }
+    showPush.showArticle = pushArticleNum.slice(6 * (push.nowPage - 1), 6 * (push.nowPage - 1) + 6)  //页码更新后更新显示的文章内容
+})
+```
+
+
 
 ### 十三、mixin
 
@@ -13815,4 +13922,182 @@ import my from '../components/my.vue'
 # VUE页面进行路由切换时出现短暂的闪烁
 
 
+
+# JavaScript 中日期处理
+
+在 JavaScript 中，Date() 函数接受的日期字符串格式有一定的要求。通常情况下，日期字符串使用斜杠（/）或者逗号（,）作为日期、月份和年份的分隔符，而不是连字符（-）。所以，在将日期字符串传给 Date() 函数之前，需要将连字符替换为斜杠，以确保日期能够被正确解析。
+
+```ts
+const formatD = (str: string): string => {
+  //2024-04-08 15:03:51 -> 2024/04/08 15:03:51
+  str = str.replace(/-/g, "/");
+  const date = new Date(str);
+  const now = new Date();
+  // 是当前年,就不显示年份
+  return date.getFullYear() === now.getFullYear()
+    ? formatDate(new Date(str), "mm月dd日")
+    : formatDate(new Date(str), "YYYY年mm月dd日");
+};
+```
+
+注: 时间日期转换函数是日期传换函数
+
+
+
+# `<Transition>`
+
+```vue
+    <Transition @enter="gsapEnterCover" :css="false">
+        <div class="coverImg" v-if="ifCover">
+            <img :src="browseArticle.cover" alt="">
+            <div class="mask">
+                <div class="title">{{ browseArticle.title }}</div>
+                <div class="author" @click="goToPersonalCenter">
+                    <div class="head">
+                        <img :src="authorInfo.headImg" alt="head">
+                    </div>
+                    <div class="nickName">{{ authorInfo.nickName }}</div>
+                </div>
+                <div class="time">
+                    <svg class="icon" aria-hidden="true">
+                        <use xlink:href="#icon-rili"></use>
+                    </svg>
+                    <span>{{ browseArticle.time }}</span>
+                </div>
+            </div>
+        </div>
+    </Transition>
+```
+
+`<Transition>` 标签通常用于在 Vue.js 应用程序中创建过渡效果。它是 Vue.js 内置的一个组件，用于在元素进入、离开或在其内部状态改变时，对元素进行动画处理。
+
+以下是一个简单的示例，演示了如何在 Vue.js 中使用 `<Transition>` 标签：
+
+```
+Copy Code<template>
+  <div>
+    <!-- 使用 Transition 包裹要进行过渡的元素 -->
+    <Transition name="fade">
+      <p v-if="show">这是一个会淡入淡出的段落。</p>
+    </Transition>
+
+    <!-- 控制按钮，点击后切换 show 变量的值 -->
+    <button @click="toggleShow">切换显示状态</button>
+  </div>
+</template>
+
+<script>
+import { ref } from 'vue';
+
+export default {
+  setup() {
+    // 使用 ref 创建响应式变量
+    const show = ref(true);
+
+    // 切换 show 变量的值
+    const toggleShow = () => {
+      show.value = !show.value;
+    };
+
+    return {
+      show,
+      toggleShow
+    };
+  }
+};
+</script>
+
+<style>
+/* 定义淡入淡出的过渡效果 */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+</style>
+```
+
+在这个例子中，`<Transition>` 标签包裹了一个段落元素，该段落根据 `show` 变量的值进行显示或隐藏。当点击按钮时，`toggleShow` 方法会切换 `show` 变量的值，从而触发过渡效果。CSS 中的过渡样式定义了淡入淡出的动画效果。
+
+使用 GSAP（GreenSock Animation Platform）来管理过渡效果，并且希望在 Vue.js 中使用 `<Transition>` 组件，则需要一些额外的步骤来集成 GSAP 和 Vue.js 过渡。
+
+```vue
+<template>
+  <div>
+    <!-- 使用 Transition 包裹要进行过渡的元素 -->
+    <Transition
+      @before-enter="beforeEnter"
+      @enter="enter"
+      @leave="leave"
+    >
+      <p v-if="show" class="transition-element">这是一个会使用GSAP过渡的段落。</p>
+    </Transition>
+
+    <!-- 控制按钮，点击后切换 show 变量的值 -->
+    <button @click="toggleShow">切换显示状态</button>
+  </div>
+</template>
+
+<script>
+import { ref } from 'vue';
+import { gsap } from 'gsap';
+
+export default {
+  setup() {
+    // 使用 ref 创建响应式变量
+    const show = ref(true);
+
+    // 切换 show 变量的值
+    const toggleShow = () => {
+      show.value = !show.value;
+    };
+
+    // 过渡前的钩子函数
+    const beforeEnter = (el) => {
+      el.style.opacity = 0;
+    };
+
+    // 进入过渡的钩子函数
+    const enter = (el, done) => {
+      gsap.to(el, {
+        opacity: 1,
+        duration: 1,
+        onComplete: done
+      });
+    };
+
+    // 离开过渡的钩子函数
+    const leave = (el, done) => {
+      gsap.to(el, {
+        opacity: 0,
+        duration: 1,
+        onComplete: done
+      });
+    };
+
+    return {
+      show,
+      toggleShow,
+      beforeEnter,
+      enter,
+      leave
+    };
+  }
+};
+</script>
+
+<style>
+/* 可以省略 */
+</style>
+
+```
+
+# 一定要设置一个loading响应数据保证 `<template>`中能拿到服务器的数据:crossed_swords:
+
+感觉这样还能解决 闪屏问题
+
+![image-20240411144917919](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240411144917919.png)
+
+![image-20240411144944415](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240411144944415.png)
 

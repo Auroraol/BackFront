@@ -409,7 +409,52 @@ background-color: #f9fafc;
           />
 ```
 
+## 标题 + 输入框
 
+```
+        <div class="title">
+            <label for="title">标题:</label>
+            <el-input @input="saveEditor" maxlength="30" v-model="articleWrite.articleTitle" placeholder="输入文章标题"
+                show-word-limit type="text" name="title" />
+        </div>
+        
+        
+    .title {
+        display: flex;
+        align-items: center;
+        margin: 1rem 0;
+
+
+        label {
+            width: 5rem;
+        }
+
+        input {
+            width: 10%;
+        }
+    }
+```
+
+## 输入框大小
+
+width: 240px
+
+```
+<template>
+  <el-input v-model="input" style="width: 240px" placeholder="Please input" />
+</template>
+```
+
+## 字数限制
+
+maxlength="10" show-word-limit 
+
+```
+        <el-input class="input"  maxlength="10" show-word-limit  v-model="title" placeholder="输入文章标题" />
+
+```
+
+![image-20240404214550169](Element%E7%AC%94%E8%AE%B0.assets/image-20240404214550169.png)
 
 # 分页组件el-pagination显示英文转变为中文
 
@@ -498,7 +543,7 @@ const toggle = () => {
 
 
 
-```
+```ts
   <el-menu
           :default-active="activeIndex"
           class="el-menu-demo"
@@ -526,6 +571,39 @@ const handleSelect = (index: string) => {
     router.push({ path: `${index}` });
   }
 };
+```
+
+
+
+```ts
+
+<el-menu
+            :default-active="activeIndex"
+            class="el-menu-demo"
+            mode="horizontal"
+            @select="handleSelect"
+            background-color="transparent"
+            active-text-color="#79bbff"
+          >
+<el-menu-item index="/index" style="margin-left: 130px">
+              <el-icon><House /></el-icon> 首页
+            </el-menu-item>
+            <el-menu-item index="/category">
+              <el-icon><document /></el-icon>
+              分类
+            </el-menu-item>
+          
+const activeIndex = ref("1");
+
+const handleSelect = (index: string) => {
+  activeIndex.value = index;
+  if (index === "info") {
+    // 某个页面
+  } else {
+    router.push({ path: `${index}` });
+  }
+};
+
 ```
 
 [Elementui中El-menu导航栏-CSDN博客](https://blog.csdn.net/qq_40323256/article/details/125212606?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-125212606-blog-124561084.235^v43^pc_blog_bottom_relevance_base1&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
@@ -603,18 +681,20 @@ border-bottom: 1px solid #fff !important;
 
 - mode：[导航栏](https://so.csdn.net/so/search?q=导航栏&spm=1001.2101.3001.7020)的模式，默认值vertical 导航栏处于垂直状态，改为horizonta可变为水平模式。
 - index：唯一标志。
-- default-active：激活当前菜单的index。 
+- default-active：激活当前菜单的index。 和唯一标志结合
 -   active-text-color="#31c27c"  点击后文字颜色
 - router： 是否使用路由，启用后可以通过index作为地址进行跳转。
 - <[el-menu](https://so.csdn.net/so/search?q=el-menu&spm=1001.2101.3001.7020)-item index="1">导航栏中的子菜单标签。
 - <el-submenu> 生成二级菜单。
+-  :collapse="isCollapse"  是否折叠
+- ​      @open="handleOpen" 选择的哪一项
 
 代码实现：
 
 ```html
 <template>
 <el-menu
-      :default-active="path"
+      :default-active="2"
       class="el-menu-demo"
       mode="horizontal"
       @select="handleSelect"
@@ -1266,7 +1346,27 @@ const gsapAnimation = () => {
 }
 ```
 
+# 过渡
 
+```
+       <!-- 使用 transition 组件包裹 router-view -->
+      <transition name="fade">
+        <!-- 路由 -->
+        <router-view />  
+      </transition>
+```
+
+
+
+```
+/* 淡入淡出的过渡效果*/
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active 在 <2.1.8 版本中 */ {
+  opacity: 0;
+}
+```
 
 
 
@@ -1291,11 +1391,18 @@ const gsapAnimation = () => {
 
 # 居中
 
+```
+margin: 0 auto;
+ width: 80%;
+```
+
+![image-20240410113019779](Element%E7%AC%94%E8%AE%B0.assets/image-20240410113019779.png)
+
 相当于父级块居中
 
 ```
  <div style="display: flex; justify-content: center;">
-     <!---->
+     <!--其他标签-->
 </div>
 ```
 
@@ -1547,9 +1654,11 @@ export default {
 
 # Affix 固钉
 
+通过设置 `offset` 属性来改变吸顶距离，默认值为 0。
+
 ```vue
 <template>
-  <el-affix>
+   <el-affix  :offset="90" class="包裹的样式">
     <div style="background-color: #2580B3;">
     </div>
   </el-affix>
@@ -2430,6 +2539,12 @@ form表单
 
 ![image-20240330184318057](Element%E7%AC%94%E8%AE%B0.assets/image-20240330184318057.png)
 
+# 左右(有时候可以用定位来实现)
+
+```
+      margin-left: auto; /* 推到容器的右侧 */
+```
+
 
 
 # 分割线
@@ -2600,6 +2715,12 @@ span {
 ```
 整体边框: box-sizing: border-box;
 ```
+
+```
+border-bottom: 1px solid hsla(0,0%,59.2%,.2);
+```
+
+![image-20240404115715987](Element%E7%AC%94%E8%AE%B0.assets/image-20240404115715987.png)
 
 # 大小
 
@@ -2892,4 +3013,681 @@ export default {
 ![img](Element%E7%AC%94%E8%AE%B0.assets/1485587-20210225172342937-1771071671.png)
 
 ![img](Element%E7%AC%94%E8%AE%B0.assets/1485587-20210225172450470-878695081.png)![img](Element%E7%AC%94%E8%AE%B0.assets/1485587-20210225172501156-1417811875.png)
+
+# 上传
+
+![image-20240405134004412](Element%E7%AC%94%E8%AE%B0.assets/image-20240405134004412.png)
+
+
+
+  :file-list="files" 绑定的文件列表
+
+ :limit="1" 和    :on-exceed="onExceed" 结合, 当文件数量超过1时, 调用自定义onExceed函数
+
+
+
+```
+//:http-request="elUploadFunc" 
+//覆盖默认的 Xhr 行为 //调用submit会自动调用http-request的函数(elUploadFunc)
+const elUploadFunc = (domParam: any) => {
+  // 
+};
+```
+
+
+
+
+
+```
+//:on-success="successUpCover"
+const successUpCover = (res) => {
+  //res就是<el-upload>中url响应结果
+
+};
+```
+
+
+
+
+
+# 标签
+
+span 天然不换行, 有时候方便
+
+![image-20240405160208288](Element%E7%AC%94%E8%AE%B0.assets/image-20240405160208288.png)
+
+
+
+```
+<span
+          class="labelTag no-choose"
+          @click="chooseTag(tag)"
+          v-for="tag in allTags"
+          :key="tag.id"
+          >{{ tag }}</span
+        >
+```
+
+```css
+    .no-choose {
+    color: black;
+    background-color: #fff;
+    border: .1rem solid black;
+    cursor: pointer;
+    transition: all .1s;
+
+    &:hover {
+        box-shadow: .2rem .2rem var(--box-shadow);
+        transform: translateY(-0.1rem);
+    }
+```
+
+# 加载
+
+在绑定了`v-loading`指令的元素上添加`element-loading-text`属性，其值会被渲染为加载文案，并显示在加载图标的下方。 
+
+比如:
+
+```
+  <ul
+    class="note-list"
+    v-loading="loading"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="#fff"
+  >
+  </ul>
+```
+
+![image-20240408155245963](Element%E7%AC%94%E8%AE%B0.assets/image-20240408155245963.png)
+
+
+
+
+
+# 边框
+
+```
+box-sizing: border-box;
+```
+
+# 阴影
+
+```
+  box-shadow: 0 0 0.5rem 0.2rem var(--gray-light-sahdow);
+  // 鼠标悬停
+  &:hover {
+    box-shadow: 0.1rem 0.1rem 0.5rem var(--gray-sahdow); //阴影
+  }
+  // 向上动画
+    &:hover {
+    cursor: pointer;
+    transform: translateY(-.3rem);
+    }
+```
+
+# 圆角
+
+```
+  border-radius: 0.5rem;
+```
+
+圆
+
+```
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+```
+
+
+
+# 手指样式
+
+```css
+   cursor: pointer;
+```
+
+# 伪元素
+
+```css
+.right-solt:after {
+        content: "·";
+        margin: 0 5px;
+        color: #b2bac2;
+}
+```
+
+这段 CSS 代码是为具有类名 `.right-solt` 的元素的伪元素 `::after` 添加样式。
+
+- `content: "·";`：设置伪元素的内容为 "·"，即一个小圆点。这个小圆点将在匹配元素的后面显示。
+- `margin: 0 5px;`：设置伪元素的外边距为 0 上下方向，5 像素左右方向。这将在伪元素前后添加 5 像素的间距，使得小圆点与其他内容之间有一定的间隔。
+- `color: #b2bac2;`：设置小圆点的颜色为 `#b2bac2`，即浅灰色。这将给小圆点赋予指定的颜色。
+
+![image-20240408162137682](Element%E7%AC%94%E8%AE%B0.assets/image-20240408162137682.png)
+
+
+
+# 列表
+
+## 例子1
+
+![image-20240408170919584](Element%E7%AC%94%E8%AE%B0.assets/image-20240408170919584.png)
+
+```vue
+<template>
+  <ul
+    class="note-list"
+    v-loading="loading"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="#fff"
+  >
+    <transition-group name="fade-list">
+      <li v-for="(item, index) in list" :key="index" class="list-item">
+         <!-- 封面 -->
+        <div class="wrap-img">
+          <img :src="item.cover" />
+        </div>
+        <!-- 用户  -->
+        <div class="wrapper-meta">
+          <div class="avatar-wrapper">
+            <img class="user-avatar" :src="item.user.avatar" />
+          </div>
+          <span class="right-solt">{{ item.user.nickname }}</span>
+          <span class="right-solt">{{ formatD(item.publishTime) }}</span>
+          <span class="active" @click="categoryClick(item.categoryId)">{{
+            item.categoryName
+          }}</span>
+        </div>
+        <!-- 文章内容 -->
+        <div class="content">
+          <router-link :to="'/article/' + item.id" class="title"
+            ><span v-if="item.original !== 1">【转载】</span>
+            {{ item.title }}</router-link
+          >
+          <p class="abstract multi-ellipsis--l3">{{ item.summary }}</p>
+          <!-- 文章标签 -->
+          <div class="tags-wrapper">
+            <span
+              v-for="(tag, index2) in item.tagList"
+              :key="index2"
+              class="tag active btn"
+              @click="tagClick(tag.id)"
+            >
+              {{ tag.name }}
+            </span>
+          </div>
+          <!-- 评论点赞收藏浏览 -->
+          <div class="meta">
+            <span>{{ item.commentCount }}&ensp;评论</span>
+            <span>{{ item.likeCount }}&ensp;点赞</span>
+            <span>{{ item.collectCount }}&ensp;收藏</span>
+            <span>{{ item.viewCount }}&ensp;浏览</span>
+          </div>
+        </div>
+      </li>
+    </transition-group>
+    <div v-show="list.length === 0 && !loading" class="list-empty">
+      列表为空
+    </div>
+  </ul>
+</template>
+
+<script setup lang="ts">
+import { formatDate } from "/@/utils/format/format-time";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+// 传参 props
+const props = defineProps({
+  list: {
+    type: Array,
+    default() {
+      return [];
+    },
+  },
+  loading: {
+    type: Boolean,
+    default: true,
+  },
+});
+
+const formatD = (str: string): string => {
+  //2024-04-08 15:03:51 -> 2024/04/08 15:03:51
+  str = str.replace(/-/g, "/");
+  const date = new Date(str);
+  const now = new Date();
+  // 是当前年,就不显示年份
+  return date.getFullYear() === now.getFullYear()
+    ? formatDate(new Date(str), "mm月dd日")
+    : formatDate(new Date(str), "YYYY年mm月dd日");
+};
+
+const categoryClick = (id: string) => {
+  if (router.currentRoute.value.path !== "/category") {
+    router.push({
+      path: "/category",
+      query: { id: id },
+    });
+  }
+};
+
+const tagClick = (id: string) => {
+  if (router.currentRoute.value.path !== "/tag") {
+    router.push({
+      path: "/tag",
+      query: { id: id },
+    });
+  }
+};
+</script>
+
+
+<style lang="scss" scoped>
+.note-list {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  min-height: 50px;
+  background-color: #fff;
+  border-radius: 1rem;
+
+  .list-item {
+    //   &:hover {
+    //     cursor: pointer;
+    //     transform: translateY(-.1rem);
+
+    // }
+
+    position: relative;  /*相对定位*/
+    min-height: 200px;
+    width: 100%;
+    border-bottom: 1px solid #1413132f;
+    padding: 15px 2px 15px 30px;
+    margin-top: 5px;
+
+    @media screen and (max-width: 922px) {
+      padding-left: 15px;
+      width: 100vw;
+    }
+
+    .active {
+      cursor: pointer;
+      &:hover {
+        color: #007fff;
+      }
+    }
+    
+    // 封面
+    .wrap-img {
+      position: absolute; /*绝对定位 根据父类偏移距离 left right top bottom*/
+      width: 150px;
+      height: 90px;
+      top: 50%;
+      transform: translateY(-50%);
+      right: 20px;
+
+      overflow: hidden;
+      border-radius: 4px;
+      border: 1px solid #f3f7fa;
+
+      @media screen and (max-width: 922px) {
+        width: 100px;
+        height: 60px;
+        right: 10px;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    //用户
+    .wrapper-meta {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+
+      .avatar-wrapper {
+        position: relative;
+        display: inline-block;
+        margin-right: 5px;
+
+        img {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      .right-solt:after {
+        content: "·";
+        margin: 0 5px;
+        color: #b2bac2;
+      }
+    }
+
+    // 文章内容
+    .content {
+      width: 100%;
+      padding-right: 180px;
+
+      @media screen and (max-width: 922px) {
+        padding-right: 120px;
+      }
+
+      .title {
+        margin: -7px 0 4px;
+        display: inline-block;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.5;
+        color: #2f2f2f;
+
+        @media screen and (max-width: 922px) {
+          width: 100%;
+          font-size: 15px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      .abstract {
+        margin: 0;
+        font-size: 13px;
+        line-height: 24px;
+        color: #999;
+        margin-bottom: 5px;
+
+        @media screen and (max-width: 922px) {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+      }
+
+      .tags-wrapper {
+        font-size: 11px;
+        margin-bottom: 15px;
+        display: flex;
+        flex-wrap: wrap;
+
+        .tag {
+          border: 1px #999 solid;
+          border-radius: 14px;
+          padding: 5px 12px;
+          margin-right: 3px;
+
+          &:hover {
+            border: 1px #007fff solid;
+          }
+        }
+      }
+
+      .meta {
+        padding-right: 0 !important;
+        font-size: 12px;
+        font-weight: normal;
+        line-height: 20px;
+
+        span {
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+
+  .list-empty {
+    background: #fff;
+    width: 100%;
+    height: 100px;
+    line-height: 100px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: center;
+  }
+}
+</style>
+
+```
+
+
+
+
+
+##  例子2 ul li
+
+li标签 天然垂直排, 有时候用在方便
+
+![image-20240411143205495](Element%E7%AC%94%E8%AE%B0.assets/image-20240411143205495.png)
+
+```
+    <!-- 分享  -->
+    <div class="share">
+      <ul class="extra-cnt">
+        <li>
+          <div class="item">
+            <a
+              target="_blank"
+              :href="
+                'https://connect.qq.com/widget/shareqq/index.html?url=' +
+                codedUrl +
+                '&title=' +
+                codedTitle +
+                '&summary=&style=101&width=96&height=24'
+              "
+            >
+              <svg-icon
+                name="qq-login"
+                color="green"
+                width="24"
+                height="24"
+              ></svg-icon>
+            </a>
+          </div>
+        </li>
+
+        <li>
+          <div class="item">
+            <el-popover
+              placement="left"
+              trigger="hover"
+              popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
+            >
+              <template #reference>
+                <svg-icon
+                  name="wx2"
+                  color="green"
+                  width="24"
+                  height="24"
+                ></svg-icon>
+              </template>
+              <template #default>
+                <div
+                  style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                  "
+                >
+                  <img
+                    :src="
+                      'https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=' +
+                      codedUrl
+                    "
+                  />
+                </div>
+              </template>
+            </el-popover>
+          </div>
+        </li>
+
+        <li
+          v-clipboard:copy="url"
+          v-clipboard:success="copySuccess"
+          class="cp-warpper"
+        >
+          <div class="item">
+            <a>
+              <svg-icon name="copy2" width="24" height="24" />
+            </a>
+          </div>
+        </li>
+        <ul />
+      </ul>
+    </div>
+```
+
+
+
+```
+  // 分享
+  .extra-cnt {
+    position: fixed;
+    color: #b2bac2;
+    background: #fff;
+    top: 420px;
+    width: 52px;
+
+    li {
+      padding: 10px 0;
+      position: relative;
+
+      &:before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        width: 20px;
+        height: 1px;
+        background-color: #e5e5e5;
+        margin-left: -10px;
+      }
+
+      &:hover {
+        //  box-shadow: 0 0 0.1rem 0.1rem var(--special-font-color);
+        color: #007fff;
+      }
+
+      .item {
+        display: flex;
+        justify-content: center;
+      }
+    }
+  }
+```
+
+
+
+# 自适应地调整位置
+
+这两行 CSS 规则使用了 CSS 的 `calc()` 函数，用于进行简单的数学计算并生成动态的样式。让我解释一下这两行规则的含义：
+
+1. `right: calc(100% - 420px);`
+   - 这行规则表示将元素的右边缘位置设置为当前容器宽度减去 420 像素。换句话说，元素的右边缘将距离容器右边缘 420 像素的位置。
+2. `left: calc(calc(100% - 1040px) / 2);`
+   - 这行规则稍微复杂一些。首先，内部的 `calc(100% - 1040px)` 表示将当前容器宽度减去 1040 像素。然后，外部的 `calc(... / 2)` 将前面的结果除以 2，也就是将得到的值除以 2。这意味着元素的左边缘将距离容器左边缘的中心位置（容器宽度减去 1040 像素的一半）的距离。
+
+这两行规则的作用是实现元素相对于容器的动态布局，使得元素可以根据容器的尺寸自适应地调整位置。
+
+
+
+# div图片
+
+```
+      <div v-if="!loading" class="content-container">
+        <div class="coverImg">
+          <img :src="article.cover" alt="" />
+          <div class="mask">
+          </div>
+        </div>
+      </div>
+      
+      
+ .content-container {
+  .coverImg {
+    // width: 80%;
+    margin: 0 auto;
+    // display: flex
+    // justify-content: center;
+    height: 10rem;
+    // position: relative;
+    border-radius: 1rem;
+    // overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+}
+      
+      
+```
+
+
+
+# Popover 气泡卡片
+
+![image-20240411142358276](Element%E7%AC%94%E8%AE%B0.assets/image-20240411142358276.png)
+
+
+
+```html
+ <el-popover
+             placement="left"
+             trigger="hover"
+             popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
+             >
+     <template #reference>
+         <svg-icon
+                   name="wx2"
+                   color="green"
+                   width="24"
+                   height="24"
+                   ></svg-icon>
+     </template>
+     <template #default>
+         <div
+              style="
+                     display: flex;
+                     justify-content: center;
+                     align-items: center;
+                     "
+              >
+             <img
+                  :src="
+                        'https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=' +
+                        codedUrl
+                        "
+                  />
+         </div>
+     </template>
+</el-popover>
+```
+
+![image-20240411142430241](Element%E7%AC%94%E8%AE%B0.assets/image-20240411142430241.png)
+
+
+
+
+
+## 显示滚动条
+
+```
+  max-height: 400px; /* 设置最大高度 */
+    overflow-y: auto; /* 当内容溢出时显示滚动条 */
+```
 

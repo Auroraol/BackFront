@@ -1548,7 +1548,8 @@ const router = new VueRouter({
 
 除了 `$route.params` 外，`$route` 对象还提供了其它有用的信息，例如，`$route.query`（如果 URL 中有查询参数）、`$route.hash` 等等。
 
-## 九、响应路由的变化
+## 九、响应路由的变化 :crossed_swords:
+
 当使用路由参数时，例如从 `/user/foo` 导航到 `/user/bar`，**原来的组件实例会被复用**。因为两个路由都渲染同个组件，比起销毁再创建，复用则显得更加高效。**不过，这也意味着组件的生命周期钩子不会再被调用**。
 
 复用组件时，如果想对路由参数的变化作出响应的话，可以简单地 watch（监测变化） `$route` 对象：
@@ -1567,6 +1568,8 @@ const User = {
 或者使用 2.2 中引入的 `beforeRouteUpdate` 守卫：
 
 ```javascript
+import { useRoute,onBeforeRouteUpdate } from "vue-router";
+
 const User = {
   template: '...',
   beforeRouteUpdate (to, from, next) {
@@ -1575,6 +1578,66 @@ const User = {
   }
 }
 ```
+
+<span style="color:red">解决: url部分一样, 但是跳转的问题, 原因是这种情况组件的生命周期钩子不会再被调用</span>
+
+### 例子
+
+使用onBeforeRouteUpdate失效
+
+```ts
+//使用 onBeforeRouteUpdate 来代替 beforeRouteUpdate 生命周期钩子
+onBeforeRouteUpdate((to, from, next) => {
+
+  id.value = Number(router.currentRoute.value.params.id); // 当前路由的 id 参数 // 更新 id 数据
+  console.error(id.value);
+  loading.value = true;
+  // 更新 url 和重新初始化文章
+  url.value = "http://localhost:8888/article/" + id.value;
+  initArticle();
+  next();
+});
+
+// 使用 watch 监听路由参数的变化, 因为当使用路由参数时，例如从 `/user/foo` 导航到 `/user/bar`，
+//原来的组件实例会被复用。因为两个路由都渲染同个组件，比起销毁再创建，复用则显得更加高效。不过，这也意味着组件的生命周期钩子不会再被调用。
+watch(
+  () => Number(router.currentRoute.value.params.id),
+  (newValue, oldValue) => {
+    // 当路由参数发生变化时执行逻辑
+    id.value = newValue;
+    url.value = "http://localhost:8888/article/" + id.value;
+    initArticle();
+  }
+);
+
+// 监听路由变化，处理滚动位置
+router.afterEach(() => {
+    // 将滚动位置重置为页面顶部
+    window.scrollTo(0, 0);
+});
+
+```
+
+// 方式3
+
+```js
+
+watchEffect(() => {
+    // 响应式地捕获路由参数的变化，并在变化时执行逻辑
+    const newId = Number(router.currentRoute.value.params.id);
+    id.value = newId;
+    url.value = `http://localhost:8888/article/${newId}`;
+    initArticle(); // 执行其他逻辑
+});
+
+// 监听路由变化，处理滚动位置
+router.afterEach(() => {
+    // 将滚动位置重置为页面顶部
+    window.scrollTo(0, 0);
+});
+```
+
+
 
 ## 十、嵌套路由:crossed_swords:
 
@@ -2450,7 +2513,23 @@ Webpack 会将任何一个异步模块与相同的块名称组合到相同的异
 
 ![image-20240106221854558](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106221854558.png)
 
+```ts
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+// 获取路由参数
+const id = router.currentRoute.value.params.id;
+console.log("Received id:", id);
+    
+```
+
 **调用结果**
+
+```ts
+const router = useRouter();
+router.push({ path: "/routeTest3/20/标题" });
+```
 
 ![image-20240106223404276](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106223404276.png)
 
@@ -2458,15 +2537,157 @@ Webpack 会将任何一个异步模块与相同的块名称组合到相同的异
 
 **route  路由**
 
+注意:  可以不需要进行配置路由表
+
 ![image-20240106223253763](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106223253763.png)
 
 **路由视图**
 
 ![image-20240106223212216](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106223212216.png)
 
+```ts
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+// 获取路由参数
+const id = router.currentRoute.value.query.id;
+console.log("Received id:", id);
+    
+```
+
 **调用结果**
+
+```ts
+const router = useRouter();
+router.push({ { path: "/routeTest4", query:{ id:20, title:"标题"}  });
+```
 
 ![image-20240106223438136](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240106223438136.png)
 
+### 不显示参数(不推荐)
+
+1,  使用不显示参数的方式，则不需要在进行配置路由表：
+
+```
+  	{
+        path: "routers",
+        name: "Routers",
+        component: () => import("../views/routers/routers.vue")
+      },
+```
+
+2，开始跳转并传参
+
+注意：需要指定路由表中的 name与之相对应；
+
+```javascript
+jumpTo() {
+      this.$router.push({ name: "Routers", params:{ id:123 } });
+    }
+```
+
+3，获取参数
+
+```javascript
+this.$route.params.id
+```
+
+补充
+
+```ts
+const tagClick = (id: number) => {
+  const query = { name: "tag", params: { id } };
+  router.push(query);
+};
+```
+
+**`注意`**：上述这种利用 params 不显示 url 传参的方式会导致在刷新页面的时候，传递的值会丢失；需要谨慎使用。
 
 
+
+# vue-router路由传参，数据类型改变
+
+在Vue Router中，无论路由参数在URL中的形式是什么，都会以字符串的形式传递到路由组件中。
+
+这意味着即使在路由定义中指定了参数的类型，参数在传递到组件中时仍然是字符串类型。
+
+因此，如果你想要确保路由参数的数据类型为数字，你需要在组件内部进行类型转换。
+
+```
+1.number数据类型：页面刷新后，其类型会转换为`string`类型。那么我们在路由刷新页面，对传递过来的属性值做一次`Number()`转换，就是不管页面有没有刷新都做一次`Number()`转换；
+
+2.string数据类型：页面刷新后，其类型依然为`string`类型，无需任何操作；
+
+3.boolean数据类型：页面刷新后，其类型会转换为`string`类型。那么我们在路由刷新页面，对传递过来的属性值做一次`Boolean()`转换，就是不管页面有没有刷新都做一次`Boolean()`转换；
+
+4.undefined数据类型：页面刷新后，其类型依然为`undefined`类型，无需任何操作；
+
+5.null数据类型：页面刷新后，其类型依然为`null`类型，无需任何操作；
+
+6.object数据类型：页面刷新后，其类型会转换为`string`类型。那么我们在路由跳转传参页面对属性值做一次`JSON.stringify()`预处理，然后在路由刷新页面对该值进行`JSON.parse()`转换即可；
+
+```
+
+## 例子
+
+**页面a**
+
+```ts
+// 带参数跳转
+const tagClick = (id: number) => {
+  const query = { path: "/tag", query: { id } };
+  router.push(query);
+};
+```
+
+**页面b**
+
+```ts
+ <li
+    v-for="(tag, index) in tags"
+    :key="index"
+    class="list-item btn"
+    :class="{ active: tagId === tag.id }"
+    @click="tagClick(tag.id)"
+    >
+    {{ tag.name }}
+</li>
+
+const router = useRouter();
+
+const tagId = ref<number>(0);
+const init = async () => {
+  try {
+    const res = await tagList();
+    tags.value = res;
+
+    //在Vue Router中，无论路由参数在URL中的形式是什么，都会以字符串的形式传递到路由组件中
+    const id = Number(router.currentRoute.value.query.id); // 当前路由的 id 参数
+    console.log(typeof id);
+
+    if (id && tags.value.some((ele) => ele.id === id)) {
+      // 显示成路由参数所表示的tag
+      tagClick(id);
+    } else {
+      tagClick(tags.value[0].id);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const tagClick = (id) => {
+  tagId.value = id;
+  current.value = 1;
+  //getArtList();
+};
+
+
+.active {
+    background-color: #00CC00;
+    color: #fff;
+}
+```
+
+如果tagId === tag.id时, 使用.active这个样式

@@ -1,3 +1,7 @@
+# 官网
+
+# [MdEditorV3 Documentation (imzbf.github.io)](https://imzbf.github.io/md-editor-v3/zh-CN/index)
+
 # 主题切换
 
 主题分为了编辑器主题（`theme`，称为全局主题）、预览内容主题（`previewTheme`）和块级代码主题（`codeTheme`），他们都支持响应式更新，而非只能预设。
@@ -198,5 +202,89 @@ const scrollElement = document.documentElement;
 
 
 
+# 关于点击目录定位的问题
 
+已在2.6.0的目录组件中新增了`scrollElementOffsetTop`属性
+
+![image-20240410090955339](md-editor-v3.assets/image-20240410090955339.png)
+
+在点击到指定的二级标题位置时，它目录的高亮显示还是在上一个二级标题
+
++ 通过目录组件的`offsetTop`来调节一下
+
+
+
+```vue
+
+<el-affix offset="100">
+    <div class="catalog">
+        <div class="titleTop">文章目录</div>
+        <!--文章目录-->
+        <MdCatalog
+                   offsetTop="200"
+                   scrollElementOffsetTop="100"
+                   editorId="preview-only"
+                   class="browserCatalog"
+                   :scrollElement="scrollElement"
+                   />
+    </div>
+</el-affix>
+
+
+// 目录
+.catalog {
+  margin-top: 50px;
+  margin-left: 1rem;
+  margin-right: 2rem;
+
+
+
+  .titleTop {
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+    margin-bottom: 0.5rem;
+    box-sizing: border-box;
+    font-size: 1.7rem;
+    // font-weight: 600;
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .browserCatalog {
+    max-height: 400px; /* 设置最大高度 */
+    overflow-y: auto; /* 当内容溢出时显示滚动条 */
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0.3rem 0.1rem rgba(255, 255, 255, 0.4);
+    box-sizing: border-box;
+    padding: 2rem 1rem;
+    font-size: 1.2rem;
+  }
+}
+```
+
+<img src="md-editor-v3.assets/image-20240410165312691.png" alt="image-20240410165312691" style="zoom: 50%;" />
+
+# onGetCatalog 动态获取`markdown`目录
+
+```vue
+ <!-- 文章内容 -->
+        <MdPreview
+          editorId="preview-only"
+          :modelValue="article.htmlContent"
+          previewTheme="vuepress"
+          codeTheme="a11y"
+          @onGetCatalog="getCatalog"
+        />
+        
+        
+  const getCatalog = (list) => {
+    console.log(list);
+
+}      
+        
+```
+
+![image-20240410161729030](md-editor-v3.assets/image-20240410161729030.png)
 

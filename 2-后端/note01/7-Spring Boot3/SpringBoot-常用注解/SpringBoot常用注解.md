@@ -2780,6 +2780,35 @@ public class Child extends Parent {
 
 ![在这里插入图片描述](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/20210624104351617.png)
 
+### @RequiredArgsConstructor
+
+使用 `@RequiredArgsConstructor` 注解的类需要满足以下条件：
+
+- 类中至少要有一个被 `final` 或 `@NonNull` 注解修饰的字段。
+- 类不能显式定义任何构造函数。
+
+```java
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public class MyClass {
+    private final String name;
+    
+    @NonNull
+    private int age;
+    private String address;
+    
+    // 自动生成的构造函数
+    // public MyClass(String name, int age) {
+    //     this.name = name;
+    //     this.age = age;
+    // }
+}
+
+```
+
+
+
 # java自带注解
 
 ## @PostConstruct
@@ -4162,7 +4191,7 @@ entity
 @Data
 @Accessors(chain = true)  // //链式, enity没必要, vo可以用
 @EqualsAndHashCode(callSuper = true)  //在不加 @EqualsAndHashCode(callSuper = true) 注解的情况下对这两个对象进行比较得到的结果却是 true
-@JsonInclude(JsonInclude.Include.NON_NULL) //返回,忽略为空的
+@JsonInclude(JsonInclude.Include.NON_NULL) //返回忽略为空的
 @ApiModel(value="Client对象", description="客户端表")
 public class Client implements Serializable {
 

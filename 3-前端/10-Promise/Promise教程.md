@@ -4061,7 +4061,7 @@ axiosInstance.interceptors.request.use(
 // 响应拦截器
 axiosInstance.interceptors.response.use(
   (response) => {
-    const res = response.data;   // 响应数据
+    const res = response.data; // 响应数据
     // 确保前端得到的res都是成功响应
     if (res.code !== 200000) {
       // 凭证无效或过期
@@ -4132,18 +4132,11 @@ const request = <ResponseType = unknown>(
       url,
       ...options, // 将传入的 options 合并到请求配置中
     })
-      .then(
-        res => {
+      .then((res) => {
         // 请求成功时，将解析后的响应数据传递给 Promise 的 resolve 函数
         //这里的res得到响应数据  而res.data得到的是响应数据中的data属性数据
         resolve(res.data as ResponseType);
         //console.log(res.data);
-        // if (res.data && res.data.code === 200000) {
-        //   resolve(res.data);
-        // } else {
-        //   reject(new Error('Invalid response format'));
-        // }
-
       })
       .catch((err) => {
         // 请求失败时，将错误信息传递给 Promise 的 reject 函数
@@ -4154,27 +4147,44 @@ const request = <ResponseType = unknown>(
 
 // 有些 api 并不需要用户授权使用，则无需携带 access_token；默认不携带，需要传则设置第三个参数为 true
 const get = (url, params = {}, isNeedToken = false) => {
-  setHeaderToken(isNeedToken);
-  return axiosInstance({
-    method: "get",
-    url,
-    params,
+  return new Promise((resolve, reject) => {
+    setHeaderToken(isNeedToken);
+    axiosInstance({
+      url,
+      method: "get",
+      params,
+    })
+      .then((res) => {
+        resolve(res.data as ResponseType);
+      })
+      .catch((err) => {
+        reject(err);
+      });
   });
 };
 
-const post = (url, params = {}, isNeedToken = false) => {
+const post = (url, data = {}, isNeedToken = false) => {
   setHeaderToken(isNeedToken);
-  return axiosInstance({
-    method: "post",
-    url,
-    data: params,
+  return new Promise((resolve, reject) => {
+    setHeaderToken(isNeedToken);
+    axiosInstance({
+      url,
+      method: "post",
+      data: data,
+    })
+      .then((res) => {
+        resolve(res.data as ResponseType);
+      })
+      .catch((err) => {
+        reject(err);
+      });
   });
 };
 
 export { axiosInstance, request, get, post };
 
 /*
-注: 上述封装抛出的是响应数据中的data属性
+注: 封装抛出的是响应数据中的data属性, 并且封装后,确保前端拿到的数据一定是成功响应数据
 
 使用
 ①axiosInstance

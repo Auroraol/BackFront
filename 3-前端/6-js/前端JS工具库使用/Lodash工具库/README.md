@@ -1,11 +1,8 @@
 # #说明介绍
 
+[lodash.chunk | Lodash中文文档 | Lodash中文网 (lodashjs.com)](https://www.lodashjs.com/docs/lodash.chunk)
+
 Lodash 是一个一致性、模块化、高性能的 JavaScript 实用工具库。
-
-
-# #目录
-
-[TOC]
 
 # 一、数组相关
 

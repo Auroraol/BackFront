@@ -743,6 +743,8 @@ public class BootWebAdminApplicationTest {
     @Autowired
     UserService userService;
  
+    //saveOrUpdate()  保存或更新
+    
     /**
      * [插入一条数据]
      * default boolean save(T entity)
@@ -1720,7 +1722,7 @@ ps:  当结果就是实体类并且没有联表使用resultMap="实体类"可以
 
 ## 分页查询
 
-**分页插件的配置（必须）**
+### **分页插件的配置（必须）**
 
 ```java
 package com.example.demo.config;
@@ -1742,28 +1744,27 @@ public class MybatisPlusConfig {
 }
 ```
 
-**排序查询**
+**使用MyBatis Plus提供的方法**
 
-```java
-public void sortUsersInfo(String column, int ascending) {
-    QueryWrapper<TUser> queryWrapper = new QueryWrapper<>();
-    if (ascending == 1) {
-        queryWrapper.orderByAsc(column);
-    } else {
-        queryWrapper.orderByDesc(column);
-    }
+| 方法                                                    | 功能                                                         |
+| ------------------------------------------------------- | ------------------------------------------------------------ |
+| Page<实体类> Page(当前页码,每页显示的总记录数)          | 创建一个Page对象,存储查询到的`分页数据`和`分页相关的信息`    |
+| Page<实体类> selectPage(Page page,Wrapper queryWrapper) | BaseMapper提供的分页查询的方法,条件构造器为null时表示查所有  |
+| Page<实体类> page(Page page,Wrapper queryWrapper)       | IService接口提供的分页查询的方法,条件构造器为null时表示查所有 设置分页的相关参数(当前页码,每页显示的总记录数) |
 
-    List<TUser> list = tUserService.list(queryWrapper);
-    if (list.size() != 0) {
-        for (TUser e : list)
-            // 遍历
-    }else{
-        // error
-    }
-}
-```
+**获取Page对象存储的`分页数据`和`分页相关的信息`的方法,用来给前端`设置页码中分页相关的超链接和按钮`**
 
+| 方法名                   | 功能                                   |
+| ------------------------ | -------------------------------------- |
+| List <实体类> getRecords | 获取查询到的分页数据                   |
+| long getCurrent          | 获取当前页的页码                       |
+| long getSize             | 获取每页显示的总记录数                 |
+| long getTotal            | 获取总记录条数(注意状态是未删除的记录) |
+| long getPages            | 获取总页数                             |
+| boolean hasPrevious      | 判断是否有上一页                       |
+| boolean hasNext          | 判断是否有下一页                       |
 
+### 单表查询
 
 1、启用分页插件
 
@@ -1811,20 +1812,36 @@ public class UserService {
 ```java
 @Test
 public void testSelectPage(){
-    //构建分页条件第二页每页显示3条
-    Page<User> page=new Page<>(2,3);
-    //使用分页条件查询，不使用其他条件
-    userMapper.selectPage(page, null);
-    //获取分页后查询出的记录
+    // 1. 创建分页对象, 即当前页码数和每页显示的记录数
+    Page<User> page=new Page<>(2,5);
+    // 2. 构造查询条件
+    QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+    queryWrapper.gt("age", 18);
+    // 3. 执行分页查询 //条件构造器queryWrapper为null表示查询所有数据
+    userMapper.selectPage(page, queryWrapper); //selectPage()会在查询时自动添加分页条件，并返回分页查询结果
+    // 4. 获取分页后查询出的记录
     List<User> records = page.getRecords();
     records.forEach(System.out::println);
-    System.out.println("是否有下一页："+page.hasNext());
+    // 5.获取Page对象存储的分页数据和分页相关的信息的方法
+    System.out.println("当前页："+page.getCurrent());
+    System.out.println("每页显示的条数："+page.getSize());
+    System.out.println("总记录数(只包含删除状态是未删除的数据)："+page.getTotal());
+    System.out.println("总页数："+page.getPages());
     System.out.println("是否有上一页："+page.hasPrevious());
-    System.out.println("总记录数："+page.getTotal());
+    System.out.println("是否有下一页："+page.hasNext());
 }
 ```
 
- **例子**
+```
+User(id=3, name=Tom, age=28, email=test3@baomidou.com, isDeleted=null) 
+User(id=4,name=Sandy, age=21, email=test4@baomidou.com, isDeleted=null) 
+User(id=5, name=Billie,age=24, email=test5@baomidou.com, isDeleted=null) 
+User(id=8, name=ybc1, age=21,email=null, isDeleted=null)
+User(id=9, name=ybc2, age=22, email=null, isDeleted=null)
+当前页：2 每页显示的条数：5 总记录数(只包含删除状态是未删除的数据)：12 总页数：3 是否有上一页：true 是否有下一页：true	
+```
+
+**例子**
 
 [Mybatis-Plus](https://so.csdn.net/so/search?q=Mybatis-Plus&spm=1001.2101.3001.7020) 中的分页查询接口主要有两个：IPage 和 Page。
 
@@ -1862,7 +1879,7 @@ public class UserService {
     private UserMapper userMapper;
 
     public IPage<User> getUserList(int currentPage, int pageSize) {
-        // 创建分页对象
+        // 创建分页对象, 即当前页码数和每页显示的记录数
         Page<User> page = new Page<>(currentPage, pageSize);
 
         // 构造查询条件
@@ -1875,10 +1892,619 @@ public class UserService {
         return userPage;
     }
 }
-1234567891011121314151617181920212223242526
 ```
 
 在这个例子中，我们通过构造一个 Page 对象来设置当前页和每页条数。然后通过 QueryWrapper 构造查询条件，在调用 `userMapper.selectPage(page, queryWrapper)` 方法进行分页查询。
+
+### 联表查询
+
+#### 例子1
+
+**第一步: 在`UserMapper`中自定义接口方法根据年龄查询用户列表并按照分页显示**
+
+从MyBatis Plus自带的selectPage方法可以看出要想使用分页插件的功能,方法的第一个参数需要接收一个Page<实体类>对象并且返回值也是一个Page对象
+
+```java
+@Repository
+public interface UserMapper extends BaseMapper<User> {
+    Page<User> selectPageVo(@Param("page") Page<User> page, @Param("age") Integer age);
+}
+```
+
+**第三步: 在`UserMapper.xml`中编写自定义SQL,因为最后的结果集是要封装到User对象的属性中,所以返回的参数是User对象**
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.mybatisplus.mapper.UserMapper">
+    <!--IPage<User> selectPageVo(Page<User> page, Integer age);-->
+    <select id="selectPageVo" resultType="User">
+        SELECT id,user_name,age,email FROM t_user WHERE age > #{age}
+    </select>
+</mapper>
+```
+
+**第四步: 在测试类中测试自定义的接口方法**
+
+```java
+@Test
+public void testSelectPageVo(){
+    //设置分页参数
+    Page<User> page = new Page<>(1, 5);
+    userMapper.selectPageVo(page, 20);
+    //获取分页数据
+    List<User> list = page.getRecords();
+    list.forEach(System.out::println);
+    System.out.println("当前页："+page.getCurrent());
+    System.out.println("每页显示的条数："+page.getSize());
+    System.out.println("总记录数："+page.getTotal());
+    System.out.println("总页数："+page.getPages());
+    System.out.println("是否有上一页："+page.hasPrevious());
+    System.out.println("是否有下一页："+page.hasNext());
+}
+```
+
+#### 例子2
+
+##### 分页查询实体
+
+```java
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+/**
+ * 分页查询实体
+ */
+@Data
+public class PageQuery {
+ 
+    //页码
+    private Integer pageNo = 1;
+ 
+    //分页大小
+    private Integer pageSize = 10;
+ 
+    //排序字段
+    private String sortBy;
+ 
+    //是否升序
+    private Boolean isIncrease = true;
+ 
+    /**
+     * PageQuery转Page
+     *
+     * @param orderItem 排序条件
+     * @return Page对象
+     */
+    public <T> Page<T> toMyBatisPlusPage(OrderItem... orderItem) {
+        //TODO:构建分页条件
+        //分页条件
+        Page<T> page = new Page<>(pageNo, pageSize);
+        //排序条件
+        if (StringUtils.hasText(sortBy)) {
+            page.addOrder(new OrderItem(sortBy, isIncrease));
+        } else if (orderItem != null) {
+            //默认按照更新时间排序-[此处改为默认按照id排序]
+            page.addOrder(orderItem);
+        }
+        //返回
+        return page;
+    }
+ 
+    /**
+     * PageQuery转Page:根据排序字段排序
+     *
+     * @param orderBy    排序字段
+     * @param isIncrease 是否升序
+     * @return Page对象
+     */
+    public <T> Page<T> toMyBatisPlusPage(String orderBy, Boolean isIncrease) {
+        return toMyBatisPlusPage(new OrderItem(orderBy, isIncrease));
+    }
+ 
+    /**
+     * PageQuery转Page:根据Id排序
+     *
+     * @return Page对象
+     */
+    public <T> Page<T> toMyBatisPlusPageSortById() {
+        return toMyBatisPlusPage(new OrderItem("id", true));
+    }
+ 
+    /**
+     * PageQuery转Page:根据create_time排序
+     *
+     * @return Page对象
+     */
+    public <T> Page<T> toMyBatisPlusPageSortByCreateTime() {
+        return toMyBatisPlusPage(new OrderItem("create_time", true));
+    }
+ 
+    /**
+     * PageQuery转Page:根据update_time排序
+     *
+     * @return Page对象
+     */
+    public <T> Page<T> toMyBatisPlusPageSortByUpdateTime() {
+        return toMyBatisPlusPage(new OrderItem("update_time", true));
+    }
+}
+```
+
+##### 分页响应实体
+
+```java
+
+package com.example.demo.demos.model.dto;
+ 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.Data;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.CollectionUtils;
+ 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+ 
+/**
+ * 分页查询结果
+ */
+@Data
+public class PageDTO<T> {
+ 
+    //总条数
+    private Long total;
+ 
+    //总页数
+    private Long pages;
+ 
+    //集合
+    private List<T> list;
+ 
+    /**
+     * Page转换为PageDTO
+     *
+     * @param page  MyBatis Plus分页对象
+     * @param clazz 类型参数
+     * @return PageDTO
+     */
+    public static <PO, VO> PageDTO<VO> of(Page<PO> page, Class<VO> clazz) {
+        //TODO:构建Vo结果
+        PageDTO<VO> pageDTO = new PageDTO<>();
+        //总条数
+        pageDTO.setTotal(page.getTotal());
+        //总页数
+        pageDTO.setPages(page.getPages());
+        //当前页数据
+        List<PO> records = page.getRecords();
+        //转换为vo
+        if (CollectionUtils.isEmpty(records)) {
+            pageDTO.setList(Collections.emptyList());
+            return pageDTO;
+        }
+        //for
+        List<VO> voList = new ArrayList<>(records.size());
+        records.forEach(po -> {
+            try {
+                VO vo = clazz.newInstance();
+                BeanUtils.copyProperties(po, vo, clazz);
+                voList.add(vo);
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
+        pageDTO.setList(voList);
+        //返回结果
+        return pageDTO;
+    }
+ 
+ 
+    /**
+     * Page转换为PageDTO-【自定义PO->VO的转换方法】
+     *
+     * @param page  MyBatis Plus分页对象
+     * @param convertor PO->VO的转换逻辑
+     * @return PageDTO
+     */
+    public static <PO, VO> PageDTO<VO> of(Page<PO> page, Function<PO,VO> convertor) {
+        //TODO:构建Vo结果
+        PageDTO<VO> pageDTO = new PageDTO<>();
+        //总条数
+        pageDTO.setTotal(page.getTotal());
+        //总页数
+        pageDTO.setPages(page.getPages());
+        //当前页数据
+        List<PO> records = page.getRecords();
+        //转换为vo
+        if (CollectionUtils.isEmpty(records)) {
+            pageDTO.setList(Collections.emptyList());
+            return pageDTO;
+        }
+        List<VO> voList = records.stream().map(convertor).collect(Collectors.toList());
+        pageDTO.setList(voList);
+        //返回结果
+        return pageDTO;
+    }
+}
+```
+
+
+
+```java
+@Override
+    public PageDTO<ProductVo> queryProductsPage(ProductQuery productQuery) {
+        //获取参数
+        String name = productQuery.getName();
+        Boolean status = productQuery.getStatus();
+        Double minPrice = productQuery.getMinPrice();
+        Double maxPrice = productQuery.getMaxPrice();
+        //TODO:构建分页条件
+        //调用封装好的方法
+        Page<Product> page = productQuery.toMyBatisPlusPageSortById();
+        //TODO:分页查询
+        Page<Product> pageResult = lambdaQuery()
+                .like(name != null && name != "", Product::getName, name)
+                .eq(status != null, Product::getStatus, status)
+                .ge(minPrice != null && minPrice != 0, Product::getPrice, minPrice)
+                .le(maxPrice != null && maxPrice != 0, Product::getPrice, maxPrice)
+                .page(page);
+        //TODO:构建Vo结果
+        //方式1:默认转换PO->VO
+//        return PageDTO.of(pageResult, ProductVo.class);
+        //方式2:自定义转换PO->VO
+        return PageDTO.of(pageResult,(product -> {
+            //自定义转换逻辑
+            ProductVo productVo = new ProductVo();
+            BeanUtils.copyProperties(product,productVo);
+            return productVo;
+        }));
+    }
+```
+
+##### 接口测试
+
+![image-20240407215429933](SpringBoot-%E6%95%B0%E6%8D%AE%E8%AE%BF%E9%97%AE.assets/image-20240407215429933.png)
+
+ 查询结果：
+
+```javascript
+
+{
+    "code": 200,
+    "data": {
+        "total": 3,
+        "pages": 2,
+        "list": [
+            {
+                "id": 2,
+                "name": "冰可乐",
+                "price": 12.12,
+                "address": "淮阳",
+                "status": false,
+                "createTime": "2024-02-18 00:35:07",
+                "updateTime": null,
+                "enumState": 2,
+                "info": "{\"bar\": \"baz\", \"balance\": 7.77, \"active\": false}"
+            },
+            {
+                "id": 4,
+                "name": "雪糕",
+                "price": 38.47,
+                "address": "阜阳",
+                "status": true,
+                "createTime": "2024-02-18 01:23:12",
+                "updateTime": null,
+                "enumState": 1,
+                "info": "{\"bar\": \"baz\", \"balance\": 7.77, \"active\": false}"
+            }
+        ]
+    },
+    "message": "ok"
+}
+```
+
+###  例子3(推荐)
+
+#### queryWrapper
+
+```java
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ArticlePageQueryWrapper {
+
+	private Integer status;
+
+	private Long offset;
+
+	private Long limit;
+
+	private Integer categoryId;
+
+	private Integer tagId;
+
+	private String title;
+
+	private String orderBy;
+
+	private String start;
+
+	private String end;
+}
+```
+
+#### 编写mapper
+
+```java
+	/**
+	 * 分页查询
+	 *
+	 * @param queryWrapper
+	 * @return
+	 */
+	List<ArticleVo> selectArticleVoPage(ArticlePageQueryWrapper queryWrapper);
+```
+
+ArticleMapper.xml
+
+```xml
+    <sql id="Article_Column_List">
+        inner_a.id,inner_a.original, inner_a.user_id, inner_a.category_name, inner_a.category_id, inner_a.title, inner_a.summary, inner_a.content, inner_a.html_content, inner_a.cover, inner_a.status, inner_a.view_count,
+        inner_a.comment_count, inner_a.like_count, inner_a.collect_count, inner_a.publish_time, inner_a.update_time, inner_a.reproduce, inner_a.deleted
+    </sql>
+
+
+<!--多表查询, ArticleVo封装Article实体数据部分数据+User部分数据+tag部分数据-->
+    <resultMap id="articleVoResultMap" type="com.lfj.blog.service.vo.ArticleVo">
+        <id property="id" column="id"/>
+        <result property="original" column="original"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="userId" column="user_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="title" column="title"/>
+        <result property="summary" column="summary"/>
+        <result property="content" column="content"/>
+        <result property="htmlContent" column="html_content"/>
+        <result property="cover" column="cover"/>
+        <result property="status" column="status"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="collectCount" column="collect_count"/>
+        <result property="publishTime" column="publish_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="reproduce" column="reproduce"/>
+        <result property="deleted" column="deleted"/>
+        <!--Article和User 一对一的关系-->
+        <association property="user" javaType="com.lfj.blog.entity.User">
+            <id property="id" column="u_user_id"/>
+            <result property="nickname" column="nickname"/>
+            <result property="avatar" column="avatar"/>
+        </association>
+        <!--Article和Tag 多对一的关系-->
+        <collection property="tagList" ofType="com.lfj.blog.entity.Tag">
+            <id property="id" column="tag_id"/>
+            <result property="name" column="tag_name"/>
+        </collection>
+    </resultMap> 
+
+    <!--分页查询文章-->
+    <select id="selectArticleVoPage" resultMap="articleVoResultMap">
+        select
+        outer_a.id,
+        outer_a.original,
+        outer_a.user_id,
+        outer_a.category_name,
+        outer_a.category_id,
+        outer_a.title,
+        outer_a.summary,
+        outer_a.cover,
+        outer_a.status,
+        outer_a.view_count,
+        outer_a.comment_count,
+        outer_a.like_count,
+        outer_a.collect_count,
+        outer_a.publish_time,
+        outer_a.update_time,
+        outer_a.reproduce,
+        outer_a.deleted,
+        u.id u_user_id,
+        u.avatar,
+        u.nickname,
+        t.id tag_id,
+        t.name tag_name
+        from
+        -- 表子查询
+        (
+        select
+        <include refid="Article_Column_List"/>
+        ,(
+        inner_a.view_count * 0.15
+        + inner_a.comment_count * 0.35
+        + inner_a.like_count * 0.25
+        + inner_a.collect_count * 0.25
+        ) as score
+        from article inner_a
+
+        where
+        inner_a.deleted = 0 -- 未删除的
+        <if test="status != null">
+            and inner_a.status = #{status}
+        </if>
+        <if test="title != null and title != ''">
+            and inner_a.title like concat('%',concat(#{title}, '%')) --生成字符串 "%apple%"，用于进行模糊匹配操作
+        </if>
+        <if test="categoryId != null">
+            and inner_a.category_id = #{categoryId}
+        </if>
+        <if test="start != null and end != null">
+            and inner_a.publish_time >= #{start} and inner_a.publish_time <![CDATA[<]]> #{end} --使用了 CDATA 标记来包裹比较符号小于
+            --以防止标签。
+        </if>
+        <if test="tagId != null">
+            and inner_a.id in (select inner_a_t.article_id from article_tag inner_a_t where inner_a_t.tag_id = #{tagId})
+        </if>
+        -- 排序
+        <choose>
+            <when test="orderBy == 'publish_time'">
+                order by inner_a.publish_time desc -- 从大到小
+            </when>
+            <otherwise>
+                order by inner_a.view_count desc
+            </otherwise>
+        </choose>
+        limit #{offset},#{limit} -- 分页
+        ) outer_a
+        left join user u on u.id = outer_a.user_id
+        left join article_tag a_t on a_t.article_id = outer_a.id
+        left join tag t on t.id = a_t.tag_id
+        -- 排序
+        <choose>
+            <when test="orderBy == 'publish_time'">
+                order by outer_a.publish_time desc
+            </when>
+            <otherwise>
+                order by score desc
+            </otherwise>
+        </choose>
+    </select>
+```
+
++ `<choose>` 是 MyBatis 中的一个元素，用于在多个条件中选择一个进行处理。它包含了一个或多个 `<when>` 元素和一个可选的 `<otherwise>` 元素。
+
+当使用 `<choose>` 元素时，会逐个检查 `<when>` 元素的条件，如果某个条件为真，则执行该条件下的语句块。如果所有条件都不为真，则执行 `<otherwise>` 元素下的语句块（可选）。
+
+分析
+
+
+
+```
+"<if></if>" 是一个条件判断语句
+```
+
+
+
+```xml
+    <sql id="Article_Column_List">
+        inner_a.id,inner_a.original, inner_a.user_id, inner_a.category_name, inner_a.category_id, inner_a.title, inner_a.summary, inner_a.content, inner_a.html_content, inner_a.cover, inner_a.status, inner_a.view_count,
+        inner_a.comment_count, inner_a.like_count, inner_a.collect_count, inner_a.publish_time, inner_a.update_time, inner_a.reproduce, inner_a.deleted
+    </sql>
+```
+
+这段代码是一个定义了一个 SQL 片段的 `<sql>` 标签，其 ID 为 "Article_Column_List"。该 SQL 片段包含了以下列名：
+
+- `inner_a.id`: 文章的 ID
+- `inner_a.original`: 是否原创
+- `inner_a.user_id`: 用户 ID
+- `inner_a.category_name`: 分类名称
+- `inner_a.category_id`: 分类 ID
+- `inner_a.title`: 文章标题
+- `inner_a.summary`: 文章摘要
+- `inner_a.content`: 文章内容
+- `inner_a.html_content`: 文章 HTML 内容
+- `inner_a.cover`: 文章封面
+- `inner_a.status`: 文章状态
+- `inner_a.view_count`: 浏览次数
+- `inner_a.comment_count`: 评论次数
+- `inner_a.like_count`: 点赞次数
+- `inner_a.collect_count`: 收藏次数
+- `inner_a.publish_time`: 发布时间
+- `inner_a.update_time`: 更新时间
+- `inner_a.reproduce`: 是否转载
+- `inner_a.deleted`: 是否已删除
+
+通过定义这个 SQL 片段，可以在其他 SQL 查询中使用 `<include>` 标签引用它，从而避免重复编写列名的代码。
+
+
+
+
+
+
+
+#### 返回前端对象
+
+```java
+
+/**
+ * 文章返回前端对象
+ * 文章详细对象
+ **/
+@Data
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@ApiModel(value = "ArticleVo对象", description = "文章详细对象")
+public class ArticleVo extends Article {
+
+	@ApiModelProperty("作者信息")
+	private User user;
+
+	@ApiModelProperty("标签列表")
+	private List<Tag> tagList;
+
+	@ApiModelProperty("分类列表,顺序:root node2 node3")
+	private List<Category> categoryList;
+
+	@ApiModelProperty("上一篇")
+	private Article previous;
+
+	@ApiModelProperty("下一篇")
+	private Article next;
+
+	@ApiModelProperty("推荐分数")
+	private Double recommendScore;
+
+}
+
+```
+
+
+
+#### ArticleServicelmpl
+
+```java
+@Override
+	public IPage<ArticleVo> selectPublishedArticleVoPage(long current, long size,
+														 Integer categoryId, Integer tagId,
+														 String yearMonth, String title, String orderBy) {
+		// 查询start-end时期的文章
+		String[] startAndEndOfMonth = getStartAndEndOfMonth(yearMonth);
+		String start = startAndEndOfMonth[0];
+		String end = startAndEndOfMonth[1];
+		int count = selectPageCount(ArticleStatusEnum.NORMAL.getStatus(), categoryId, tagId, start, end, title);
+		if (count == 0) {
+			return new Page<>(current, size);
+		}
+		//自定义Wrapper
+		ArticlePageQueryWrapper queryWrapper = new ArticlePageQueryWrapper();
+		queryWrapper.setOffset((current - 1) * size);
+		queryWrapper.setLimit(size);
+		queryWrapper.setCategoryId(categoryId);
+		queryWrapper.setTagId(tagId);
+		queryWrapper.setTitle(title);
+		queryWrapper.setOrderBy(orderBy);
+		queryWrapper.setStart(start);
+		queryWrapper.setEnd(end);
+		queryWrapper.setStatus((ArticleStatusEnum.NORMAL.getStatus()));  // 文章状态正常的
+        //
+		List<ArticleVo> articleVoList = articleMapper.selectArticleVoPage(queryWrapper);
+		// 1. 创建分页对象, 即当前页码数和每页显示的记录数
+		Page<ArticleVo> page = new Page<>(current, size, count);
+        // 2. 获取分页后查询出的记录
+		page.setRecords(articleVoList);
+		return page;
+	}
+```
+
+
+
+
+
+
 
 ## 自动配置原理
 
@@ -2577,5 +3203,37 @@ OrderInfo orderInfo;  无法自动装配。找不到 'OrderInfo' 类型的 Bean�
 
 ```
 OrderInfo orderInfo = new OrderInfo();
+```
+
+
+
+
+
+# 常用xml
+
+```xml
+    <!-- 查询上一篇和下一篇
+    具体来说，这个查询可以分为两部分：
+第一个子查询选取比给定 id 小的文章中 id 最大的一篇，并且符合 deleted = 0 和 status = 0 的条件。这一部分用于获取上一篇文章的信息。
+第二个子查询选取比给定 id 大的文章中 id 最小的一篇，并且同样符合 deleted = 0 和 status = 0 的条件。这一部分用于获取下一篇文章的信息。
+然后，这两个子查询的结果通过 union all 进行合并，最终将上一篇和下一篇文章的信息组合在一起返回。
+    -->
+    <select id="selectPreAndNext" resultMap="BaseResultMap">
+        (select a.id,
+                a.title
+         from article a
+         where a.id <![CDATA[<]]> #{id}
+           and a.deleted = 0
+           and a.status = 0
+         order by a.id desc limit 1)
+        union all
+        (select b.id,
+                b.title
+         from article b
+         where b.id > #{id}
+           and b.deleted = 0
+           and b.status = 0
+         order by b.id limit 1)
+    </select>
 ```
 

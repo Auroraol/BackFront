@@ -69,6 +69,77 @@
 	arr4 = [1, 'b', false];
 ```
 
+### 常用方法
+
+1. **map**: 对数组的每个元素执行提供的函数，并返回一个新数组，其中包含每次函数调用的结果。
+
+```
+const numbers = [1, 2, 3, 4, 5];
+const doubled = numbers.map(num => num * 2);
+console.log(doubled); // 输出: [2, 4, 6, 8, 10]
+```
+
+1. **filter**: 使用提供的函数测试所有元素，并创建一个包含所有通过测试的元素的新数组。
+
+```
+const numbers = [1, 2, 3, 4, 5];
+const evenNumbers = numbers.filter(num => num % 2 === 0);
+console.log(evenNumbers); // 输出: [2, 4]
+```
+
+1. **reduce**: 对数组中的所有元素执行一个提供的函数，并将其结果累积到单个输出。
+
+```
+const numbers = [1, 2, 3, 4, 5];
+const sum = numbers.reduce((acc, curr) => acc + curr, 0);
+console.log(sum); // 输出: 15
+```
+
+1. **find**: 返回数组中满足提供的测试函数的第一个元素的值。
+
+```
+const numbers = [1, 2, 3, 4, 5];
+const found = numbers.find(num => num > 3);
+console.log(found); // 输出: 4
+```
+
+1. **forEach**: 对数组的每个元素执行提供的函数。
+
+```
+const numbers = [1, 2, 3, 4, 5];
+numbers.forEach(num => console.log(num));
+// 输出:
+// 1
+// 2
+// 3
+// 4
+// 5
+```
+
+1. **some**: `some` 方法测试数组中是否至少有一个元素通过了由提供的函数实现的测试。如果有至少一个元素通过了测试，则返回 `true`，否则返回 `false`。
+
+```
+const numbers = [1, 2, 3, 4, 5];
+const hasEvenNumber = numbers.some(num => num % 2 === 0);
+console.log(hasEvenNumber); // 输出: true
+```
+
+1. **every**: `every` 方法测试数组中的所有元素是否都通过了由提供的函数实现的测试。如果所有元素都通过了测试，则返回 `true`，否则返回 `false`。
+
+```
+const numbers = [2, 4, 6, 8, 10];
+const allEvenNumbers = numbers.every(num => num % 2 === 0);
+console.log(allEvenNumbers); // 输出: true
+```
+
+1. **sort**: `sort` 方法用于对数组的元素进行排序，并返回排序后的数组。默认情况下，`sort` 方法会将元素转换为字符串，然后按照 Unicode 码点的顺序进行排序。
+
+```
+const numbers = [3, 1, 5, 2, 4];
+const sortedNumbers = numbers.sort((a, b) => a - b);
+console.log(sortedNumbers); // 输出: [1, 2, 3, 4, 5]
+```
+
 ## 5、[元祖](https://so.csdn.net/so/search?q=元祖&spm=1001.2101.3001.7020)类型
 
 元祖类型其实就是数组类型的扩展，用于保存定长定数据类型的数据。
@@ -225,3 +296,38 @@ const isMobile = ref(false);
 
 1. **使用可选链操作符 ?. ，当前值有可能为空的情况下使用**
 2. `!` 表示对一个变量[断言](https://so.csdn.net/so/search?q=断言&spm=1001.2101.3001.7020)其非空，当前值一定有时使用
+
+
+
+# 类型转换
+
+1. 尖括号语法：
+
+```
+let someValue: any = "this is a string";
+let strLength: number = (<string>someValue).length;
+```
+
+1. as 语法：
+
+```
+let someValue: any = "this is a string";
+let strLength: number = (someValue as string).length;
+```
+
+**上述一般不用, 用以下方法**
+
+```ts
+1.number数据类型：页面刷新后，其类型会转换为`string`类型。那么我们在路由刷新页面，对传递过来的属性值做一次`Number()`转换，就是不管页面有没有刷新都做一次`Number()`转换；
+
+2.string数据类型：页面刷新后，其类型依然为`string`类型，无需任何操作；
+
+3.boolean数据类型：页面刷新后，其类型会转换为`string`类型。那么我们在路由刷新页面，对传递过来的属性值做一次`Boolean()`转换，就是不管页面有没有刷新都做一次`Boolean()`转换；
+
+4.undefined数据类型：页面刷新后，其类型依然为`undefined`类型，无需任何操作；
+
+5.null数据类型：页面刷新后，其类型依然为`null`类型，无需任何操作；
+
+6.object数据类型：页面刷新后，其类型会转换为`string`类型。那么我们在路由跳转传参页面对属性值做一次`JSON.stringify()`预处理，然后在路由刷新页面对该值进行`JSON.parse()`转换即可；
+```
+

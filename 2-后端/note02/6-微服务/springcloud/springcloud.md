@@ -2814,6 +2814,12 @@ logging:
 
 ### 编写api
 
+可以看
+
+<img src="springcloud.assets/image-20240411133818315.png" alt="image-20240411133818315" style="zoom:67%;" />
+
+![image-20240411133830721](springcloud.assets/image-20240411133830721.png)
+
 **引入依赖**
 
 ```java
@@ -2849,7 +2855,12 @@ Product实体类
 
 ![image-20231014095815713](springcloud.assets/image-20231014095815713.png)
 
-**服务启动类添加Feign的支持**
+**服务启动类(调用者)添加Feign的支持**
+
+```
+@EnableFeignClients(clients = {UserClient.class, TestClient.class}, defaultConfiguration = DefaultFeignConfiguration.class)
+
+```
 
 <img src="springcloud.assets/image-20231014100449550.png" alt="image-20231014100449550" style="zoom:67%;" />
 

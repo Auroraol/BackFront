@@ -252,7 +252,7 @@ class Person {
 		List<Person> dataList = getData( true);  //存放数据: Person p9 = new Person(9, 2, "子2_9");
 
 		//将List转化为Map，其中id为key，对象为value  比如:
-		Map<Integer, Person> personMap = dataList.stream().collect(Collectors.toMap(Person::getId, person -> person));
+		Map<Integer, Person> personMap = dataList.stream().collect(Collectors.toMap(Category::getId, person -> person));
 		//System.out.println(personMap);
 		/*
 		 * {1=Test$Person@7ba4f24f, 2=Test$Person@3b9a45b3, 3=Test$Person@7699a589,
@@ -793,4 +793,537 @@ public class Test {
 	}
 }
 ```
+
+
+
+
+
+# 工具类
+
+## **BuildTreeUtil**
+
+```java
+package com.lfj.blog.utils.buildTreeUtil;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * BuildTree 是一个开发中常用的工具类，用于构建树形结构。它封装了一系列方法，使得构建树形结构变得简单和高效。使用 BuildTree 工具类的优势包括：
+ * • 简化开发流程：BuildTree 工具类提供了一种简单直观的方式来构建树形结构，不需要手动编写复杂的逻辑。
+ * • 提高代码可读性和可维护性：通过使用 BuildTree 工具类，代码的意图更加清晰明了，降低了出错的几率，并且简化了后续的维护工作。
+ *
+ * @Author: LFJ
+ * @Date: 2024-04-06 16:17
+ */
+public class BuildTreeUtil {
+
+	/**
+	 * 默认-1为顶级节点
+	 *
+	 * @param nodes
+	 * @param <T>
+	 * @return
+	 */
+	public static <T> TreeVo<T> build(List<TreeVo<T>> nodes) {
+
+		// 如果节点列表为空，则返回 null
+		if (nodes == null) {
+			return null;
+		}
+
+		// 创建一个空的顶级节点列表
+		List<TreeVo<T>> topNodes = new ArrayList<TreeVo<T>>();
+
+		for (TreeVo<T> children : nodes) {
+			String pid = children.getParentId();
+
+			// 如果父节点ID为null或者"-1"，则将当前节点视为顶级节点，添加到顶级节点列表中
+			if (pid == null || "-1".equals(pid)) {
+				topNodes.add(children);
+
+				continue;
+			}
+
+			// 遍历节点列表，将当前节点添加到对应的父节点的子节点列表中
+			for (TreeVo<T> parent : nodes) {
+				String id = parent.getId();
+				if (id != null && id.equals(pid)) {
+					parent.getChildren().add(children);
+					children.setHasParent(true);
+					parent.setChildren(true);
+					continue;
+				}
+			}
+
+		}
+
+		TreeVo<T> root = new TreeVo<T>();
+
+		// 根据顶级节点列表的大小决定返回结果
+		if (topNodes.size() == 1) {
+			// 如果顶级节点列表只有一个节点，将其作为根节点返回
+			root = topNodes.get(0);
+		} else {
+			// 如果顶级节点列表为空或包含多个节点，创建一个虚拟的根节点，将顶级节点列表作为其子节点，然后返回根节点
+			root.setId("000");
+			root.setParentId("-1");
+			root.setHasParent(false);
+			root.setChildren(true);
+			root.setChecked(true);
+			root.setChildren(topNodes);
+			root.setText("顶级节点");
+			Map<String, Object> state = new HashMap<>(16);
+			state.put("opened", true);
+			root.setState(state);
+		}
+
+		return root;
+	}
+
+	/**
+	 * 指定idParam为顶级节点
+	 *
+	 * @param nodes   带有父子关系的数据
+	 * @param idParam 顶级节点id，当其id=idParam时为顶级父节点
+	 * @param <T>
+	 * @return
+	 */
+	public static <T> List<TreeVo<T>> buildList(List<TreeVo<T>> nodes, String idParam) {
+		// 如果节点列表为空，则返回 null
+		if (nodes == null) {
+			return null;
+		}
+
+		// 创建一个空的顶级节点列表
+		List<TreeVo<T>> topNodes = new ArrayList<TreeVo<T>>();
+
+		for (TreeVo<T> children : nodes) {
+
+			String pid = children.getParentId();
+
+			// 如果父节点ID为null或与idParam相等，则将当前节点视为顶级节点，添加到顶级节点列表中
+			if (pid == null || idParam.equals(pid)) {
+				topNodes.add(children);
+
+				continue;
+			}
+
+			// 遍历节点列表，将当前节点添加到对应的父节点的子节点列表中
+			for (TreeVo<T> parent : nodes) {
+				String id = parent.getId();
+				if (id != null && id.equals(pid)) {
+					parent.getChildren().add(children);
+					children.setHasParent(true);
+					parent.setChildren(true);
+
+					continue;
+				}
+			}
+
+		}
+		return topNodes;
+	}
+
+}
+```
+
+## TreeVo
+
+- `id`: 节点ID
+- `text`: 显示节点文本
+- `state`: 节点状态，可以是 `open` 或 `closed`
+- `checked`: 节点是否被选中，布尔类型
+- `attributes`: 节点属性，以Map形式存储
+- `children`: 节点的子节点列表，类型为 `List<TreeVo<T>>`
+- `parentId`: 父节点ID
+- `hasParent`: 是否有父节点，布尔类型
+- `hasChildren`: 是否有子节点，布尔类型
+
+```
+[
+        {
+            "id": "1",
+            "text": "小说",
+            "state": null,
+            "checked": false,
+            "attributes": null,
+            "children": [
+                {
+                    "id": "12",
+                    "text": "一级分类一",
+                    "state": null,
+                    "checked": false,
+                    "attributes": null,
+                    "children": [],
+                    "parentId": "1",
+                    "hasParent": true,
+                    "hasChildren": false
+                }
+            ],
+            "parentId": "0",
+            "hasParent": false,
+            "hasChildren": true
+      }
+]
+```
+
+**代码**
+
+```java
+package com.lfj.blog.utils.buildTreeUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Author: LFJ
+ * @Date: 2024-04-06 16:19
+ */
+
+public class TreeVo<T> {
+	/**
+	 * 节点ID
+	 */
+	private String id;
+	/**
+	 * 显示节点文本
+	 */
+	private String text;
+	/**
+	 * 节点状态，open closed
+	 */
+	private Map<String, Object> state;
+	/**
+	 * 节点是否被选中 true false
+	 */
+	private boolean checked = false;
+	/**
+	 * 节点属性
+	 */
+	private Map<String, Object> attributes;
+
+	/**
+	 * 节点的子节点
+	 */
+	private List<TreeVo<T>> children = new ArrayList<TreeVo<T>>();
+
+	/**
+	 * 父ID
+	 */
+	private String parentId;
+	/**
+	 * 是否有父节点
+	 */
+	private boolean hasParent = false;
+	/**
+	 * 是否有子节点
+	 */
+	private boolean hasChildren = false;
+
+	public TreeVo(String id, String text, Map<String, Object> state, boolean checked, Map<String, Object> attributes,
+				  List<TreeVo<T>> children, boolean isParent, boolean isChildren, String parentID) {
+		super();
+		this.id = id;
+		this.text = text;
+		this.state = state;
+		this.checked = checked;
+		this.attributes = attributes;
+		this.children = children;
+		this.hasParent = isParent;
+		this.hasChildren = isChildren;
+		this.parentId = parentID;
+	}
+
+	public TreeVo() {
+		super();
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public Map<String, Object> getState() {
+		return state;
+	}
+
+	public void setState(Map<String, Object> state) {
+		this.state = state;
+	}
+
+	public boolean isChecked() {
+		return checked;
+	}
+
+	public void setChecked(boolean checked) {
+		this.checked = checked;
+	}
+
+	public Map<String, Object> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, Object> attributes) {
+		this.attributes = attributes;
+	}
+
+	public List<TreeVo<T>> getChildren() {
+		return children;
+	}
+
+	public void setChildren(List<TreeVo<T>> children) {
+		this.children = children;
+	}
+
+	public void setChildren(boolean isChildren) {
+		this.hasChildren = isChildren;
+	}
+
+	public boolean isHasParent() {
+		return hasParent;
+	}
+
+	public void setHasParent(boolean isParent) {
+		this.hasParent = isParent;
+	}
+
+	public boolean isHasChildren() {
+		return hasChildren;
+	}
+
+	public String getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
+	}
+
+	@Override
+	public String toString() {
+		return "TreeVo [id=" + id + ", text=" + text + ", state=" + state + ", checked=" + checked + ", attributes="
+				+ attributes + ", children=" + children + ", parentId=" + parentId + ", hasParent=" + hasParent
+				+ ", hasChildren=" + hasChildren + "]";
+	}
+
+}
+```
+
+## 测试
+
+```java
+	@Data
+	@AllArgsConstructor
+	class Person {
+		private Integer id;
+		private Integer parentId;
+		private String name;
+	}
+
+
+	private List<Person> createPersonList() {
+		Person p1 = new Person(1, 0, "顶级父1");
+		Person p3 = new Person(3, 1, "子1_3");
+		Person p4 = new Person(4, 1, "子1_4");
+
+		Person p21 = new Person(21, 3, "子1_3_21");
+		Person p22 = new Person(22, 4, "子1_4_22");
+		Person p23 = new Person(23, 4, "子1_4_23");
+		Person p24 = new Person(24, 23, "子1_4_23_24");
+
+		Person p5 = new Person(5, 1, "子1_5");
+		Person p6 = new Person(6, 1, "子1_6");
+		Person p7 = new Person(7, 1, "子1_7");
+
+		Person p2 = new Person(2, 0, "顶级父2");
+		Person p8 = new Person(8, 2, "子2_8");
+
+		Person p14 = new Person(14, 8, "子2_8_14");
+		Person p15 = new Person(15, 8, "子2_8_15");
+		Person p17 = new Person(17, 8, "子2_8_17");
+
+		Person p18 = new Person(18, 14, "子2_8_14_18");
+		Person p19 = new Person(19, 14, "子2_8_14_19");
+		Person p20 = new Person(20, 15, "子2_8_15_20");
+
+		Person p9 = new Person(9, 2, "子2_9");
+		Person p10 = new Person(10, 2, "子2_10");
+		Person p11 = new Person(11, 2, "子2_11");
+		Person p12 = new Person(12, 2, "子2_12");
+		Person p13 = new Person(13, 2, "子2_13");
+
+		Person p16 = new Person(16, 0, "顶级父16");
+
+		List<Person> list = new ArrayList<Person>();
+
+		//打乱排序
+		list.add(p15);
+		list.add(p14);
+		list.add(p8);
+
+		list.add(p23);
+
+		list.add(p11);
+		list.add(p12);
+		list.add(p5);
+		list.add(p13);
+		list.add(p18);
+		list.add(p19);
+
+		list.add(p24);
+
+		list.add(p10);
+		list.add(p17);
+
+		list.add(p7);
+		list.add(p9);
+		list.add(p21);
+		list.add(p4);
+		list.add(p16);
+		list.add(p6);
+
+		list.add(p20);
+		list.add(p22);
+		list.add(p1);
+		list.add(p2);
+		list.add(p3);
+
+		return list.stream().distinct().sorted(Comparator.comparingInt(Person::getId)).collect(Collectors.toList());
+	}
+
+
+	private static List<TreeVo<Person>> convertToTreeNodes(List<Person> personList) {
+		List<TreeVo<Person>> treeNodes = new ArrayList<>();
+		for (Person person : personList) {
+			TreeVo<Person> treeNode = new TreeVo<>();
+			treeNode.setId(String.valueOf(person.getId()));
+			treeNode.setParentId(String.valueOf(person.getParentId()));
+			treeNode.setText(person.getName());
+			treeNodes.add(treeNode);
+		}
+		return treeNodes;
+	}
+
+	@Test
+	void BuildTreeUtil() {
+
+
+		// 创建 Person 类型的列表，并填充数据
+		List<Person> personList = createPersonList();
+
+		// 将 Person 类型的列表转换为 TreeVo<Person> 类型的列表
+		List<TreeVo<Person>> treeNodes = convertToTreeNodes(personList);
+
+		// 使用 BuildTreeUtil 的 build 方法构建树形结构
+		List<TreeVo<Person>> treeVos = BuildTreeUtil.buildList(treeNodes, "0");
+
+
+		System.out.println(
+				JSON.toJSONString(treeVos)
+		);
+	}
+```
+
+
+
+# 方式2
+
+```java
+    /**
+     * 分类目录树
+     * @return
+     */
+    @Override
+    public List<CategoryNodeDTO> getCategoryNodeTree() {
+        List<CategoryNodeDTO> resultList = new ArrayList<>();
+        Map<Integer, List<Category>> integerListMap = buildParentId2ChildrenMap(list());
+        List<CategoryNodeDTO> rootCategoryNodeDTOList = listWarp(integerListMap.get(ROOT_PARENT_ID));
+        rootCategoryNodeDTOList.forEach(
+                root -> {
+                    resultList.add(recursiveTree(root, integerListMap));
+                }
+        );
+        return resultList;
+    }
+
+
+  /**
+     * 构建key为ParentId，value为List<Category> children的map
+     *
+     * @param categoryList
+     * @return
+     */
+    private Map<Integer, List<Category>> buildParentId2ChildrenMap(List<Category> categoryList) {
+        Map<Integer, List<Category>> map = new HashMap<>(16);
+        for (Category category : categoryList) {
+            List<Category> children = map.get(category.getParentId());
+            if (children == null) {
+                children = new ArrayList<>();
+                children.add(category);
+                map.put(category.getParentId(), children);
+            } else {
+                children.add(category);
+                map.put(category.getParentId(), children);
+            }
+        }
+        return map;
+    }
+
+    /**
+     * List<Category> 转 List<CategoryNodeDTO>
+     *
+     * @param sourceList
+     * @return
+     */
+    private List<CategoryNodeDTO> listWarp(List<Category> sourceList) {
+        return new AbstractListWarp<Category, CategoryNodeDTO>() {
+            @Override
+            public CategoryNodeDTO warp(Category source) {
+                CategoryNodeDTO target = new CategoryNodeDTO();
+                BeanUtils.copyProperties(source, target);
+                return target;
+            }
+        }.warpList(sourceList);
+    }
+
+    /**
+     * 递归获取元素
+     *
+     * @param node
+     * @param integerListMap
+     * @return
+     */
+    private CategoryNodeDTO recursiveTree(CategoryNodeDTO node, Map<Integer, List<Category>> integerListMap) {
+        node.setChildren(new ArrayList<>());
+        List<CategoryNodeDTO> children = listWarp(integerListMap.get(node.getId()));
+        if (CollectionUtils.isEmpty(children)) {
+            node.setChildren(null);
+            return node;
+        }
+        for (CategoryNodeDTO child : children) {
+            CategoryNodeDTO nextChild = recursiveTree(child, integerListMap);
+            node.getChildren().add(nextChild);
+        }
+        return node;
+    }
+
+
+```
+
+
 
