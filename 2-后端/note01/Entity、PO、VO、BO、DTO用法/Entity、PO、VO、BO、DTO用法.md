@@ -6,6 +6,8 @@ DTO是一种用于在不同层之间传递数据的对象，其主要目的是�
 
 DTO通常包含业务对象的一部分或全部属性，并提供简单的getter和setter方法。
 
+就是处于vo和entity之间的
+
 ```java
 @Data
 public class UserDTO {

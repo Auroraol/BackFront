@@ -6400,3 +6400,7 @@ LoadProperties测试获取的功能描述：原生获取配置文件的值
 # 补充
 
 [springboot由3.1.5升级到3.2.0 报Invalid value type for attribute ‘factoryBeanObjectType‘: java.lang.String-CSDN博客](https://blog.csdn.net/u011410254/article/details/134611035)
+
+
+
+# 无法自动装配。找不到 'Integer' 类型的 Bean。

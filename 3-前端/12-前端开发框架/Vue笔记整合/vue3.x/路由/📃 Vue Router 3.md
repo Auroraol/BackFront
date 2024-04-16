@@ -1614,8 +1614,8 @@ watch(
 router.afterEach(() => {
     // 将滚动位置重置为页面顶部
     window.scrollTo(0, 0);
-});
-
+    
+});  
 ```
 
 // 方式3
@@ -2691,3 +2691,36 @@ const tagClick = (id) => {
 ```
 
 如果tagId === tag.id时, 使用.active这个样式
+
+
+
+# 刷新(不推荐)
+
+出现
+
+![image-20240412101940512](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240412101940512.png)
+
+解决不了只能进行刷新
+
+```js
+router.afterEach(() => {
+  // 将页面滚动到顶部
+  // window.scrollTo(0, 0);
+  //
+  // 刷新页面
+  location.reload();
+});
+```
+
+# 顶部
+
+```js
+到顶部
+const goTopBtn = () => {
+  window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+  })
+};
+```
+

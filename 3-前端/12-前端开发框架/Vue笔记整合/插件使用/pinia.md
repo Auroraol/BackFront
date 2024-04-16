@@ -1410,6 +1410,7 @@ export { useAuthUserStore, useCommonStore }
 import { useAuthUserStore } from "@/store/index"
 const { setUserInfo } = useAuthUserStore()
 
-setUserInfo() // getUserInfo
+const setUserInfoPinia = setUserInfo();// getUserInfo
+
 </script>
 ```

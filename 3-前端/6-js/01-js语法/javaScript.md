@@ -67,6 +67,8 @@
 
 # 运算符
 
+js中 `if (!token.value)` 来检查计算属性 `token` 是否为空`null`、`undefined`、空字符串等假值，则条件表达式 `!token.value` 会评估为 `true`，进而执行相应的代码块。
+
 比较运算符：
 
 - = 如果1=’1’,则为false

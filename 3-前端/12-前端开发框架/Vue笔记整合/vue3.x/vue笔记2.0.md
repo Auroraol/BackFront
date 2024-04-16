@@ -2748,7 +2748,7 @@ vue2还需要这些, vue3就简单多了
 
 ![image-20231120221359726](vue%E7%AC%94%E8%AE%B0.assets/image-20231120221359726.png)
 
-## 指令
+## 指令:crossed_swords:
 
 ### 内置指令
 
@@ -2814,6 +2814,10 @@ vue2还需要这些, vue3就简单多了
 ![image-20231120223145197](vue%E7%AC%94%E8%AE%B0.assets/image-20231120223145197.png)
 
 #### 2.v-html_指令
+
+注意:   使用 `v-html` 会存在一些潜在的安全风险和性能问题，因此在组件上使用 `v-html` 可能会导致组件内容被破坏，这也是 eslint-plugin-vue 中的 `[vue/no-v-text-v-html-on-component]` 规则所提醒的。
+
+推荐的做法是尽量避免使用 `v-html`，而是通过 Vue.js 的数据绑定和模板语法来动态渲染内容
 
 ```html
 <!DOCTYPE html>
@@ -11468,6 +11472,8 @@ ref: modalOpen = false
 
 ### 3.Suspense (常用)
 
+> 搭配过渡,动画使用,  需要异步加载的组件最好写个过渡/动画
+
 - 等待异步组件时渲染一些额外内容，让应用有更好的用户体验
 
 - 尽量多层封装
@@ -12065,6 +12071,13 @@ const props = defineProps<{
   customContent: CustomData; // 使用自定义数据类型作为第一个 props 类型
   otherProp: string;         // 其他 props 类型
 }>();
+    
+// 在 setup 中可以直接使用 props 变量, 不需要使用.value
+console.log(props.otherProp);    
+    
+//  在 setup 中一般要搭配计算属性或者监视属性(由于 Vue 的响应式系统，可能存在细微的延迟，在此期间 props 还未被更新)
+const codedTitle = computed(() => encodeURIComponent(props.title ));
+    
 </script>
 
 <template>
@@ -12730,6 +12743,12 @@ const submit = () => {
 **计算属性（Computed Property）**：
 
 ```vue
+<template>
+  <div>
+    <p>doubleCount: {{ doubleCount }}</p>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 
@@ -12737,6 +12756,9 @@ const count = ref(0);
 
 // 计算属性
 const doubleCount = computed(() => count.value * 2);
+    
+//使用    
+console.log(doubleCount.value); // 访问 value 属性以获取计算属性的值    
 </script>
 ```
 
@@ -12854,7 +12876,7 @@ import { ref, watch } from 'vue';
 
 const count = ref(0);
 
-// 监视属性
+// 监视属性, 注意: count, 监视的属性不用加.value
 watch(count, (newValue, oldValue) => {
     console.log(`count 值从 ${oldValue} 变为 ${newValue}`);
 });
@@ -13930,7 +13952,7 @@ import my from '../components/my.vue'
 ```ts
 const formatD = (str: string): string => {
   //2024-04-08 15:03:51 -> 2024/04/08 15:03:51
-  str = str.replace(/-/g, "/");
+  str = str.replace(/-/g, "/"); // iOS 兼容性问题
   const date = new Date(str);
   const now = new Date();
   // 是当前年,就不显示年份
@@ -14095,9 +14117,257 @@ export default {
 
 # 一定要设置一个loading响应数据保证 `<template>`中能拿到服务器的数据:crossed_swords:
 
-感觉这样还能解决 闪屏问题
+感觉这样还能解决 闪屏问题, 注意不用于根标签, 和el标签,   用于需要加载ajax请求数据的地方下面例子会出现问题
+
+```
+ <div v-if="!loading">
+ // 其他标签, 有加载ajax请求数据
+ </div>
+```
 
 ![image-20240411144917919](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240411144917919.png)
 
 ![image-20240411144944415](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240411144944415.png)
+
+
+
+
+
+# v-clipboard
+
+安装
+
+```
+npm install vue-clipboard-next
+```
+
+- `v-clipboard:copy`：表示在元素上绑定了复制操作。它会监听指定事件（通常是点击事件），并在触发时将文本复制到剪贴板中。在这里，`url` 可能是一个 Vue 数据对象中的属性，其值将被复制到剪贴板。
+- `v-clipboard:success`：表示在复制操作成功时触发的事件处理器。这个事件处理器应该是一个 Vue 实例中定义的方法，用于处理复制成功时的逻辑。在你的代码中，`copySuccess` 可能是一个这样的方法。
+
+```vue
+<template>
+  <button v-clipboard:copy="url" @clipboard:success="onCopySuccess">
+    Copy URL
+  </button>
+</template>
+
+<script>
+import { useClipboard } from 'vue-clipboard-next'; // 导入 v-clipboard-next
+
+export default {
+  setup() {
+    const { toClipboard } = useClipboard(); // 获取剪贴板操作的函数
+
+    const url = 'https://example.com'; // 要复制的 URL
+
+    const onCopySuccess = () => {
+      console.log('Copied to clipboard successfully!');
+    };
+
+    return {
+      url,
+      onCopySuccess
+    };
+  }
+};
+</script>
+
+```
+
+# Vue3 复制 copy 功能实现（vue-clipboard3）
+
+注: Vite 的版本为 `2.5.10`
+
+- 安装 `vue-clipboard3`，附：[vue2 复制 copy 功能实现](https://blog.csdn.net/zz00008888/article/details/124557684)
+
+  ```
+  $ npm install --save vue-clipboard3
+  1
+  ```
+
+- 在 `setup () {}` 中使用：
+
+  ```html
+  <template>
+    <button @click="touchCopy">复制链接</button>
+  </template>
+  
+  <script>
+  import { defineComponent } from 'vue'
+  // 导入插件
+  import useClipboard from 'vue-clipboard3'
+  
+  export default defineComponent({
+    setup () {
+      // 点击复制
+      function touchCopy () {
+        // 调用
+        copy('拷贝内容')
+      }
+      // 使用插件
+      const { toClipboard } = useClipboard()
+      const copy = async (msg) => {
+        try {
+          // 复制
+          await toClipboard(msg)
+          // 复制成功
+        } catch (e) {
+          // 复制失败
+        }
+      }
+      // 导出
+      return {
+        // 点击复制
+        touchCopy
+      }
+    }
+  })
+  </script>
+  ```
+
+- 在 `<script setup>` 中使用：
+
+  ```html
+  <template>
+    <button @click="touchCopy">复制链接</button>
+  </template>
+  
+  <script setup>
+  // 导入插件
+  import useClipboard from 'vue-clipboard3'
+  
+  // 点击复制
+  function touchCopy () {
+    // 调用
+    copy('拷贝内容')
+  }
+      
+  // 使用插件
+  const { toClipboard } = useClipboard()
+  const copy = async (msg) => {
+    try {
+      // 复制
+      await toClipboard(msg)
+      // 复制成功
+    } catch (e) {
+      // 复制失败
+    }
+  }
+  </script>
+  ```
+
+# [一键分享到QQ空间、QQ好友、新浪微博、微信代码](https://www.cnblogs.com/lxwphp/p/9669377.html)
+
+通过`qq空间`、`qq聊天`、`新浪微博`和微信二维码`分享平台提供的接口`，`实现`把网页中对应的图片、标题、描述的信息参数用javascript获取后传进接口中，实现`一键分享`。
+
+ **`   使用到的接口(测试时需要登录，网址和图片必须是公网的，不能localhost)：`**
+
+​      1.**分享到QQ空间接口**：https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=你的网址&sharesource=qzone&title=你的分享标题&pics=你的分享图片&summary=你的分享描述信息
+
+​      2.**分享给QQ好友接口**：http://connect.qq.com/widget/shareqq/index.html?url=你的分享网址&sharesource=qzone&title=你的分享标题&pics=你的分享图片地址&summary=你的分享描述&desc=你的分享简述
+
+​      3.**分享到新浪微博接口**：http://service.weibo.com/share/share.php?url=你的分享网址&sharesource=weibo&title=你的分享标题&pic=你的分享图片&appkey=你的key，需要在新浪微博开放平台中申请
+
+**一键分享代码参考如下：**
+
+```
+    <div class="fl">分享到：</div> 
+    <div onclick="shareTo('qzone')">     
+        <img src="http://zixuephp.net/static/images/qqzoneshare.png" width="30"> 
+    </div> 
+    <div onclick="shareTo('qq')">     
+        <img src="http://zixuephp.net/static/images/qqshare.png" width="32"> 
+    </div> 
+    <div onclick="shareTo('sina')">     
+        <img src="http://zixuephp.net/static/images/sinaweiboshare.png" width="36"> 
+    </div> 
+    <div onclick="shareTo('wechat')">     
+        <img src="http://zixuephp.net/static/images/wechatshare.png" width="32"> 
+    </div>
+```
+
+```
+js
+
+    function shareTo(stype){
+        var ftit = '';
+        var flink = '';
+        var lk = '';
+        //获取文章标题
+        ftit = $('.pctitle').text();
+        //获取网页中内容的第一张图片
+        flink = $('.pcdetails img').eq(0).attr('src');
+        if(typeof flink == 'undefined'){
+            flink='';
+        }
+        //当内容中没有图片时，设置分享图片为网站logo
+        if(flink == ''){
+            lk = 'http://'+window.location.host+'/static/images/logo.png';
+        }
+        //如果是上传的图片则进行绝对路径拼接
+        if(flink.indexOf('/uploads/') != -1) {
+            lk = 'http://'+window.location.host+flink;
+        }
+        //百度编辑器自带图片获取
+        if(flink.indexOf('ueditor') != -1){
+            lk = flink;
+        }
+        //qq空间接口的传参
+        if(stype=='qzone'){
+            window.open('https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+document.location.href+'?sharesource=qzone&title='+ftit+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content'));
+        }
+        //新浪微博接口的传参
+        if(stype=='sina'){
+            window.open('http://service.weibo.com/share/share.php?url='+document.location.href+'?sharesource=weibo&title='+ftit+'&pic='+lk+'&appkey=2706825840');
+        }
+        //qq好友接口的传参
+        if(stype == 'qq'){
+            window.open('http://connect.qq.com/widget/shareqq/index.html?url='+document.location.href+'?sharesource=qzone&title='+ftit+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content')+'&desc=php自学网，一个web开发交流的网站');
+        }
+        //生成二维码给微信扫描分享，php生成，也可以用jquery.qrcode.js插件实现二维码生成
+        if(stype == 'wechat'){
+            window.open('http://zixuephp.net/inc/qrcode_img.php?url=http://zixuephp.net/article-1.html');
+        }
+    } 
+```
+
+**使用说明：**
+
+  这里的如获取文章标题、文章图片、logo图片地址等一些其他信息是按照本站的规则来的，使用时需要修改成自己站点的calss或id选择器来获取。如果调试不成功，可以尝试本站中的分享功能，分享时会打开新窗口，那条链接是最终要分享的，已经拼接好的参数链接，可以复制进行比对参考。
+
+**最终分享链接示例：**
+
+  *1.分享到qq空间：*
+
+> https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://zixuephp.net/article-309.html?sharesource=qzone&title=一键分享到QQ空间、QQ好友、新浪微博、微信代码&pics=http://zixuephp.net/uploads/image/20170810/1502335815192079.png&summary=通过各自平台的开发接口，进行参数指定，进行一键分享javascript代码功能
+
+  *2.分享到qq好友：*
+
+> https://connect.qq.com/widget/shareqq/index.html?url=http://zixuephp.net/article-309.html?sharesource=qzone&title=一键分享到QQ空间、QQ好友、新浪微博、微信代码&pics=http://zixuephp.net/uploads/image/20170810/1502335815192079.png&summary=通过各自平台的开发接口，进行参数指定，进行一键分享javascript代码功能&desc=php自学网，一个web开发交流的网站
+
+  *3.分享到新浪微博：*
+
+> http://service.weibo.com/share/share.php?url=http://zixuephp.net/article-309.html?sharesource=weibo&title=一键分享到QQ空间、QQ好友、新浪微博、微信代码&pic=http://zixuephp.net/uploads/image/20170810/1502335815192079.png&appkey=2706825840&sudaref=zixuephp.net&display=0&retcode=6102#_loginLayer_1528860698455
+
+  *4.分享到微信（js生成二维码方式）*
+
+> jquery生成二维码方式：
+>
+> ![img](http://www.zixuephp.net/static/ueditor/dialogs/attachment/fileTypeImages/icon_txt.gif)[jquery.qrcode.js生成二维码demo.html](http://www.zixuephp.net/uploads/file/20180613/1528863675999954.html)
+>
+> 下载代码：
+>
+> ![img](http://www.zixuephp.net/static/ueditor/dialogs/attachment/fileTypeImages/icon_rar.gif)[jquery.qrcode.js生成二维码demo.rar](http://www.zixuephp.net/uploads/file/20180613/1528863853461058.rar)
+
+分享效果点击本站文章分享功能，效果图如下：
+
+![一键分享js代码](http://www.zixuephp.net/uploads/image/20170810/1502335815192079.png)
+
+http://www.zixuephp.net/article-309.html
+
+
+
+
+
+
 

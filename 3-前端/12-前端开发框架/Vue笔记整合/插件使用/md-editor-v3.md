@@ -288,3 +288,226 @@ const scrollElement = document.documentElement;
 
 ![image-20240410161729030](md-editor-v3.assets/image-20240410161729030.png)
 
+
+
+# 编辑器的扩展组件(表情等)
+
+注意:  得用数字在toolbars占位
+
+```js
+import { Emoji } from "@vavt/v3-extension";
+import '@vavt/v3-extension/lib/asset/style.css';
+```
+
+使用
+
+[md-editor-extension/README-CN.md at develop · imzbf/md-editor-extension (github.com)](https://github.com/imzbf/md-editor-extension/blob/develop/README-CN.md)
+
+![image-20240415175650785](md-editor-v3.assets/image-20240415175650785.png)
+
+```
+npm install @vavt/v3-extension
+```
+
+例子
+
+[md-editor-v3/src/pages/Preview/index.vue at docs · imzbf/md-editor-v3 (github.com)](https://github.com/imzbf/md-editor-v3/blob/docs/src/pages/Preview/index.vue)
+
+![image-20240415180315437](md-editor-v3.assets/image-20240415180315437.png)
+
+效果
+
+![image-20240415183047798](md-editor-v3.assets/image-20240415183047798.png)
+
+
+
+```vue
+<template>
+  <div class="project-preview">
+    <div class="container">
+      <MdEditor
+        ref="editorRef"
+         :editorId="editorId"
+        :toolbars="toolbars"
+        :footers="['markdownTotal', '=', 0, 'scrollSwitch']"
+        showCodeRowNumber
+        autoDetectCode
+        @onUploadImg="uploadImg"
+      >
+        <template #defToolbars>
+          <Mark />
+          <Emoji />
+          <ExportPDF :modelValue="text" height="700px" />
+        </template>
+        <template #defFooters>
+          <TimeNow />
+        </template>
+      </MdEditor>
+      <br />
+      <span class="tips-text">
+        {{ tips
+        }}<a
+          href="https://github.com/imzbf/md-editor-v3/tree/docs/src/components"
+          target="_blank"
+          >components</a
+        >
+      </span>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, reactive, watch, ref, onMounted } from 'vue';
+import { MdEditor } from 'md-editor-v3';
+import { Emoji, Mark, ExportPDF } from '@vavt/v3-extension';
+import '@vavt/v3-extension/lib/asset/style.css';
+import type { ExposeParam } from 'md-editor-v3';
+import { toolbars } from './staticConfig';
+import TimeNow from '/@/components/TimeNow/index.vue';
+
+
+const editorId = 'editor-preview';
+
+const editorRef = ref<ExposeParam>();
+
+const test= ref("")
+
+onMounted(() => {
+  console.log(editorRef.value?.on('catalog', console.log));
+});
+</script>
+
+<script lang="ts">
+export default {
+  name: 'PreviewPage'
+};
+</script>
+```
+
+
+
+# 自定义
+
+##  toolbars
+
+选择性展示工具栏，可选内容见下方。
+
+你可以随意排序工具栏，通过`'-'`分割两个工具，通过`'='`实现左右放置！
+
+从 v1.10.0 开始，你可以自定义工具栏，将`defToolbars`中自定义工具项的下标穿插在`toolbars`实现展示（这并不规范）
+
+```js
+[
+  'bold',
+  'underline',
+  'italic',
+  '-',
+  'title',
+  'strikeThrough',
+  'sub',
+  'sup',
+  'quote',
+  'unorderedList',
+  'orderedList',
+  'task',
+  '-',
+  'codeRow',
+  'code',
+  'link',
+  'image',
+  'table',
+  'mermaid',
+  'katex',
+  '-',
+  'revoke',
+  'next',
+  'save',
+  '=',
+  'pageFullscreen',
+  'fullscreen',
+  'preview',
+  'previewOnly',
+  'htmlPreview',
+  'catalog',
+  'github'
+];
+```
+
+
+
+## defToolbars
+
+```vue
+<template>
+  <MdEditor :toolbars="toolbars">
+    <template #defToolbars>
+      <NormalToolbar title="mark" @onClick="handler">
+        <template #trigger>
+          <svg class="md-editor-icon" aria-hidden="true">
+            <use xlink:href="#icon-mark"></use>
+          </svg>
+        </template>
+      </NormalToolbar>
+    </template>
+  </MdEditor>
+</template>
+
+<script setup>
+import { MdEditor, NormalToolbar } from 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
+
+const toolbars = ['bold', '-', 0, '=', 'github'];
+
+const handler = () => {
+  console.log('NormalToolbar clicked!');
+};
+</script>
+```
+
+![普通扩展工具栏](md-editor-v3.assets/normal-toolbar.gif)
+
+## defFooters
+
+自定义扩展页脚
+
+```vue
+<template>
+  <MdEditor :footers="footers">
+    <template #defFooters>
+      <span>￥_￥</span>
+      <span>^_^</span>
+    </template>
+  </MdEditor>
+</template>
+
+<script setup>
+import { MdEditor } from 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
+
+// 将插槽中的组件下标放到对应的位置即可显示
+const footers = ['markdownTotal', 0, '=', 1, 'scrollSwitch'];
+</script>
+```
+
+![img](md-editor-v3.assets/footer.png)
+
+
+
+
+
+
+
+
+
+### 变成对话框
+
+```vue
+<MdEditor :toolbars="toolbars" :preview="false"> </MdEditor>
+
+import { MdEditor, NormalToolbar } from "md-editor-v3";
+import "md-editor-v3/lib/style.css";
+
+const toolbars = [];
+```
+
+![image-20240415222332517](md-editor-v3.assets/image-20240415222332517.png)

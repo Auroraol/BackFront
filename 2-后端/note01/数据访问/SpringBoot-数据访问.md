@@ -1645,6 +1645,7 @@ private List<Student> students;  //班级与学生是一对多的关系
         <result property="age" column="age"/>
         <result property="sex" column="sex"/>
         <association property="cardId" javaType="com.example.experiment01.entity.TbIdcard">
+            <!--表示cardId里有的东西 -->
             <id property="id" column="card_id"/>
             <result property="code" column="code"/>
         </association>
@@ -2287,6 +2288,7 @@ ArticleMapper.xml
         </association>
         <!--Article和Tag 多对一的关系-->
         <collection property="tagList" ofType="com.lfj.blog.entity.Tag">
+            <!--将 column 属性设置为 "tag_id"。这样，在查询结果中，MyBatis 就会根据 tag_id 列的值来填充标签集合 tagList 中的每个标签对象的 id 属性。-->
             <id property="id" column="tag_id"/>
             <result property="name" column="tag_name"/>
         </collection>

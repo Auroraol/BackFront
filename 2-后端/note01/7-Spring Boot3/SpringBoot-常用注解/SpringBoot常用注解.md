@@ -495,7 +495,7 @@ public ResponseEntity deleteUser(@PathVariable(value = "userId") Long userId){
 
 ####  get请求
 
-**params**
+##### **params**
 
 ![image-20240326225858933](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20240326225858933.png)
 
@@ -523,11 +523,17 @@ export function test (params) {
 public Result test(@RequestParam Map<String, Object> map) {
     return Res.ok();
 }
+
+//或者
+@GetMapping("/test")
+public Result test(@RequestParam(value = "id"), @RequestParam(value = "name")) {
+    return Res.ok();
+}
 ```
 
 ####  post请求
 
- **params**
+#####  **params**
 
 ![image-20240326225836095](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20240326225836095.png)
 
@@ -541,7 +547,7 @@ const params = {
 }
 test(params)
 
-// api
+// api, 默认情况下，Axios 会自动将请求数据（例如 JavaScript 对象）转换为 JSON 格式
 export function test (params) {
   return axios({
     url: url,
@@ -558,7 +564,7 @@ public Result test(@RequestParam Map<String, Object> map) {
 
 ```
 
-**data**
+##### **data**
 
 ![image-20240326225819562](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20240326225819562.png)
 
@@ -592,7 +598,6 @@ export function test (params) {
 public Result test(@RequestBody TestEntity testEntity) {
     return Res.ok();
 }
-
 ```
 
 ### 前端传值
@@ -846,6 +851,9 @@ public ResponseResult<Token> userLogin(@RequestBody Map<String, String> loginDat
 		String password = loginData.get("password");
 		return userService.usernameLogin(username, password);
 }
+
+
+// 也可以用@RequestParam(value = "xxxx")
 ```
 
 ###### 表单默认方式

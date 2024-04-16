@@ -1282,9 +1282,11 @@ body {
 
 
 
+# 解决闪屏
 
+> 下述内容可以搭配使用
 
-# 动画
+## 动画
 
 [GSAP 中文教程 中文文档 ｜官方文档 官方教程翻译 ｜好奇代码出品](https://gsap.framer.wiki/)
 
@@ -1346,7 +1348,98 @@ const gsapAnimation = () => {
 }
 ```
 
-# 过渡
+
+
+```
+//这里是文章顶部的编辑按钮，点击展开下面的抽屉
+let showEditorBox = false
+const expandEdiorBox = () => {
+    showEditorBox = !showEditorBox
+    if (showEditorBox === true) {
+        gsap.to('.ediorBox', {
+            duration: .3,
+            height: 80
+        })
+    } else {
+        gsap.to('.ediorBox', {
+            duration: .3,
+            height: 0
+        })
+    }
+}
+```
+
+
+
+```
+const containerGsap = () => {
+    gsap.from('.contaier', {
+        y: 50,
+        duration: 0.3
+    })
+}
+
+const gsapEnterCover = (el: any, done: any) => {
+    gsap.from(el, {
+        y: -50,
+        duration: 0.3
+    })
+    done()
+}
+
+onMounted(() => {
+    containerGsap()
+    }
+```
+
+## 过渡
+
+```vue
+<template>
+  <el-row>
+    <el-col :span="2" class="grid-content1">
+      <transition name="el-fade-in">
+        <BrowserSidePanel
+          class="browserSide"
+          :id="articleId"
+        ></BrowserSidePanel>
+      </transition>
+    </el-col>
+    <el-col :span="16">
+      <!-- 使用 -->
+      <transition name="el-fade-in">
+        <div v-if="!loading" class="layout-left-side container">
+          <!-- 这里是你的其他内容 -->
+        </div>
+      </transition>
+    </el-col>
+    <el-col :span="6" class="ep-bg-purple">
+      <transition name="el-fade-in">
+        <div class="grid-content" />
+      </transition>
+      <el-affix offset="60">
+        <!-- 这里是你的其他内容 -->
+      </el-affix>
+    </el-col>
+  </el-row>
+</template>
+
+
+<style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+</style>
+```
+
+![1712891542844](Element%E7%AC%94%E8%AE%B0.assets/1712891542844.gif)
+
+
+
+
 
 ```
        <!-- 使用 transition 组件包裹 router-view -->
@@ -1366,6 +1459,37 @@ const gsapAnimation = () => {
 .fade-enter, .fade-leave-to /* .fade-leave-active 在 <2.1.8 版本中 */ {
   opacity: 0;
 }
+```
+
+
+
+```vue
+<template>
+  <div>
+    <transition name="fade">
+      <div v-if="!loading" class="container">内容</div>
+    </transition>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      loading: true // 根据实际情况设置 loading 状态
+    };
+  }
+};
+</script>
+
+<style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+</style>
 ```
 
 
@@ -3101,7 +3225,7 @@ span 天然不换行, 有时候方便
 
 ![image-20240408155245963](Element%E7%AC%94%E8%AE%B0.assets/image-20240408155245963.png)
 
-
+loading=true 时显示
 
 
 
@@ -3691,3 +3815,226 @@ li标签 天然垂直排, 有时候用在方便
     overflow-y: auto; /* 当内容溢出时显示滚动条 */
 ```
 
+
+
+```css
+
+//滚动条样式
+::-webkit-scrollbar {
+  width: .5rem;
+  height: .5rem;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 0;
+  background-color: rgb(218, 218, 218);
+  transition: all .2s;
+  border-radius: .5rem;
+
+  &:hover {
+    background-color: rgb(172, 172, 172);
+  }
+}
+```
+
+![image-20240412112951316](Element%E7%AC%94%E8%AE%B0.assets/image-20240412112951316.png)
+
+
+
+# 背景
+
+公共背景
+
+```
+/* ~ %相对于父级所以body html也要设置，尽量不混用 % vh vw ，容易产生未知错误 */
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%; 
+  background-image: linear-gradient(to top, #FFE6FA 65%, #2580B3 100%);
+  background-attachment: fixed;
+  /* background-color: #54befc; */
+  font-size: 13px;
+  font-family: '思源黑体 Normal', 'Microsoft YaHei', '黑体';
+}
+```
+
+# 将页脚固定在页面底部
+
+当一个HTML页面中含有较少的内容时，Web页面的“footer”部分随着飘上来，处在页面的半腰中间，给视觉效果带来极大的影响，让你的页面看上去很不好看，特别是现在宽屏越来越多，这种现象更是常见。
+
+![img](Element%E7%AC%94%E8%AE%B0.assets/stickyfooter.png)
+
+
+
+`.app-container` 元素被设置为 `position: relative;`，这是因为我们要将 `<foot></foot>` 设置为绝对定位，并相对于 `.app-container` 定位。然后，`.foot` 元素被设置为 `position: absolute;`，`bottom: 0;` 表示距离父元素底部为 0，这样它就会固定在页面底部。
+
+```vue
+<template>
+  <div class="app-container">
+  <navigation></navigation>
+  <el-config-provider :locale="zhCn">
+    <!-- 路由视图 -->
+    <router-view></router-view>
+  </el-config-provider>
+  <foot class="foot"></foot>
+    </div>
+</template>
+
+
+<style lang="less">
+
+
+.app-container {
+ position: relative;
+  min-height: 100vh;
+}
+
+
+.foot {
+  /* Footer 组件样式 */
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+</style>
+```
+
+## 方法
+
+需求：当页面高度不足一屏时需要footer固定显示在页面底部，而页面内容超过一屏时需要footer紧跟在页面内容的最后。
+
+思路：通过获取 网页可见区域高度：document.body.clientHeight;设置内容区域的最小高度，从而曲线救国使footer置底。
+
+代码：
+
+```vue
+<template>
+    <div id="app">
+        <Header></Header>
+        <div id="v-content" v-bind:style="{minHeight: Height+'px'}"><router-view /></div>
+        <Footer></Footer>
+    </div>
+</template>
+
+<script>
+export default {
+  name: 'App',
+  data() {
+     return {
+       Height: 0
+     }
+  },
+  mounted(){
+    //动态设置内容高度 让footer始终居底   header+footer的高度是100 //可以修改
+    this.Height = document.documentElement.clientHeight - 100;  
+　　//监听浏览器窗口变化　
+    window.onresize = ()=> {this.Height = document.documentElement.clientHeight -100}
+  }
+}
+</script>
+```
+
+
+
+```vue
+<template>
+  <div class="flex flex-col min-h-screen">
+    <navigation></navigation>
+    <el-config-provider :locale="zhCn">
+      <!-- 路由视图 -->
+      <router-view class="view"></router-view>
+    </el-config-provider>
+    <foot class="foot" :style="{ position: footerPosition }"></foot>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+
+const footerPosition = ref('fixed');
+
+const updateFooterPosition = () => {
+  const windowHeight = document.documentElement.clientHeight;
+  const documentHeight = document.documentElement.scrollHeight;
+  const contentHeight = documentHeight - windowHeight;
+
+  if (contentHeight <= 0) {
+    // 当页面内容不足一屏时，页脚固定显示在页面底部
+    footerPosition.value = 'fixed';
+  } else {
+    // 当页面内容超过一屏时，页脚跟随内容在页面的最底部
+    footerPosition.value = 'static';
+  }
+};
+
+onMounted(() => {
+  updateFooterPosition();
+  window.addEventListener('resize', updateFooterPosition);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateFooterPosition);
+});
+</script>
+
+<style scoped>
+/* 可以添加页脚样式 */
+</style>
+
+```
+
+
+
+# 在线生成二维码
+
+### 搜狐视频 API
+
+[https://my.tv.sohu.com/user/a/wvideo/getQRCode.do?text=http://192.168.1.88&width=500&height=500](https://my.tv.sohu.com/user/a/wvideo/getQRCode.do?text=https://192.168.1.88&width=500&height=500)
+
+width：图片宽
+
+height：图片高
+
+![image-20240414115733844](Element%E7%AC%94%E8%AE%B0.assets/image-20240414115733844.png)
+
+# 表情
+
+[💖 闪亮的爱心 表情符号 — 含义和用法 (emojis.wiki)](https://emojis.wiki/zh/闪亮的爱心/)
+
+1. 使用 Unicode 字符：可以使用 Unicode 字符 \u{1F618} 来表示“飞吻”表情符号。
+
+```
+htmlCopy Code<span>&#x1F618;</span>
+```
+
+2. 使用 Emoji：直接使用 Emoji 表情字符来表示“飞吻”表情。
+
+```
+htmlCopy Code<span>😘</span>
+```
+
+
+
+## 引用
+
+```css
+      .main-tip-label {
+        border-left: 5px solid #00a77c;
+        border-bottom: 1px solid #00a77c;
+        font-size: 18px;
+        font-weight: bold;
+        line-height: 2;
+        color: #545454;
+        padding-left: 10px;
+      }
+
+```
+
+![image-20240415225613145](Element%E7%AC%94%E8%AE%B0.assets/image-20240415225613145.png)
