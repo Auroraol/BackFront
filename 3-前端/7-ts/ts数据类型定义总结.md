@@ -73,7 +73,7 @@
 
 1. **map**: 对数组的每个元素执行提供的函数，并返回一个新数组，其中包含每次函数调用的结果。
 
-```
+```ts
 const numbers = [1, 2, 3, 4, 5];
 const doubled = numbers.map(num => num * 2);
 console.log(doubled); // 输出: [2, 4, 6, 8, 10]
@@ -81,7 +81,7 @@ console.log(doubled); // 输出: [2, 4, 6, 8, 10]
 
 1. **filter**: 使用提供的函数测试所有元素，并创建一个包含所有通过测试的元素的新数组。
 
-```
+```ts
 const numbers = [1, 2, 3, 4, 5];
 const evenNumbers = numbers.filter(num => num % 2 === 0);
 console.log(evenNumbers); // 输出: [2, 4]
@@ -89,7 +89,7 @@ console.log(evenNumbers); // 输出: [2, 4]
 
 1. **reduce**: 对数组中的所有元素执行一个提供的函数，并将其结果累积到单个输出。
 
-```
+```ts
 const numbers = [1, 2, 3, 4, 5];
 const sum = numbers.reduce((acc, curr) => acc + curr, 0);
 console.log(sum); // 输出: 15
@@ -97,7 +97,7 @@ console.log(sum); // 输出: 15
 
 1. **find**: 返回数组中满足提供的测试函数的第一个元素的值。
 
-```
+```ts
 const numbers = [1, 2, 3, 4, 5];
 const found = numbers.find(num => num > 3);
 console.log(found); // 输出: 4
@@ -105,7 +105,7 @@ console.log(found); // 输出: 4
 
 1. **forEach**: 对数组的每个元素执行提供的函数。
 
-```
+```ts
 const numbers = [1, 2, 3, 4, 5];
 numbers.forEach(num => console.log(num));
 // 输出:
@@ -139,6 +139,70 @@ const numbers = [3, 1, 5, 2, 4];
 const sortedNumbers = numbers.sort((a, b) => a - b);
 console.log(sortedNumbers); // 输出: [1, 2, 3, 4, 5]
 ```
+
+1. **find**:`find()` 方法来检查对象数组中是否包含特定值的示例：
+
+```
+// 检查是否存在 'admin' 角色
+var isAdmin = userInfo.roles.find(role => role === 'admin');
+
+if (isAdmin) {
+    // 包含 'admin' 角色
+} else {
+    // 不包含 'admin' 角色
+}
+```
+
+1. **push()**: 将一个或多个元素添加到数组的末尾，并返回新数组的长度。
+
+   ```
+   javascriptCopy Codeconst array = [1, 2, 3];
+   array.push(4); // [1, 2, 3, 4]
+   ```
+
+2. **pop()**: 移除数组的最后一个元素，并返回该元素的值。
+
+   ```
+   javascriptCopy Codeconst array = [1, 2, 3];
+   const poppedElement = array.pop(); // 3
+   ```
+
+3. **shift()**: 移除数组的第一个元素，并返回该元素的值。
+
+   ```
+   javascriptCopy Codeconst array = [1, 2, 3];
+   const shiftedElement = array.shift(); // 1
+   ```
+
+4. **unshift()**: 在数组的开头添加一个或多个元素，并返回新数组的长度。
+
+   ```
+   javascriptCopy Codeconst array = [2, 3];
+   array.unshift(1); // [1, 2, 3]
+   ```
+
+1. **splice()**: 从数组中添加或移除元素。
+
+   ```
+   javascriptCopy Codeconst array = [1, 2, 3, 4, 5];
+   array.splice(2, 1); // 移除索引为 2 的元素，[1, 2, 4, 5]
+   array.splice(2, 0, 3); // 在索引为 2 的位置添加元素 3，[1, 2, 3, 4, 5]
+   ```
+
+2. **slice()**: 返回数组的一部分，不修改原数组。
+
+   ```
+   javascriptCopy Codeconst array = [1, 2, 3, 4, 5];
+   const slicedArray = array.slice(1, 3); // [2, 3]
+   ```
+
+3. **concat()**: 合并两个或多个数组，并返回新数组。
+
+   ```
+   javascriptCopy Codeconst array1 = [1, 2];
+   const array2 = [3, 4];
+   const concatenatedArray = array1.concat(array2); // [1, 2, 3, 4]
+   ```
 
 ## 5、[元祖](https://so.csdn.net/so/search?q=元祖&spm=1001.2101.3001.7020)类型
 
@@ -297,7 +361,16 @@ const isMobile = ref(false);
 1. **使用可选链操作符 ?. ，当前值有可能为空的情况下使用**
 2. `!` 表示对一个变量[断言](https://so.csdn.net/so/search?q=断言&spm=1001.2101.3001.7020)其非空，当前值一定有时使用
 
+**<span>注意: 在vue3 + ts 中的v-if语句中也可以使用</span>**
 
+```html
+<div class="btns-bar">
+    <el-popover
+      v-if="userInfo && (userInfo.id === comment.fromUser.id || 
+      userInfo.roles?.includes('admin'))"
+      placement="bottom"
+ >
+```
 
 # 类型转换
 

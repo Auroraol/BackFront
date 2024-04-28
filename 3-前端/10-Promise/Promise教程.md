@@ -4185,6 +4185,7 @@ export { axiosInstance, request, get, post };
 
 /*
 注: 封装抛出的是响应数据中的data属性, 并且封装后,确保前端拿到的数据一定是成功响应数据
+    不定义响应数据类型则自动匹配,就没有自动补全提示,不安全
 
 使用
 ①axiosInstance

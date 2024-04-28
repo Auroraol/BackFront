@@ -1,3 +1,5 @@
+
+
 ## [官网](https://pinia.vuejs.org/api/modules/pinia.html#Type-Aliases)
 
 ## Pinia介绍
@@ -88,7 +90,7 @@ const useStore = defineStore('storeId', {
 
 注意:
 
-对于简单的情况，比如只需要返回一个值或者简单的对象时，可以使用单行箭头函数的写法：
+**对于简单的情况，比如只需要返回一个值或者简单的对象时，可以使用单行箭头函数的写法：**
 
 ```
 javascriptCopy Codeconst getValue = () => 42;
@@ -1414,3 +1416,58 @@ const setUserInfoPinia = setUserInfo();// getUserInfo
 
 </script>
 ```
+
+
+
+
+
+# 总结
+
+ **pinia定义属性**
+
++ **可能为空对象{} 或者 空数组[] 时, 则搭配计算属性/监视**
+
++ 其他清空, 则正常使用, 默认就是vue响应数据
+
+**因为if 直接不能判断**
+
++ 空对象{}不能判断,  判断方法 Object.keys(obj).length === 0;
+
++ 空数组[]不能判断,  判断方法 array.length === 0;
+
+**例子1**
+
+如果要使用v-if则需要手动检测对象是否为空
+
+```ts
+import { computed } from 'vue';
+import { useGetters } from "/@/store/getters";
+
+const useGettersPinia = useGetters();
+
+// 计算属性
+const userInfo = computed(() => {
+  const info = useGettersPinia.userInfo; //info数据类型是{}
+  // 手动检查对象是否为空
+  return Object.keys(info).length === 0 ? null : info;
+});
+```
+
+**例子2**
+
+```ts
+<script setup>
+import { useGetters } from './path/to/your/getters/store';
+
+// 通过 useGetters() 获取 getters store 的实例
+const gettersStore = useGetters();
+
+// 使用 getter 方法获取对应的状态值, 默认就是响应数据
+const token = gettersStore.token;
+const userInfo = gettersStore.userInfo;
+const loginUsername = gettersStore.loginUsername;
+const loginPassword = gettersStore.loginPassword;
+    
+</script>
+```
+

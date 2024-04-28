@@ -571,9 +571,29 @@ export default new Router({
 
 ```
 
+## 二、useRoute  与 useRouter :crossed_swords:
 
+### useRoute  与 useRouter
 
-## 二、`$route`与`$router`
+**路由参数/ 元信息**
+
+```ts
+import {  useRoute } from "vue-router";
+const route = useRoute();
+// 路由参数
+const Id =route.query.id  //
+```
+
+**路由跳转**
+
+```ts
+import { useRouter } from "vue-router";
+const router = useRouter();
+// 路由跳转
+router.push(url) // //路由地址
+```
+
+### `$route`与`$router`
 
 使用模块注册 vue-router，将会在 `Vue.prototype` 中注入一个 `$route` 和 `$router` 的只读属性。
 
@@ -586,7 +606,7 @@ export default new Router({
 - **$router**为VueRouter实例，比如想要导航到不同URL，则使用`$router.push`方法
 - **$route**为当前router跳转对象，里面可以获取name、path、query、params等
 
-### vue3
+#### vue3
 
 在Vue 3中，`$route`对象通常与Vue Router关联，通常在组件的生命周期钩子中访问。
 
@@ -665,7 +685,7 @@ export default new Router({
    </script>
    ```
 
-### vue2
+#### vue2
 
 ==在Vue.js 2中，this.$route 可以在Vue组件的任何生命周期钩子函数和方法中被调用。和vue3有很大区别==
 
@@ -745,7 +765,7 @@ store.state.route.query  // current query (object)
 - `router.push(location, onComplete?, onAbort?)` 跳转
 - `router.back()` 后退
 - `router.forward()` 前进
-- `router.go(n)` 直接抵达指定的路由历史栈中的某个页面，指定n值，当前页面为 0，正数为此页之后的页面，负数为此页之前的页面
+- `router.go(n)` 直接抵达指定的路由历史栈中的某个页面，指定n值，当前页面为 0( router.go(0);)，正数为此页之后的页面，负数为此页之前的页面
 - `router.replace(location, onComplete?, onAbort?)` 替换
 
 **使用**
@@ -2134,7 +2154,24 @@ export default {
 
 ```
 
+### 显示标题
 
+```ts
+
+// 在路由元信息配置守卫 requiredPath为true, 适合守卫多个页面 vue3next() 变成return true
+router.beforeEach((to, from, next) => {
+  // 进入写文页面，判断是否有权限
+  if (to.path === '/write') {
+      if (!useUserStore().$state.userInfo) {
+          alert('还没有登录，去登录吧')
+          router.push('/login-register/login')
+      }
+  }
+
+//标题
+  window.document.title = to.meta.title as string
+  }
+```
 
 ## 十五、路由动画
 
@@ -2521,7 +2558,18 @@ const router = useRouter();
 // 获取路由参数
 const id = router.currentRoute.value.params.id;
 console.log("Received id:", id);
-    
+```
+
+等价
+
+```ts
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+// 获取路由参数
+const id = route.params.id;
+console.log("Received id:", id);
 ```
 
 **调用结果**
@@ -2629,7 +2677,7 @@ const tagClick = (id: number) => {
 
 ```
 
-## 例子
+## 案例
 
 **页面a**
 
@@ -2712,7 +2760,76 @@ router.afterEach(() => {
 });
 ```
 
-# 顶部
+# vue路由跳转时定位到页面顶部的方法
+
+方式一：
+
+在main.js中添加以下代码即可：
+
+```
+router.beforeEach((to, from, next) => {    
+    // chrome
+    document.body.scrollTop = 0
+    // firefox
+    document.documentElement.scrollTop = 0
+    // safari
+    window.pageYOffset = 0
+    next()
+})
+ 
+ 
+或者下面代码：
+ 
+// 跳转后返回顶部
+ router.afterEach((to,from,next) => {
+      window.scrollTo(0,0);
+ })
+```
+
+方式二：如果需要某个页面跳转回顶部，仅需要在当前页面（page）合适的位置加入一下代码即可：
+
+```
+	// chrome
+	document.body.scrollTop = 0
+	// firefox
+	document.documentElement.scrollTop = 0
+	// safari
+	window.pageYOffset = 0
+```
+
+方式三： (推荐)
+
+在路由的index.js中，加入以下代码也可实现路由改变定位到顶部的效果，savedPosition当且仅当通过浏览器的前进/后退按钮触发时才可用，代码如下：
+
+```java
+// 导出路由
+const router = createRouter({
+  history: createWebHistory(), //开启history模式
+  // history: createWebHashHistory(), //开启hash模式
+  routes,
+  // 路由滚动位置 解决vue页面之间跳转，页面不是在顶部的问题
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return Promise.resolve(savedPosition);
+    } else {
+      return Promise.resolve({ left: 0, top: 0 });
+    }
+  },
+});
+
+// 或者
+  // 路由滚动位置 解决vue页面之间跳转，页面不是在顶部的问题
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { x: 0, y: 0 };
+    }
+  },
+});
+```
+
+方式4: 代码
 
 ```js
 到顶部

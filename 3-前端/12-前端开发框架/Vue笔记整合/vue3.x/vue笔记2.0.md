@@ -1,4 +1,4 @@
-# 创建工程
+#  创建工程
 
 ## 0. 安装
 
@@ -915,7 +915,7 @@ Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进
 </html>
 ```
 
-## 动态数据绑定
+## 动态数据绑定:crossed_swords:
 
 <font color=red>可以用于设置元素的任何属性</font>
 
@@ -928,7 +928,7 @@ Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进
 
 #### class绑定
 
-> 动态绑定 class，只需要在 class 前加入 `v-bind` 即可，即 `v-bind:class` 简写为 `:class`。
+> 动态绑定 class，只需要在 class 前加入 `v-bind` 即可，即 `v-bind:class` 简写为 `:class`。动态设置 类的存在
 
 ##### 字符串语法
 
@@ -1525,6 +1525,7 @@ new Vue({
 
 + 使用 `methods` 定义方法对事件进行处理
 + 在调用方法的时候传入一个 `$event`，这就是事件对象
++ 是可以直接绑定到自定义组件上
 
 示例： 
 
@@ -2126,6 +2127,31 @@ v-show实际会将p标签的css样式的display属性设为none来达到隐藏�
 而v-if是直接在页面上添加和删除p标签来达到效果，因此v-show在反复切换的应用场景下，效率比v-if更高。
 
 <img src="vue%E7%AC%94%E8%AE%B0.assets/1646013576224-8e8ae787-878c-486b-bac9-2e224fdbe2d8.png" alt="img" style="zoom:67%;" />
+
+### 调用表达式
+
+```
+<div v-if="type === 'A'">A</div>
+<div v-else-if="type === 'B'">B</div>
+<div v-else-if="type === 'C'">C</div>
+<div v-else>Not A/B/C</div>
+```
+
+###  调用函数
+
+```
+<div v-if="test()"></div>
+```
+
+```
+methods: {
+    test: function() {
+        var result = false;
+        // ...
+        return result;
+    }
+}
+```
 
 ### 综合代码
 
@@ -5093,7 +5119,7 @@ School.vue
 
 ### 方式2: 插槽:crossed_swords:
 
-1. 作用：让父组件可以向子组件指定位置插入html结构，也是一种组件间通信的方式，适用于 <strong style="color:red">父组件 ===> 子组件</strong> 
+1. 作用：**让父组件可以向子组件指定位置插入html结构**，也是一种组件间通信的方式，适用于 <strong style="color:red">子组件 ===> 父组件</strong> 
 
 2. 分类：默认插槽、具名插槽、作用域插槽
 
@@ -5104,7 +5130,7 @@ School.vue
      ```vue
      父组件中：
              <Category>
-                <div>html结构1</div>
+                <div>html结 构1</div>
              </Category>
      子组件中：
              <template>
@@ -5222,7 +5248,7 @@ School.vue
 在 Vue 3 中使用插槽：
 
 ```vue
-vueCopy code<!-- ParentComponent.vue -->
+<!-- ParentComponent.vue -->
 <template>
   <ChildComponent>
     <!-- 使用默认插槽 -->
@@ -5249,8 +5275,7 @@ export default {
 </script>
 
 
-
-vueCopy code<!-- ChildComponent.vue -->
+<!-- ChildComponent.vue -->
 <template>
   <div>
     <h1>子组件</h1>
@@ -5344,6 +5369,8 @@ export default {
 ```
 
 <img src="vue%E7%AC%94%E8%AE%B02.0.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hvdXlpYmluZzkzMDkyMA==,size_16,color_FFFFFF,t_70.png" alt="img" style="zoom: 67%;" />
+
+
 
 App.vue
 
@@ -6318,7 +6345,7 @@ export default {
 
 参考：[https://vuejs.org/v2/guide/transitions.html#Reusable-Transitions](https://vuejs.org/v2/guide/transitions.html#Reusable-Transitions)
 
-### 十三、列表过滤
+### 十三、列表过滤:crossed_swords:
 
 在使用 `v-for` 的场景中，可以使用 `<transition-group>` 组件进行列表过渡。
 
@@ -6326,9 +6353,92 @@ export default {
 - 同 `<transition>`，需要指定 `name` 属性以添加过渡效果。
 - 内部元素 **总是需要** 提供唯一的 `key` 属性值
 
-<a name="4WMwW"></a>
-
 #### transition-group
+
+`<transition-group>` 设置了 `name` 属性时，Vue 会根据这个名称自动生成一组与过渡相关的 CSS 类名。以 `fade-list` 为例，Vue 会生成以下 CSS 类名：
+
+- `fade-list-enter`
+- `fade-list-enter-active`
+- `fade-list-enter-to`
+- `fade-list-leave`
+- `fade-list-leave-active`
+- `fade-list-leave-to`
+
+这些类名分别对应着元素进入时的过渡开始、过渡进行中、过渡结束时的样式，以及元素离开时的过渡开始、过渡进行中、过渡结束时的样式。
+
+[vue3 transition-group详解-CSDN博客](https://blog.csdn.net/weixin_45532665/article/details/133876026)
+
+##### 例子
+
+```vue
+<template>
+  <ul>
+    <transition-group name="fade">
+      <li v-for="item in items" :key="item.id">{{ item.text }}</li>
+    </transition-group>
+  </ul>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      items: [
+        { id: 1, text: 'Item 1' },
+        { id: 2, text: 'Item 2' },
+        { id: 3, text: 'Item 3' }
+      ]
+    };
+  }
+};
+</script>
+
+<style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+  opacity: 0;
+}
+</style>
+
+```
+
+##### 例子
+
+```vue
+<template>
+  <transition-group name="fade-list">
+    <div v-for="item in items" :key="item.id">{{ item.text }}</div>
+  </transition-group>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      items: [
+        { id: 1, text: 'Item 1' },
+        { id: 2, text: 'Item 2' },
+        { id: 3, text: 'Item 3' }
+      ]
+    };
+  }
+};
+</script>
+
+<style>
+.fade-list-enter-active, .fade-list-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-list-enter, .fade-list-leave-to /* .fade-list-leave-active in <2.1.8 */ {
+  opacity: 0;
+}
+</style>
+
+```
+
+##### 例子
 
 以下示例，展示了 `transition-group` 的基础用法：
 
@@ -7111,6 +7221,125 @@ input[type="range"] {
 ```
 
 效果：<br />[点击查看【codepen】](https://codepen.io/quanzaiyu-the-decoder/embed/XWjpxaj)
+
+### 十五、过渡常用
+
+> 个人一般是直接使用动画
+
+基本情况下在app.vue入口文件加上这个就行了。
+
+```html
+<transition name="scale" mode="out-in">
+   <router-view></router-view>
+</transition>
+123
+```
+
+但在新版vuerouter需要更改下
+
+```html
+<router-view v-slot="{ Component }">
+  <transition name="scale" mode="out-in">
+    <component :is="Component" />
+  </transition>
+</router-view>
+12345
+```
+
+这里提一下transition中的mode属性：
+mode为过度模式，
+in-out：新元素先进行过渡，完成之后当前元素过渡离开。
+out-in：当前元素先进行过渡，完成之后新元素过渡进入。
+
+第一种淡出淡入效果：
+
+```css
+// 淡出淡入
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+123456789
+```
+
+第二种滑动效果：
+
+```css
+// 滑动
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.75s ease-out;
+}
+.slide-enter-to {
+  position: absolute;
+  right: 0;
+}
+.slide-enter {
+  position: absolute;
+  right: -100%;
+}
+.slide-leave-to {
+  position: absolute;
+  left: -100%;
+}
+.slide-leave {
+  position: absolute;
+  left: 0;
+}
+// 设置滑动过渡必须给每个组件设定宽度
+.wrapper {
+  width: 100%;
+  // min-height: 100vh;
+  // background: chartreuse;
+}
+123456789101112131415161718192021222324252627
+```
+
+第三种缩放效果：
+
+```css
+// 缩放
+.scale-enter-active,
+.scale-leave-active {
+  transition: all 0.5s ease;
+}
+.scale-enter-from,
+.scale-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+12345678910
+```
+
+更多效果可参考：
+
+> https://segmentfault.com/a/1190000040935668
+
+另：
+可通过监听$route来控制滑动滑动的滑动方向，动态赋值给transition中的动画名称。
+
+```javascript
+watch: {
+    //使用watch 监听$router的变化
+    $route(to, from) {
+      //如果to索引大于from索引,判断为前进状态,反之则为后退状态
+      if (to.meta.index > from.meta.index) {
+        //设置动画名称
+        this.transitionName = "slide-left";
+      } else {
+        this.transitionName = "slide-right";
+      }
+    },
+  },
+```
+
+
+
+
 
 ## vue脚手架配置代理
 
@@ -11611,9 +11840,83 @@ const Pop = () => {
 }
 ```
 
+### component
 
+**`<component>`**，一个用于渲染动态组件或元素的“元组件”。
 
+**Props**
 
+```ts
+interface DynamicComponentProps {
+  is: string | Component
+}
+```
+
+要渲染的实际组件由 `is` 决定。
+
+- 当 `is` 是字符串，它既可以是 HTML 标签名也可以是组件的注册名。
+- 或者，`is` 也可以直接绑定到组件的定义。
+
+```ts
+<component is="标签或组件名">标签内容</component>
+```
+
+#### 动态渲染标签：
+
+```ts
+<template>
+  <h3>我是父组件</h3>
+  <component is="h1">动态渲染 h1 标签</component>
+</template>
+```
+
+**示例**
+
+```js
+<template>
+
+    <div class="basediv">
+      
+        APP.vue 中的 msg : {{ msg }}
+
+        <template v-for="item in componentList">
+            <component :is="item.component"></component>
+        </template>
+
+    </div>
+    
+</template>
+    
+<script setup lang="ts">
+
+	// 引入 provide 方法
+    import { ref } from 'vue'
+    // 声明父组件的一个变量
+    const msg = ref('这是App根组件的msg变量')
+
+    // 引入两个组件
+    import componentA from './componentA.vue';
+    import componentB from './componentB.vue';
+
+    const componentList = [
+        {cname:'ac',component:componentA},
+        {cname:'bc',component:componentB}
+    ]
+
+</script>
+    
+<style scoped>
+
+    .basediv{
+        width: 600px;
+        height: 400px;
+        border: 1px solid red;
+    }
+</style>
+
+```
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20240427131553180.png" alt="image-20240427131553180" style="zoom: 67%;" />
 
 ## 六、其他
 
@@ -12039,7 +12342,7 @@ import MyComponent from './MyComponent.vue'
 
 在 `<script setup>` 中，你不需要手动使用 `ref` 包装变量，因为 Vue 3 的 `<script setup>` 已经自动将变量包装成响应式对象。因此，直接使用 `const path = '...'` 就足够了。
 
-### 四、传参
+### 四、传参(**搭配计算/监视属性**)
 
 **defineProps** 用来接收父组件传来的 props ; **defineEmits** 用来声明触发的事件
 
@@ -12054,6 +12357,14 @@ import MyComponent from './MyComponent.vue'
 + ![image-20240328212512285](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240328212512285.png)
 
 + ![image-20240405221245069](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240405221245069.png)
+
++ 注意:   `props.xxxx` 被 Vue 3 的响应式系统包装成了一个 Proxy 对象,   不能`||` 运算符时它不会触发默认值。解决方法如下:
+
+  ```ts
+  const dynamicTags = ref(props.xxxx && props.xxxxx.length > 0 ? props.selectedTags : ["c++", "sss"]);
+  
+  
+  ```
 
 **不设置默认-例子**
 
@@ -12075,8 +12386,22 @@ const props = defineProps<{
 // 在 setup 中可以直接使用 props 变量, 不需要使用.value
 console.log(props.otherProp);    
     
-//  在 setup 中一般要搭配计算属性或者监视属性(由于 Vue 的响应式系统，可能存在细微的延迟，在此期间 props 还未被更新)
+//  在 setup 中一般要搭配计算属性或者监视属性(由于 Vue 的响应式系统，可能存在细微的延迟，在此期间 props 还未被更新) // 如果参数会同路由中动态变化, 就要搭配计算属性或者监视属性
 const codedTitle = computed(() => encodeURIComponent(props.title ));
+    
+    
+import { defineProps } from 'vue';
+
+interface Tag {
+  id: number;
+  name: string;
+  deleted: number;
+}
+
+const props = defineProps<{
+  selectedTags: Tag[] | null; // 定义 selectedTags 属性为 Tag 对象数组或 null
+}>({
+});
     
 </script>
 
@@ -12100,7 +12425,7 @@ const codedTitle = computed(() => encodeURIComponent(props.title ));
 
 <script>
 import CustomComponent from './CustomComponent.vue';
-
+    
 export default {
   components: {
     CustomComponent
@@ -12144,6 +12469,183 @@ const props = defineProps<{
 </template>
 
 ```
+
+#### 例子
+
+##### 写法一 ： 静态传值
+
+> 简单来说，这种写法就是直接给属性赋值。
+> `这种方式除了 字符串 类型的属性，其他的类型在传值的时候都需要添加 【:】才可以，否则会提示错误！`
+
+```html
+<template>
+
+    
+    <div class="basediv">
+      
+        父组件msg : {{ msg }}
+
+        <br>
+        <br>
+        <!-- 子组件的使用 -->
+
+        <!-- 直接给子组件传递静态的值过去，使用中划线的方式 -->
+        <ChildComponent title-name="abcd"  
+        			:title-num="1024" 
+        			:title-show="true"
+        			:title-list="[100,99,88]"/>
+        
+    </div>
+    
+  
+</template>
+    
+<script setup lang="ts">
+
+    import { ref } from 'vue'
+
+    // 引入子组件
+    import ChildComponent from './ChildComponent.vue'
+
+    // 声明父组件的一个变量
+    const msg = ref('这是父组件的msg变量')
+
+</script>
+    
+<style scoped>
+
+    .basediv{
+        width: 400px;
+        height: 200px;
+        border: 1px solid red;
+    }
+</style>
+123456789101112131415161718192021222324252627282930313233343536373839404142
+```
+
+> 运行效果：
+
+![在这里插入图片描述](vue%E7%AC%94%E8%AE%B02.0.assets/6d74e607cf394b23a8cc7106fd86c94a.png)
+
+##### 写法二 ： 动态传值
+
+> 动态传值，就是 把 【父组件】中的变量传递给【子组件】
+> 这种写法的时候，就需要 所有的属性都要在前面添加 `【:】`了，表示是动态绑定的。
+
+```html
+<template>
+
+    <div class="basediv">
+      
+        父组件msg : {{ msg }}
+
+        <br>
+        <br>
+        <!-- 子组件的使用 -->
+
+        <!-- 动态传值的方式给 【子组件】传值 -->
+        <ChildComponent :title-name="propsValueObj.titleName"  
+                        :title-num="propsValueObj.titleNum" 
+                        :title-show="propsValueObj.titleShow" 
+                        :title-list="propsValueObj.titleList"/>
+        
+    </div>
+    
+</template>
+    
+<script setup lang="ts">
+
+    import { ref } from 'vue'
+
+    // 引入子组件
+    import ChildComponent from './ChildComponent.vue'
+
+    // 声明父组件的一个变量
+    const msg = ref('这是父组件的msg变量')
+
+    const num = ref(4001)
+
+    // 声明一个对象,用来传递给子组件
+    const propsValueObj = ref({
+        titleName:'父组件传过去的值',
+        titleNum:2000,  
+        titleShow:false, 
+        titleList:[1,2,3,4,5]
+    })
+
+</script>
+    
+<style scoped>
+
+    .basediv{
+        width: 400px;
+        height: 200px;
+        border: 1px solid red;
+    }
+</style>
+1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950
+```
+
+> 运行效果：
+
+![在这里插入图片描述](vue%E7%AC%94%E8%AE%B02.0.assets/f346554cd8d3419081bdb841de0e83ef.png)
+
+##### 写法三 ： 直接传一个对象
+
+> 这种写法实际上是对 【写法二】的一种扩展，
+> 传值时不指定属性名，而是直接使用 `v-bind` 指令 把整个对象传进去，
+> 此时组要注意的是，传递的对象的属性名 需要和 【子组件】中接收的属性名一致，这样才能对应起来。
+
+```html
+<template>
+
+    <div class="basediv">
+      
+        父组件msg : {{ msg }}
+
+        <br>
+        <br>
+        <!-- 子组件的使用 : 直接传递一个对象过去 -->
+        <ChildComponent v-bind="propsValueObj"/>
+        
+    </div>
+   
+</template>
+    
+<script setup lang="ts">
+
+    import { ref } from 'vue'
+
+    // 引入子组件
+    import ChildComponent from './ChildComponent.vue'
+
+    // 声明父组件的一个变量
+    const msg = ref('这是父组件的msg变量')
+
+    // 声明一个对象,用来传递给子组件
+    const propsValueObj = ref({
+        titleName:'父组件直接传了个对象',
+        titleNum:20,  
+        titleShow:true, 
+        titleList:[100,200,3,4,5]
+    })
+
+</script>
+    
+<style scoped>
+
+    .basediv{
+        width: 400px;
+        height: 200px;
+        border: 1px solid red;
+    }
+</style>
+12345678910111213141516171819202122232425262728293031323334353637383940414243
+```
+
+> 运行效果 ：
+
+![在这里插入图片描述](vue%E7%AC%94%E8%AE%B02.0.assets/02a8bf1e711041ebb7915672cc027152.png)
 
 #### 例子1
 
@@ -12690,7 +13192,13 @@ const login = async () => {
 
 ##### ② ts中读写 ref
 
-<span style="color:red">使用一定要用.value</span>
+<span style="color:red">使用一定要用.value</span>  
+
+```js
+const contentValue = content.value;
+```
+
+例子
 
 ```vue
 <template>
@@ -12738,7 +13246,14 @@ const submit = () => {
 
 + 使用 const 来声明 userInfo 是更好的选择。这是因为 userInfo 是一个响应式引用（通过 ref 创建），而实际上并不是在重新赋值 userInfo 这个引用本身，而是在修改它所指向的值（通过 .value 属性）。即使在后续的代码中，您需要更新 userInfo 所持有的值，使用 const 也是完全合适的，因为您只是修改了 userInfo 的内部状态，而不是重新赋予 userInfo 一个全新的引用。
 
-#### 2.计算属性（computed函数）
+#### 2.计算属性（computed函数   . value）
+
+**使用**
+
++ 里面的属性变化就会触发
+
++  xxx.value 就会触发, 并不是自动调用的, 别在onMounted中if(计算属性)因为这时候他一定为空
++ 再`<template>`使用就会触发
 
 **计算属性（Computed Property）**：
 
@@ -12755,7 +13270,7 @@ import { ref, computed } from 'vue';
 const count = ref(0);
 
 // 计算属性
-const doubleCount = computed(() => count.value * 2);
+const doubleCount = computed(() => count.value * 2);  //()=> xxxxx  简写方式
     
 //使用    
 console.log(doubleCount.value); // 访问 value 属性以获取计算属性的值    
@@ -12865,6 +13380,10 @@ fullName.value = "sam xiaoguai"
 ```
 
 #### 3.监视属性
+
+详情见:  
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20240419224538290.png" alt="image-20240419224538290" style="zoom:67%;" />
 
 ##### watch函数
 
@@ -13152,6 +13671,415 @@ const sendCode = () => {
 };
 </script>
 ```
+
+### 十四、 插槽
+
+`<slot>` 定义(子)
+
+`<template v-slot:xxx> ` 使用(父)
+
+**让父组件可以向子组件指定位置插入html结构**
+
+```vue
+<template #defToolbars>`
+//等价
+`<template v-slot:defToolbars>
+```
+
+#### 默认插槽
+
+若父组件没有提供插槽内容，则不会渲染，子组件会使用其本身的默认内容进行页面渲染。
+
+子组件：`SlotsComponent.vue`
+
+```html
+<template>
+  <div class="red-text">
+    <slot>
+      子组件插槽
+    </slot>
+  </div>
+</template>
+<style scoped>
+.red-text {
+  color: red;
+}
+</style>
+```
+
+父组件：`index.vue`
+
+```html
+<template>
+  <div>
+    <label>父组件</label>
+    <SlotComponent>
+     </SlotComponent>
+  </div>
+</template>
+<script>
+import SlotComponent from "./component/SlotsComponent";
+export default {
+  components: {
+    SlotComponent
+  }
+};
+</script>
+```
+
+渲染结果如下：
+
+![image-20240417125220874](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240417125220874.png)
+
+#### 具名插槽
+
+具名插槽就是利用slot的`name`属性给插槽命名，父组件中使用`v-slot:slotName`来使用对应的插槽。
+
+注意点：
+
+1. **若存在多个插槽，部分有名称，部分无名称，则无名插槽使用方法同默认插槽；**
+2. **vue3语法有所改变，使用具名插槽必须使用`<template v-slot:slotname>`,和部分vue低版本用法不同。**
+3. **#default 用于匿名插槽**
+
+##### 基本使用
+
+子组件：`SlotsComponent.vue`
+
+```html
+<template>
+  <div class="red-text">
+    <header>
+      <slot name="header">
+        <!-- 页面头部 -->
+      </slot>
+    </header>
+    <main>
+      <slot name="main">
+        <!-- 页面内容 -->
+      </slot>
+    </main>
+    <footer>
+      <slot name="footer">
+        <!-- 页面底部 -->
+      </slot>
+    </footer>
+  </div>
+</template>
+<script>
+export default {};
+</script>
+<style scoped>
+.red-text {
+  color: red;
+}
+</style>
+```
+
+父组件：`index.vue`
+
+```html
+<template>
+  <div>
+    <label>父组件</label>
+    <SlotComponent>
+      <template v-slot:header> <!--可以写成<template #header>-->
+        我是头
+      </template>
+      <template v-slot:footer>
+        我是底
+      </template>
+    </SlotComponent>
+  </div>
+</template>
+<script>
+import SlotComponent from "./component/SlotsComponent";
+export default {
+  components: {
+    SlotComponent
+  }
+};
+</script>
+```
+
+渲染结果如下：
+
+![image-20240417125341205](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240417125341205.png)
+
+##### 动态插槽名
+
+在具名插槽的基础上，动态控制插槽的名称，成为动态插槽名，使用动态插槽，可以将父组件的内容动态渲染到到子组件插槽接口中。
+
+父组件：
+
+```html
+<template>
+  <div>
+    <label>父组件</label>
+    <SlotComponent>
+      <template v-slot:[dynamicSlotName]>
+        我是动态插槽
+      </template>
+      <template v-slot:footer>
+        我是底
+      </template>
+    </SlotComponent>
+  </div>
+</template>
+<script>
+import SlotComponent from "./component/SlotsComponent";
+export default {
+  components: {
+    SlotComponent
+  },
+  data() {
+    return {
+      dynamicSlotName: "header"
+    };
+  }
+};
+</script>
+```
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20240417125532758.png" alt="image-20240417125532758" style="zoom:67%;" />
+
+#### 作用域插槽(插槽传值)
+
+理解：<span style="color:red">数据在组件的自身，但根据数据生成的结构需要组件的使用者来决定。</span>
+
+通常情况下，父子间插槽内容只能直接访问父组件的属性，当我们父组件需要使用子组件插槽属性时，我们可以用到插槽传值。
+
+<strong style="color:red">子组件 ===> 父组件</strong> 传递参数
+
+<strong style="color:red">父组件 ===> 子组件</strong> 传递html结构
+
+子组件：`SlotsComponent.vue`
+
+```html
+<template>
+  <div class="red-text">
+    <header>
+      <!-- 这里的:title="headerTitle", title表示传递给父组件的数据 -->
+      <slot :title="headerTitle" name="header">  
+        <!-- 页面头部 -->
+      </slot>
+    </header>
+    <main>
+      <slot name="main">
+        <!-- 页面内容 -->
+      </slot>
+    </main>
+    <footer>
+      <slot name="footer">
+        <!-- 页面底部 -->
+      </slot>
+    </footer>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      headerTitle: "我是子组件slot变量"
+    };
+  }
+};
+</script>
+<style scoped>
+.red-text {
+  color: red;
+}
+</style>
+```
+
+父组件：`index.vue`
+
+```html
+<template>
+  <div>
+    <label>父组件</label>
+    <SlotComponent>
+      <!--这里的slotProps是作用域对象, 一般情况统一命名为scope, 通过这个可以拿到子组件里面的数据-->  
+      <template v-slot:header="slotProps">  
+        {{ slotProps.title }}
+      </template>
+      <template v-slot:footer>
+        我是底
+      </template>
+    </SlotComponent>
+  </div>
+</template>
+<script>
+import SlotComponent from "./component/SlotsComponent";
+export default {
+  components: {
+    SlotComponent
+  },
+  data() {
+    return {
+      dynamicSlotName: "header"
+    };
+  }
+};
+</script>
+```
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20240417125757714.png" alt="image-20240417125757714" style="zoom: 67%;" />
+
+### 十五 ref获取dom元素
+
+#### **1.ref获取DOM元素**
+
+元素上使用 ref属性关联响应式数据，获取DOM元素，
+
+步骤：
+
+1. 创建 ref：`const xxxRef = ref()`
+2. 绑定ref属性到标签上： `ref=“xxxRef”`
+3. 通过`xxxRef.value`访问dom
+
+代码：
+
+```js
+<script setup>
+import { ref } from 'vue'
+
+// 1. 调用ref函数
+const iptRef = ref()  
+const clickFn = () => {
+  console.log('iptRef  ----->  ', iptRef);
+  // 通过`xxxRef.value`访问dom
+  iptRef.value.focus()
+}
+</script>
+
+<template>
+  <div>
+    <!-- 2. 绑定到标签ref属性上 -->
+    <input ref="iptRef">
+    <br>
+    <button @click="clickFn">操作DOM</button>
+  </div>
+</template>
+```
+
+####  2. 父组件使用ref操作子组件的属性和方法
+
+**ref操作组件-defineExpose：**
+
+defineExpose ----> [组件暴露出自己的属性]
+
+传统的写法，我们可以在父组件中，通过 ref 实例的方式去访问子组件的内容，但在 script setup 中，该方法就不能用了，setup 相当于是一个闭包，除了内部的 `template`模板，谁都不能访问内部的数据和方法。
+
+> 组件上使用 ref属性关联响应式数据，获取组件实例
+
+步骤：
+
+1. 准备父组件、子组件
+
+2. 父组件内：
+
+3. 1. 创建ref
+   2. 绑定ref到子组件标签上
+   3. 通过ref.value访问子组件实例
+
+1. 子组件内， 调用`defineExpose()`[无需导入](https://link.zhihu.com/?target=https%3A//cn.vuejs.org/api/sfc-script-setup.html%23defineprops-defineemits)，暴露数据和方法
+
+解释：
+
+- 使用 `<script setup>` 的组件是**默认关闭**的，父组件**拿不到**子组件的数据和函数。
+- 需要配合 `defineExpose` 向外暴露数据，暴露的响应式数据会自动解除响应式。
+
+代码：
+
+1. 准备父组件、子组件（无需注册，直接导入后使用）
+
+`components/Child.vue` 子组件
+
+```js
+<script setup>
+import { ref } from 'vue'
+
+const count = ref(0)
+const hello = () => {
+  alert("点我干啥")
+}
+</script>
+
+<template>
+  <h3>我是Child组件</h3>
+</template>
+```
+
+App.vue 父组件
+
+```js
+<script setup>
+//  setup语法中，无需注册组件，直接使用即可
+import Child from './components/Child.vue'
+
+const fn = () => {
+  
+}
+</script>
+
+<template>
+  <Child />
+	<button @click="fn">点我获取子组件内数据和方法</button>
+</template>
+```
+
+1. 2.父组件内：
+
+2. 1. 创建ref
+   2. 绑定ref到子组件标签上
+   3. 通过ref.value访问子组件实例
+
+```
+components/Child.vue
+<script setup>
+import Child from './components/Child.vue'
+
+import { ref } from 'vue'; 
+	
+// 2.1. 创建ref
+const childRef = ref() 
+const fn = () => {
+  // 2.3. 通过ref.value访问子组件实例
+  console.log('childRef.value  ----->  ', childRef.value.count);  
+}
+	
+</script>
+
+<template>
+  <Child
+	// 2.2. 绑定ref到子组件标签上
+ 	ref="childRef" 
+  />
+  <button @click="fn">点我获取子组件内数据和方法</button>
+</template>
+```
+
+3.子组件内， 调用`definExpose()`，暴露数据和方法
+
+```js
+<script setup>
+import { ref } from 'vue'
+
+const count = ref(0)
+const hello = () => {
+  alert("点我干啥")
+}
+
+// 3. 调用`defineExpose()`，暴露数据和方法
+defineExpose({count, hello}) 
+</script>
+
+<template>
+  <h3>我是Child组件</h3>
+</template>
+```
+
+- 
 
 # $ref语法糖
 
@@ -13964,6 +14892,15 @@ const formatD = (str: string): string => {
 
 注: 时间日期转换函数是日期传换函数
 
+```js
+    records.forEach((ele) => {
+      ele.date = formatDate(
+        new Date(ele.publishTime.replace(/-/g, "/")),
+        "yyyy-MM-dd"
+      );
+    });
+```
+
 
 
 # `<Transition>`
@@ -14129,9 +15066,106 @@ export default {
 
 ![image-20240411144944415](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240411144944415.png)
 
+## 项目背景
 
+在做[vue3项目](https://so.csdn.net/so/search?q=vue3项目&spm=1001.2101.3001.7020)的时候，遇到了控制台打印出来了数据，而页面上数据却是undefined或NaN的情况。这是因为这部分页面在数据获取之前就渲染导致的。
 
+### 解决办法
 
+使用[v-if](https://so.csdn.net/so/search?q=v-if&spm=1001.2101.3001.7020)。
+
+先定义一个标志值取false
+
+```javascript
+const isShow = ref(false)
+```
+
+当成功获取到数据的时候，标志值取true
+
+```javascript
+host = val;
+console.log('host',host);
+
+isShow.value = true;
+
+```
+
+当标志值为true时，这部分页面才会渲染，而此时已经有数据了，就不会出现undefined或NaN的情况了。
+
+```html
+<div class="example" v-if="isShow">
+    {{ host.cpu_model }}
+ </div>
+```
+
+## 例子
+
+```vue
+<template>
+  <div v-if="isReady">
+    <p>Token: {{ token }}</p>
+    <p>User Info: {{ userInfo }}</p>
+    <p>Login Username: {{ loginUsername }}</p>
+    <p>Login Password: {{ loginPassword }}</p>
+  </div>
+  <div v-else>
+    Loading...
+  </div>
+</template>
+
+<script setup>
+import { useGetters } from './path/to/your/getters/store';
+import { ref, onMounted } from 'vue';
+
+// 引入 ref 函数来创建响应式数据
+const isReady = ref(false);
+
+// 通过 useGetters() 获取 getters store 的实例
+const gettersStore = useGetters();
+
+// 使用 ref 创建响应式变量来保存获取到的状态值
+const token = ref('');
+const userInfo = ref('');
+const loginUsername = ref('');
+const loginPassword = ref('');
+
+// 在组件挂载后执行获取数据的操作
+onMounted(async () => {
+  // 使用 try-catch 来捕获可能的异步操作错误
+  try {
+    // 在这里获取数据并更新响应式变量的值
+    token.value = gettersStore.token;
+    userInfo.value = gettersStore.userInfo;
+    loginUsername.value = gettersStore.loginUsername;
+    loginPassword.value = gettersStore.loginPassword;
+
+    // 数据获取完成，将 isReady 置为 true，让组件渲染
+    isReady.value = true;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+});
+</script>
+
+```
+
+## 例子2
+
+注意:  使用ts的话, v-if也遵循ts语法
+
+```vue
+<el-popover
+            v-if="userInfo && (userInfo.id === comment.fromUser.id || 
+                  userInfo.roles?.includes('admin'))"
+            placement="bottom"
+            >
+</el-popover>
+
+//Pinia
+const gettersStore = useGetters();
+//计算属性, 默认是ref
+const userInfo = computed(() => gettersStore.userInfo);
+```
 
 # v-clipboard
 
@@ -14368,6 +15402,390 @@ http://www.zixuephp.net/article-309.html
 
 
 
+
+
+
+# 一定不要定义与响应数据相同的变量名
+
+
+
+
+
+
+
+# Proxy对象的处理
+
+> 计算属性和传递的参数都是空的 Proxy 对象 `{}`
+
+现象
+
+<img src="vue%E7%AC%94%E8%AE%B02.0.assets/image-20240421201615126.png" alt="image-20240421201615126" style="zoom:67%;" />
+
+ **第一种获取target值的方式：**
+
+通过vue中的响应式对象可使用 toRaw() 方法获取原始对象
+
+```typescript
+//第一种获取target值的方式，通过vue中的响应式对象可使用toRaw()方法获取原始对象
+import { toRaw } from '@vue/reactivity'
+const state = toRaw(store.state)
+```
+
+**第二种获取target值的方式**
+
+通过json序列化之后可获取值
+
+```typescript
+JSON.parse(JSON.stringify(store.state))
+```
+
+# if 问题:crossed_swords:
+
+> 响应数据为空`<template>`渲染会报错
+
+确定: 响应数据是否为空很重要, 确定不为空的话就不用v-if了
+
+## 总结
+
+**如果响应数据类型是{}, 在使用 v-if/ if 则需要手动检测对象是否为空**
+
+JavaScript中被视为假值的情况：
+
+1. `false`：布尔值 `false`。
+2. `0`：数值 `0`。
+3. `''`：空字符串。
+4. `null`：表示无值的特殊值。
+5. `undefined`：表示未定义的特殊值。
+6. `NaN`：表示非数字值。
+
+<span style="color:red">**①  注意:空对象{}不能判断,  判断方法 Object.keys(obj).length === 0;**</span>
+
+```
+userInfo: {}
+```
+
+```java
+ v-if="
+     userInfo &&
+     (userInfo.id === comment.fromUser.id ||
+      userInfo.id === authorId ||
+      userInfo.roles.includes('admin'))
+     "
+
+
+import { computed } from 'vue';
+import { useGetters } from "/@/store/getters";
+
+const useGettersPinia = useGetters();
+
+// 计算属性
+const userInfo = computed(() => {
+  const info = useGettersPinia.userInfo; //info数据类型是{}
+  // 手动检查对象是否为空
+  return Object.keys(info).length === 0 ? null : info;
+});
+```
+
+但是 userInfo为空时, 直接用userInfo.xxx 依然报错
+
+ <span style="color:red">**②  注意: 空数组[]不能判断,  判断方法 array.length === 0;**</span>
+
+默认值问题, 如果 `props.selectedTags` 是一个空数组 `[]`，它会被视为存在但是为空。
+
+```ts
+const dynamicTags = ref(props.selectedTags || ["c++", "sss"]);
+```
+
+推荐使用这个方法
+
+```ts
+const dynamicTags = ref(props.selectedTags && props.selectedTags.length > 0 ? props.selectedTags : ["c++", "sss"]);
+```
+
+例子
+
+添加了一个额外的检查 `scope.row.tagList && scope.row.tagList[0]` 来确保 `scope.row.tagList[0]` 存在并且不是 `undefined`
+
+```html
+<span v-if="Array.isArray(scope.row.tagList) && scope.row.tagList.length === 0" class="tag">无</span>
+
+ <el-tag v-else-if="scope.row.tagList && scope.row.tagList[0]">{{ scope.row.tagList[0].name }}</el-tag>
+```
+
+
+
+## 问题重现
+
+user.ts
+
+```ts
+import { defineStore } from "pinia";
+//.......
+
+export const useUserStore = defineStore("user", {
+  state: () => ({
+    userInfo: {}, // 使用会报各种各样错误, 下述所述
+  }),
+  //......
+});
+```
+
+当登录账号后
+
+```ts
+userInfo = { "id": 61,
+        "username": "lfj",
+        "password": "$2a$10$v6cYGcfvupH5CRsH7torC.hT1OgGZng/vAUqGLdbLwOjLCrDWbB8m",
+        "mobile": 15775984866,
+        "nickname": "用户984866",
+        "gender": 1,
+        "birthday": "2024-04-01",
+        "email": "1665843268@qq.com",
+        "avatar": "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
+        "status": 0,
+        "admin": 0,
+        "createTime": "2024-04-01 19:13:46",
+        "roles": [
+            "ordinary"
+        ]
+}
+```
+
+没有登录账号
+
+```ts
+userInfo = []
+```
+
+**使用**
+
+```vue
+<template>
+    <div class="avatar-wrapper">
+    	<img :src="userInfo.avatar || defaultAvatar" class="user-avatar" />
+    </div>
+</template>
+
+
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useGetters } from "/@/store/getters";
+
+const useGettersPinia = useGetters();
+
+// 计算属性
+const userInfo = computed(() => {
+  const info = useGettersPinia.userInfo; //info数据类型是{}
+  // 手动检查对象是否为空
+  return Object.keys(info).length === 0 ? null : info;
+});
+   
+</script>
+```
+
+当userInfo为空时, userInfo.avatar查找不到, 报错
+
+**解决**
+
+```vue
+<template>
+    <div class="avatar-wrapper">
+    	<img :src="userInfo && userInfo.avatar || defaultAvatar" class="user-avatar" />
+    </div>
+</template>
+
+
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useGetters } from "/@/store/getters";
+
+const useGettersPinia = useGetters();
+
+// 计算属性
+const userInfo = computed(() => {
+  const info = useGettersPinia.userInfo; //info数据类型是{}
+  // 手动检查对象是否为空
+  return Object.keys(info).length === 0 ? null : info;
+});
+   
+</script>
+```
+
+
+
+# vue注意点`$attrs`、`$slots`
+
+## $attrs号称捡漏王
+
+当父组件给子组件传值，子组件并没有接收数据时，此时数据在$attrs中可以拿到，并且如果子组件不需要使用数据，而孙组件需要，则可以直接`v-bind="$attrs"`传给孙。
+
+### 示例：
+
+```html
+<-- 父组件 -->
+<div>
+  <myButton type="primary"/>
+<div>
+```
+
+```html
+<-- 子组件 -->
+<el-button v-band='$attrs'>主要按钮</el-button>
+```
+
+这样的写法就会直接将`type="primary"`传递给孙组件中,子组件不需要使用props来接收，这样写的好处是无需再子组件中定义props，属性有时候也并不确定
+
+同样孙组件中也可以采用props来接受根组件传递过来的参数
+
+```html
+<template>
+	<button></button>
+</template>
+ 
+<script>
+export default {
+ inheritAttrs: false,
+  props: [
+    "type",//注意props里的参数名称不能改变，必须和根组件传递过来的是一样的
+  ],
+  mounted(){
+      console.log(this.$attrs) //可直接使用数据或者调用根组件的方法
+  }
+};
+</script>
+```
+
+### 子组件有多个根节点时
+
+> 如果子组件存在多个根节点时，需要手动绑定具体的根节点，否则就会抛出警告
+> [![img](vue%E7%AC%94%E8%AE%B02.0.assets/2552614-20230209100539151-1738557937.png)](https://img2023.cnblogs.com/blog/2552614/202302/2552614-20230209100539151-1738557937.png)
+
+这样就能解决
+
+```html
+<template>
+  <div :style="$attrs['style']">我是孙组件第一个div</div>
+  <div>我是孙组件的第二个div</div>
+</template>
+<script>
+```
+
+### inheritAttrs
+
+`inheritAttrs`的值为`boolean`,默认为true，由于`v-band='$attrs'`传递过来的值会作为dom元素上的属性存在，设置为false可以阻止这个行为，这些属性仍然可以通过$attrs来访问，(vue2中class和style不会受到影响，但是vue3中class和style会受影响)
+
+- #### vue2中
+
+`inheritAttrs: true`
+[![img](vue%E7%AC%94%E8%AE%B02.0.assets/2552614-20230208173916270-951609218.png)](https://img2023.cnblogs.com/blog/2552614/202302/2552614-20230208173916270-951609218.png)
+
+`inheritAttrs: false`
+[![img](vue%E7%AC%94%E8%AE%B02.0.assets/2552614-20230208173850052-558760813.png)](https://img2023.cnblogs.com/blog/2552614/202302/2552614-20230208173850052-558760813.png)
+
+- #### vue3中
+
+`inheritAttrs: true`
+[![img](vue%E7%AC%94%E8%AE%B02.0.assets/2552614-20230208183043558-119937374.png)](https://img2023.cnblogs.com/blog/2552614/202302/2552614-20230208183043558-119937374.png)
+
+`inheritAttrs: false`
+[![img](vue%E7%AC%94%E8%AE%B02.0.assets/2552614-20230208182950381-453111855.png)](https://img2023.cnblogs.com/blog/2552614/202302/2552614-20230208182950381-453111855.png)
+
+### vue3禁止inheritAttrs
+
+如果你使用了 `<script setup>`，你需要一个额外的 `<script>` 块来书写这个选项声明：
+
+```html
+<script>
+// 使用普通的 <script> 来声明选项
+export default {
+  inheritAttrs: false
+}
+</script>
+
+<script setup>
+// ...setup 部分逻辑
+</script>
+```
+
+### vue3中访问$attrs
+
+```html
+<script setup>
+import { useAttrs } from 'vue'
+const attrs = useAttrs()
+</script>
+```
+
+如果没有使用`setup`语法糖，则
+
+```js
+export default {
+  setup(props, context) {
+    // 透传 attribute 被暴露为 ctx.attrs
+    console.log(context.attrs)
+  }
+}
+```
+
+## $slots
+
+$slots可以拿到父组件所传递过来的所有插槽,它是一个对象，key 名对应着插槽名。
+
+```html
+<!-- 子组件 -->
+<template>
+  <el-button v-bind="$attrs">
+    <!-- 通过遍历实现插槽透传 -->
+    <template v-for="(item, key, index) in $slots" :key="index" v-slot:[key]>
+      <slot :name="key"></slot>
+    </template>
+  </el-button>
+</template>
+```
+
+
+
+```html
+<!-- 父组件 -->
+<template>
+  <MyButton type="primary">
+    <template #default>按钮</template>
+    <template #icon>111</template>
+    <template #footer>ceshi</template>
+  </MyButton>
+</template>
+```
+
+如果插槽是一个**作用域插槽**，传递给该插槽函数的参数可以作为插槽的 prop 提供给插槽。
+
+
+
+```html
+<!-- 子组件 -->
+<template>
+  <el-button v-bind="$attrs">
+    <!-- 通过便利实现插槽透传 -->
+    <!-- v-slot:[key] 绑定到对应的插槽中 -->
+    <template v-for="(item, key, index) in $slots" :key="index" v-slot:[key]>
+      <slot :name="key" v-if="key === 'icon'" :count="99"></slot>
+      <slot :name="key" v-else></slot>
+    </template>
+  </el-button>
+</template>
+```
+
+
+
+```html**
+<!-- 父组件 -->
+<template>
+  <MyButton type="primary">
+    <template #default>按钮</template>
+    <template #icon="iconProps">11{{ iconProps.count }}</template>
+    <template #footer>ceshi</template>
+  </MyButton>
+</template>
+```
 
 
 

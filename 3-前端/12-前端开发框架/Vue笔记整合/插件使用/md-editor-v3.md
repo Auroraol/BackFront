@@ -309,6 +309,16 @@ import '@vavt/v3-extension/lib/asset/style.css';
 npm install @vavt/v3-extension
 ```
 
+![image-20240417084337811](md-editor-v3.assets/image-20240417084337811.png)
+
+emojis自定义表情 :emojis="['🤡','💀']"
+
+selectAfterlnsert=false表示可以连续点击表情
+
+源码:
+
+![image-20240417090201111](md-editor-v3.assets/image-20240417090201111.png)
+
 例子
 
 [md-editor-v3/src/pages/Preview/index.vue at docs · imzbf/md-editor-v3 (github.com)](https://github.com/imzbf/md-editor-v3/blob/docs/src/pages/Preview/index.vue)
@@ -499,7 +509,7 @@ const footers = ['markdownTotal', 0, '=', 1, 'scrollSwitch'];
 
 
 
-### 变成对话框
+# 变成对话框
 
 ```vue
 <MdEditor :toolbars="toolbars" :preview="false"> </MdEditor>
@@ -511,3 +521,118 @@ const toolbars = [];
 ```
 
 ![image-20240415222332517](md-editor-v3.assets/image-20240415222332517.png)
+
+
+
+
+
+# 样式
+
+![image-20240416213804578](md-editor-v3.assets/image-20240416213804578.png)
+
+```vue
+  <div class="edit-container">
+          <MdEditor
+            class="editor"
+            v-model="content"
+            previewTheme="vuepress"
+            codeTheme="a11y"
+            placeholder="客官，来都来了，怎么不给博主留个言呢 ？"
+            :toolbars="[0]"
+            :preview="false"
+            :footers="[]"
+          >
+            <template #defToolbars>
+              <Emoji />
+            </template>
+          </MdEditor>
+        </div>
+        
+              .edit-container {
+        margin: 0 auto;
+        padding: 0 50px;
+
+        @media screen and (max-width: 960px) {
+          padding: 0;
+        }
+
+        .editor {
+          height: 180px;
+          border: 1px solid #e74851;
+          border-radius: 5px;
+          min-height: 120px;
+        }
+      }
+```
+
+# MdEditor 绑定事件
+
+### onSave
+
+- **类型**：`(v: string, h: Promise<string>) => void`
+
+  保存事件，快捷键与保存按钮均会触发。
+
+- v: 原始文本内容  
+
+- h: 编辑器将 `content` 渲染为 HTML 后的结果
+
+```vue
+<template>
+  <MdEditor @onSave="onSave" />
+</template>
+
+<script setup>
+import { MdEditor } fr om 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
+
+const onSave = (v, h) => {
+  console.log(v);
+
+  h.then((html) => {
+    console.log(html);
+  });
+};
+</script>
+```
+
+# 设置链接在新窗口打开
+
+TargetBlankExtension.js
+
+```js
+const TargetBlankExtension = (md) => {
+    const defaultRender =
+      md.renderer.rules.link_open ||
+      function (tokens, idx, options, env, self) {
+        return self.renderToken(tokens, idx, options);
+      };
+  
+    md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+      const aIndex = tokens[idx].attrIndex('target');
+  
+      if (aIndex < 0) {
+        tokens[idx].attrPush(['target', '_blank']);
+      } else {
+        tokens[idx].attrs[aIndex][1] = '_blank';
+      }
+  
+      // pass token to default renderer.
+      return defaultRender(tokens, idx, options, env, self);
+    };
+  };
+  
+  export default TargetBlankExtension;
+```
+
+使用
+
+```ts
+import TargetBlankExtension from "./TargetBlankExtension";
+config({
+  markdownItConfig(md) {
+    md.use(TargetBlankExtension);
+  },
+});
+```
+

@@ -489,6 +489,221 @@ public ResponseEntity deleteUser(@PathVariable(value = "userId") Long userId){
 
 <strong style="color:red">注意: 一些注解是前后端发分离项目使用</strong>
 
+
+
+### 封装 axios.ts
+
+详情使用见promise文章
+
+![image-20240401223739973](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20240401223739973.png)
+
+```ts
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { getAccessToken } from "/@/utils/auth";
+import { ElMessageBox, ElMessage } from "element-plus";
+
+const axiosInstance = axios.create({
+  timeout: 10000,
+  // axios中请求配置有baseURL选项,表示请求URL公共部分,每个请求将会带该部分
+  // baseURL: import.meta.env.VITE_API_URL,//配置了跨域这里不用写会冲突
+});
+
+// 请求拦截
+axiosInstance.interceptors.request.use(
+  (config) => {
+    return config;
+  },
+  (error) => {
+    // 当请求失败时做一些处理 抛出错误
+    console.log(error);
+    return Promise.reject(error);
+  }
+);
+
+// 响应拦截器
+axiosInstance.interceptors.response.use(
+  (response) => {
+    const res = response.data; // 响应数据
+    // 确保前端得到的res都是成功响应
+    if (res.code !== 200000) {
+      // 凭证无效或过期
+      if (res.code === 400007 || res.code === 4000010) {
+        // useStore.dispatch('user/resetToken')
+        ElMessageBox.confirm("登录信息已过期", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            location.reload();
+          })
+          .catch(() => {
+            location.reload();
+          });
+      } else {
+        // 其他, 返回失败message
+        ElMessage({
+          message: res.message || "Error",
+          type: "error",
+          duration: 5 * 1000,
+        });
+      }
+      return Promise.reject(new Error(res.message || "Error"));
+    } else {
+      return res;
+    }
+  },
+  (error) => {
+    console.log("err" + error);
+    ElMessage({
+      message: error.message,
+      type: "error",
+      duration: 5 * 1000,
+    });
+    return Promise.reject(error);
+  }
+);
+
+// 给请求头添加 access_token
+const setHeaderToken = (isNeedToken: boolean) => {
+  // 请求头携带token
+  const accessToken = isNeedToken ? getAccessToken() : null;
+  if (isNeedToken) {
+    // api 请求需要携带 access_token
+    if (!accessToken) {
+      console.log("不存在 access_token 则跳转回登录页");
+    }
+    // instance.defaults.headers.common['accessToken'] 中的accessToken叫啥由后端决定
+    axiosInstance.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${accessToken}`;
+  }
+};
+
+// 定义一个泛型函数 request，用于发送 HTTP 请求
+const request = <ResponseType = unknown>(
+  url: string,
+  options?: AxiosRequestConfig<unknown>,
+  isNeedToken: boolean = false // 默认不需要 token
+): Promise<ResponseType> => {
+  // 返回一个 Promise 对象，Promise 的泛型参数是 ResponseType，即期望的响应数据类型
+  return new Promise((resolve, reject) => {
+    // 使用 axiosInstance 发送 HTTP 请求
+    setHeaderToken(isNeedToken);
+    axiosInstance({
+      url,
+      ...options, // 将传入的 options 合并到请求配置中
+    })
+      .then((res) => {
+        // 请求成功时，将解析后的响应数据传递给 Promise 的 resolve 函数
+        //这里的res得到响应数据  而res.data得到的是响应数据中的data属性数据
+        resolve(res.data as ResponseType);
+        //console.log(res.data);
+      })
+      .catch((err) => {
+        // 请求失败时，将错误信息传递给 Promise 的 reject 函数
+        reject(err);
+      });
+  });
+};
+
+// 有些 api 并不需要用户授权使用，则无需携带 access_token；默认不携带，需要传则设置第三个参数为 true
+const get = (url, params = {}, isNeedToken = false) => {
+  return new Promise((resolve, reject) => {
+    setHeaderToken(isNeedToken);
+    axiosInstance({
+      url,
+      method: "get",
+      params,
+    })
+      .then((res) => {
+        resolve(res.data as ResponseType);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+const post = (url, data = {}, isNeedToken = false) => {
+  setHeaderToken(isNeedToken);
+  return new Promise((resolve, reject) => {
+    setHeaderToken(isNeedToken);
+    axiosInstance({
+      url,
+      method: "post",
+      data: data,
+    })
+      .then((res) => {
+        resolve(res.data as ResponseType);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export { axiosInstance, request, get, post };
+
+/*
+注: 封装抛出的是响应数据中的data属性, 并且封装后,确保前端拿到的数据一定是成功响应数据
+    不定义响应数据类型则自动匹配,就没有自动补全提示,不安全
+
+使用
+①axiosInstance
+和axios使用一致
+
+②request
+// 定义数据响应的类型, 不定义则自动匹配,就没有自动补全提示
+interface DataResponseType {
+  // 在这里定义响应数据的结构
+}
+
+// 可选的 Axios 请求配置
+const options: AxiosRequestConfig = {
+  method: "GET", // 请求方法，例如 GET、POST 等
+  params: { // 请求参数，可以是 params、data 等
+    // 具体参数
+  },
+  // 其他 Axios 请求配置，例如 headers、timeout 等
+};
+
+// 发送请求并指定响应数据的类型
+request<DataResponseType>(url, options, isNeedToken)
+  .then((data) => {
+    // 请求成功时，处理返回的数据
+    console.log("响应数据:", data);
+  })
+  .catch((error) => {
+    // 请求失败时，处理错误信息
+    console.error("请求失败:", error);
+  });
+
+③get
+get(url, params, isNeedToken)
+  .then(response => {
+    // 处理请求成功的响应
+    console.log('GET 请求成功:', response);
+  })
+  .catch(error => {
+    // 处理请求失败
+    console.error('GET 请求失败:', error);
+  });
+
+④post
+post(url, data, isNeedToken)
+  .then(response => {
+    // 处理请求成功的响应
+    console.log('POST 请求成功:', response);
+  })
+  .catch(error => {
+    // 处理请求失败
+    console.error('POST 请求失败:', error);
+  });
+*/
+
+```
+
 ### axios中get/post请求方式
 
 ![image-20240322212114235](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20240322212114235.png)
@@ -600,6 +815,43 @@ public Result test(@RequestBody TestEntity testEntity) {
 }
 ```
 
+### http接口url 斜杠问题（“/”）
+
+出现问题: 
+
++ 当前端发起AJAX请求时,  参数中包含特殊字符，如斜杠 `/`，会被 axios、Fetch API 等常见的网络请求库自动对 URL 进行编码。自动编码为 `%2F` 
+
++ 在 HTTP URL 中，斜杠（`/`）被视为分隔符，用于分隔 URL 的各个部分，斜杠会被编码成%2F）
+
++ URL编码是一种处理特殊字符的方法，可以在URL中包含任何字符，而不会影响其他部分的解析。
+
+**使用axios和Spring Boot不用考虑该问题原因如下:**
+
++ axios自动对 URL参数 进行编码
++ Spring Boot会自动解码URL参数
+
+**补充:**
+
+前端:
+
+```
+const oldCover = "/example/path"; // 假设这是需要编码的路径
+const encodedCover = encodeURIComponent(oldCover);
+console.log(encodedCover); // 输出编码后的值
+```
+
+后端:
+
+```
+String encodedUrl = URLEncoder.encode("http://example.com/hello world/", "UTF-8");：  加密
+```
+
+
+
+
+
+
+
 ### 前端传值
 
 | 注解          | 说明                                                         |
@@ -636,6 +888,21 @@ public List<Teacher> getKlassRelatedTeachers(
 如果前端请求的 url 是：/klasses/123456/teachers?type=web
 
 那么后端服务获取到的数据就是：klassId=123456,  type=web
+
+**前端:  一定要用``而不是""**
+
+```ts
+/**
+ * 文章详情（后台）
+ * @param {Object} id
+ */
+export function articleDetail(id) {
+  return get(import.meta.env.VITE_APP_BASE_API +`/article/detail/${id}`, true)
+}
+
+```
+
+
 
 #### 4.2 @RequestParam("xxx")   ?
 
@@ -1431,9 +1698,11 @@ jwt:
 注意: 
 
 + <font color = red>.properties类型文件映射规则，短横线(-)后面的首个字母会变成大写，同时注意有内部类时的写法</font>
-
-+ 如果有内部类对象，加上@Data，不然无法映射数据
++ 如果有内部类对象
+  + 加上@Data，不然无法映射数据,  
+  + 并且都是静态内部类, 不需要额外的 `static` 修饰符。
 + 配置类上记得加上@Component注解
++ 
 
 配置类
 
@@ -1477,7 +1746,6 @@ public class JwtService {
     private JwtProperties jwtProperties;
 
     public void someMethod() {
-        
         // 使用配置参数进行JWT操作
         String secret = jwtProperties.getSecret();
         String issuer = jwtProperties.getIssuer();
@@ -1485,6 +1753,26 @@ public class JwtService {
     }
 }
 ```
+
+或
+
+```java
+public void  someMethod(JwtProperties jwtProperties) {
+    // 使用配置参数进行JWT操作
+    String secret = app.getAppId();
+    String issuer = app.getSecretId();
+    Long expireDate = app.getExpireDate();
+}
+
+// 都是静态内部类, 所以可以JwtProperties.app 使用
+public void someMethod(JwtProperties.app app) {
+    // 使用配置参数进行JWT操作
+    String secret = app.getAppId();
+    String issuer = app.getSecretId();
+}
+```
+
+
 
 ### 5.3  PropertySource（不常用）
 
@@ -1499,6 +1787,326 @@ class WebSite {
   省略getter/setter
   ......
 }
+```
+
+### 5.4@ConfigurationProperties  + @EnableConfigurationProperties方式(推荐)
+
+> 用户动态切换配置
+
+注意: 
+
++ xxxxProperties上不加@Component注解
++ xxxxProperties里面的类都是静态内部类,
+
+**StorageAutoConfiguration**
+
+```java
+
+/**
+ * oss 存储自动配置
+ **/
+@Log4j2
+@Configuration
+@EnableConfigurationProperties({StorageProperties.class})
+public class StorageAutoConfiguration {
+
+	@Bean
+	@ConditionalOnMissingBean(name = {"storage"})
+//ConditionalOnMissingBean表示 只有当名为 "storage" 的 Bean 不存在时，才会创建当前的 Bean。确保在容器中只会有一个名为 "storage" 的 Bean
+	public Storage storage(StorageProperties properties) {
+		return StorageFactory.build(properties);
+	}
+}
+```
+
+**StorageFactory**
+
+```java
+package com.lfj.blog.common.oss.config;
+
+import com.lfj.blog.common.oss.Storage;
+import com.lfj.blog.common.oss.service.AliStorage;
+import com.lfj.blog.common.oss.service.LocalStorage;
+import com.lfj.blog.common.oss.service.NeteaseStorage;
+import com.lfj.blog.common.oss.service.QiniuStorage;
+import com.qiniu.common.Zone;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ * 存储工厂, 目的用于自动装配
+ **/
+@Log4j2
+public final class StorageFactory {
+
+	/**
+	 * 本地
+	 */
+	private static final int LOCAL = 1;
+	/**
+	 * 七牛云
+	 */
+	private static final int QINIU = 2;
+	/**
+	 * 网易云
+	 */
+	private static final int NETEASE = 3;
+	/**
+	 * 阿里云
+	 */
+	private static final int ALI = 4;
+
+	private static final String SUFFIX = "/";
+
+	/**
+	 * 根据配置信息生成不同 Storage 实例
+	 *
+	 * @param properties
+	 * @return
+	 */
+	public static Storage build(StorageProperties properties) {
+		int type = properties.getType();
+		if (type == LOCAL) {
+			return localStorage(properties.getLocal());
+		} else if (type == QINIU) {
+			return qiniuStorage(properties.getQiniu());
+		} else if (type == NETEASE) {
+			return neteaseStorage(properties.getNetease());
+		} else if (type == ALI) {
+			return aliStorage(properties.getAli());
+		}
+		log.error("无效存储类型: " + type);
+		return null;
+	}
+
+	/**
+	 * 网易云存储
+	 *
+	 * @param netease 网易云存储配置
+	 * @return
+	 */
+	private static NeteaseStorage neteaseStorage(StorageProperties.Netease netease) {
+		String accessKey = netease.getAccessKey();
+		if (StringUtils.isEmpty(accessKey)) {
+			log.error("网易云accessKey未配置,请检查配置信息");
+			return null;
+		}
+		String secretKey = netease.getSecretKey();
+		if (StringUtils.isEmpty(secretKey)) {
+			log.error("网易云secretKey未配置,请检查配置信息");
+			return null;
+		}
+		String endpoint = netease.getEndpoint();
+		if (StringUtils.isEmpty(endpoint)) {
+			log.error("网易云endpoint未配置,请检查配置信息");
+			return null;
+		}
+		String bucket = netease.getBucket();
+		if (StringUtils.isEmpty(bucket)) {
+			log.error("网易云bucket未配置,请检查配置信息");
+			return null;
+		}
+		return new NeteaseStorage(netease);
+	}
+
+	/**
+	 * 本地存储
+	 *
+	 * @param local 本地存储配置
+	 * @return
+	 */
+	private static LocalStorage localStorage(StorageProperties.Local local) {
+		String path = local.getPath();
+		if (StringUtils.isEmpty(path)) {
+			log.error("本地存储路径未配置,请检查配置信息");
+			return null;
+		}
+		local.setPath(addSuffix(path));
+		String proxy = local.getProxy();
+		if (StringUtils.isEmpty(proxy)) {
+			log.error("本地存储代理未配置，请检查配置信息");
+		}
+		local.setProxy(addSuffix(proxy));
+		return new LocalStorage(local);
+	}
+
+	/**
+	 * 七牛云存储
+	 *
+	 * @param qiniu 七牛云配置
+	 * @return
+	 */
+	private static QiniuStorage qiniuStorage(StorageProperties.Qiniu qiniu) {
+		String accessKey = qiniu.getAccessKey();
+		if (StringUtils.isEmpty(accessKey)) {
+			log.error("七牛云accessKey未配置，请检查配置信息");
+			return null;
+		}
+		String secretKey = qiniu.getSecretKey();
+		if (StringUtils.isEmpty(secretKey)) {
+			log.error("七牛云secretKey未配置,请检查配置信息");
+			return null;
+		}
+		String domain = qiniu.getDomain();
+		if (StringUtils.isEmpty(domain)) {
+			log.error("七牛云domain未配置，请检查配置信息");
+			return null;
+		}
+		qiniu.setDomain(addSuffix(domain));
+		String bucket = qiniu.getBucket();
+		if (StringUtils.isEmpty(bucket)) {
+			log.error("七牛云bucket未配置，请检查配置信息");
+			return null;
+		}
+		Zone zone = qiniuZone(qiniu.getRegion());
+		return new QiniuStorage(qiniu, zone);
+	}
+
+	/**
+	 * 阿里云存储
+	 *
+	 * @param ali 阿里云配置
+	 * @return
+	 */
+	private static AliStorage aliStorage(StorageProperties.Ali ali) {
+		String accessKeyId = ali.getAccessKeyId();
+		if (StringUtils.isEmpty(accessKeyId)) {
+			log.error("阿里云accessKeyId未配置，请检查配置信息");
+			return null;
+		}
+		String accessKeyIdSecret = ali.getAccessKeyIdSecret();
+		if (StringUtils.isEmpty(accessKeyIdSecret)) {
+			log.error("阿里云accessKeyIdSecret未配置，请检查配置信息");
+			return null;
+		}
+		String endpoint = ali.getEndpoint();
+		if (StringUtils.isEmpty(endpoint)) {
+			log.error("阿里云endpoint未配置，请检查配置信息");
+			return null;
+		}
+		String bucket = ali.getBucket();
+		if (StringUtils.isEmpty(bucket)) {
+			log.error("阿里云bucket未配置，请检查配置信息");
+			return null;
+		}
+		return new AliStorage(ali);
+	}
+
+	/**
+	 * 七牛云 区域
+	 *
+	 * @param zone
+	 * @return
+	 */
+	private static Zone qiniuZone(String zone) {
+		final String HUANAN = "huanan";
+		final String HUABEI = "huabei";
+		final String HUADONG = "huadong";
+		final String BEIMEI = "beimei";
+		final String XINJIAPO = "xinjiapo";
+		switch (zone) {
+			case HUANAN:
+				return Zone.huanan();
+			case HUABEI:
+				return Zone.huabei();
+			case HUADONG:
+				return Zone.huadong();
+			case BEIMEI:
+				return Zone.beimei();
+			case XINJIAPO:
+				return Zone.xinjiapo();
+			default:
+				return Zone.autoZone();
+		}
+	}
+
+	/**
+	 * 添加 / 后缀
+	 *
+	 * @param path
+	 * @return
+	 */
+	private static String addSuffix(String path) {
+		if (!path.endsWith(SUFFIX)) {
+			return path + SUFFIX;
+		}
+		return path;
+	}
+}
+```
+
+**StorageProperties**
+
+```java
+package com.lfj.blog.common.oss.config;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+/**
+ * oss 存储配置
+ **/
+@Data
+@ConfigurationProperties(prefix = "oss")
+public class StorageProperties {
+
+	private Netease netease;
+	private Qiniu qiniu;
+	private Local local;
+	private Ali ali;
+	private int type = 1;
+
+	/**
+	 * 本地
+	 */
+	@Data
+	public static class Local {
+		private String path;  // 文件保存路径
+		private String proxy; // 公网url
+	}
+
+	/**
+	 * 七牛
+	 */
+	@Data
+	public static class Qiniu {
+		private String accessKey;
+		private String secretKey;
+		private String bucket;
+		private String domain;
+		private String region;
+	}
+
+	/**
+	 * 网易云
+	 */
+	@Data
+	public static class Netease {
+		private String accessKey;
+		private String secretKey;
+		private String endpoint;
+		private String bucket;
+	}
+
+
+	/**
+	 * 阿里云
+	 */
+	@Data
+	public static class Ali {
+		private String accessKeyId;
+		private String accessKeyIdSecret;
+		private String bucket;
+		private String endpoint;
+	}
+}
+
+/*
+Local: 本地存储配置，包括文件保存路径和公网 URL。
+Qiniu: 七牛存储配置，包括访问密钥、秘钥、存储桶、域名和地区等信息。
+Netease: 网易云存储配置，包括访问密钥、秘钥、终端节点、存储桶等信息。
+Ali: 阿里云存储配置，包括访问密钥 ID、密钥、存储桶、终端节点等信息。
+* */
 ```
 
 ## 6、参数校验(常用)
@@ -4064,7 +4672,16 @@ Copy
 
 如果用传统方式，在保存和返回时加上转换的处理，需要复杂且繁琐的操作，jackson提供了JsonSerialize和JsonDeserialize注解来优雅的解决这个问题，项目采用的springboot框架，而springboot框架默认配置json转换工具就是jackson。如此，使用注解解决问题很nice了。
 
- 
+例子: 
+
+```java
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+
+// 等价于 FastJSON 2.x  (可能报错)
+  	@JSONField(serializeUsing = LocalDateTimeSerializer.class,
+			deserializeUsing = LocalDateTimeDeserializer.class)
+```
 
 #### 注解简介：
 

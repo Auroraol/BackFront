@@ -1038,6 +1038,28 @@ const formatData = useFormatResult(data, callback)
 
 针对登录表单这种场景，不需要加上防抖、节流和轮询这些优化技术。
 
+
+
+```js
+// 防抖动
+function getArticleTitle(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve("成功");
+    }, 300);
+  });
+}
+
+const { data, run } = useRequest(() => getArticleTitle(), {
+  debounceWait: 1000,
+  manual: true,
+  onSuccess: (data) => {
+    const draft = JSON.stringify(articleWrite);
+    sessionStorage.setItem("articleDraft", draft); // 保存到浏览器
+  },
+});
+```
+
 # axios封装:crown:
 
 ```ts
@@ -1221,5 +1243,44 @@ post(url, data, isNeedToken)
     console.error('POST 请求失败:', error);
   });
 */
+```
+
+# 补充:  防抖/节流工具函数
+
+```js
+// 防抖动h函数  参数 方法 时间
+// 1. func: 一个函数，表示需要执行的函数。
+// 2. wait: 一个数字，表示延迟执行的时间间隔（毫秒）
+export const debonce = (func: Function, wait: number) => {
+    let timer: any;
+    return (...args: any[]) => {
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+            func(...args);
+        }, wait);
+    }
+}
+
+//节流
+export const throttle = (func: Function, wait: number) => {
+    let timer;
+    return (...args: any[]) => {
+        timer = setTimeout(() => {
+            func(...args)
+            timer = null
+        }, wait);
+    }
+}
+```
+
+例子
+
+```js
+//保存草稿（防抖,避免一直触发）
+const saveEditor = debonce(() => {
+  const draft = JSON.stringify(articleWrite);
+  sessionStorage.setItem("articleDraft", draft);
+}, 500);
+
 ```
 

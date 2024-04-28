@@ -539,6 +539,8 @@ const toggle = () => {
 
 # 导航
 
+## 使用
+
 ![image-20231204134054875](Element%E7%AC%94%E8%AE%B0.assets/image-20231204134054875.png)
 
 
@@ -605,6 +607,15 @@ const handleSelect = (index: string) => {
 };
 
 ```
+
+或者不使用 @select="handleSelect"  用    :router="true"
+
+1. 在el-menu加上router
+2. index必须绑定路由的path, 或通过这个跳转
+3. default-active设为当前路由（this.$route.path）,这样在路由变化的时候，对应的menu-item才会高亮，如：
+   ![在这里插入图片描述](https://img-blog.csdnimg.cn/2a4c4467fd9f4ba98b9c00f39591ed6b.png#pic_center)
+
+## 样式
 
 [Elementui中El-menu导航栏-CSDN博客](https://blog.csdn.net/qq_40323256/article/details/125212606?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-125212606-blog-124561084.235^v43^pc_blog_bottom_relevance_base1&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
 
@@ -685,9 +696,9 @@ border-bottom: 1px solid #fff !important;
 -   active-text-color="#31c27c"  点击后文字颜色
 - router： 是否使用路由，启用后可以通过index作为地址进行跳转。
 - <[el-menu](https://so.csdn.net/so/search?q=el-menu&spm=1001.2101.3001.7020)-item index="1">导航栏中的子菜单标签。
-- <el-submenu> 生成二级菜单。
+- `<el-submenu>` 生成二级菜单。
 -  :collapse="isCollapse"  是否折叠
-- ​      @open="handleOpen" 选择的哪一项
+-  @open="handleOpen" 选择的哪一项
 
 代码实现：
 
@@ -716,6 +727,45 @@ border-bottom: 1px solid #fff !important;
     </el-menu>
 </template>
 ```
+
+
+
+<img src="Element%E7%AC%94%E8%AE%B0.assets/image-20240425122016346.png" alt="image-20240425122016346" style="zoom:50%;" />
+
+```vue
+      <el-menu
+        default-active="2"
+        class="el-menu-vertical-demo"
+        @open="handleOpen"
+        @close="handleClose"
+      >
+        <el-sub-menu index="1">
+          <template #title>
+            <el-icon><location /></el-icon>
+            <span>Navigator One</span>
+          </template>
+          <el-menu-item-group title="Group One">
+            <el-menu-item index="1-1">item one</el-menu-item>
+            <el-menu-item index="1-2">item two</el-menu-item>
+          </el-menu-item-group>
+          <el-menu-item-group title="Group Two">
+            <el-menu-item index="1-3">item three</el-menu-item>
+          </el-menu-item-group>
+          <el-sub-menu index="1-4">
+            <template #title>item four</template>
+            <el-menu-item index="1-4-1">item one</el-menu-item>
+          </el-sub-menu>
+        </el-sub-menu>
+   <>
+```
+
+` <el-sub-menu>`    一级
+
+`<el-menu-item >` 内容
+
+ `<el-sub-menu >`二级
+
+
 
 ### 二、导航菜单中的router用法
 
@@ -1081,6 +1131,16 @@ background-color="#545c64"  背景颜色
   </style>
 ```
 
+### element-Plus中el-menu菜单无法正常收缩解决方案
+
+**原因如下图，在把菜单menu动态封装为组件时，新建的文件中，会自动生成div标签，在不记得删除的情况下就会导致层级嵌套错误，无法正常收缩，移除掉div标签后即可正常收缩**
+
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/98724896cba4443490ec125fd8233366.png)
+正常收缩
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/1511a1d32b6640009724ea7ed349987a.png)
+
+
+
 
 
 # TODO
@@ -1394,6 +1454,31 @@ onMounted(() => {
 
 ## 过渡
 
+例子1
+
+```css
+
+<style lang="less" scoped>
+.container {
+  width: 100%;
+  background: #fff;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  color: #2e3135;
+  position: relative;
+  margin-top: 2rem;
+
+  border-radius: 0.5rem;
+  transition: all 0.3s;
+}
+```
+
+```
+将 CSS 的过渡效果应用于所有属性的变化， 这行 CSS 代码正是用来实现这个效果的。它告诉浏览器在任何 CSS 属性发生变化时都要应用一个持续时间为 0.3 秒的过渡效果。这在让网页元素的变化更加平滑和自然时非常有用
+```
+
+例子2
+
 ```vue
 <template>
   <el-row>
@@ -1554,6 +1639,21 @@ div里标签元素居中(一般用于<标签>文字</标签>有文字的标签)
 
 ![](Element%E7%AC%94%E8%AE%B0.assets/image-20240304152336319.png)
 
+# 正中
+
+这个元素就会在其父元素的中间位置水平和垂直居中显示。
+
+```
+  .list-none {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 50%);
+  } 
+```
+
+
+
 # 日历
 
  [记录改造elementui日历组件实例（日报月报）.html](..\..\..\..\..\..\Desktop\Browser Download\记录改造elementui日历组件实例（日报月报）.html) 
@@ -1594,6 +1694,15 @@ div里标签元素居中(一般用于<标签>文字</标签>有文字的标签)
 ```
 
 ![image-20240317213121984](Element%E7%AC%94%E8%AE%B0.assets/image-20240317213121984.png)
+
+```
+  <h1>
+          <img :src="randomImageSrc" />
+          归档
+        </h1>
+```
+
+![image-20240418140829792](Element%E7%AC%94%E8%AE%B0.assets/image-20240418140829792.png)
 
 # 头像
 
@@ -1686,6 +1795,12 @@ const handleCommand = (command: string | number | object) => {
 
  当用户输入 0 或者没有的值的时候 就判断一下 如果返回数据为空 就将input 的值为空 重新发起请求 这样列表就又出来了
 
+
+
+宽度     style="width: 75px"
+
+![image-20240420134527661](Element%E7%AC%94%E8%AE%B0.assets/image-20240420134527661.png)
+
 ## 去掉这个黑框
 
 在控制台查找这个元素，我们可以看见里面有这样一段样式，可以看见外边框outline自动给我们添加了1px,所以我们划过下拉框和点击都会出现这个黑框
@@ -1712,7 +1827,9 @@ const handleCommand = (command: string | number | object) => {
 
 ![img](Element%E7%AC%94%E8%AE%B0.assets/a2c10fabb58b4ea683d4bddfd82d0143.png)
 
- 
+##  下拉菜单定位偏移问题
+
+![image-20240419122356590](Element%E7%AC%94%E8%AE%B0.assets/image-20240419122356590.png)
 
 # Dialog 对话框
 
@@ -1775,6 +1892,12 @@ export default {
 }
 </script>
 ```
+
+### 自定义头
+
+
+
+
 
 # Affix 固钉
 
@@ -2952,9 +3075,21 @@ const open3 = () => {
 
 ![image-20240330161929796](Element%E7%AC%94%E8%AE%B0.assets/image-20240330161929796.png)
 
+## MessageBox 消息弹框
+
+![image-20240416162240329](Element%E7%AC%94%E8%AE%B0.assets/image-20240416162240329.png)
 
 
-## 表单
+
+**当需要用户输入内容时，可以使用 Prompt 类型的消息框。**
+
+![image-20240428191645747](Element%E7%AC%94%E8%AE%B0.assets/image-20240428191645747.png)
+
+
+
+
+
+# 表单
 
 ![image-20240330215122877](Element%E7%AC%94%E8%AE%B0.assets/image-20240330215122877.png)
 
@@ -3142,13 +3277,9 @@ export default {
 
 ![image-20240405134004412](Element%E7%AC%94%E8%AE%B0.assets/image-20240405134004412.png)
 
-
-
   :file-list="files" 绑定的文件列表
 
  :limit="1" 和    :on-exceed="onExceed" 结合, 当文件数量超过1时, 调用自定义onExceed函数
-
-
 
 ```
 //:http-request="elUploadFunc" 
@@ -3158,10 +3289,6 @@ const elUploadFunc = (domParam: any) => {
 };
 ```
 
-
-
-
-
 ```
 //:on-success="successUpCover"
 const successUpCover = (res) => {
@@ -3170,7 +3297,166 @@ const successUpCover = (res) => {
 };
 ```
 
+## 例子
 
+```js
+<!-- 图片上传组件 -->
+<template>
+  <div class="upload-img">
+    <p class="title">上传封面:</p>
+    <el-upload
+      class="upload-demo"
+      ref="uploadCover"
+      drag="true"
+      multiple="false"
+      :limit="1"
+      list-type="picture"
+      :action="path"
+      :headers="headers"
+      :auto-upload="false"
+      :on-success="successUpCover"
+      :on-error="errorUpCover"
+      :on-change="onChangeCover"
+      :on-remove="onRemove"
+      :on-exceed="onExceed"
+      :before-upload="beforeUpload"
+    >
+      <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+      <div class="el-upload__text">
+        拖拽至此或者<em>点击上传</em>
+        只能上传一张封面,支持(jpg/jpeg/png),不超过500kb
+      </div>
+      <template #tip>
+        <!-- <div class="el-upload__tip">大小小于500kb的Jpg /png文件</div> -->
+      </template>
+    </el-upload>
+    <el-button
+      style="margin-left: 10px; margin-right: 10px; margin-bottom: 1rem"
+      type="success"
+      @click="coverSubmit"
+      >上传文件</el-button
+    >
+  </div>
+</template>
+
+<script setup lang="ts">
+import Vue from "vue";
+import { UploadFilled } from "@element-plus/icons-vue";
+import type { UploadInstance } from "element-plus";
+import { getAccessToken } from "/@/utils/auth";
+
+//提交文章
+const uploadCover = ref<UploadInstance>(); //绑定<el-upload></el-upload>
+const path = ref(import.meta.env.VITE_APP_BASE_API + "/file/upload"); // 上传图片接口
+const limitSize = 500 * 1024; //封面大小限制500kb   3 * 1024 * 1024; 限制3MB
+const coverTypeArr = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+const headers = computed(() => {
+  return { Authorization: "Bearer " + getAccessToken() }; //上传文件请求头
+});
+
+// 子->父
+const emits = defineEmits(["uploadSuccess"]);
+
+//封面上传成功的钩子
+type Status = {
+  status: number;
+  code: number;
+  message: string;
+};
+const successUpCover = (res) => {
+  // 这里是:action="path" 之后, 自己服务响应结果
+  if (res.code !== 200000) {
+    ElMessage.error("文件上传失败");
+    return;
+  }
+  // console.error(res.data);
+  emits("uploadSuccess", res.data); // 传父  //element-plus 中el-upload 上传成功返回URL
+};
+
+//文件列表移除文件时的钩子
+const onRemove = (e: any) => {};
+
+//封面上传失败的钩子
+const errorUpCover = () => {
+  ElMessage.error("封面上传失败");
+};
+
+//封面超出上传限制
+const onExceed = (e: any) => {
+  ElMessage.error("封面超出上传限制，上传失败");
+};
+
+//文件状态改变时的钩子，添加文件、上传成功和上传失败时都会被调用
+const onChangeCover = (e: any) => {
+  //文件格式校验
+  if (!coverTypeArr.includes(e.raw.type)) {
+    ElMessage({
+      showClose: true,
+      message: "选择的文件格式错误，错误的格式将不会被上传",
+      type: "error",
+    });
+    return;
+  }
+  // 文件大小效验
+  const isLtSize = e.size > limitSize;
+  if (isLtSize) {
+    ElMessage.error("文件大小不能大于" + limitSize);
+  }
+};
+
+//上传前钩子
+const beforeUpload = (e: any) => {};
+
+const coverSubmit = () => {
+  uploadCover.value!.submit();
+};
+</script>
+
+<style lang="less" scoped>
+// 上传封面
+.upload-img {
+  margin-top: 2rem;
+
+  display: flex;
+  flex-direction: column;
+  .title {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+  }
+  .upload-demo {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  .el-upload__tip {
+    margin-left: 1rem;
+  }
+}
+</style>
+
+```
+
+**自己服务器进行oss存储**
+
+```js
+// 封面上传成功，删除原图片
+const coverUploadSuccess = (url) => {
+  const oldCover = articleWrite.cover;
+  articleWrite.cover = url;
+  const params = {
+    fullPath: oldCover,
+  };
+  if (oldCover) {
+    deleteFile(params);  // 
+  }
+  ElMessage({
+    message: "封面上传成功",
+    type: "success",
+  });
+};
+```
 
 
 
@@ -3227,6 +3513,62 @@ span 天然不换行, 有时候方便
 
 loading=true 时显示
 
+## 应用
+
+```vue
+ <div
+          v-show="current === 1 && loading"
+          v-loading="loading"
+          element-loading-text="拼命加载中"
+          element-loading-spinner="el-icon-loading"
+          element-loading-background="#fff"
+          style="color: #fff; width: 100%; height: 100px"
+        >
+          正在加载
+        </div>
+      </div>
+      <div v-if="!loading && commentList.length === 0" class="list-empty">
+        还没有评论哦~
+      </div>
+
+
+
+<script lang="ts" setup>
+const loading = ref(false); //默认不显示加载动画
+
+// 获取分页数据
+const pageComment = () => {
+   loading.value = true;  // 显示加载动画
+  const params = {
+    articleId: props.articleId,
+    current: current.value,
+    size: size.value,
+  };
+
+  apipageComment(params).then(
+    (res) => {
+      loading.value = false;
+      total.value = res.total;
+      const commentListData1 = res.records;
+      commentListData1.forEach((comment) => {
+        comment.del_visible = false;
+        comment.replyList.forEach((reply) => {
+          reply.del_visible = false;   // 关闭显示加载动画
+        });
+      });
+      commentList.value = commentListData1;
+      console.error(commentList.value.length);
+    },
+    (error) => {
+      console.error(error);
+      loading.value = false;
+    }
+  );
+};
+
+</script>
+```
+
 
 
 # 边框
@@ -3234,6 +3576,24 @@ loading=true 时显示
 ```
 box-sizing: border-box;
 ```
+
+```
+.element {
+  border: 2px solid #000; /* 设置边框宽度为 2px，实线样式，颜色为黑色 */
+}
+
+.element {
+  border-style: solid; /* 边框样式为实线 */
+  border-width: 2px; /* 边框宽度为 2px */
+  border-color: #000; /* 边框颜色为黑色 */
+}
+
+.element {
+  border-bottom: 2px solid #000; /* 底边框为 2px 实线，颜色为黑色 */
+}
+```
+
+
 
 # 阴影
 
@@ -3254,6 +3614,17 @@ box-sizing: border-box;
 
 ```
   border-radius: 0.5rem;
+```
+
+只设置某个角的圆角
+
+```
+.element {
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 2rem;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
 ```
 
 圆
@@ -3761,9 +4132,77 @@ li标签 天然垂直排, 有时候用在方便
       
 ```
 
+## Vue 3中实现随机显示图片
+
+```vue
+<!-- RandomImage.vue -->
+<template>
+  <div>
+    <img :src="randomImageSrc" alt="Random Image" />
+    <button @click="changeImage">换一张</button>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      images: [
+        '/img/image1.jpg',
+        '/img/image2.jpg',
+        '/img/image3.jpg',
+        // 添加更多图片路径
+      ],
+      currentImageIndex: 0
+    };
+  },
+  computed: {
+    randomImageSrc() {
+      return this.images[this.currentImageIndex];
+    }
+  },
+  methods: {
+    changeImage() {
+      // 生成一个随机的索引值
+      const newIndex = Math.floor(Math.random() * this.images.length);
+      // 确保新的索引不与当前索引相同
+      if (newIndex !== this.currentImageIndex) {
+        this.currentImageIndex = newIndex;
+      } else {
+        // 如果新的索引与当前索引相同，递归调用changeImage方法，直到索引不同为止
+        this.changeImage();
+      }
+    }
+  }
+};
+</script>
+```
+
+在你的Vue应用中使用这个组件：
+
+```vue
+htmlCopy Code<template>
+  <div>
+    <RandomImage />
+  </div>
+</template>
+
+<script>
+import RandomImage from './RandomImage.vue';
+
+export default {
+  components: {
+    RandomImage
+  }
+};
+</script>
+```
 
 
-# Popover 气泡卡片
+
+# Popover 弹出框(气泡卡片)
+
+![image-20240416184524916](Element%E7%AC%94%E8%AE%B0.assets/image-20240416184524916.png)
 
 ![image-20240411142358276](Element%E7%AC%94%E8%AE%B0.assets/image-20240411142358276.png)
 
@@ -3808,7 +4247,7 @@ li标签 天然垂直排, 有时候用在方便
 
 
 
-## 显示滚动条
+# 显示滚动条
 
 ```
   max-height: 400px; /* 设置最大高度 */
@@ -4008,6 +4447,8 @@ height：图片高
 
 [💖 闪亮的爱心 表情符号 — 含义和用法 (emojis.wiki)](https://emojis.wiki/zh/闪亮的爱心/)
 
+[GetEmoji - Copy & Paste All Emojis From The Emoji Keyboard - No apps required](https://getemoji.com/)
+
 1. 使用 Unicode 字符：可以使用 Unicode 字符 \u{1F618} 来表示“飞吻”表情符号。
 
 ```
@@ -4038,3 +4479,391 @@ htmlCopy Code<span>😘</span>
 ```
 
 ![image-20240415225613145](Element%E7%AC%94%E8%AE%B0.assets/image-20240415225613145.png)
+
+
+
+
+
+# p标签文本内容自动换行
+
+![image-20240416230154386](Element%E7%AC%94%E8%AE%B0.assets/image-20240416230154386.png)
+
+要根据 `comment.content` 的内容来调整宽度，你可以使用 CSS 中的 `max-width` 属性。你可以为包含 `comment.content` 的元素设置 `max-width`，这样当内容超出指定宽度时，就会自动换行，而不会撑破容器。
+
+例如，你可以为 `<p>` 标签添加一个类，并设置其 `max-width` 属性，如下所示：
+
+```
+<p class="body-text comment-content">{{ comment.content }}</p>
+```
+
+然后在你的 CSS 中定义 `.comment-content` 类，并设置 `max-width` 属性，如下所示：
+
+```
+cssCopy Code.comment-content {
+  max-width: 300px; /* 设置最大宽度为 300 像素，可以根据需要进行调整 */
+  /* 如果需要更多的样式，可以在这里继续添加 */
+}
+```
+
+这样，无论 `comment.content` 的内容有多长，它都不会超出 300 像素的宽度，而是
+
+# Timeline 时间线
+
+![image-20240418132156283](Element%E7%AC%94%E8%AE%B0.assets/image-20240418132156283.png)
+
+
+
+# 当标签内容超过容器宽度时，标签会自动换行显示，而不会挤在一起
+
+```html
+      <div @click="saveEditor" class="tag-container">
+        <span
+          class="labelTag"
+          @click="chooseTag(tag)"
+          v-for="tag in dynamicTags"
+          :key="tag.id"
+          >{{ tag.name }}</span
+        >
+      </div>
+      
+      .tag {
+  margin-left: 1rem;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.tag-container {
+  display: flex;
+  flex-wrap: wrap; /* 允许标签换行显示 */
+}
+
+.labelTag {
+  margin-right: 1.5rem;
+  margin-bottom: 0.2rem; /* 调整标签之间的下方间距 */
+  padding: 0.2rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1.4rem;
+  color: black;
+  background-color: #fff;
+  border: 0.1rem solid black;
+  cursor: pointer;
+  transition: all 0.1s;
+
+  &:hover {
+    box-shadow: 0.2rem 0.2rem var(--box-shadow);
+    transform: translateY(-0.1rem);
+  }
+}
+```
+
+![image-20240421165957069](Element%E7%AC%94%E8%AE%B0.assets/image-20240421165957069.png)
+
+
+
+
+
+# Card
+
+## 卡片
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <style>
+    .test {
+      float: left;
+      width: 25%;
+      box-sizing: border-box;
+      padding: 10px;
+      min-width: 150px;
+    }
+    .container {
+      width: 100%;
+    }
+    @media (max-width:615px) {
+      .test {
+        float: left;
+        width: 33%;
+        box-sizing: border-box;
+        padding: 10px;
+        min-width: 150px;
+      }
+    }
+    @media (max-width:465px) {
+      .test {
+        float: left;
+        width: 50%;
+        box-sizing: border-box;
+        padding: 10px;
+        min-width: 150px;
+      }
+    }
+    @media (max-width:315px) {
+      .test {
+        float: left;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="test">
+      <img src="./640.webp" style="max-width: 100%;" />
+    </div>
+    <div class="test">
+      <img src="./640.webp" style="max-width: 100%;" />
+    </div>
+    <div class="test">
+      <img src="./640.webp" style="max-width: 100%;" />
+    </div>
+    <div class="test">
+      <img src="./640.webp" style="max-width: 100%;" />
+    </div>
+  </div>
+</body>
+</html>
+
+```
+
+再放效果
+
+一行
+![image-20240427225511941](Element%E7%AC%94%E8%AE%B0.assets/image-20240427225511941.png)
+第二行
+<img src="Element%E7%AC%94%E8%AE%B0.assets/image-20240427225517092.png" alt="image-20240427225517092" style="zoom:67%;" />
+
+1、用到的技术是响应式布局（就是监听页面宽度实现不同变化）
+2、这里用的是float，当然用flex也是一样的
+3、其实不是完美的，比如三个一排的时候是33%，所以还剩下1%在最后面，不影响大局
+4、@media中的max-width值得由来：
+比如这里设置的每个元素的最小宽度是150px，也就是再低于这个值就会换行，
+当有四个换到三个的临界值是 150 * 4 = 600 。也就是说再小就要换行了，这个时候我们主动换行，比如上面的在615的时候就把宽度设置为33%，这样就提前完成转换，实现完美衔接。
+同理三到二就是 150 * 3 = 450 。提前15px 就是 465；其它同理
+5、这里计算的宽度是浏览器可视范围的宽度，所有计算上面值得时候要加上其它布局的宽度。
+
+## el-card
+
+```html
+<div class="card-container">
+  <el-card
+    v-for="(item, index) in userList"
+    :key="index"
+    :body-style="{ padding: '0px' }"
+    shadow="hover"
+    class="card-item"
+  >
+    <!-- 卡片内容 -->
+  </el-card>
+</div>
+```
+
+然后，在你的 CSS 样式中添加以下代码：
+
+```css
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.card-item {
+  flex: 1 1 300px; /* 控制每个卡片的宽度，这里设置为自动扩展，最小宽度为300px */
+  margin: 10px; /* 调整卡片之间的间距 */
+}
+```
+
+这样，`el-card` 就会根据父容器的宽度自动调整布局，实现多行排列的自适应效果。
+
+
+
+<img src="Element%E7%AC%94%E8%AE%B0.assets/image-20240427230325857.png" alt="image-20240427230325857" style="zoom: 50%;" />
+
+
+
+
+
+# 表格
+
+![image-20240428111548477](Element%E7%AC%94%E8%AE%B0.assets/image-20240428111548477.png)
+
+当 `el-table` 元素中注入 `data` 对象数组后，在 `el-table-column` 中用 `prop` 属性来对应对象中的键名即可填入数据，用 `label` 属性来定义表格的列名。 可以使用 `width` 属性来定义列宽。
+
+## 显示图片
+
+**详情使用见** 
+
+![image-20240428165931657](Element%E7%AC%94%E8%AE%B0.assets/image-20240428165931657.png)
+
+
+
+例子
+
+```html
+<el-table :data="dataList" :border="true">
+                <el-table-column type="index" width="50px"></el-table-column>
+                <el-table-column label="图片" width="150px">
+                    <template #default="scope">
+                        <el-image :src="scope.row.imgUrl" style="width:100px ;"></el-image>
+                        <div style="text-align: center;width: 100px;">美景</div>
+                    </template>
+                </el-table-column>
+            </el-table>
+```
+
+![image-20240428113439739](Element%E7%AC%94%E8%AE%B0.assets/image-20240428113439739.png)
+
+## 合并行
+
+#### 个人查看element-plus文档，去结合使用 [链接]([Table 表格 | Element Plus (element-plus.org)](https://link.juejin.cn/?target=https%3A%2F%2Felement-plus.org%2Fzh-CN%2Fcomponent%2Ftable.html%23%E5%90%88%E5%B9%B6%E8%A1%8C%E6%88%96%E5%88%97))
+
+element文档中有“合并行或列”的例子： 多行或多列共用一个数据时，可以合并行或列。
+
+通过给 table 传入`span-method`方法可以实现合并行或列， 方法的参数是一个对象，里面包含当前行` row`、当前列 `column`、当前行号` rowIndex`、当前列号 `columnIndex` 四个属性。 该函数可以返回一个包含两个元素的数组，第一个元素代表 `rowspan`，第二个元素代表 `colspan`。 也可以返回一个键名为` rowspan` 和` colspan` 的对象；
+
+```html
+<template>
+    <el-table
+        :data="data"
+        border
+        :span-method="objectSpanMethod"
+    >
+        <el-table-column type="selection" width="55" />
+        <el-table-column label="#" width="60" prop="">
+            <template #default="{ $index }">
+                {{ $index + 1 }}
+            </template>
+        </el-table-column>
+        <el-table-column
+            label="指标组合名称"
+            align="center"
+            prop="userName"
+            show-overflow-tooltip
+        />
+        <el-table-column
+            label="已使用使用指标"
+            align="center"
+            prop="value1"
+            show-overflow-tooltip
+        />
+        <el-table-column
+            label="权重"
+            align="center"
+            prop="value2"
+            show-overflow-tooltip
+        />
+        <el-table-column
+            label="计算状态"
+            align="center"
+            prop="detectionTime"
+            show-overflow-tooltip
+        /> 
+        <el-table-column label="操作" width="160" resizable>
+            <template #default="scope">
+                <el-buttontype="text">删除</el-button>
+            </template>
+       </el-table-column>
+    </el-table>
+</template>
+```
+
+
+
+```javascript
+import type { TableColumnCtx } from 'element-plus';
+//举例数据格式
+const data = [
+    {
+        userName: "营业收费系统",
+        value1: "中国农业银行",
+        value2: "2022-03",
+        detectionTime: "2022-03-04",
+    },
+    {
+        userName: "营业收费系统",
+        value1: "中国农业银行",
+        value2: "2022-03",
+        detectionTime: "2022-03-04",
+    },
+    {
+        userName: "营业收费系统",
+        value1: "中国农业银行",
+        value2: "2022-03",
+        detectionTime: "2022-03-04",
+    },
+    {
+        userName: "营业收费系统",
+        value1: "中国农业银行",
+        value2: "2022-03",
+        detectionTime: "2022-03-04",
+    }
+ ];
+ 
+//需要判断的属性组
+const spanProps = ['userName', 'detectionTime'];
+ 
+let rowSpansMap = new Map(); //存需要开始合并的行号，向下合并多少行
+ 
+/**
+ * 根据列表数据得出需要合并的行
+ * @param data 列表数据
+ */
+const spanPropGroup = (data: any) => {
+  let oldRow: any = null; //需要合并的行
+  rowSpansMap = new Map(); //重置Map
+ 
+  oldRow = data[0]; //默认第0行为需要合并的行
+  rowSpansMap.set(0, 1); //第0行，向下合并一行(其实就是自己单独一行)
+  let spanRow = 0; //记录需要开始合并的行号
+  for (let i = 1; i < data.length; i++) {
+    const item = data[i];
+    let isSame = true;
+    //遍历需要判断的属性判断对应值是否全部相等
+    for (let j = 0; j < spanProps.length; j++) {
+      const prop = spanProps[j];
+      //只要有一个属性值不相等则记录新的需要合并的行号
+      if (item[prop] != oldRow[prop]) {
+        oldRow = item;
+        rowSpansMap.set(i, 1);
+        spanRow = i;
+        isSame = false;
+        break;
+      }
+    }
+    //如果所有属性值相同则所需要合并的行数+1
+    if (isSame) {
+      let span = rowSpansMap.get(spanRow);
+      rowSpansMap.set(spanRow, span + 1);
+    }
+  }
+};
+ 
+const objectSpanMethod: any = ({ row, column, rowIndex, columnIndex }) => {
+  //采样值1-5列所对应的行不需要合并
+  if (columnIndex != 3 && columnIndex != 4) {
+    //根据当前行号从map中获取开始合并的行根据当前行号从map中获取开始合并的行号，向下合并多少行
+    const span = rowSpansMap.get(rowIndex);
+    if (span != null) {
+      return {
+        rowspan: span, //向下合并span行
+        colspan: 1,
+      };
+    } else {
+      return {
+        rowspan: 0,
+        colspan: 0,
+      };
+    }
+  }
+};
+//进行传递数据
+spanPropGroup(data);
+```
+
+[ElementuiPlus的table组件实现行拖动与列拖动_element-plus-table-dragable-CSDN博客](https://blog.csdn.net/qq_52845451/article/details/134205694)
