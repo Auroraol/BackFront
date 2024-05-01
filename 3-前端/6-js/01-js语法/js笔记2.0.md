@@ -351,3 +351,94 @@ ECMAScript 6 新增,  详细见[面向对象2笔记](.\参考\第4天(重要).md
 
 
 
+# 运算符（...）
+
+展开运算符的常见作用大致分为：
+
+1. `展开数组：`展开运算符（…）会把数组中各项展开显示。
+2. `拼接数组：`展开运算符还可以用来拼接两个数组，把各项元素连接到一起，形成一个新数组。（可以在数组任意位置拼接）
+3. `拷贝数组：`执行的都是浅拷贝(只遍历一层)。
+4. `在函数中使用：`展开运算符可以运用在函数参数中。
+5. `构造字面量对象:`展开运算符在对`对象`使用时，应当注意以`{}包裹起来。`
+
+## 1、展开数组
+
+```javascript
+	let arr1 = [1, 3, 5, 7, 9]
+    console.log(arr1)
+    console.log(...arr1)  // 展开一个数组
+```
+
+![image-20240430164235736](js%E7%AC%94%E8%AE%B02.0.assets/image-20240430164235736.png)
+
+## 2、拼接数组
+
+```javascript
+	let arr1 = [1, 3, 5, 7, 9]
+	let arr2 = [2, 4, 6, 8, 10]
+	let arr3 = [...arr1, ...arr2]  // 连接数组
+	console.log(arr3)
+```
+
+![image-20240430164636807](js%E7%AC%94%E8%AE%B02.0.assets/image-20240430164636807.png)
+
+可以在任何地方拼接，比如
+
+```js
+var parts = ['shoulders', 'knees'];
+var lyrics = ['head', ...parts, 'and', 'toes']; 
+console.log(lyrics)
+```
+
+![image-20240430164907618](js%E7%AC%94%E8%AE%B02.0.assets/image-20240430164907618.png)
+
+## 3、拷贝数组
+
+```javascript
+var arr = [1, 2, 3];
+var arr2 = [...arr]; 
+arr2.push(4);
+
+// arr2 此时变成 [1, 2, 3, 4]
+// arr 不受影响
+```
+
+## 4、函数中的展开语法
+
+```js
+// javascript内置数组方法reduce
+function sum(...numbers) {
+  //前后
+  return numbers.reduce((preValue, currentValue) => {
+    return preValue + currentValue
+  })
+}
+
+console.log(sum(1, 2, 3, 4))
+// 控制台输出：10
+```
+
+## 5、构造字面量对象时使用展开语法
+
+在构造字面量对象时，也可以使用展开运算符：
+
+```javascript
+var obj1 = { foo: 'bar', x: 42 };
+var obj2 = { foo: 'baz', y: 13 };
+
+var clonedObj = { ...obj1 };
+// 克隆后的对象: { foo: "bar", x: 42 }
+
+var mergedObj = { ...obj1, ...obj2 };
+// 合并后的对象: { foo: "baz", x: 42, y: 13 }
+```
+
+```js
+const obj1 = {a: 1, b: 2};
+const obj2 = {...obj1, c: 30};
+console.log(obj2);         // {a:1, b:2, c:30}
+const obj3 = {b: 20, c: 30};
+const obj4 = {...obj2, ...obj3};  // 合并对象
+ 
+console.log(obj4);         // {a:1, b:20, c:30}
+```

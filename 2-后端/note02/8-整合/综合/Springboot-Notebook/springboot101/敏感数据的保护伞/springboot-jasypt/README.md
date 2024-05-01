@@ -380,6 +380,21 @@ public class Encryptor {
 
 ```
 
+### 启动类添加注解
+
+在启动类上添加注解`@EnableEncryptableProperties`注解来开启自动解密
+
+```java
+@SpringBootApplication
+@MapperScan("cn.xj.xjdoc.**.mapper")
+@EnableEncryptableProperties  //开启自动解密功能
+public class XjdocApplication {
+	public static void main(String[] args) {
+		SpringApplication.run(XjdocApplication.class, args);
+	}
+}
+```
+
 ### mybatis
 
 #### entity

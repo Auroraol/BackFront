@@ -3257,6 +3257,53 @@ export default {
 
 ```
 
+**vue3 使用** 
+
+```vue
+<template>
+  <el-form :model="form" :rules="rules" label-position="left" ref="formRef">
+    <el-form-item prop="name">
+      <el-input v-model="form.name" placeholder="输入名称" />
+    </el-form-item>
+    <el-form-item prop="url">
+      <el-input v-model="form.url" placeholder="输入链接" />
+    </el-form-item>
+    <el-form-item prop="icon">
+      <el-input v-model="form.icon" placeholder="输入图标" />
+    </el-form-item>
+  </el-form>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+const form = ref({
+  icon: '',
+  id: null,
+  name: '',
+  url: ''
+})
+const rules = ref({
+  name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+  url: [{ required: true, message: '请输入链接', trigger: 'blur' }],
+  icon: [{ required: true, message: '请输入图标', trigger: 'blur' }]
+})
+
+const formRef = ref(null) // 创建表单引用
+
+const saveSubmit = () => {
+  formRef.value.validate((valid) => {
+    if (valid) {
+      // 保存逻辑
+    }
+  })
+}
+</script>
+
+```
+
+
+
 ## 间距
 
 表单组件之间的间距可以在CSS中设置

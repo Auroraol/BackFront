@@ -1,26 +1,3 @@
-# #此文件为方便gitee网站观阅使用专门创建
-
- 此笔记文件于某一时间复制至此,容易存在更新不及时问题,建议观看同级目录下的笔记文件
-
- 由于此笔记篇幅过长,防止Gitee上点开加载时间过久,所以只截取了上方`ES全系列详细学习笔记`部分笔记的部分知识点至此,方便网站阅读概览,完整内容请看具体笔记
-
- * **ES全系列详细学习笔记** : 是所有ES系列笔记总集,也是`最全面的笔记`,第一时间也会更新至此笔记中,当然篇幅很大,十几万字!
- * **其他零散笔记**: 即目录中零散知识点笔记,相对碎片化,类似于**ES全系列详细学习笔记**的拆解,方便快速查找到相关知识点,相对而言更新没有那么具有实时性
-
- 除此笔记外大家可以看我其他笔记 :**[全栈笔记](https://gitee.com/hongjilin/hongs-study-notes/tree/master)**、**[数据结构与算法](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_算法及课程基础学习笔记/数据结构与算法)**、**[编程_前端开发学习笔记](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记)**、**[编程_后台服务端学习笔记](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_后台服务端学习笔记)** 、**[Java](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_后台服务端学习笔记/Java)** 、**[Nodejs](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_后台服务端学习笔记/Nodejs)** 、**[JavaScript笔记](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记/HTML+CSS+JS基础笔记/JavaScript笔记)**、**[ES6及后续版本学习笔记](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记/ES6及后续版本学习笔记)** 、**[Vue笔记整合](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记/Vue笔记整合)** 、**[React笔记](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记/React笔记)**、**[微信小程序学习笔记](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记/微信小程序学习笔记)**、**[Chrome开发使用及学习笔记](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记/Chrome开发使用及学习笔记)** 以及许多其他笔记就不一一例举了
-
-------
-
-# #说明
-
-本笔记是本人`ES全系统详细学习笔记`,将ES系列全部梳理一遍,包括新特性等
-
-观阅或查阅的资料:[[阮一峰的ES6文档](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记/ES6及后续版本学习笔记/ES6资料文档摘录)]、[[`尚硅谷Web前端ES6教程, 涵盖ES6-ES11`](https://www.bilibili.com/video/BV1uK411H7on?share_source=copy_web)]、[[`JowayYoung的1.5万字概括ES6全部特性(已更新ES2020)`](https://juejin.cn/user/2330620350432110)]
-
-笔记中每部分都会首先给出[`概括总结`],总结概括此部分知识点,然后再于下方给出`部分常用重点`知识点详解
-
-必要的预备前置知识点:  [JavaScript基础以及进阶知识点](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记/HTML+CSS+JS基础笔记/JavaScript笔记) --其中 [ 进阶 ] 笔记部分需要重点掌握
-
 # #目录
 
 [TOC]
@@ -79,10 +56,6 @@ TC39（Technical Committee 39）是推进 ECMAScript 发展的委员会。其会
 可以查看gitHub上的这个图--[点我传送](http://kangax.github.io/compat-table/es6/)
 
 # 二、ECMASript 6 新特性
-
- 想要查看更权威的官方ES6文档,可以看阮一峰的ES6文档,本人当初对其进行了摘录放至此处方便查阅--**[ES6资料文档摘录](https://gitee.com/hongjilin/hongs-study-notes/tree/master/编程_前端开发学习笔记/ES6及后续版本学习笔记/ES6资料文档摘录)** 
-
- 此处ES6部分笔记主要为:`查阅的资料博客整合摘录`,加上学习ES6时笔记、个人心得体会以及在相当一段工作时间中觉得常用或者是需要重点学习的理解整合
 
 ## 1、ES6更新的内容概括
 
@@ -1401,6 +1374,7 @@ function tag(strings) {
 
 上面代码中, `tag`函数的第一个参数`strings`, 有一个`raw`属性, 也指向一个数组。该数组的成员与`strings`数组完全一致。比如, `strings`数组是`["First line\nSecond line"]`, 那么`strings.raw`数组就是`["First line\\nSecond line"]`。两者唯一的区别, 就是字符串里面的斜杠都被转义了。比如 , strings.raw 数组会将`\n`视为`\\`和`n`两个字符, 而不是换行符。这是为了方便取得转义之前的原始模板而设计的。
 
-# `更多笔记看上方对应具体知识点笔记`
 
- ES系列笔记过大,防止gitee网站上进入加载时间过长,只截取小部分,建议下载后阅读,本笔记完整版本应接近8W字
+
+
+

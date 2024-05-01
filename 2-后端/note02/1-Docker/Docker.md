@@ -38,7 +38,7 @@ CI\CD Jenkins
 
 淘宝在双11的时候，用户量暴增：需要很多很多的运维人员去增加部署的服务器，运维成本过高的问题。
 
-##  二、Docker介绍 
+##  二、Docker介绍
 
 ### 2.1 Docker的由来
 
@@ -955,9 +955,766 @@ firewall-cmd --zone=public --add-port=15672/tcp --permanent
 firewall-cmd --reload
 ```
 
+### 补充:crossed_swords:
+
+
+
+#### 1、安装Nginx
+
+##### 1.1、下拉镜像
+
+```shell
+# 这里就默认安装latest版本
+docker pull nginx
+```
+
+##### 1.2、移动配置文件
+
+```shell
+# 创建文件夹
+mkdir -p /mydata/nginx/html
+mkdir -p /mydata/nginx/logs
+mkdir -p /mydata/nginx/conf
+
+# nginx 配置文件拷贝
+docker container cp nginx:/etc/nginx /mydata/nginx/conf/
+mv /mydata/nginx/conf/nginx/* /mydata/nginx/conf/
+rm -rf /mydata/nginx/conf/nginx
+```
+
+##### 1.3、停止、删除Nginx容器
+
+```shell
+# 停止 nginx 容器
+docker stop nginx
+# 删除 nginx 容器
+docker rm nginx
+```
+
+##### 1.4、启动Nginx容器
+
+```shell
+docker run -p 80:80 --name nginx \
+-v /mydata/nginx/html:/usr/share/nginx/html \
+-v /mydata/nginx/logs:/var/log/nginx \
+-v /mydata/nginx/conf/:/etc/nginx \
+--restart always nginx
+```
+
+#### 2、安装MySQL
+
+##### 2.1、下拉MySQL镜像
+
+我们通过命令直接去DockerHub下拉MySQL镜像，这里我们使用的是5.7版本的MySQL（因为我目前不是超级管理员权限，需要加上sudo）：
+
+```shell
+# 下拉镜像
+docker pull mysql:5.7
+
+# 检查镜像是否下载成功
+docker images
+12345
+```
+
+![在这里插入图片描述](Docker.assets/5933794d6d364f3abadf64ca6f5d30b3.png)
+
+##### 2.2、启动MySQL容器
+
+```shell
+# 启动MySQL镜像
+docker run -p 3306:3306 --name mysql \
+-v /mydata/mysql/log:/var/log/mysql \
+-v /mydata/mysql/data:/var/lib/mysql \
+-v /mydata/mysql/conf:/etc/mysql \
+-e MYSQL_ROOT_PASSWORD=root \
+-d mysql:5.7
+
+# 查看MySQL容器(镜像启动后就是容器)
+docker ps
+12345678910
+```
+
+##### 2.3、修改MySQL配置
+
+使用mysql之前我们需要先进行配置修改，直接修改Linux的**挂载**文件即可（毕竟数据可以同步）
+
+```shell
+# 进入配置目录
+cd /mydata/mysql/conf
+
+# 编写配置文件
+vi my.cnf
+
+# 粘贴内容
+[client]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+
+[mysqld]
+init_connect='SET collation_connection = utf8_unicode_ci'
+init_connect='SET NAMES utf8'
+character-set-server=utf8
+collation-server=utf8_unicode_ci
+skip-character-set-client-handshake
+skip-name-resolve
+
+# 修改完配置需要重启容器才能生效
+docker restart mysql
+1234567891011121314151617181920212223
+```
+
+#### 3、安装Redis
+
+##### 3.1、下拉Redis镜像
+
+```shell
+# 下载Redis镜像(不指定版本就是最新版)
+docker pull redis
+12
+```
+
+##### 3.2、启动Redis容器
+
+注意：我们需要现在Linux中把文件建好，在进行Redis容器**挂载**，否则会出错（MySQL不需要提前建文件）
+
+```shell
+# 创建目录和配置文件
+mkdir -p /mydata/redis/conf
+cd /mydata/redis/conf
+touch redis.conf
+
+# 启动镜像
+docker run -p 6379:6379 --name redis -v /mydata/redis/data:/data \
+-v /mydata/redis/conf/redis.conf:/etc/redis/redis.conf \
+-d redis redis-server /etc/redis/redis.conf
+
+# 查看Redis是否启动
+docker ps
+123456789101112
+```
+
+#### 4、安装ElasticSearch
+
+##### 4.1、下拉ElasticSearch镜像
+
+下载ElasticSearch镜像（我选择7.4.2版本），检索数据需要存放在该容器中：
+
+```shell
+docker pull elasticsearch:7.4.2
+1
+```
+
+##### 4.2、下拉Kibana镜像
+
+下载Kibana镜像，Kibana是ElasticSearch的可视化界面，类似于操作MySQL的Navicat：
+
+```shell
+docker pull kibana:7.4.2
+1
+```
+
+##### 4.3、启动容器前配置
+
+```shell
+# 创建config文件夹（用于挂载ES的配置）
+mkdir -p /mydata/elasticsearch/config
+# 创建data文件夹（用于挂载ES的数据）
+mkdir -p /mydata/elasticsearch/data
+# 进入到config文件夹，执行该命令，添加ES配置文件
+# 该文件作用：可以接收所有远程主机的访问
+echo "http.host: 0.0.0.0" >/mydata/elasticsearch/config/elasticsearch.yml
+# 修改文件权限，保证任何用户任何组都可读写（否则ElasticSearch容器启动就会闪退）
+chmod -R 777 /mydata/elasticsearch/
+123456789
+```
+
+##### 4.4、启动ElasticSearch容器
+
+命令：
+
+```shell
+docker run --name elasticsearch -p 9200:9200 -p 9300:9300 \
+-e "discovery.type=single-node" \
+-e ES_JAVA_OPTS="-Xms64m -Xmx128m" \
+-v /mydata/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+-v /mydata/elasticsearch/data:/usr/share/elasticsearch/data \
+-v /mydata/elasticsearch/plugins:/usr/share/elasticsearch/plugins \
+-d elasticsearch:7.4.2 
+1234567
+```
+
+解释：
+
+> –name：为容器起个名
+> -p：暴露端口（9200为ElasticSearch端口，9300为分布式集群节点之间的通信端口）
+> -e “discovery.type=single-node”：ElasticSearch以单节点模式运行
+> -e ES_JAVA_OPTS=“-Xms64m -Xmx128m”：初始64m，最大128m
+> -v：进行挂载，不多解释
+> -d：后台启动
+
+##### 4.5、启动Kibana容器
+
+```shell
+docker run --name kibana -e ELASTICSEARCH_HOSTS=http://192.168.56.10:9200 -p 5601:5601 -d kibana:7.4.2
+1
+```
+
+#### 5、安装Nacos
+
+##### 5.1、配置数据库
+
+这样可以持久化Nacos数据到MySQL中，即使Nacos容器出现问题，数据也不会丢失，创建数据库脚本链接：https://github.com/alibaba/nacos/blob/master/config/src/main/resources/META-INF/nacos-db.sql
+
+如果打不开链接，可以使用以下SQL脚本内容：
+
+```sql
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = config_info   */
+/******************************************/
+CREATE TABLE `config_info` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `data_id` varchar(255) NOT NULL COMMENT 'data_id',
+  `group_id` varchar(128) DEFAULT NULL,
+  `content` longtext NOT NULL COMMENT 'content',
+  `md5` varchar(32) DEFAULT NULL COMMENT 'md5',
+  `gmt_create` datetime NOT NULL DEFAULT '2010-05-05 00:00:00' COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL DEFAULT '2010-05-05 00:00:00' COMMENT '修改时间',
+  `src_user` text COMMENT 'source user',
+  `src_ip` varchar(20) DEFAULT NULL COMMENT 'source ip',
+  `app_name` varchar(128) DEFAULT NULL,
+  `tenant_id` varchar(128) DEFAULT '' COMMENT '租户字段',
+  `c_desc` varchar(256) DEFAULT NULL,
+  `c_use` varchar(64) DEFAULT NULL,
+  `effect` varchar(64) DEFAULT NULL,
+  `type` varchar(64) DEFAULT NULL,
+  `c_schema` text,
+  `encrypted_data_key` text NOT NULL COMMENT '秘钥',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_configinfo_datagrouptenant` (`data_id`,`group_id`,`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='config_info';
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = config_info_aggr   */
+/******************************************/
+CREATE TABLE `config_info_aggr` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `data_id` varchar(255) NOT NULL COMMENT 'data_id',
+  `group_id` varchar(128) NOT NULL COMMENT 'group_id',
+  `datum_id` varchar(255) NOT NULL COMMENT 'datum_id',
+  `content` longtext NOT NULL COMMENT '内容',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `app_name` varchar(128) DEFAULT NULL,
+  `tenant_id` varchar(128) DEFAULT '' COMMENT '租户字段',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_configinfoaggr_datagrouptenantdatum` (`data_id`,`group_id`,`tenant_id`,`datum_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='增加租户字段';
+
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = config_info_beta   */
+/******************************************/
+CREATE TABLE `config_info_beta` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `data_id` varchar(255) NOT NULL COMMENT 'data_id',
+  `group_id` varchar(128) NOT NULL COMMENT 'group_id',
+  `app_name` varchar(128) DEFAULT NULL COMMENT 'app_name',
+  `content` longtext NOT NULL COMMENT 'content',
+  `beta_ips` varchar(1024) DEFAULT NULL COMMENT 'betaIps',
+  `md5` varchar(32) DEFAULT NULL COMMENT 'md5',
+  `gmt_create` datetime NOT NULL DEFAULT '2010-05-05 00:00:00' COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL DEFAULT '2010-05-05 00:00:00' COMMENT '修改时间',
+  `src_user` text COMMENT 'source user',
+  `src_ip` varchar(20) DEFAULT NULL COMMENT 'source ip',
+  `tenant_id` varchar(128) DEFAULT '' COMMENT '租户字段',
+  `encrypted_data_key` text NOT NULL COMMENT '秘钥',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_configinfobeta_datagrouptenant` (`data_id`,`group_id`,`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='config_info_beta';
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = config_info_tag   */
+/******************************************/
+CREATE TABLE `config_info_tag` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `data_id` varchar(255) NOT NULL COMMENT 'data_id',
+  `group_id` varchar(128) NOT NULL COMMENT 'group_id',
+  `tenant_id` varchar(128) DEFAULT '' COMMENT 'tenant_id',
+  `tag_id` varchar(128) NOT NULL COMMENT 'tag_id',
+  `app_name` varchar(128) DEFAULT NULL COMMENT 'app_name',
+  `content` longtext NOT NULL COMMENT 'content',
+  `md5` varchar(32) DEFAULT NULL COMMENT 'md5',
+  `gmt_create` datetime NOT NULL DEFAULT '2010-05-05 00:00:00' COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL DEFAULT '2010-05-05 00:00:00' COMMENT '修改时间',
+  `src_user` text COMMENT 'source user',
+  `src_ip` varchar(20) DEFAULT NULL COMMENT 'source ip',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_configinfotag_datagrouptenanttag` (`data_id`,`group_id`,`tenant_id`,`tag_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='config_info_tag';
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = config_tags_relation   */
+/******************************************/
+CREATE TABLE `config_tags_relation` (
+  `id` bigint(20) NOT NULL COMMENT 'id',
+  `tag_name` varchar(128) NOT NULL COMMENT 'tag_name',
+  `tag_type` varchar(64) DEFAULT NULL COMMENT 'tag_type',
+  `data_id` varchar(255) NOT NULL COMMENT 'data_id',
+  `group_id` varchar(128) NOT NULL COMMENT 'group_id',
+  `tenant_id` varchar(128) DEFAULT '' COMMENT 'tenant_id',
+  `nid` bigint(20) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`nid`),
+  UNIQUE KEY `uk_configtagrelation_configidtag` (`id`,`tag_name`,`tag_type`),
+  KEY `idx_tenant_id` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='config_tag_relation';
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = group_capacity   */
+/******************************************/
+CREATE TABLE `group_capacity` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `group_id` varchar(128) NOT NULL DEFAULT '' COMMENT 'Group ID，空字符表示整个集群',
+  `quota` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配额，0表示使用默认值',
+  `usage` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '使用量',
+  `max_size` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '单个配置大小上限，单位为字节，0表示使用默认值',
+  `max_aggr_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '聚合子配置最大个数，，0表示使用默认值',
+  `max_aggr_size` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '单个聚合数据的子配置大小上限，单位为字节，0表示使用默认值',
+  `max_history_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最大变更历史数量',
+  `gmt_create` datetime NOT NULL DEFAULT '2010-05-05 00:00:00' COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL DEFAULT '2010-05-05 00:00:00' COMMENT '修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_group_id` (`group_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='集群、各Group容量信息表';
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = his_config_info   */
+/******************************************/
+CREATE TABLE `his_config_info` (
+  `id` bigint(64) unsigned NOT NULL,
+  `nid` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `data_id` varchar(255) NOT NULL,
+  `group_id` varchar(128) NOT NULL,
+  `app_name` varchar(128) DEFAULT NULL COMMENT 'app_name',
+  `content` longtext NOT NULL,
+  `md5` varchar(32) DEFAULT NULL,
+  `gmt_create` datetime NOT NULL DEFAULT '2010-05-05 00:00:00',
+  `gmt_modified` datetime NOT NULL DEFAULT '2010-05-05 00:00:00',
+  `src_user` text,
+  `src_ip` varchar(20) DEFAULT NULL,
+  `op_type` char(10) DEFAULT NULL,
+  `tenant_id` varchar(128) DEFAULT '' COMMENT '租户字段',
+  `encrypted_data_key` text NOT NULL COMMENT '秘钥',
+  PRIMARY KEY (`nid`),
+  KEY `idx_gmt_create` (`gmt_create`),
+  KEY `idx_gmt_modified` (`gmt_modified`),
+  KEY `idx_did` (`data_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='多租户改造';
+
+
+/******************************************/
+/*   数据库全名 = nacos_config   */
+/*   表名称 = tenant_capacity   */
+/******************************************/
+CREATE TABLE `tenant_capacity` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `tenant_id` varchar(128) NOT NULL DEFAULT '' COMMENT 'Tenant ID',
+  `quota` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配额，0表示使用默认值',
+  `usage` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '使用量',
+  `max_size` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '单个配置大小上限，单位为字节，0表示使用默认值',
+  `max_aggr_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '聚合子配置最大个数',
+  `max_aggr_size` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '单个聚合数据的子配置大小上限，单位为字节，0表示使用默认值',
+  `max_history_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最大变更历史数量',
+  `gmt_create` datetime NOT NULL DEFAULT '2010-05-05 00:00:00' COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL DEFAULT '2010-05-05 00:00:00' COMMENT '修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_tenant_id` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='租户容量信息表';
+
+
+CREATE TABLE `tenant_info` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `kp` varchar(128) NOT NULL COMMENT 'kp',
+  `tenant_id` varchar(128) default '' COMMENT 'tenant_id',
+  `tenant_name` varchar(128) default '' COMMENT 'tenant_name',
+  `tenant_desc` varchar(256) DEFAULT NULL COMMENT 'tenant_desc',
+  `create_source` varchar(32) DEFAULT NULL COMMENT 'create_source',
+  `gmt_create` bigint(20) NOT NULL COMMENT '创建时间',
+  `gmt_modified` bigint(20) NOT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_tenant_info_kptenantid` (`kp`,`tenant_id`),
+  KEY `idx_tenant_id` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='tenant_info';
+
+CREATE TABLE users (
+	username varchar(50) NOT NULL PRIMARY KEY,
+	password varchar(500) NOT NULL,
+	enabled boolean NOT NULL
+);
+
+CREATE TABLE roles (
+	username varchar(50) NOT NULL,
+	role varchar(50) NOT NULL,
+	constraint uk_username_role UNIQUE (username,role)
+);
+
+CREATE TABLE permissions (
+    role varchar(50) NOT NULL,
+    resource varchar(512) NOT NULL,
+    action varchar(8) NOT NULL,
+    constraint uk_role_permission UNIQUE (role,resource,action)
+);
+
+INSERT INTO users (username, password, enabled) VALUES ('nacos', '$2a$10$EuWPZHzz32dJN7jexM34MOeYirDdFAZm2kuWj7VEOJhhZkDrxfvUu', TRUE);
+
+INSERT INTO roles (username, role) VALUES ('nacos', 'ROLE_ADMIN');
+123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109110111112113114115116117118119120121122123124125126127128129130131132133134135136137138139140141142143144145146147148149150151152153154155156157158159160161162163164165166167168169170171172173174175176177178179180181182183184185186187188189190191192193194195196197198199200201202203204205
+```
+
+##### 5.2、启动Nacos容器
+
+```shell
+#推荐使用这种方式，可以连接自己的数据库
+docker run -d -p 8848:8848 -p 9848:9848 \
+--name nacos \
+--env MODE=standalone \
+--env SPRING_DATASOURCE_PLATFORM=mysql \
+--env MYSQL_SERVICE_HOST=192.168.0.12 \
+--env MYSQL_SERVICE_PORT=3306 \
+--env MYSQL_SERVICE_DB_NAME=nacos \
+--env MYSQL_SERVICE_USER=root \
+--env MYSQL_SERVICE_PASSWORD=wisesoft \
+nacos/nacos-server:latest
+1234567891011
+```
+
+##### 5.3、访问Nacos地址
+
+访问链接：http://ip:8848/nacos
+默认账号：nacos
+默认密码：nacos
+![在这里插入图片描述](Docker.assets/a129c14adf264603b3dfcf4ea4f119c9.png)
+
+##### 5.4、注意事项
+
+该技术文章中，安装的Nacos为`2.0.3`，那么`nacos_config`数据库中的`config_info`和`his_config_info`的 `encrypted_data_key`字段需要删除掉，否则使用Nacos过程中会报错！
+
+参考链接：https://blog.csdn.net/qq_60361946/article/details/127760181
+
+#### 6、安装XXL-JOB
+
+##### 6.1、配置数据库
+
+跟安装nacos一样，需要先准备数据库，这里不做过多解释：
+
+https://github.com/xuxueli/xxl-job/blob/master/doc/db/tables_xxl_job.sql
+
+```sql
+CREATE database if NOT EXISTS `xxl_job` default character set utf8mb4 collate utf8mb4_unicode_ci;
+use `xxl_job`;
+
+SET NAMES utf8mb4;
+
+CREATE TABLE `xxl_job_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `job_group` int(11) NOT NULL COMMENT '执行器主键ID',
+  `job_desc` varchar(255) NOT NULL,
+  `add_time` datetime DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  `author` varchar(64) DEFAULT NULL COMMENT '作者',
+  `alarm_email` varchar(255) DEFAULT NULL COMMENT '报警邮件',
+  `schedule_type` varchar(50) NOT NULL DEFAULT 'NONE' COMMENT '调度类型',
+  `schedule_conf` varchar(128) DEFAULT NULL COMMENT '调度配置，值含义取决于调度类型',
+  `misfire_strategy` varchar(50) NOT NULL DEFAULT 'DO_NOTHING' COMMENT '调度过期策略',
+  `executor_route_strategy` varchar(50) DEFAULT NULL COMMENT '执行器路由策略',
+  `executor_handler` varchar(255) DEFAULT NULL COMMENT '执行器任务handler',
+  `executor_param` varchar(512) DEFAULT NULL COMMENT '执行器任务参数',
+  `executor_block_strategy` varchar(50) DEFAULT NULL COMMENT '阻塞处理策略',
+  `executor_timeout` int(11) NOT NULL DEFAULT '0' COMMENT '任务执行超时时间，单位秒',
+  `executor_fail_retry_count` int(11) NOT NULL DEFAULT '0' COMMENT '失败重试次数',
+  `glue_type` varchar(50) NOT NULL COMMENT 'GLUE类型',
+  `glue_source` mediumtext COMMENT 'GLUE源代码',
+  `glue_remark` varchar(128) DEFAULT NULL COMMENT 'GLUE备注',
+  `glue_updatetime` datetime DEFAULT NULL COMMENT 'GLUE更新时间',
+  `child_jobid` varchar(255) DEFAULT NULL COMMENT '子任务ID，多个逗号分隔',
+  `trigger_status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '调度状态：0-停止，1-运行',
+  `trigger_last_time` bigint(13) NOT NULL DEFAULT '0' COMMENT '上次调度时间',
+  `trigger_next_time` bigint(13) NOT NULL DEFAULT '0' COMMENT '下次调度时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `xxl_job_log` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `job_group` int(11) NOT NULL COMMENT '执行器主键ID',
+  `job_id` int(11) NOT NULL COMMENT '任务，主键ID',
+  `executor_address` varchar(255) DEFAULT NULL COMMENT '执行器地址，本次执行的地址',
+  `executor_handler` varchar(255) DEFAULT NULL COMMENT '执行器任务handler',
+  `executor_param` varchar(512) DEFAULT NULL COMMENT '执行器任务参数',
+  `executor_sharding_param` varchar(20) DEFAULT NULL COMMENT '执行器任务分片参数，格式如 1/2',
+  `executor_fail_retry_count` int(11) NOT NULL DEFAULT '0' COMMENT '失败重试次数',
+  `trigger_time` datetime DEFAULT NULL COMMENT '调度-时间',
+  `trigger_code` int(11) NOT NULL COMMENT '调度-结果',
+  `trigger_msg` text COMMENT '调度-日志',
+  `handle_time` datetime DEFAULT NULL COMMENT '执行-时间',
+  `handle_code` int(11) NOT NULL COMMENT '执行-状态',
+  `handle_msg` text COMMENT '执行-日志',
+  `alarm_status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '告警状态：0-默认、1-无需告警、2-告警成功、3-告警失败',
+  PRIMARY KEY (`id`),
+  KEY `I_trigger_time` (`trigger_time`),
+  KEY `I_handle_code` (`handle_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `xxl_job_log_report` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `trigger_day` datetime DEFAULT NULL COMMENT '调度-时间',
+  `running_count` int(11) NOT NULL DEFAULT '0' COMMENT '运行中-日志数量',
+  `suc_count` int(11) NOT NULL DEFAULT '0' COMMENT '执行成功-日志数量',
+  `fail_count` int(11) NOT NULL DEFAULT '0' COMMENT '执行失败-日志数量',
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `i_trigger_day` (`trigger_day`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `xxl_job_logglue` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `job_id` int(11) NOT NULL COMMENT '任务，主键ID',
+  `glue_type` varchar(50) DEFAULT NULL COMMENT 'GLUE类型',
+  `glue_source` mediumtext COMMENT 'GLUE源代码',
+  `glue_remark` varchar(128) NOT NULL COMMENT 'GLUE备注',
+  `add_time` datetime DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `xxl_job_registry` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `registry_group` varchar(50) NOT NULL,
+  `registry_key` varchar(255) NOT NULL,
+  `registry_value` varchar(255) NOT NULL,
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `i_g_k_v` (`registry_group`,`registry_key`,`registry_value`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `xxl_job_group` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `app_name` varchar(64) NOT NULL COMMENT '执行器AppName',
+  `title` varchar(12) NOT NULL COMMENT '执行器名称',
+  `address_type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '执行器地址类型：0=自动注册、1=手动录入',
+  `address_list` text COMMENT '执行器地址列表，多地址逗号分隔',
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `xxl_job_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL COMMENT '账号',
+  `password` varchar(50) NOT NULL COMMENT '密码',
+  `role` tinyint(4) NOT NULL COMMENT '角色：0-普通用户、1-管理员',
+  `permission` varchar(255) DEFAULT NULL COMMENT '权限：执行器ID列表，多个逗号分割',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `i_username` (`username`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `xxl_job_lock` (
+  `lock_name` varchar(50) NOT NULL COMMENT '锁名称',
+  PRIMARY KEY (`lock_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `xxl_job_group`(`id`, `app_name`, `title`, `address_type`, `address_list`, `update_time`) VALUES (1, 'xxl-job-executor-sample', '示例执行器', 0, NULL, '2018-11-03 22:21:31' );
+INSERT INTO `xxl_job_info`(`id`, `job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`) VALUES (1, 1, '测试任务1', '2018-11-03 22:21:31', '2018-11-03 22:21:31', 'XXL', '', 'CRON', '0 0 0 * * ? *', 'DO_NOTHING', 'FIRST', 'demoJobHandler', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', '2018-11-03 22:21:31', '');
+INSERT INTO `xxl_job_user`(`id`, `username`, `password`, `role`, `permission`) VALUES (1, 'admin', 'e10adc3949ba59abbe56e057f20f883e', 1, NULL);
+INSERT INTO `xxl_job_lock` ( `lock_name`) VALUES ( 'schedule_lock');
+
+commit;
+123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109110111112113114115116117
+```
+
+##### 6.2、配置docker-compose.yml文件
+
+```yml
+version: "2.2"
+services:
+  xxl-job-admin:
+    restart: always
+    image: xuxueli/xxl-job-admin:2.3.1
+    container_name: xxl-job-admin
+    volumes:
+      - /data/xxl-job-admin/logs:/data/applogs
+    ports:
+      - "8800:8800"
+    environment:
+      PARAMS: '
+      --server.port=8800
+      --server.servlet.context-path=/xxl-job-admin
+      --spring.datasource.url=jdbc:mysql://120.53.242.235:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+      --spring.datasource.username=root
+      --spring.datasource.password=root      
+      --xxl.job.accessToken=Lpoms_xxljob_default_token'
+123456789101112131415161718
+```
+
+##### 6.3、运行docker-compose.yml文件
+
+```shell
+# 启动 docker-compose
+docker-compose up -d
+12
+```
+
+启动完成后访问：[http://ip:8800/xxl-job-admin/](http://120.53.242.235:8800/xxl-job-admin/)
+默认账号：admin
+默认密码：123456
+![在这里插入图片描述](Docker.assets/e13dc579e4ff428699f719e592bc97a7.png)
+
+#### 7、安装Sentinel
+
+##### 7.1、下拉Sentinel镜像
+
+```shell
+# DockerHub仓库搜索Sentinel镜像
+docker search sentinel
+
+# 下拉Sentinel镜像
+docker pull bladex/sentinel-dashboard
+12345
+```
+
+##### 7.2、启动Sentinel容器
+
+```shell
+docker run --name sentinel-dashboard -p 8858:8858 -d bladex/sentinel-dashboard:latest  
+1
+```
+
+##### 7.3、访问Sentinel
+
+启动完成后，访问地址：http://ip:8858
+登录账号： sentinel
+登录密码：sentinel
+![在这里插入图片描述](Docker.assets/4fe997b3876d45929034f0872366c675.png)
+
+#### 8、安装Jenkins
+
+##### 8.1、下拉Jenkins镜像
+
+```shell
+docker pull jenkins/jenkins
+1
+```
+
+##### 8.2、启动Jenkins容器
+
+```shell
+# 先创建挂载目录，分配权限
+mkdir -p /mydata/jenkins_home/
+chmod 777 /mydata/jenkins_home/
+
+# 启动容器
+docker run -d -p 8080:8080 -p 50000:50000 -v /mydata/jenkins_home:/var/jenkins_home -v /etc/localtime:/etc/localtime --name jenkins jenkins/jenkins
+123456
+```
+
+##### 8.3、配置镜像加速
+
+```shell
+# 进入挂载目录
+cd /mydata/jenkins_home
+
+# 修改配置文件，将url标签内容修改为清华大学官方镜像
+# https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
+vim hudson.model.UpdateCenter.xml
+123456
+```
+
+##### 8.4、访问Jenkins
+
+获取Jenkins登录密码：
+
+```shell
+# 查看Jenkins密码
+cat /mydata/jenkins_home/secrets/initialAdminPassword
+12
+```
+
+浏览器输入ip:8080，进入到Jenkins页面，输入密码登录即可：
+![在这里插入图片描述](Docker.assets/1c0bde059e344ba295a64fa082ad0db6.png)
+
+#### 9、安装Kafka
+
+##### 9.1、启动Zookpeer容器
+
+```shell
+# 建立网络
+docker network create app-tier --driver bridge
+
+# 安装Zookpeer
+docker run -d --name zookeeper-server \
+    --network app-tier \
+    -e ALLOW_ANONYMOUS_LOGIN=yes \
+    bitnami/zookeeper:latest
+12345678
+```
+
+##### 9.2、启动Kafka容器
+
+```shell
+docker run -d --name kafka-server \
+    --network app-tier \
+    -p 9092:9092 \
+    -e ALLOW_PLAINTEXT_LISTENER=yes \
+    -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181 \
+    -e KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://192.168.0.101:9092 \
+    bitnami/kafka:latest
+1234567
+```
+
+#### 10、安装Minio
+
+##### 10.1、下拉Minio镜像
+
+```shell
+docker pull minio/minio
+1
+```
+
+##### 10.2、启动Minio容器
+
+```shell
+# 创建挂载目录
+mkdir -p /home/minio/config
+mkdir -p /home/minio/data
+
+# 启动容器
+docker run -p 9000:9000 -p 9090:9090 \
+     --name minio \
+     -d --restart=always \
+     -e "MINIO_ACCESS_KEY=minioadmin" \
+     -e "MINIO_SECRET_KEY=minioadmin" \
+     -v /home/minio/data:/data \
+     -v /home/minio/config:/root/.minio \
+     minio/minio server \
+     /data --console-address ":9090" -address ":9000"
+1234567891011121314
+```
+
+##### 10.3、访问Minio
+
+通过`ip:9090/login`即可访问Minio：
+![在这里插入图片描述](Docker.assets/e85294c04fdb4db8a38e66bc543776ca.png)
+
 ## 七、数据卷【`重点`】
 
- 数据卷：将宿主机的一个目录映射到容器的一个目录中。可以在宿主机中操作目录中的内容，那么容器内部映射的文件，也会跟着一起改变。**容器的持久化和数据共享同步操作！**
+> 容器的持久化和数据共享同步操作！ **只要数据卷相同可以和Docker-Compose一键部署的容器共享**
+
+数据卷：将宿主机的一个目录映射到容器的一个目录中。可以在宿主机中操作目录中的内容，那么容器内部映射的文件，也会跟着一起改变。**容器的持久化和数据共享同步操作！**
 
 Docker 不支持在已经运行的容器中动态追加数据卷。一旦容器创建后，数据卷的挂载路径是固定的，无法直接追加新的数据卷或更改挂载点。
 
@@ -1322,7 +2079,9 @@ docker exec -it test2 /bin/bash
 
 测试结果都能ping通
 
-## 九、Dockerfile自定义镜像【`重点`】
+## 九、Dockerfile自定义镜像:crossed_swords:【`重点`】
+
+**作用之一:  Dockerfile的作用是将后端SpringBoot的项目Jar包build成Docker镜像。**
 
 可以从中央仓库下载一个镜像，也可以自己手动去制作一个镜像，需要通过Dockerfile去指定自定义镜像的信息
 
@@ -2151,7 +2910,9 @@ $ docker run -it --cpus=1 -m=2048m --pids-limit=1000 busybox sh
 
 文章知识点与官方知识档案匹配，可进一步学习相关知识
 
-## 十、Docker-Compose【`重点`】
+## 十、Docker-Compose:crossed_swords: 【`重点`】
+
++ DockerCompose的作用是批量操作Docker容器，可以一键部署环境。
 
 + Docker Compose是一个工具，用于定义和运行多容器应用程序的工具；
 + Docker Compose通过yml文件定义多容器的docker应用；
@@ -2163,10 +2924,30 @@ $ docker run -it --cpus=1 -m=2048m --pids-limit=1000 busybox sh
 [Docker Compose介绍和安装](https://blog.csdn.net/juanxiaseng0838/article/details/127553225)
 
 + 独立安装的Compose，不论是V1还是V2版本，指令都是docker-compose（中间是短横线）
-
 + 插件安装的Compose，在V2版本，指令是docker compose（中间是空格），最新版的docker安装时会自动以插件的形式安装docker compose
++ Docker Compose安装的最新的版本Docker Compose version v2.12.2，对于Mac和Windows安装好Docker以后，就已经安装好Docker Compose，不需要手动安装
 
-Docker Compose安装的最新的版本Docker Compose version v2.12.2，对于Mac和Windows安装好Docker以后，就已经安装好Docker Compose，不需要手动安装，这里的安装方式是基于Linux的Cnetos的，可以参考[官方网站](https://docs.docker.com/compose/install/)去安装。
+**单独安装**
+
+```shell
+# 安装DockerCompose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+# 或者
+curl -SL "https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+# 分配权限
+sudo chmod +x /usr/local/bin/docker-compose
+
+# 查看版本
+docker-compose --version
+
+#卸载
+sudo rm /usr/local/bin/docker-compose
+```
+
+**插件安装**
+
+这里的安装方式是基于Linux的Cnetos的，可以参考[官方网站](https://docs.docker.com/compose/install/)去安装。
 
 ```shell
 [root@localhost ~]# sudo yum install docker-compose-plugin
@@ -2182,19 +2963,6 @@ Loading mirror speeds from cached hostfile
 ```
 
 ![image-20231002194648410](Docker.assets/image-20231002194648410-169646749658822.png)
-
-查看安装情况
-
-```shell
-[root@localhost ~]# docker compose version
-Docker Compose version v2.12.2
-```
-
-卸载
-
-```shell
-sudo rm /usr/local/bin/docker-compose
-```
 
 #### Docker Compose基本命令
 
@@ -2421,7 +3189,7 @@ Commands:
 Run 'docker compose COMMAND --help' for more information on a command.
 ```
 
-安装
+**使用**
 
 ```shell
 docker compose -f docker-compose.yml up -d
@@ -2904,7 +3672,39 @@ curl http://172.21.122.231/hello
 
 ![img](Docker.assets/1627204247825-43503cbc-884d-4e02-ab78-3ba1b661628e-169646749658826.png)
 
+#### 实战2
 
+当你的应用需要多个容器协同工作时，可以使用Docker Compose来简化管理。例如，一个Web应用可能需要一个Web服务器容器和一个数据库容器。
+
+**编写`docker-compose.yml`文件**
+
+```yaml
+version: '3'
+
+services:
+  web:
+    image: my-web-app
+    ports:
+      - "80:80"
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+```
+
+ 使用Docker Compose
+
+**启动所有服务：**
+
+```text
+docker-compose up -d
+```
+
+**停止所有服务：**
+
+```text
+docker-compose down
+```
 
 ## 十一、Docker CI、CD
 

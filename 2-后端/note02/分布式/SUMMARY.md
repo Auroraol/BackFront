@@ -95,6 +95,24 @@ spring.redis.1ettuce.pool.max-idle=8
 spring.redis.lettuce.pool.min-idle=0
 ```
 
+注意:
+
+spring.redis是 Spring Boot 1.x 版本中使用的配置前缀，用于配置与 Redis 相关的参数，如连接地址、端口、密码等。配置文件参数如下：
+
+```
+spring.redis.host=localhost
+spring.redis.port=6379
+spring.redis.password=mypassword
+```
+
+spring.data.redis则是从 Spring Boot 2.x 版本开始引入的新的配置前缀，也用于配置 Redis 的相关参数。配置文件参数如下：
+
+```
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+spring.data.redis.password=mypassword
+```
+
 ### pom
 
 部分

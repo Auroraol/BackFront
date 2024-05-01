@@ -617,7 +617,7 @@ public class Timetest implements Serializable {
 
 搭配`@JsonFormat` 注解的优先级比较高，会以 `@JsonFormat` 注解的时间格式为主。
 
-在搭配 下述注解进行序列化反序列化操作(比如entity中时间数据存入Redis中)
+**在搭配 下述注解进行序列化反序列化操作(比如entity中时间数据存入Redis中)**
 
 ```java
 // 推荐 jackson  

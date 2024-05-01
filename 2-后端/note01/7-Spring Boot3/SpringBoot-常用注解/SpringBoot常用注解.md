@@ -3334,6 +3334,10 @@ public class test1 {
 
 ### @EqualsAndHashCode(callSuper = true)
 
+1. 如果比较两个对象时需要考虑父类（基类，超类）中的成员，使用`@EqualsAndHashCode(callSuper=true)`，才能正确比较
+2. 如果只是想在当前类比较字段，使用`@EqualsAndHashCode(callSuper=false)`，或者不使用，它是默认选项
+3. 如果全部要比较 或 全部不需要比较 父类成员，使用全局配置 lombok.config
+
 举个简单的例子：
 这边先定义一个分类对象 Parent，有一个属性：code
 
@@ -4826,7 +4830,7 @@ public class Client implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-
+    @JsonIgnore  // 忽略,不返回
     @NotBlank(message = "客户端秘钥不能为空")
     @ApiModelProperty(value = "客户端秘钥")
     private String clientSecret;
