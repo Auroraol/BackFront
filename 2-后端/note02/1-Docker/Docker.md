@@ -800,7 +800,6 @@ default_character_set=utf8
 [mysqld]
 collation_server = utf8_general_ci
 character_set_server = utf8
-123456
 ```
 
 ##### 3.4.2 查看字符集是否修改成功
@@ -1092,7 +1091,6 @@ docker run -p 6379:6379 --name redis -v /mydata/redis/data:/data \
 
 # 查看Redis是否启动
 docker ps
-123456789101112
 ```
 
 #### 4、安装ElasticSearch
@@ -1741,6 +1739,10 @@ docker volume create 数据卷名称
 docker volume inspect 数据卷名称
 ```
 
+在输出中找到 "Mounts" 部分，其中列出了容器挂载的所有卷。
+
+<img src="Docker.assets/image-20240505121046295.png" alt="image-20240505121046295" style="zoom:67%;" />
+
 #### 7.3 查看全部数据卷
 
 查看全部数据卷信息
@@ -1763,6 +1765,7 @@ docker volume rm 数据卷名称
 
 - 通过数据卷名称映射，如果数据卷不存在。Docker会帮你自动创建，会将容器内部自带的文件，存储在默认的存放路径中。
 - 通过路径映射数据卷，直接指定一个路径作为数据卷的存放位置。但是这个路径下是空的。
+- 删除的时候最好都删除了, 不然有些配置一直改不了
 
 语法
 
@@ -1796,7 +1799,7 @@ $ docker run --name server -v ~/data_volume:/data:ro -it ubuntu /bin/bash
 - `ro` read only
 - `rw` read write
 
-#### 7.7 通过Dockerfile挂载(推荐)
+#### 7.7 通过Dockerfile挂载
 
 **编写dockerfile**
 
@@ -1940,6 +1943,14 @@ docker run --volumes-from jenkins-data -v /buckup:/home centos tar cvf /home/jen
 ![image-20231120142656336](Docker.assets/image-20231120142656336.png)
 
 ![image-20231003231909315](Docker.assets/image-20231003231909315.png)
+
+#### 查看挂载情况
+
+```
+
+```
+
+
 
 ## 八  Docker 容器网络连接
 
@@ -2976,7 +2987,9 @@ docker-compose up [options] [SERVICE...]
 docker compose -f docker-compose.yml up -d
 ```
 
-默认情况，如果服务容器已经存在，`docker-compose up` 将会尝试停止容器，然后重新创建（保持使用 `volumes-from` 挂载的卷），以保证新启动的服务匹配 `docker-compose.yml` 文件的最新内容。如果用户不希望容器被停止并重新创建，可以使用 `docker-compose up --no-recreate`。这样将只会启动处于停止状态的容器，而忽略已经运行的服务。如果用户只想重新部署某个服务，可以使用 `docker-compose up --no-deps -d <SERVICE_NAME>` 来重新创建服务并后台停止旧服务，启动新服务，并不会影响到其所依赖的服务。
+默认情况，如果服务容器已经存在，`docker-compose up` 将会尝试停止容器，然后重新创建（保持使用 `volumes-from` 挂载的卷），以保证新启动的服务匹配 `docker-compose.yml` 文件的最新内容。
+
+如果用户不希望容器被停止并重新创建，可以使用 `docker-compose up --no-recreate`。这样将只会启动处于停止状态的容器，而忽略已经运行的服务。如果用户只想重新部署某个服务，可以使用 `docker-compose up --no-deps -d <SERVICE_NAME>` 来重新创建服务并后台停止旧服务，启动新服务，并不会影响到其所依赖的服务。
 
 **services** **可以选择只启动一个服务，默认启动所有的服务**
 
@@ -3704,6 +3717,41 @@ docker-compose up -d
 
 ```text
 docker-compose down
+```
+
+#### 使用
+
+解决方案：
+1、避免直接挂载文件，而是挂载目录；
+2、如果真要挂载文件，那么要将文件权限修改为777
+
+```apache
+chmod 777 挂载文件
+```
+
+**启动所有服务：**
+
+##### 配置未变
+
+用于启动已经存在的服务容器，如果服务容器不存在则会自动创建
+
+```text
+docker-compose up -d
+```
+
+##### 配置改变
+
+用于重新构建服务容器。如果服务容器已经存在，该命令会先停止并移除现有的容器，然后重新构建并启动容器。
+
+```
+docker-compose up --build -d
+```
+
+或者 先停止所有服务再启动所有服务
+
+```text
+docker-compose down
+docker-compose up -d
 ```
 
 ## 十一、Docker CI、CD

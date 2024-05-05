@@ -15711,6 +15711,30 @@ const userInfo = computed(() => {
 
 但是 userInfo为空时, 直接用userInfo.xxx 依然报错
 
+ avatar可能未定义
+
+在这种情况下，你可以使用 JavaScript 中的条件运算符（ternary operator）来检查 `userInfo.avatar` 是否已定义，如果未定义，则使用默认头像。这样可以避免出现未定义错误。以下是一个示例代码：
+
+```js
+<el-avatar
+    style="cursor: pointer"
+    :size="45"
+    :src="userInfo.avatar ? userInfo.avatar : defaultAvatar"
+/>
+```
+
+或者，你也可以使用 JavaScript 中的逻辑与（logical AND）运算符 `&&` 来实现同样的逻辑，如下所示：
+
+```js
+<el-avatar
+    style="cursor: pointer"
+    :size="45"
+    :src="userInfo.avatar && userInfo.avatar !== '' ? userInfo.avatar : defaultAvatar"
+/>
+```
+
+这两种方法都会首先检查 `userInfo.avatar` 是否已定义（不是 `undefined` 或者 `null`），如果已定义且不为空字符串，则使用用户头像，否则使用默认头像。
+
  <span style="color:red">**②  注意: 空数组[]不能判断,  判断方法 array.length === 0;**</span>
 
 默认值问题, 如果 `props.selectedTags` 是一个空数组 `[]`，它会被视为存在但是为空。
