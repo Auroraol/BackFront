@@ -5100,7 +5100,8 @@ public class RedisConfig {
     //    return template;
     //}
     //
-    FastJsonRedisSerializer
+    
+    //FastJsonRedisSerializer
     //@Bean("redisTemplate")
     //public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory){
     //    RedisTemplate<String, Object> template = new RedisTemplate<>();

@@ -102,5 +102,43 @@ https://cdjwc.webvpn.ccu.edu.cn/jsxsd/xskb/xskb_list.do
 
 
 
+# Postman如何导入和导出接口文件
+
+
+
+## **生成****json文件导入的方式**
+
+### 2.1、导出json文件
+
+![img](Postman%E4%BD%BF%E7%94%A8.assets/8e49c62f937543f5a84dcb1386ab1ea4.png)
+
+
+
+选择版本，导出
+
+![img](Postman%E4%BD%BF%E7%94%A8.assets/5613b8ca3919492ca86a41f3669a6ef5.png)
+
+
+
+选择导出文件存放位置
+
+![img](Postman%E4%BD%BF%E7%94%A8.assets/d542d790fdee4430af87794f4f6ed8c5.png)
+
+### 
+
+### 2.2、导入json文件
+
+![img](Postman%E4%BD%BF%E7%94%A8.assets/0f1f15aa66334ff9984942066a17c5ad.png)
+
+
+
+![image-20240508223418054](Postman%E4%BD%BF%E7%94%A8.assets/image-20240508223418054.png)
+
+选择导出的json文件进行导入
+
+![img](Postman%E4%BD%BF%E7%94%A8.assets/970ccd291a7f40299ef9e9d08f86a067.png)
+
+
+
 
 

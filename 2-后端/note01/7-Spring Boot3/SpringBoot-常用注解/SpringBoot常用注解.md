@@ -3337,6 +3337,7 @@ public class test1 {
 1. 如果比较两个对象时需要考虑父类（基类，超类）中的成员，使用`@EqualsAndHashCode(callSuper=true)`，才能正确比较
 2. 如果只是想在当前类比较字段，使用`@EqualsAndHashCode(callSuper=false)`，或者不使用，它是默认选项
 3. 如果全部要比较 或 全部不需要比较 父类成员，使用全局配置 lombok.config
+4. 保存Reids数据 
 
 举个简单的例子：
 这边先定义一个分类对象 Parent，有一个属性：code
@@ -4643,13 +4644,7 @@ public static class MyCustomFilter extends SimpleBeanPropertyFilter {
 }
 ```
 
-Copy
-
-
-
 然后，在Person类中使用@JsonInclude注解，指定序列化过程中使用上面定义的自定义序列化过滤器：
-
-
 
 ```java
 public class Person {
@@ -4661,12 +4656,6 @@ public class Person {
   // getter and setter omitted
 }
 ```
-
-Copy
-
-
-
-这样，当序列化Person对象时，就使用自定义的序列化过滤器。
 
 ## @JsonSerialize和@JsonDeserialize的使用详解
 
@@ -4700,8 +4689,6 @@ Copy
 \2. @JsonDeserialize：json[反序列化](https://so.csdn.net/so/search?q=反序列化&spm=1001.2101.3001.7020)注解，用于字段或set方法上，作用于setter()方法，将json数据反序列化为java对象。使用方法同@JsonSerialize类似。
 
 3.常用于对数据进行简单的特殊处理，比如本次项目实践用到的，对金额类数据进行格式化操作。
-
-
 
 需要注意的是，该注解只在json序列化和反序列化的时候触发，其他时候并不生效！
 
@@ -4805,6 +4792,63 @@ public class HistoryOrderBean {
 
 4.注解失效：
 如果注解失效，可能是因为你使用的是fastJson，尝试使用对应的注解来忽略字段，注解为：@JSONField(serialize = false)，使用方法一样。
+
+# 针对redis
+
+```java
+package com.lfj.blog.service.vo;
+
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.lfj.blog.entity.Article;
+import com.lfj.blog.entity.Category;
+import com.lfj.blog.entity.Tag;
+import com.lfj.blog.entity.User;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+
+import java.util.List;
+
+/**
+ * ArticleVo对象
+ * 文章返回前端对象
+ * 文章详细对象
+ **/
+@Data
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)           //  []  
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@ApiModel(value = "ArticleVo对象", description = "文章详细对象")
+public class ArticleVo extends Article {
+
+	@ApiModelProperty("作者信息")
+	private User user;
+
+	@ApiModelProperty("标签列表")
+	private List<Tag> tagList;
+
+	@ApiModelProperty("分类列表,顺序:root node2 node3")
+	private List<Category> categoryList;
+
+	@ApiModelProperty("上一篇")
+	private Article previous;
+
+	@ApiModelProperty("下一篇")
+	private Article next;
+
+	@ApiModelProperty("推荐分数")
+	private Double recommendScore;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@JsonSerialize(using = LocalDateTimeSerializer.class)  //序列化                 []
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class) //方序列化            []
+	@TableField(value = "publish_time")
+	private LocalDateTime publishTime;
+}
+```
 
 
 

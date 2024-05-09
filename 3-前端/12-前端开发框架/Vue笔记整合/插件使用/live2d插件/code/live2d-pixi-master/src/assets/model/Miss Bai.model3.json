@@ -1,0 +1,37 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "Miss Bai.moc3",
+		"Textures": [
+			"Miss Bai.4096/texture_00.png"
+		],
+		"Physics": "Miss Bai.physics3.json",
+		"DisplayInfo": "Miss Bai.cdi3.json",
+		"Motions": {
+			"weapon": [{
+				"Name": "weapon",
+				"File": "weapon.motion3.json",
+				"Sound": "reaction.ogg"
+			}]
+		}
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		}
+	],
+	"HitAreas": [{
+		"Name": "dress",
+		"Id": "dress"
+	}]
+}

@@ -456,6 +456,49 @@ maxlength="10" show-word-limit
 
 ![image-20240404214550169](Element%E7%AC%94%E8%AE%B0.assets/image-20240404214550169.png)
 
+## 回车搜索
+
+```ts
+<el-input
+    style="width: 350px; padding: 0 70px"
+    v-model="keyword"
+    placeholder="搜索文章"
+    @focus="inputFocus"
+    @blur="inputBlur"
+    @keyup.enter.native="search"
+    class="search"
+    suffix-icon="el-icon-search"
+></el-input>
+
+            
+            // 搜索框聚焦
+const inputFocus = () => {
+  inputIconColor.value = "#1989fa";
+};
+
+// 搜索框失焦
+const inputBlur = () => {
+  inputIconColor.value = "";
+};
+
+// 搜索
+const search = () => {
+  const keywordValue = keyword.value;
+  if (keywordValue) {
+    router.push({
+      path: "/search",
+      query: { keyword: keywordValue },
+    });
+  }
+};
+```
+
+
+
+
+
+
+
 # 分页组件el-pagination显示英文转变为中文
 
 ![image-20231127195410463](Element%E7%AC%94%E8%AE%B0.assets/image-20231127195410463.png)
@@ -1654,6 +1697,15 @@ div里标签元素居中(一般用于<标签>文字</标签>有文字的标签)
 
 
 
+# 满div
+
+```
+padding: 0;
+margin: 0;
+```
+
+
+
 # 日历
 
  [记录改造elementui日历组件实例（日报月报）.html](..\..\..\..\..\..\Desktop\Browser Download\记录改造elementui日历组件实例（日报月报）.html) 
@@ -2792,6 +2844,47 @@ form表单
       margin-left: auto; /* 推到容器的右侧 */
 ```
 
+始终在右侧
+
+```vue
+<style scoped>
+.nav {
+  display: flex;
+  justify-content: space-between; // 让子元素在父元素两端对齐
+}
+
+.el-menu-demo {
+  flex-grow: 1; // 让菜单占据剩余空间
+}
+
+.nav-user-info {
+  margin-left: auto; // 将组件移到最右侧
+}
+</style>
+
+<template>
+  <el-row class="nav" v-if="device !== 'desktop'">
+    <el-col :span="24">
+      <el-menu
+        :default-active="activeIndex"
+        class="el-menu-demo"
+        mode="horizontal"
+        @select="handleSelect"
+        background-color="transparent"
+        active-text-color="#79bbff"
+      >
+        <el-menu-item index="/index">首页</el-menu-item>
+      </el-menu>
+      <nav-user-info :userInfo="userInfo" v-else></nav-user-info>
+    </el-col>
+  </el-row>
+</template>
+```
+
+![image-20240507113003762](Element%E7%AC%94%E8%AE%B0.assets/image-20240507113003762.png)
+
+
+
 
 
 # 分割线
@@ -3639,6 +3732,35 @@ box-sizing: border-box;
   border-bottom: 2px solid #000; /* 底边框为 2px 实线，颜色为黑色 */
 }
 ```
+
+
+
+如果你想在 CSS 中设置 `border-bottom`，并且使用 `hsla` 来定义颜色，那么你可以根据以下示例来设置：
+
+```
+cssCopy Code.my-element {
+    border-bottom: 1px solid hsla(0, 0%, 10.2%, 0.1);
+}
+```
+
+这段代码在 `.my-element` 类的元素上设置了底部边框，边框的颜色是半透明的深灰色，透明度为 0.1。你可以根据需要调整 HSLA 参数中的色相、饱和度、亮度和透明度，来获得你想要的颜色效果。
+
+在 HSLA 中：
+
+- 第一个值是色相（Hue），通常取 0 到 360 度。
+- 第二个值是饱和度（Saturation），取 0% 到 100%。
+- 第三个值是亮度（Lightness），也取 0% 到 100%。
+- 第四个值是透明度（Alpha），取 0 到 1。
+
+如果你希望加深颜色，你可以增加亮度值或者将透明度调高，例如：
+
+```
+cssCopy Code.my-element {
+    border-bottom: 1px solid hsla(0, 0%, 10.2%, 0.5);
+}
+```
+
+这样会让底部边框更显眼。你可以根据实际效果来调整这些值。
 
 
 
@@ -4732,7 +4854,17 @@ cssCopy Code.comment-content {
 
 <img src="Element%E7%AC%94%E8%AE%B0.assets/image-20240427230325857.png" alt="image-20240427230325857" style="zoom: 50%;" />
 
+## 修改el-card中header或body样式或自定义图片样式
 
+[修改el-card中header或body样式或自定义图片样式_el-card 样式-CSDN博客](https://blog.csdn.net/qq_50276105/article/details/127315880)
+
+```
+.el-card {
+  /deep/ .el-card__header {
+    background-color: lightblue;
+  }
+}
+```
 
 
 
@@ -4914,3 +5046,471 @@ spanPropGroup(data);
 ```
 
 [ElementuiPlus的table组件实现行拖动与列拖动_element-plus-table-dragable-CSDN博客](https://blog.csdn.net/qq_52845451/article/details/134205694)
+
+
+
+# 响应式布局的实现方式（5种）
+
+## 1、百分比布局
+
+> 百分比是相对于 包含块 的计量单位，通过对属性设置百分比来适应不同的屏幕
+>
+> **包含块：**
+>
+> \1. 有父元素相对于父元素
+>
+> \2. 无父元素相对于视口
+>
+> \3. 或者继承于父元素
+
+```xml
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title> %和rem 布局</title>
+    <style>
+      html {
+        font-size: 30px;
+      }
+      .box2 {
+        width: 10rem;
+        height: 10rem;
+        background-color: plum;
+      }
+      .box {
+        width: 80%;
+        height: 200px;
+        background-color: aquamarine;
+      }
+      .part {
+        width: 80%;
+        height: 80%;
+        background-color: pink;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="part"></div>
+    </div>
+    <div class="box2"></div>
+  </body>
+</html>
+```
+
+## 2、rem布局 
+
+> ##  rem（font size of the root element）是指相对于根元素的字体大小的单位，rem只是一个相对单位
+>
+> ​      题外： rem和em的对比
+>
+> ​        \1. rem和em都是相对单位
+>
+> ​        \2. rem相对于根元素
+>
+> ​        \3. em相对于父元素
+>
+> ​      情景描述：
+>
+> ​      \1. 设置HTML的根元素的font-size为20px
+>
+> ​      \2. 设置红色的正方形宽高为2rem
+>
+> ​      \3. 设置绿色的正方形宽高为40px
+>
+> ​      \4. 从图中可以看出两个正方形一样宽高
+>
+> ​      \5. 所以1rem === 根元素字号 === 20px
+
+```xml
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rem布局</title>
+    <style>
+      html {
+        font-size: 20px;
+      }
+      .r1 {
+        width: 2rem;
+        height: 2rem;
+        background-color: plum;
+      }
+      .r2 {
+        width: 40px;
+        height: 40px;
+        background-color: aquamarine;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="r1"></div>
+    <div class="r2"></div>
+  </body>
+</html>
+```
+
+<img src="Element%E7%AC%94%E8%AE%B0.assets/image-20240506224151702.png" alt="image-20240506224151702" style="zoom: 50%;" />
+
+
+
+## 3 媒体查询 @media screen        
+
+```xml
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@media screen</title>
+    <style>
+      .box {
+        width: 10rem;
+        height: 10rem;
+        background-color: pink;
+        margin-left: 20rem;
+      }
+      @media screen and (min-width: 1200px) {
+        html {
+          font-size: 20px;
+        }
+      }
+      @media screen and (max-width: 1200px) {
+        html {
+          font-size: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box"></div>
+  </body>
+</html>
+```
+
+
+
+## **4 flex布局** 
+
+```html
+<div
+        class="edit-head-right"
+        style="display: flex; justify-content: space-between"
+      >
+        <el-select v-model="articleWrite.original" class="col" style="flex: 1">
+          <el-option
+            v-for="(option, index) in options"
+            :key="index"
+            :label="option.name"
+            :value="option.value"
+          />
+        </el-select>
+
+        <el-select
+          v-model="articleWrite.categoryId"
+          class="col"
+          placeholder="选择分类"
+          style="flex: 1"
+        >
+          <el-option
+            v-for="(category, index) in categories"
+            :key="index"
+            :label="category.name"
+            :value="category.id"
+          />
+        </el-select>
+
+        <el-button
+          class="col"
+          type="warning"
+          :loading="loading1"
+          @click="save(1)"
+          style="flex: 1"
+          >保存</el-button
+        >
+        <el-button
+          class="col"
+          type="danger"
+          :loading="loading"
+          @click="save(0)"
+          style="flex: 1"
+          >发布</el-button
+        >
+      </div>
+   </div>
+```
+
+![image-20240506224248832](Element%E7%AC%94%E8%AE%B0.assets/image-20240506224248832.png)
+
+这段代码将`.edit-head-right`元素设置为Flex容器，并使用`justify-content: space-between;`将子元素分散对齐。然后，每个子元素都被赋予了`flex: 1;`属性，使它们平均分配剩余的空间。
+
+## 5、vw 和 vh
+
+> `vw`表示相对于视图窗口的宽度，`vh`表示相对于视图窗口高度，除了`vw`和`vh`外，还有`vmin`和`vmax`两个相关的单位。各个单位具体的含义如下：
+>
+> | 单位 | 含义                                                      |
+> | :--- | :-------------------------------------------------------- |
+> | vw   | 相对于视窗的宽度，1vw 等于视口宽度的1%，即视窗宽度是100vw |
+> | vh   | 相对于视窗的高度，1vh 等于视口高度的1%，即视窗高度是100vh |
+> | vmin | vw和vh中的较小值                                          |
+> | vmax | vw和vh中的较大值                                          |
+
+
+
+# 响应式布局
+
+
+
+替换同级的
+
+
+
+```
+  @media screen and (max-width: 922px) {
+    width: 90%;
+  }
+```
+
+
+
+
+
+```
+@media only screen and (max-width: 1050px) {
+  .container-more { //控制  .container-more
+    width: 90%;
+    .bottom {
+      margin: 2rem;
+      p {
+        font-size: 1.2rem;
+      }
+    }
+  }
+}
+```
+
+
+
+```
+ // 手机
+ @media screen and (max-width: 960px) {
+    background: #fff;
+    margin: 0 auto;
+    width: 90%;
+  }
+  
+  // 平板
+  @media screen and (max-width: 1024px) {
+    background: #fff;
+    margin: 0 auto;
+    width: 90%;
+}
+
+```
+
+
+
+动态绑定样式
+
+```
+ <el-aside class="sidebar-container" :style="{ width: sidebarWidth }">
+      <layout-menu />
+    </el-aside>
+    
+const sidebarWidth = computed(() => {
+  if (device.value === "mobile" && sidebar.value.opened) {
+    return "200px";
+  } else {
+    return sidebar.value.opened ? "200px" : "0px";
+  }
+}); 
+```
+
+
+
+# Drawer 抽屉
+
+```
+
+```
+
+
+
+
+
+# 波浪页脚
+
+![image-20240507234015975](Element%E7%AC%94%E8%AE%B0.assets/image-20240507234015975.png)
+
+```
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>飞雪前端艺术</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        h1 {
+            font-weight: 300;
+            letter-spacing: 2px;
+            font-size: 48px;
+        }
+
+        p {
+            font-family: 'Lato', sans-serif;
+            letter-spacing: 1px;
+            font-size: 30px;
+            color: #333333;
+        }
+
+        .header {
+            position: relative;
+            text-align: center;
+            background: linear-gradient(60deg, rgba(84, 58, 183, 1) 0%, rgba(0, 172, 193, 1) 100%);
+            color: white;
+        }
+
+        .inner-header {
+            height: 65vh;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .flex {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .waves {
+            position: relative;
+            width: 100%;
+            height: 15vh;
+            margin-bottom: -7px;
+            min-height: 100px;
+            max-height: 150px;
+        }
+
+        .content {
+            position: relative;
+            height: 20vh;
+            text-align: center;
+            background-color: white;
+        }
+
+        .parallax>use {
+            /* 使use元素执行move-forever动画 */
+            animation: move-forever 25s cubic-bezier(.55, .5, .45, .5) infinite;
+        }
+
+        .parallax>use:nth-child(1) {
+            /* 延迟2秒启动动画  */
+            animation-delay: -2s;
+            /* 设置动画持续时间为7秒 */
+            animation-duration: 7s;
+        }
+
+        .parallax>use:nth-child(2) {
+            animation-delay: -3s;
+            animation-duration: 10s;
+        }
+
+        .parallax>use:nth-child(3) {
+            animation-delay: -4s;
+            animation-duration: 13s;
+        }
+
+        .parallax>use:nth-child(4) {
+            animation-delay: -5s;
+            animation-duration: 20s;
+        }
+
+        @keyframes move-forever {
+            0% {
+                transform: translate3d(-90px, 0, 0);
+            }
+
+            100% {
+                transform: translate3d(85px, 0, 0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .waves {
+                height: 40px;
+                min-height: 40px;
+            }
+
+            .content {
+                height: 30vh;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="inner-header flex"></div>
+        <div>
+            <!--
+                xmlns:SVG命名看见URI
+                viewBox:定义当前视口（viewbox）中绘制区域的位置大小
+                preserveeAspectRatio：定义了绘制区域在视口中的对齐方式
+                shape-rendering：定义了形状的渲染方式（如何呈现头像的锯齿效果）
+             -->
+            <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+                <!-- 定义一个defs元素，用于存储各种元素的定义，可以被其他元素引用。
+                    在defs元素中定义了一个名为“gentle-wave”的路径元素，用于描述波浪形状
+                    改路径秒苏联一系列二次贝塞尔曲线的控制点坐标，从而实现了波浪形状 -->
+                <defs>
+                    <path id="gentle-wave"
+                        d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                </defs>
+                <!-- 定义一个g元素，用于讲多个图形组合在一期，并应用一些样式
+                    在g元素中使用use元素多次引用了赚钱定义的名为gentle-wave的路径元素
+                    通过设置不同的x，y坐标和填充颜色，实现了波浪形状和渐变效果 -->
+                <g class="parallax">
+                    <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7)" />
+                    <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
+                    <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
+                    <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
+                </g>
+
+            </svg>
+        </div>
+    </div>
+    <div class="content flex">
+        <p>bilibili-飞雪前端艺术</p>
+    </div>
+</body>
+
+</html>
+```
+

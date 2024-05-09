@@ -2679,6 +2679,12 @@ const tagClick = (id: number) => {
 
 ## 案例
 
+```html
+<router-link :to="'/article/' + item.id"> 
+{{ item.title }}</router-link
+>
+```
+
 **页面a**
 
 ```ts

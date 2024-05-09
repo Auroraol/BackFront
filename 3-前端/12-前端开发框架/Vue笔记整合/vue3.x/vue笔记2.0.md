@@ -2841,6 +2841,36 @@ vue2还需要这些, vue3就简单多了
 
 #### 2.v-html_指令
 
+**v-html 渲染的图片太宽解决解决**
+
+```vue
+<div
+     v-loading="loading"
+     class="content markdown-body"
+     v-html="articleHtmlContent"
+     />
+
+const opened = () => {
+  loading.value = true;
+  articleDetail(props.id).then((res) => {
+    loading.value = false;
+
+    let htmlContent = res.htmlContent;
+
+    articleHtmlContent.value = htmlContent.replace(
+      /<video/g,
+      "<video style='width:100%;height:auto;'"
+    );
+
+    articleHtmlContent.value = htmlContent.replace(
+      /<img/g,
+      "<img style='width:100%;height:auto;'"
+    );
+  });
+};
+
+```
+
 注意:   使用 `v-html` 会存在一些潜在的安全风险和性能问题，因此在组件上使用 `v-html` 可能会导致组件内容被破坏，这也是 eslint-plugin-vue 中的 `[vue/no-v-text-v-html-on-component]` 规则所提醒的。
 
 推荐的做法是尽量避免使用 `v-html`，而是通过 Vue.js 的数据绑定和模板语法来动态渲染内容
@@ -15670,6 +15700,32 @@ const loadData = () => {
 
 ## 总结
 
+```
+v-if="device === 'desktop'"
+```
+
+```
+1. 使用完整的可选链和逻辑与操作符：
+为了确保在 comment.fromUser 为 undefined 或 null 时不会尝试进行不安全的属性访问，您应该在整个表达式中使用可选链操作符，并结合逻辑与操作符来确保安全访问。
+这种写法确保了即使 comment.fromUser 是 undefined，比较操作也不会执行，从而避免了错误。
+2. 增加额外的检查：
+如果您想要更加明确地处理这种情况，可以在表达式中显式检查 comment.fromUser 是否存在：
+这样可以确保只有在 comment.fromUser 真正存在时，才会尝试访问 id 属性。
+```
+
+```html
+   <!--使用完整的可选链和逻辑与操作符：--> 
+   <p
+     class="nickname"
+     :style="comment.fromUser?.id === authorId ? 'color:#e74851' : ''"
+   >
+   <!--增加额外的检查：-->
+   <p
+     class="nickname"
+     :style="comment.fromUser && comment.fromUser.id === authorId ? 'color:#e74851' : ''"
+   >
+```
+
 **如果响应数据类型是{}, 在使用 v-if/ if 则需要手动检测对象是否为空**
 
 JavaScript中被视为假值的情况：
@@ -16036,3 +16092,22 @@ $slots可以拿到父组件所传递过来的所有插槽,它是一个对象，k
 
 
 
+# 在退出登录的时候，执行 location.reload();
+
+
+
+### 方法一：
+
+点登录，后端返回成功后，用window.location.href="/" ，不要用router.push
+
+### 方法二：
+
+在退出登录的时候
+
+```
+ location.reload();
+ // 或者
+ location.assign("/");
+```
+
+[vue3.0+TS使用_vue3+ts-CSDN博客](https://blog.csdn.net/yxlyttyxlytt/article/details/128057058)

@@ -1,0 +1,58 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "NaXiDaqwq.moc3",
+		"Textures": [
+			"NaXiDaqwq.2048/texture_00.png",
+			"NaXiDaqwq.2048/texture_01.png",
+			"NaXiDaqwq.2048/texture_02.png",
+			"NaXiDaqwq.2048/texture_03.png",
+			"NaXiDaqwq.2048/texture_04.png",
+			"NaXiDaqwq.2048/texture_05.png"
+		],
+		"Physics": "NaXiDaqwq.physics3.json",
+		"DisplayInfo": "NaXiDaqwq.cdi3.json",
+		"Expressions": [
+			{
+				"Name": "fa guang",
+				"File": "biao qing/fa guang.exp3.json"
+			},
+			{
+				"Name": "hei lian",
+				"File": "biao qing/hei lian.exp3.json"
+			},
+			{
+				"Name": "ku ku",
+				"File": "biao qing/ku ku.exp3.json"
+			},
+			{
+				"Name": "mo gu",
+				"File": "biao qing/mo gu.exp3.json"
+			},
+			{
+				"Name": "sheng qi",
+				"File": "biao qing/sheng qi.exp3.json"
+			},
+			{
+				"Name": "xiao hua hua",
+				"File": "biao qing/xiao hua hua.exp3.json"
+			}
+		]
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		}
+	],
+	"HitAreas": []
+}
