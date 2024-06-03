@@ -1702,7 +1702,7 @@ jwt:
   + 加上@Data，不然无法映射数据,  
   + 并且都是静态内部类, 不需要额外的 `static` 修饰符。
 + 配置类上记得加上@Component注解
-+ 
++ 在Java中，用于布尔属性的getter方法的命名规范是`is`前缀，而不是`get`。因此，您应该使用`isAllowCustomRequests()`方
 
 配置类
 
@@ -4928,5 +4928,49 @@ public class ArticleLikeController extends BaseController {
     }
 
 }
+```
+
+# 工具类
+
+```java
+@Component
+public class SpringContextUtil implements ApplicationContextAware {
+
+    private static ApplicationContext applicationContext; // Spring应用上下文环境
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        if(SpringContextUtil.applicationContext == null){
+            SpringContextUtil.applicationContext  = applicationContext;
+        }
+    }
+
+    public static ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    public static Object getBean(String name) throws BeansException {
+        return applicationContext.getBean(name);
+    }
+
+    public static Object getBean(String name, Class requiredType)
+            throws BeansException {
+        return applicationContext.getBean(name, requiredType);
+    }
+
+    // 通过class获取Bean.
+    public static <T> T getBean(Class<T> clazz) {
+        return getApplicationContext().getBean(clazz);
+    }
+}
+
+```
+
+使用
+
+```java
+Service  service = (Service) SpringContextUtil.getBean(Class.forName("com.service.TestService"));
+Method objMethod = service.getClass().getDeclaredMethod("test");//获取方法
+objMethod.invoke(service);//执行方法
 ```
 

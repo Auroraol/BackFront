@@ -404,3 +404,266 @@ let strLength: number = (someValue as string).length;
 6.object数据类型：页面刷新后，其类型会转换为`string`类型。那么我们在路由跳转传参页面对属性值做一次`JSON.stringify()`预处理，然后在路由刷新页面对该值进行`JSON.parse()`转换即可；
 ```
 
+## 核心作用
+
+## 定义
+
+![image-20240601174515020](ts%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AE%9A%E4%B9%89%E6%80%BB%E7%BB%93.assets/image-20240601174515020.png)
+
+```ts
+interface Chat {
+    id: number,
+    room: number,
+    data: ChatInfo
+}
+
+interface ChatInfo {
+    id?: number,
+    avatar: string,
+    name: string,
+    content: string,
+    date: Date
+}
+
+type ChatUserInfo = Omit<ChatInfo, "id" | "content" | "date">
+```
+
+## 使用
+
+可以直接使用, 无需导入
+
+```ts
+import { defineStore } from "pinia";
+
+export const useChatStore = defineStore("chat", {
+  state: () => ({
+    // 当前房间号
+    room: undefined as number | undefined,
+    // 当前用户信息
+    chatUserInfo: undefined as ChatUserInfo | undefined,
+  }),
+  actions: {
+    // 判断登记的信息是否为空
+    isNull() {
+      return !(this.chatUserInfo?.name && this.chatUserInfo?.avatar);
+    },
+    updateRoom(n: number) {
+      this.room = n;
+    },
+    updateChatUserInfo(data: ChatUserInfo) {
+      this.chatUserInfo = data;
+    },
+  },
+});
+
+```
+
+# 接口与类型别名
+
+## 1.相对于对象
+
+```typescript
+// interface
+interface Point {
+  x: number;
+  y: number;
+}
+
+// type
+type Point = {
+  x: number;
+  y: number;
+};
+```
+
+## 2.相对于函数
+
+```typescript
+// interface
+interface SetPoint {
+  (x: number, y: number): void;
+}
+
+// type
+type SetPoint = (x: number, y: number) => void;
+```
+
+## 3.相对于类
+
+```typescript
+// interface
+interface Point {
+  x: number;
+  y: number;
+}
+
+class SomePoint implements Point {
+  x: 1;
+  y: 2;
+}
+
+// type
+type Point2 = {
+  x: number;
+  y: number;
+};
+
+class SomePoint2 implements Point2 {
+  x: 1;
+  y: 2;
+}
+```
+
+## 4.相对于其他类型
+
+与接口不同，类型别名还可以用于其他类型，如基本类型（原始值）、联合类型、元组。
+
+```typescript
+// primitive 基本类型（原始值)
+type Name = string;
+
+
+// union 联合类型
+type PartialPoint = PartialPointX | PartialPointY;
+
+// tuple 元组
+type Data = [number, string];
+
+// dom 节点
+let div = document.createElement('div');
+type B = typeof div;
+```
+
+## 5.相对于扩展（extends）
+
+- interface extends interface
+
+```typescript
+interface Name { 
+  name: string; 
+}
+interface User extends Name { 
+  age: number; 
+}
+123456
+```
+
+- type extends type
+
+```typescript
+type Name = { 
+  name: string; 
+}
+type User = Name & { age: number  };
+```
+
+- interface extends type
+
+```typescript
+type Name = { 
+  name: string; 
+}
+interface User extends Name { 
+  age: number; 
+}
+```
+
+- type extends interface
+
+```typescript
+interface Name { 
+  name: string; 
+}
+type User = Name & { 
+  age: number; 
+}
+```
+
+## 6.相对于同名合并
+
+interface 能够声明合并
+
+```typescript
+interface User {
+  name: string
+  age: number
+}
+
+interface User {
+  sex: string
+}
+
+/*
+User 接口为 {
+  name: string
+  age: number
+  sex: string 
+}
+*/
+```
+
+## 7.相对于计算属性
+
+type 能使用 in 关键字生成映射类型，但 interface 不行。
+
+语法与索引签名的语法类型，内部使用了 for … in。 具有三个部分：
+
+- 类型变量 K，它会依次绑定到每个属性。
+- 字符串字面量联合的 Keys，它包含了要迭代的属性名的集合。
+- 属性的结果类型。
+
+```typescript
+type Keys = "firstName" | "secondName"
+
+type DudeType = {
+  [key in Keys]: string
+}
+
+const test: DudeType = {
+  firstName: "前端收割机",
+  secondName: "alan"
+}
+
+// error!
+interface DudeType2 {
+  [key in keys]: string
+}
+```
+
+在很多场景下，interface 和 type都能使用，因此两者在很多时候会被混淆：
+
+- 类型：对象、函数两者都适用，但是 type 可以用于基础类型、联合类型、元祖等。
+- 同名合并：interface 支持，type 不支持。
+- 计算属性：type 支持, interface 不支持。
+
+## 8.外部文件中使用
+
+如果你在外部文件中使用 `ArticleRequestData` 类型时遇到了找不到名称的问题，可能是因为模块导入的方式不正确。请确保按照以下步骤操作：
+
+在 `chat.ts` 文件中定义 `ArticleRequestData` 类型，并导出它：
+
+```
+export type ArticleRequestData = {
+    // ... （ArticleRequestData 的定义）
+}
+```
+
+在需要使用 `ArticleRequestData` 类型的外部文件中，使用正确的路径和方式导入它：
+
+```
+import { ArticleRequestData } from './chat';
+
+// 现在可以在 externalFile.ts 中使用 ArticleRequestData 类型
+```
+
+## 使用建议
+
+1、官方推荐使用 interface，其他无法满足需求的情况下用 type。但是因为**联合类型**和**交叉类型**是比较常用的，所以避免不了大量使用 type 的场景，一些复杂类型也需要通过组装后形成类型别名来使用。
+
+2、如果想保持代码统一，还是可选择使用 type。通过上面的对比，type 其实可涵盖 interface 的大部分场景。
+
+
+
+# vue中使用ts
+
+[项目中使用了vue3+ts总结经验-CSDN博客](https://blog.csdn.net/jiurikeai/article/details/134260158)

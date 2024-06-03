@@ -3922,10 +3922,20 @@ public class ServerSecurityContext {
 ```java
 // 请求携带token, 可以用任务上下文获得authenticationToken
 		AuthenticationToken authenticationToken = ServerSecurityContext.getAuthenticationToken(true);
+	String accessToken = authenticationToken.getAccessToken();
 
 // 获取任务上下文, 得到当前用户信息
 CustomUserDetails userDetail = ServerSecurityContext.getUserDetail(true);
-article.setUserId(userDetail.getId());
+article.setUserId(userDetail.getId()); 
+```
+
+
+
+```java
+// 请求没有直接携带token, 不能用任务上下文
+AuthenticationToken authToken = tokenStore.readByAccessToken(accessToken);
+//得到当前用户信息
+CustomUserDetails principal = authToken.getPrincipal();
 ```
 
 

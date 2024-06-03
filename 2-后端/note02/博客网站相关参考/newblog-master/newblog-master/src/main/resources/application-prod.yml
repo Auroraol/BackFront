@@ -1,0 +1,31 @@
+server:
+  tomcat:
+    accesslog:
+      directory: access
+      enabled: true
+      prefix: access_log
+      suffix: .log
+      max-days: 10
+    basedir: ./tomcat
+
+spring:
+  config:
+    import: classpath:application-common.yml
+  datasource:
+    url: jdbc:mysql://localhost:3306/myblog?useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: 6on5&as.O/#U
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: 127.0.0.1
+    password: 0CVF5Dsh79
+    port: 6379
+
+management:
+  metrics:
+    export:
+      elastic:
+        host: http://es.wenzhihuai.com
+        user-name: elastic
+        password: elastic-admin
+        index-date-format: yyyy-MM-dd

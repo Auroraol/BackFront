@@ -683,10 +683,10 @@ public class DateFormatConfig{
 ```java
 @Data
 public class OrderDTO {
-    private LocalDateTime createTime;    // yyyy-MM-dd HH:mm:ss
+    private LocalDateTime createTime;    // yyyy-MM-dd HH:mm:ss  
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd")
-    private Date updateTime;  //yyyy-MM-dd
+    private Date updateTime;  //yyyy-MM-dd 
 }
 ```
 
@@ -1162,6 +1162,19 @@ public class SelectTest {
         list.forEach(System.out::println);
     }
 
+     /**
+	 * 根据名称查询
+	 *
+	 * @param name
+	 * @return
+	 */
+	private Category selectByBName(String name) {
+		QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
+		queryWrapper.lambda().eq(Category::getName, name);
+		return this.getOne(queryWrapper, false);
+	}
+
+    
     /**
      * 名字中包含雨，并且年龄小于40
      * SELECT * FROM `user`
@@ -2514,11 +2527,11 @@ public class ArticleVo extends Article {
 	}
 ```
 
+## MySQL数据类型为 json #TODO
 
+[Mybatis和Mybatis-Plus对MySQL中json类型处理 - 简书 (jianshu.io)](https://wsa.jianshu.io/p/7a4653704acb)
 
-
-
-
+[MyBatisPlus实现数据库JSON数据自动转换_mybatis-plus实体类复杂对象字段json自动相互转换-CSDN博客](https://blog.csdn.net/weixin_52195362/article/details/136451432)
 
 ## 自动配置原理
 

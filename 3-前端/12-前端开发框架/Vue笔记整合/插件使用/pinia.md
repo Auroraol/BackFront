@@ -1,5 +1,3 @@
-
-
 ## [官网](https://pinia.vuejs.org/api/modules/pinia.html#Type-Aliases)
 
 ## Pinia介绍
@@ -175,7 +173,7 @@ export default {
 
 在上面的代码中，我们在组件中使用 useStore 钩子来获取 store 实例，然后将其传递给 fetchMessage() 方法。该方法将从应用程序的后台获取数据，并更新存储器中的状态。最后，公开了一个 handleClick() 方法，以便组件可以调用它并触发 Action 。
 
-## Pinia的Option Store方式定义 Store
+## Pinia的Option Store方式定义 Store (个人推荐)
 
 示例代码如下：
 
@@ -212,7 +210,7 @@ export const useCounterStore = defineStore('counter', () => {
 
 在 Setup Store 中：
 
-- ​      ref() 就是 state 属性
+-  ref() 就是 state 属性
 - computed() 就是 getters
 - function() 就是 actions
 
@@ -821,6 +819,9 @@ export const useStore = defineStore('main', {
     }
   },
 });
+
+
+// 使用 useStore().doublePlusOne
 ```
 
 ### 可以相互调用

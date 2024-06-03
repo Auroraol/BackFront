@@ -1,0 +1,17 @@
+server:
+  tomcat:
+    basedir: ./logs/newblog
+
+spring:
+  config:
+    import: classpath:application-common.yml
+  datasource:
+    url: jdbc:mysql://43.153.15.174:3306/myblog?useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: 6on5&as.O/#U
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: 43.153.15.174
+      password: 0CVF5Dsh79
+

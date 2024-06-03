@@ -14903,7 +14903,9 @@ import my from '../components/my.vue'
 
 
 
-# JavaScript 中日期处理
+# JavaScript 中日期处理:crossed_swords:
+
+## 接收
 
 在 JavaScript 中，Date() 函数接受的日期字符串格式有一定的要求。通常情况下，日期字符串使用斜杠（/）或者逗号（,）作为日期、月份和年份的分隔符，而不是连字符（-）。所以，在将日期字符串传给 Date() 函数之前，需要将连字符替换为斜杠，以确保日期能够被正确解析。
 
@@ -14931,7 +14933,48 @@ const formatD = (str: string): string => {
     });
 ```
 
+## 传递
 
+```js
+    //更新数据库的聊天记录
+    const newLog = {
+      roomName: roomName,
+      account: account,
+      content: chatLogIpt.value,
+      date: formatDate(new Date(), "YYYY-mm-dd HH:MM:SS"),
+    };
+```
+
+后端
+
+```java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ApiModel(value = "添加聊天json", description = "添加聊天")
+public class AddChatRequest {
+
+	@NotBlank(message = "房间名称不能为空")
+	@ApiModelProperty(value = "名称")
+	private String roomName;
+
+	@NotBlank(message = "账号不能为空")
+	@ApiModelProperty(value = "账号")
+	private String account;
+
+	@NotBlank(message = "内容不能为空")
+	@ApiModelProperty(value = "内容")
+	private String content;
+
+	@NotBlank(message = "时间不能为空")
+	@ApiModelProperty(value = "年月,格式yyyy-mm")
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private LocalDateTime date;
+
+}
+```
 
 # `<Transition>`
 
@@ -15737,6 +15780,11 @@ JavaScript中被视为假值的情况：
 5. `undefined`：表示未定义的特殊值。
 6. `NaN`：表示非数字值。
 
+```
+head: res.avatar || defaultAvatar
+      可以表示如果 res.avatar 存在且不为假（例如不是 null 或空字符串），则使用 res.avatar 的值作为头像路径；否则，使用 defaultAvatar 的值作为头像路径。
+```
+
 <span style="color:red">**①  注意:空对象{}不能判断,  判断方法 Object.keys(obj).length === 0;**</span>
 
 ```
@@ -16111,3 +16159,113 @@ $slots可以拿到父组件所传递过来的所有插槽,它是一个对象，k
 ```
 
 [vue3.0+TS使用_vue3+ts-CSDN博客](https://blog.csdn.net/yxlyttyxlytt/article/details/128057058)
+
+# vue项目引入外部字体使用
+
+#### 1. 下载字体
+
+*发现一个字体库，里面字体还挺好看的[字体](https://www.hanyi.com.cn/)*
+
+
+
+
+
+#### 2. assets 里面创建文件夹 fontFamily，将下载的放入文件夹中
+
+
+
+
+
+前言
+一般做后台管理系统UI没有影响要求可以不使用自定义字体。但是在大屏项目中，高度自定义化，就肯定需要UI导出字体文件，然后放到服务器上或者是我们项目文件中，我们前端引入后在页面中使用。
+
+下面以放在项目文件中为例。
+
+各字体文件类型对应的format类型
+
+```
+src: url(“字体名.woff2”) format(“woff2”),
+url(“字体名.woff”) format(“woff”),
+url(“字体名.ttf”) format(“truetype”),
+url(“字体名.eot”) format(“embedded-opentype”),
+url(“字体名.svg”) format(“svg”),
+url(“字体名.otf”) format(“opentype”);
+```
+
+在线网站 - 自定义字体相关
+在线webfont字体生成工具
+ttc 文件拆分为 ttf 文件
+
+![image-20240529113243289](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240529113243289.png)
+
+1、将字体文件放在项目文件中并定义
+项目以vue3 + vite 搭建的为例。
+注意路径问题。
+
+==font-family: "" 引入的名称要和字体文件里面的命名一样和src不一定一样（这是个巨坑)==
+
+![image-20240529124323096](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240529124323096.png)
+
+![image-20240529112937505](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240529112937505.png)
+
+2、引入定义好的自定义字体文件
+在合适的地方引入定义好的自定义字体。比如main.js、或者是大屏的入口index.vue中。
+
+如果是在main.js中引入，则直接使用import '@/assets/fonts/font.less' 。
+
+![image-20240529112953478](vue%E7%AC%94%E8%AE%B02.0.assets/image-20240529112953478.png)
+
+下面是在大屏的index.vue中引入：
+注意：必须要先引入自定义字体文件之后才能使用。
+
+3、使用自定义字体
+
+```
+.text{
+	padding: 42px 0;
+	line-height: 34px;
+	font-family: AlibabaPuHuiTi-Bold; /* 字体名 */
+	font-size: 34px;
+	color: #FFFFFF;
+	letter-spacing: 0;
+	font-weight: 700;
+}
+
+
+```
+
+推荐使用:
+
+[CMBill/lxgw-wenkai-web: LXGW WenKai / 霞鹜文楷 网络字体仓库 (github.com)](https://github.com/CMBill/lxgw-wenkai-web)
+
+直接将文后提供的[链接](https://github.com/CMBill/lxgw-wenkai-web#链接)以 `<link>` 的形式添加到网页的 `<head>` 内即可
+
+```
+<html>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@callmebill/lxgw-wenkai-web@latest/style.css" />
+  <style>
+    body {
+      font-family: "LXGW WenKai";
+      font-weight: normal;
+    }
+  </style>
+</head>
+<body>
+  
+</body>
+</html>
+```
+
+这样引入的 `style.css` 可以调用仓库包含的所有字体，使用字体时以表格中所示 `font-family` 与 `font-weight` 在 CSS 中调用即可。
+
+这样引入的 `style.css` 可以调用仓库包含的所有字体，使用字体时以表格中所示 `font-family` 与 `font-weight` 在 CSS 中调用即可。
+
+| 字体                   | `font-family`            | `font-weight` |
+| ---------------------- | ------------------------ | ------------- |
+| LXGW Wenkai            | `LXGW Wenkai`            | `normal`      |
+| LXGW Wenkai Bold       | `LXGW Wenkai`            | `bold`        |
+| LXGW Wenkai Light      | `LXGW Wenkai Light`      | `normal`      |
+| LXGW WenKai Mono       | `LXGW WenKai Mono`       | `normal`      |
+| LXGW WenKai Mono Bold  | `LXGW WenKai Mono`       | `bold`        |
+| LXGW WenKai Mono Light | `LXGW WenKai Mono Light` | `normal`      |

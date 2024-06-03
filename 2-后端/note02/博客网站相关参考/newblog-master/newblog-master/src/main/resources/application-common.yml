@@ -1,0 +1,39 @@
+server:
+  port: 8081
+  http2:
+    enabled: true
+  address: 0.0.0.0
+  servlet:
+    encoding:
+      charset: UTF-8
+
+spring:
+  application:
+    name: blog
+  main:
+    allow-circular-references: true
+  cache:
+    cache-names: redisCache
+    type: redis
+    redis:
+      time-to-live: 5s
+  aop:
+    auto: true
+  mvc:
+    view:
+      prefix: /
+      suffix: .jsp
+    pathmatch:
+      use-suffix-pattern: true
+      matching-strategy: ant_path_matcher
+
+
+management:
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    tags:
+      application: ${spring.application.name}

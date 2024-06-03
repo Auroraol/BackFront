@@ -141,7 +141,49 @@ div {
 
 ### 变量使用
 
-定义：@name: value; （@black: #000;）
+#### 定义
+
+@name: value; （@black: #000;）
+
+如果定义一个固定的值作为变量的值，可以使用第一种方式；
+
+如果定义一个动态的值，可能会受到其他变量或环境的影响，可以使用第二种方式。
+
+**使用普通数值：**
+
+```less
+@nprogress-color: #f5f7fd;
+```
+
+**使用变量插值：**
+
+```less
+@nprogress-color:var(--nprogress-color, red);
+```
+
+==修改值==
+
+```ts
+<script setup lang="ts">
+// 简化写法
+const $css = document.documentElement.style;
+$css.setProperty("--nprogress-color", color.value);
+</script>
+
+//直接使用变量
+<el-menu
+:default-active="activeIndex"
+class="el-menu-demo"
+mode="horizontal"
+@select="handleSelect"
+background-color="transparent"
+active-text-color="var(--nprogress-color, #333)"
+></el-menu>
+
+//在style中使用 用@nprogress-color
+```
+
+#### 使用
 
 使用场合分3种：
 
@@ -149,7 +191,7 @@ div {
 - 作为选择器或属性名：@{name}
 - 作为URL："@{name}"
 
-#### 常规使用
+##### 常规使用
 
 ```less
 @width: 10px;
@@ -170,7 +212,7 @@ div {
 }
 ```
 
-#### 变量用于选择器名、属性名、URL、`@import`语句
+##### 变量用于选择器名、属性名、URL、`@import`语句
 
 ```less
 // 变量定义
@@ -1102,6 +1144,33 @@ Less 内置了多种函数用于转换颜色、处理字符串、算术运算等
 
 ## 导出
 
+在 Less 中，要定义和导出变量，可以直接使用 Less 的变量语法，例如：
+
+```less
+@name: "less";
+@background-img: url('...');
+@header-background-img: url('...');
+@background: #fff;
+```
+
+在其他 Less 文件中引入这些变量：
+
+```less
+@import "your-variables-file.less";
+
+body {
+  background-image: @background-img;
+}
+
+.header {
+  background-image: @header-background-img;
+}
+
+.some-element {
+  background-color: @background;
+}
+```
+
 **手动给每个less文件指定导出**
 
 导出必须写到第一行
@@ -1146,3 +1215,149 @@ Less 内置了多种函数用于转换颜色、处理字符串、算术运算等
 2. `width: 100vw;`：当屏幕宽度小于或等于 922 像素时，设置元素宽度为视口宽度的 100%。这将使元素的宽度与屏幕宽度相同，以适应较小的屏幕。
 
 通过这段代码，您可以在屏幕宽度小于或等于 922 像素时，对元素进行特定的样式调整，以提供更好的移动设备体验或响应式设计。
+
+
+
+
+
+
+
+# 实际使用
+
+
+
+在 Less 中，如果你需要强制某个属性具有最高的优先级，可以这样写：
+
+```
+.someClass {
+    background-color: #232931 !important;
+}
+```
+
+在编译后的 CSS 中，这将会被转换为：
+
+```
+.someClass {
+    background-color: #232931 !important;
+}
+```
+
+
+
+创建src/assets/style/variables.less 
+
+```less
+// 默认的主题颜色
+@backgroundImg: var(--backgroundImg, ''); //背景
+@backgroundCard: var(--backgroundCard, ''); //卡片背景
+@backgroundTab: var(--backgroundTab, ''); //底部tab背景
+@backgroundDeep: var(--backgroundDeep, ''); //小时累计背景
+@backgroundDeepTextColor: var(--backgroundDeepTextColor, ''); //小时累计字体颜色
+@textColorStyle: var(--textColorStyle, ''); //卡片内的(包括不限于温度，降水，风）值得颜色
+@textColorStyleBottom: var(--textColorStyleBottom, ''); //卡片内的(包括不限于温度，降水，风）值下面的描述颜色
+@backgroundCardLine: var(--backgroundCardLine, ''); //卡片标题下面的线条
+@colorStopsOffset1: var(--colorStopsOffset1, ''); //echarts折线图渐变色0%处
+@colorStopsOffset2: var(--colorStopsOffset2, ''); //echarts折线图渐变色100%处
+@lineStyleClor: var(--lineStyleClor, ''); echarts折线颜色
+@backgroundPrecipitation: var(--backgroundPrecipitation, ''); //降水按钮背景
+@r: 25rem;
+
+
+//首页卡片
+.backgroundCard {
+  position: relative;
+  padding: 14 / @r;
+  border-radius: 14 / @r;
+  background-color: @backgroundCard;
+  text-align: center;
+  font-size: 13 / @r;
+  color: #fff;
+  margin-bottom: 14 / @r;
+}
+```
+
+
+
+
+
+```less
+// 默认的主题颜色
+@background: var(--background, #f5f7fd);
+@background-img: var(--background-img, white);
+@header-background-img: var(--header-background-img, url("https://code-nav.top/statics/img/ssr/bg-boy.jpg"));
+// 导出变量
+:export {
+  name: "less";
+  background-img: @background-img;
+  header-background-img: @header-background-img;
+  background: @background;
+}
+```
+
+**补充**
+
+在CSS中，你使用了`:root`伪类来定义全局的CSS自定义属性，例如：
+
+```
+:root {
+  --menuText: #bfcbd9;
+}
+```
+
+而在Less中，你使用`@`符号来定义变量，例如：
+
+```
+@menuText: #bfcbd9;
+```
+
+
+
+src/assets/style/variables.less 
+
+
+
+- 创建src/assets/style/variables.less 使用 @XXX:var(–XXX,‘style’) 声明系列变量，之后添加其他变量直接增加即可（由于之后要配置颜色，[默认值](https://so.csdn.net/so/search?q=默认值&spm=1001.2101.3001.7020)可以先给" "）
+  也可以声明一下常用的class，方便全局使用（这里已.backgroundCard 为例）
+
+```
+
+```
+
+
+
+- 创建src/config/model.ts 声明所有类型主题themes
+
+```
+
+```
+
+- 创建src/config/weatherTheme.ts 进行逻辑处理
+- 
+
+# vite.config.ts配置
+
+![image-20240529222812264](less.assets/image-20240529222812264.png)
+
+这样做的目的是可以直接使用定义的变量, 不用每次去@import "/@/assets/styles/variables.less";
+
+
+
+# 在 JavaScript 中更改 Less 变量的值
+
+```less
+// 引入 Less.js 库
+
+// 定义包含要更改的 Less 变量及其新值的对象
+const newVariableValues = {
+  '@primary-color': '#00ff00',
+  '@secondary-color': '#0000ff'
+};
+
+// 使用 Less.modifyVars 方法修改变量的值
+less.modifyVars(newVariableValues).then(() => {
+  console.log('Less 变量值修改成功！');
+}).catch(error => {
+  console.error('Less 变量值修改失败:', error);
+});
+```
+

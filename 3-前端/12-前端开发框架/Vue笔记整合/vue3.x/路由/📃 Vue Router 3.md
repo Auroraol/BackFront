@@ -2847,3 +2847,14 @@ const goTopBtn = () => {
 };
 ```
 
+
+
+
+
+### 百度统计
+
+[百度统计 (baidu.com)](https://tongji.baidu.com/main/setting/10000623294/home/site/getjs?siteId=20570370)
+
+![image-20240528161041657](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240528161041657.png)
+
+![image-20240528161428960](%F0%9F%93%83%20Vue%20Router%203.assets/image-20240528161428960.png)

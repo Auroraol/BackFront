@@ -305,6 +305,46 @@ background-color: #f9fafc;
 
 
 
+例子
+
+![image-20240601205359736](Element%E7%AC%94%E8%AE%B0.assets/image-20240601205359736.png)
+
+```vue
+  <el-input
+        v-model="chatLogIpt"
+        :autosize="{ minRows: 2, maxRows: 6 }"
+        :input-style="{ borderRadius: '1rem', flex: '1', height: '100px' }"
+        resize="none"
+        :maxlength="1000"
+        :show-word-limit="true"
+        type="textarea"
+        placeholder="发送消息"
+        @keydown="sendKeyDown"
+      />
+
+<script>
+//键盘enter发送消息
+const sendKeyDown = (e: any) => {
+  //按 Ctrl + Enter
+  if (e.ctrlKey && e.key === "Enter") {
+    sendChatLog();
+  }
+
+  // 按Enter
+  //   if (e.key === "Enter") {
+  //     e.preventDefault(); //阻止默认的换行行为
+  //   }
+};
+</script>
+```
+
+`:autosize="{ minRows: 2, maxRows: 6 }"` 是 Element UI 中 `<el-input>` 组件的一个属性，用于设置文本框自动调整高度的行数范围。
+
+- `minRows`: 表示文本框的最小行数。
+- `maxRows`: 表示文本框的最大行数。当输入内容超过最大行数时，文本框会出现滚动条
+
+`resize="none"` 是 `<el-input>` 组件的一个属性，用于禁止用户调整文本框的大小。设置 `resize="none"` 后，用户将无法通过拖动文本框边缘来改变文本框的大小。
+
 ##  #prepend  #suffix 的使用
 
 ```html
@@ -656,7 +696,7 @@ const handleSelect = (index: string) => {
 1. 在el-menu加上router
 2. index必须绑定路由的path, 或通过这个跳转
 3. default-active设为当前路由（this.$route.path）,这样在路由变化的时候，对应的menu-item才会高亮，如：
-   ![在这里插入图片描述](https://img-blog.csdnimg.cn/2a4c4467fd9f4ba98b9c00f39591ed6b.png#pic_center)
+   ![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/2a4c4467fd9f4ba98b9c00f39591ed6b.png#pic_center)
 
 ## 样式
 
@@ -1883,6 +1923,180 @@ const handleCommand = (command: string | number | object) => {
 
 ![image-20240419122356590](Element%E7%AC%94%E8%AE%B0.assets/image-20240419122356590.png)
 
+## 自定义
+
+![image-20240530183543950](Element%E7%AC%94%E8%AE%B0.assets/image-20240530183543950.png)
+
+```html
+            <ul class="one">
+              <!-- <li class="one_item">
+              </li> -->
+              <!-- 扩展页面 -->
+              <li class="one_item">
+                <router-link :to="ExtendPage.url" class="one_item_nav">
+                  {{ ExtendPage.icon }} {{ ExtendPage.name }}
+
+                  <!-- 判断有没有二级分类，有就显示下拉箭头 -->
+                  <svg
+                    v-if="ExtendPage.children.length"
+                    preserveAspectRatio="xMidYMid meet"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="1em"
+                    height="1em"
+                    fill="none"
+                    viewBox="0 0 48 48"
+                  >
+                    <!--?lit$369315321$-->
+                    <g>
+                      <path
+                        stroke-linejoin="round"
+                        stroke-width="4"
+                        stroke="currentColor"
+                        d="M36 18 24 30 12 18"
+                        data-follow-stroke="currentColor"
+                      ></path>
+                    </g>
+                  </svg>
+                </router-link>
+
+                <!-- 二级导航 -->
+                <ul class="two">
+                  <li
+                    class="two_item"
+                    v-for="two in ExtendPage.children"
+                    :key="two.id"
+                  >
+                    <router-link
+                      :to="{ path: two.url, query: two.date }"
+                      class="two_item_nav"
+                      >{{ two.name }}</router-link
+                    >
+                  </li>
+                </ul>
+              </li>
+            </ul>
+```
+
+
+
+```js
+
+const ExtendPage = {
+  name: "扩展页面",
+  icon: "💡",
+  url: "",
+  children: [
+    {
+      id: 1,
+      name: "个人主页",
+      url: "/my",
+    },
+    {
+      id: 2,
+      name: "我的相册",
+      url: "/photo",
+    },
+    {
+      id: 3,
+      name: "数据统计",
+      url: "/stats",
+    },
+    {
+      id: 4,
+      name: "在线聊天室",
+      url: "/chat",
+      date: {
+        name: "默认房间",
+      },
+    },
+  ],
+};
+```
+
+
+
+```css
+
+// 一级导航
+.one {
+  display: flex;
+  align-items: center;
+  height: 60px;
+    
+  // 导航列表
+  .one_item {
+    position: relative;
+    z-index: 999;
+    // 导航
+    .one_item_nav {
+      display: inline-block;
+      padding: 20px;
+      color: #333;
+      font-size: 15px;
+      transition: color 0.3s;
+    }
+
+    // 二级导航
+    .two {
+      display: none;
+      overflow: hidden;
+      position: absolute;
+      top: 50px;
+      width: 100%;
+
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.08);
+
+      .two_item {
+        .two_item_nav {
+          position: relative;
+          display: inline-block;
+          width: 100%;
+          padding: 10px;
+          padding-left: 10px;
+          font-size: 15px;
+          box-sizing: border-box;
+          color: #666;
+          transition: all 0.3s;
+
+          // 鼠标经过的小横线
+          &::after {
+            content: "";
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 3px;
+            background-color: @color;
+            transition: width 0.3s;
+          }
+        }
+
+        // 鼠标经过二级导航的效果
+        &:hover .two_item_nav {
+          color: @color !important;
+          background-color: #f2f2f2;
+          padding-left: 30px;
+
+          &:hover::after {
+            width: 10px;
+          }
+        }
+      }
+    }
+
+    // 鼠标经过哪个，就让哪个二级导航显示
+    &:hover .two {
+      display: block;
+    }
+  }
+}
+```
+
+
+
 # Dialog 对话框
 
 ![image-20240318221758991](Element%E7%AC%94%E8%AE%B0.assets/image-20240318221758991.png)
@@ -1945,9 +2159,133 @@ export default {
 </script>
 ```
 
-### 自定义头
+### 例子
+
+<img src="Element%E7%AC%94%E8%AE%B0.assets/image-20240601213124068.png" alt="image-20240601213124068" style="zoom:50%;" />
+
+```html
+ <!-- 登记弹窗 -->
+  <el-dialog
+    v-model="registerModel"
+    title="选择一个身份"
+    width="500"
+    @close="close"
+  >
+    <el-form ref="form" :model="chatUserInfo" :rules="rules">
+      <el-form-item label="名称" prop="name">
+        <el-input
+          v-model="chatUserInfo.name"
+          autocomplete="off"
+          style="width: 300px"
+        />
+      </el-form-item>
+
+      <el-form-item label="头像">
+        <el-radio-group v-model="chatUserInfo.avatar" class="ml-4">
+          <el-radio
+            :label="item"
+            size="large"
+            v-for="(item, index) in avatars"
+            :key="index"
+          >
+            <img :src="avatarFilter(item)" v-avatar alt="" />
+          </el-radio>
+        </el-radio-group>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button
+          type="primary"
+          size="large"
+          style="width: 100%"
+          @click="submit"
+          >选择</el-button
+        >
+      </el-form-item>
+    </el-form>
+  </el-dialog>
+```
+
+```css
+:deep(.el-form-item__content) {
+  .el-radio.el-radio--large {
+    margin-bottom: 30px;
+    margin-top: 10px;
+
+    img {
+      width: 50px;
+      height: 50px;
+      border-radius: 15px;
+    }
+  }
+}
+```
 
 
+
+```ts
+
+// 登记框
+const form = ref<FormInstance>();
+const registerModel = ref<boolean>(false);
+// 头像列表
+const avatars = [
+  "Ginger",
+  "Patches",
+  "Sadie",
+  "Casper",
+  "Molly",
+  "Smokey",
+  "Lilly",
+];
+const avatarFilter = (v: string) =>
+  `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${v}`;
+
+// 名称校验规则
+const rules = reactive({
+  name: [
+    { required: true, message: "名称不能为空", trigger: "blur" },
+    {
+      min: 1,
+      max: 10,
+      message: "名称长度限制为 1 ~ 10个字符",
+      trigger: "blur",
+    },
+  ],
+});
+
+// 用户信息
+const chatUserInfo = reactive<ChatUserInfo>({
+  name: "",
+  avatar: "Ginger",
+});
+
+// 关闭弹框触发
+const close = () => {
+  form.value?.resetFields();
+  chatUserInfo.name = "";
+  chatUserInfo.avatar = "Ginger";
+};
+
+// 提交表单触发
+const submit = async () => {
+  if (!form.value) return;
+  await form.value.validate((valid, fields) => {
+    if (valid) {
+      useChatStorePinia.updateChatUserInfo(chatUserInfo);
+
+      registerModel.value = false;
+
+      ElMessage({
+        message: "🎉选择成功~",
+        type: "success",
+      });
+    } else {
+      console.log("error submit!", fields);
+    }
+  });
+};
+```
 
 
 
@@ -1962,6 +2300,8 @@ export default {
     </div>
   </el-affix>
 </template>
+
+//等价 position: fixed; 
 ```
 
 # Autocomplete 自动补全输
@@ -2791,7 +3131,7 @@ form表单
 
 # 对齐
 
-```
+```less
 <template>
   <div class="xxxx">
     <div class="left-element">左侧元素</div>
@@ -2837,6 +3177,24 @@ form表单
 ```
 
 ![image-20240330184318057](Element%E7%AC%94%E8%AE%B0.assets/image-20240330184318057.png)
+
+
+
+```css
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  transform: translateY(-50%);
+```
+
+这段 CSS 样式用于将一个元素定位在父容器的垂直中间，并且距离父容器右侧的距离为 5%。具体来说：
+
+- `position: absolute;`：将元素的位置相对于最近的非 static 定位的祖先元素进行定位。
+- `top: 50%;`：将元素的顶部边缘位置移动到父容器的中间。
+- `right: 5%;`：将元素的右边缘位置移动到距离父容器右边界 5% 的位置。
+- `transform: translateY(-50%);`：通过 `translateY` 变换将元素在垂直方向上向上移动自身高度的一半，从而实现垂直居中。
+
+这段样式通常用于在设计中实现垂直居中和水平偏移的效果，经常用于定位图标按钮或者提示框等元素
 
 # 左右(有时候可以用定位来实现)
 
@@ -3179,6 +3537,14 @@ const open3 = () => {
 ![image-20240428191645747](Element%E7%AC%94%E8%AE%B0.assets/image-20240428191645747.png)
 
 
+
+## Notification 通知
+
+悬浮出现在页面角落，显示全局的通知提醒消息
+
+![image-20240529233850980](Element%E7%AC%94%E8%AE%B0.assets/image-20240529233850980.png)
+
+[Notification 通知 | Element Plus (element-plus.org)](https://element-plus.org/zh-CN/component/notification.html#notification-通知)
 
 
 
@@ -3815,6 +4181,15 @@ cssCopy Code.my-element {
 # 伪元素
 
 ```css
+  // 鼠标悬停效果
+  &:hover {
+    color: @color !important;
+  }
+```
+
+
+
+```css
 .right-solt:after {
         content: "·";
         margin: 0 5px;
@@ -3831,6 +4206,64 @@ cssCopy Code.my-element {
 ![image-20240408162137682](Element%E7%AC%94%E8%AE%B0.assets/image-20240408162137682.png)
 
 
+
+在 CSS 中，`:nth-child()` 伪类是用来选择父元素下的特定子元素的，而不是直接在类名上使用的。如果你想要对 `.nameAndTme` 下的第一个和第二个 `<span>` 元素分别应用样式，可以这样做：
+
+```
+.nameAndTme span:nth-child(1) {
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: red;
+}
+
+.nameAndTme span:nth-child(2) {
+  color: #333;
+  margin-left: 0.5rem;
+}
+```
+
+这样就能正确地选择`.nameAndTme`下的第一个和第二个 `<span>` 元素，并且应用相应的样式了。
+
+
+
+```css
+{
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 60px;
+  backdrop-filter: blur(5px);
+  transition: background-color $move;
+  z-index: 999;
+
+  &::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 0;
+    background: linear-gradient(#fff, transparent 70%);
+    transition: background $move;
+  }
+```
+
+根据你提供的代码片段，这是一个描述一个固定在页面顶部的导航栏的CSS样式。让我解释一下每个属性的作用：
+
+1. `position: fixed;` - 将元素固定在视口中，不随页面滚动而移动。
+2. `top: 0;` - 将元素定位在距离顶部的位置为0。
+3. `width: 100%;` - 设置元素宽度为100%。
+4. `height: 60px;` - 设置元素高度为60像素。
+5. `backdrop-filter: blur(5px);` - 应用模糊效果到元素背后内容，模糊半径为5像素。
+6. `transition: background-color $move;` - 设置背景颜色变化时的过渡效果，$move 可能是一个变量，用来控制过渡时间或速度。
+7. `z-index: 999;` - 设置元素的堆叠顺序，使其位于其他元素之上。
+
+接下来是伪元素 `&::after` 的样式：用于创建一个元素的最后一个子元素，并且通常用于添加一些装饰性的内容或样式
+
+1. `content: "";` - 声明伪元素的内容为空。
+2. `display: block;` - 将伪元素设置为块级元素。
+3. `width: 100%;` - 设置伪元素宽度为100%（与父元素宽度相同）。
+4. `height: 0;` - 初始时将伪元素高度设为0。
+5. `background: linear-gradient(#fff, transparent 70%);` - 使用线性渐变设置伪元素的背景，从白色到透明，覆盖高度的70%。
+6. `transition: background $move;` - 设置背景变化时的过渡效果，$move 可能是一个变量，用来控制过渡时间或速度。
 
 # 列表
 
@@ -4412,15 +4845,24 @@ export default {
 
 ![image-20240411142430241](Element%E7%AC%94%E8%AE%B0.assets/image-20240411142430241.png)
 
+# Popconfirm 气泡确认框
 
+[Popconfirm 气泡确认框 | Element Plus (element-plus.org)](https://element-plus.org/zh-CN/component/popconfirm.html#popconfirm-气泡确认框)
 
-
+![image-20240602162244563](Element%E7%AC%94%E8%AE%B0.assets/image-20240602162244563.png)
 
 # 显示滚动条
 
 ```
   max-height: 400px; /* 设置最大高度 */
     overflow-y: auto; /* 当内容溢出时显示滚动条 */
+```
+
+```
+  .main {
+    overflow-y: scroll;
+    height: 100%;
+  }
 ```
 
 
@@ -4472,6 +4914,31 @@ body,
   font-family: '思源黑体 Normal', 'Microsoft YaHei', '黑体';
 }
 ```
+
+解决卡顿问题
+
+```html
+<div class="content"
+    :style="{ backgroundImage: `url(/image/imgs/1.png)` }">
+    
+</div>   
+
+.content {
+  background: url("") center;
+  background-size: cover;
+
+  // 标签加载之后
+  &::after {
+    content: "";
+    width: 100%;
+    height: 20%;
+  }
+}
+```
+
+
+
+
 
 # 将页脚固定在页面底部
 
@@ -5512,5 +5979,559 @@ const sidebarWidth = computed(() => {
 </body>
 
 </html>
+```
+
+
+
+1. 
+
+# z-index无效，无论设置多大都被其他的元素覆盖
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<title>z-index问题</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+	<!-- 如果打开不了，首先就检查这里的jquery导入是否正确了，我这的js文件路径不一样的 -->
+	<script src="js/jquery-1.4.2.min.js" type="text/javascript" ></script>  
+</head>
+<style type="text/css">
+.test-div{
+	border:1px blue solid;
+	width:300px;
+	min-height:100px;
+	position:relative;
+	-z-index:0;
+	font-size:18px;
+	font-family:microsoft yahe;
+	color:#fff;
+}
+.has-position-absolute{
+	border:1px #999999 solid;
+	width:100px;
+	height:200px;
+	background-color:#FAFAFA;
+	position:absolute;
+	z-index:99;
+	top:20px;
+	left:50px;
+	color:#333333;
+}
+</style>
+<script type="text/javascript">
+</script>
+<body>
+<div id="no-style">
+	<div id="div1" class="test-div" style="background-color:blue;">
+		div1的z-index为1
+		<div id="test-position" class="has-position-absolute">
+			div3的z-index为99
+		</div>
+	</div>
+	<div id="div2" class="test-div" style="background-color:red;">
+		<span>
+			div2的z-index为2，但是现在绝对定位的div3明明z-index比它大，
+			却依旧在这个层之下。原因是z-index是相对同一父元素下叠加时的z轴顺序。
+			z-index具有继承性，用简单的数学逻辑表示就是：div1的z-index为1，则它
+			的子元素div3的z-index就应该是1.xx，如果绝对定位的元素还有子元素，
+			则z=index值实际上就应该是1.xx.xx。下面的div2的z-index值为2，所以在div3之上
+		</span>
+	</div>
+	
+<pre style="font-size:18px">
+浅说position定位及z-index使用
+ 
+使用前提
+ 
+z-index只能在position属性值为relative或absolute或fixed的元素上有效。
+ 
+基本原理
+ 
+z-index值可以控制定位元素在垂直于显示屏方向（Z 轴）上的堆叠顺序（stack order），值大的元素发生重叠时会在值小的元素上面。
+ 
+使用的相对性
+ 
+z-index值只决定同一父元素中的同级子元素的堆叠顺序。父元素的z-index值（如果有）为子元素定义了堆叠顺序（css版堆叠“拼爹”）。
+向上追溯找不到含有z-index值的父元素的情况下，则可以视为自由的z-index元素，它可以与父元素的同级兄弟定位元素或其他自由的定位元素来比较z-index的值，
+决定其堆叠顺序。同级元素的z-index值如果相同，则堆叠顺序由元素在文档中的先后位置决定，后出现的会在上面。
+ 
+所以如果当你发现一个z-index值较大的元素被值较小的元素遮挡了，请先检查它们之间的dom结点关系，多半是因为其父结点含有激活并设置了z-index值的position定位元素。
+ 
+也因为这个相对性，还会引发浏览器表现不一致出现兼容问题。原因是ie6、7下面position值为非static的元素在未设置z-index值的情况下都会被隐含添加z-index:0，
+而Firefox/Chrome等现代浏览器会遵循标准默认z-index:auto不会产生值。
+ 
+还有一点需要注意，负值的z-index也依照大小比较的原理，但一般来说负值的z-index会被透明的body覆盖导致点击等事件响应出现问题，请谨慎使用。
+</pre>
+</div>
+</body>
+</html>
+```
+
+- z-index值越大越“靠近我们” -- 最初级的认知
+- 要搭配position: absolute | relative | fixed 使用才有用呢 -- 稍微进阶一些的认知
+- 比较两个兄弟节点谁更“靠近我们”，要看他们的同级父元素的比较呢。-- 可能是大部分前端的终极认知了
+
+
+
+（1）简单定义：
+
+通常 z-index 的使用是在有两个重叠的标签，在一定的情况下，控制其中一个在另一个的上方或者下方出现。
+
+z-index值越大就越是在上层。
+
+（2）Z-index 仅能在定位元素上奏效（也就是说要有position属性，再详细的说，它的值需要是relative、absolute、fixed）补充：它的值也可以写成inherit，只要它的结果能是上边的三种也可以。不能是static，因为这个是默认值，相当于没有定位
+
+
+
+
+
+![preview](Element%E7%AC%94%E8%AE%B0.assets/view.png)
+
+**当不同父元素的子元素之间进行显示时，会根据父级元素的z-index进行渲染，与子元素的z-index值没有关系**
+
+```css
+<div class="father"
+	<div class="public num01">我是第一个</div>
+</div>
+<div class="fatherTwo">
+	<div class="public num02">我是第二个</div>
+</div>
+```
+
+```css
+.father,
+.fatherTwo{
+width: 100px;height: 100px;
+color: white;
+position: relative;
+}
+
+.father{z-index: 1;}
+
+.fatherTwo{z-index: 2;} 
+
+.public{width: inherit;height: inherit;}
+.num01{
+position: absolute;
+background-color: black;
+margin-top: 50px;
+z-index: 1000;
+}
+.num02{
+position: inherit;
+background-color: red;
+z-index:100;
+}
+```
+
+![image-20240528165849847](Element%E7%AC%94%E8%AE%B0.assets/image-20240528165849847.png)
+
+
+
+
+
+**z-index无论设置多高都不起作用情况**
+
+这种情况发生的条件有三个：
+
+1. 父标签 position属性为 relative；
+2. 问题标签无position属性（不包括static）；
+3. 问题标签含有浮动(float)属性。
+
+例子z-index层级不起作用，浮动会让z-index失效，代码如下:
+
+```html
+<div style="position:relative; z-index:9999;">
+	<img style="float:left;" src="http://7te9u8.com1.z0.glb.clouddn.com/wp-content/uploads/2014/03/100084691.jpg" alt="div层调整z-index属性无效原因分析及解决方法">
+</div>
+```
+
+### 解决方法
+
+1. position:relative改为position:absolute；
+2. 浮动元素添加position属性（如relative，absolute等）；
+3. 去除浮动。
+
+
+
+兄弟盒子中绝对定位对z-index的影响
+
+```html
+<!-- html部分 -->
+<div class="box1">box1</div>
+<div class="box2">box2</div>
+```
+
+```css
+
+/* css部分 */
+.box1{
+    width: 200px;
+    height: 200px;
+    background: salmon;
+    position: absolute;
+    top:250px;
+    left: 100px;
+}
+.box2{
+    width: 200px;
+    height: 200px;
+    background: rgb(162, 20, 228);
+    margin-bottom: 500px;
+    position: absolute;
+    top: 400px;
+    /* 后来者居上，此时box2在box1上面 */
+    left: 0px; 
+    /* 设置box2在box1后面 */
+    z-index: -1; 
+}
+```
+
+父子盒子中绝对定位对z-index的影响
+
+```css
+/* css部分 */
+.father{
+    width: 200px;
+    height: 200px;
+    background: darkgreen;
+    margin-bottom: 50px;
+    /* 此时设置该属性没有作用，若想要父盒子覆盖在子盒子之上，则在子盒子中设置！ */
+    z-index: 1; 
+
+    /* 使得子盒子以父盒子为参照 */
+    /* position: relative;  */
+        }
+
+.child{
+    width: 100px;
+    height: 100px;
+    background: salmon;
+    top: 20px;
+    left: 20px;
+
+    /* 子盒子需要使用绝对定位才能设置z-index! */
+    /* position: absolute;   */
+    /* 此时子盒子被覆盖 */
+    /* z-index: -1;  */
+}
+
+```
+
+# CSS鼠标悬浮动画-hover属性
+
+[八大经典优雅的CSS鼠标悬浮动画-hover属性_css hover 动画-CSDN博客](https://blog.csdn.net/weixin_62650212/article/details/123912722)
+
+#### 1.Grow-Shadow
+
+###### 效果：
+
+
+
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/60d303d049ca4bf0aad60b12c88b1d92.gif#pic_center)
+
+###### 代码：
+
+```css
+/* Grow-Shadow */
+.hvr-grow-shadow {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: box-shadow, transform;
+  transition-property: box-shadow, transform;
+}
+.hvr-grow-shadow:hover, .hvr-grow-shadow:focus, .hvr-grow-shadow:active {
+  box-shadow: 0 10px 10px -10px rgba(0, 0, 0, 0.5);
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+1234567891011121314151617
+```
+
+#### 2.Grow
+
+###### 效果：
+
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/1fa116f6481545238758459981f4bf4e.gif#pic_center)
+
+###### 代码：
+
+```css
+/* Grow */
+.hvr-grow {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
+}
+.hvr-grow:hover, .hvr-grow:focus, .hvr-grow:active {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+12345678910111213141516
+```
+
+#### 3.Shrink
+
+###### 效果：
+
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/0db60c0a21c8466d9fcb4f98c2bf52d0.gif#pic_center)
+
+###### 代码：
+
+```css
+/* Shrink */
+.hvr-shrink {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
+}
+.hvr-shrink:hover, .hvr-shrink:focus, .hvr-shrink:active {
+  -webkit-transform: scale(0.9);
+  transform: scale(0.9);
+}
+12345678910111213141516
+```
+
+#### Float
+
+###### 效果：
+
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/8bd7969cc17d4b4bb3fa0eb32a778dc1.gif#pic_center)
+
+###### 代码：
+
+```css
+/* Float */
+.hvr-float {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
+  -webkit-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+}
+.hvr-float:hover, .hvr-float:focus, .hvr-float:active {
+  -webkit-transform: translateY(-8px);
+  transform: translateY(-8px);
+}
+123456789101112131415161718
+```
+
+#### 5.Float Shadow
+
+###### 效果：
+
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/c83ccf12826c472dbd5875c5a2ab1fde.gif#pic_center)
+
+###### 代码：
+
+```css
+/* Float Shadow */
+.hvr-float-shadow {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  position: relative;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
+}
+.hvr-float-shadow:before {
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+  content: '';
+  top: 100%;
+  left: 5%;
+  height: 10px;
+  width: 90%;
+  opacity: 0;
+  background: -webkit-radial-gradient(center, ellipse, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 80%);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 80%);
+  /* W3C */
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform, opacity;
+  transition-property: transform, opacity;
+}
+.hvr-float-shadow:hover, .hvr-float-shadow:focus, .hvr-float-shadow:active {
+  -webkit-transform: translateY(-5px);
+  transform: translateY(-5px);
+  /* move the element up by 5px */
+}
+.hvr-float-shadow:hover:before, .hvr-float-shadow:focus:before, .hvr-float-shadow:active:before {
+  opacity: 1;
+  -webkit-transform: translateY(5px);
+  transform: translateY(5px);
+  /* move the element down by 5px (it will stay in place because it's attached to the element that also moves up 5px) */
+}
+123456789101112131415161718192021222324252627282930313233343536373839404142
+```
+
+#### 6.Curl Bottom Right
+
+###### 效果：
+
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/55f2b1654466492f8ddea9d38696106b.gif#pic_center)
+
+###### 代码：
+
+```css
+/* Curl Bottom Right */
+.hvr-curl-bottom-right {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  position: relative;
+}
+.hvr-curl-bottom-right:before {
+  pointer-events: none;
+  position: absolute;
+  content: '';
+  height: 0;
+  width: 0;
+  bottom: 0;
+  right: 0;
+  background: white;
+  /* IE9 */
+  background: linear-gradient(315deg, white 45%, #aaa 50%, #ccc 56%, white 80%);
+  box-shadow: -1px -1px 1px rgba(0, 0, 0, 0.4);
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: width, height;
+  transition-property: width, height;
+}
+.hvr-curl-bottom-right:hover:before, .hvr-curl-bottom-right:focus:before, .hvr-curl-bottom-right:active:before {
+  width: 25px;
+  height: 25px;
+}
+123456789101112131415161718192021222324252627282930
+```
+
+#### 7.Bubble Float Right
+
+###### 效果：
+
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/40446100330e4190bf7250d632b33990.gif#pic_center)
+
+###### 代码：
+
+```css
+/* Bubble Float Right */
+.hvr-bubble-float-right {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  position: relative;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
+}
+.hvr-bubble-float-right:before {
+  position: absolute;
+  z-index: -1;
+  top: calc(50% - 10px);
+  right: 0;
+  content: '';
+  border-style: solid;
+  border-width: 10px 0 10px 10px;
+  border-color: transparent transparent transparent #e1e1e1;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
+}
+.hvr-bubble-float-right:hover, .hvr-bubble-float-right:focus, .hvr-bubble-float-right:active {
+  -webkit-transform: translateX(-10px);
+  transform: translateX(-10px);
+}
+.hvr-bubble-float-right:hover:before, .hvr-bubble-float-right:focus:before, .hvr-bubble-float-right:active:before {
+  -webkit-transform: translateX(10px);
+  transform: translateX(10px);
+}
+
+```
+
+#### 8.Box Shadow Inset
+
+###### 效果：
+
+![在这里插入图片描述](Element%E7%AC%94%E8%AE%B0.assets/9fffa52342e44a7cbb8ec038d373a1d1.gif#pic_center)
+
+###### 代码：
+
+```css
+/* Box Shadow Inset */
+.hvr-box-shadow-inset {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: box-shadow;
+  transition-property: box-shadow;
+  box-shadow: inset 0 0 0 rgba(0, 0, 0, 0.6), 0 0 1px rgba(0, 0, 0, 0);
+  /* Hack to improve aliasing on mobile/tablet devices */
+}
+.hvr-box-shadow-inset:hover, .hvr-box-shadow-inset:focus, .hvr-box-shadow-inset:active {
+  box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.6), 0 0 
+```
+
+# 聊天框
+
+```
+    <div class="chatMain" ref="chatMainWindow
+    </div>
+```
+
+
+
+```js
+  //把聊天窗口滚动到最底部
+  const chatDom = chatMainWindow.value as HTMLElement;
+  const observer = new MutationObserver((mutationsList) => {
+    // 滚动到最底部
+    chatDom.scrollTop = chatDom.scrollHeight;
+  });
+  observer.observe(chatDom, { childList: true });
 ```
 

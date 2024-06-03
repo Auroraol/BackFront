@@ -1,0 +1,37 @@
+:root {
+  /* 蓝色边框颜色 */
+  --border-line: #54befc;
+  /* 蓝色的盒子阴影的颜色 */
+  --box-shadow: rgb(54, 162, 250);
+  /* 导航栏底色 */
+  --nav-background-color: rgb(68, 68, 68);
+  /* 特殊蓝色字体蓝色 */
+  --special-font-color: rgb(91, 180, 253);
+  /* 泛用纯白背景颜色 */
+  --white-background-color: #ffffff;
+  /* 深色背景 */
+  --black-background-color: rgb(44, 44, 44);
+  /* 黑色字体 */
+  --black-font-color: #000;
+  /* 白色字体 */
+  --white-font-color: #fff;
+  /* 浅灰色字体 */
+  --font-gray-color: rgb(173, 173, 173);
+  /* 深灰色字体 */
+  --font-gray-color-dark: rgb(87, 87, 87);
+  /* 灰色的阴影 */
+  --gray-sahdow: rgb(78, 78, 78);
+  /* 浅灰色阴影 */
+  --gray-light-sahdow: rgb(182, 182, 182);
+  /* 半透明背景 */
+  --backgeound-color: rgba(172, 172, 172, 0.2);
+  /* 非常浅色的边框 */
+  --gray-light-border: rgb(224, 224, 224);
+  /* 浅灰蓝色背景(主页标签，留言背景使用中) */
+  --light-gray-blue: #dfe9f3;
+  /* 标题分离框渐变色组合 */
+  --gradient-start-one: #EF33B1;
+  --gradient-end-one: #F6E6BC;
+  /* 聊天室用浅灰色底色 */
+  --chat-gray-back: #505050;
+}
