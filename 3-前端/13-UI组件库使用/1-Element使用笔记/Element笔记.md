@@ -1698,7 +1698,14 @@ margin: 0 auto;
 </div>
 ```
 
+![image-20240604105452894](Element%E7%AC%94%E8%AE%B0.assets/image-20240604105452894.png)
 
+```html
+      <div style="text-align: center; /* 文本水平居中 */">
+        <svg-icon name="empty-df445c2e" width="161px" height="166px"></svg-icon>
+        <div class="info">暂无收藏</div>
+      </div>
+```
 
 div里标签元素居中(一般用于<标签>文字</标签>有文字的标签)
 

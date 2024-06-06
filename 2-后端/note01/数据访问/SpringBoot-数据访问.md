@@ -2527,11 +2527,142 @@ public class ArticleVo extends Article {
 	}
 ```
 
-## MySQL数据类型为 json #TODO
+## MySQL数据类型为 json
 
-[Mybatis和Mybatis-Plus对MySQL中json类型处理 - 简书 (jianshu.io)](https://wsa.jianshu.io/p/7a4653704acb)
+参考:
 
-[MyBatisPlus实现数据库JSON数据自动转换_mybatis-plus实体类复杂对象字段json自动相互转换-CSDN博客](https://blog.csdn.net/weixin_52195362/article/details/136451432)
++ [Mybatis和Mybatis-Plus对MySQL中json类型处理 - 简书 (jianshu.io)](https://wsa.jianshu.io/p/7a4653704acb)
+
++ [MyBatisPlus实现数据库JSON数据自动转换_mybatis-plus实体类复杂对象字段json自动相互转换-CSDN博客](https://blog.csdn.net/weixin_52195362/article/details/136451432)
+
+有时候在数据库中我们需要将数据以JSON的形式存储，例如：图片地址数组列表。
+
+在Java项目中可能是以这种形式来存储的：List< String > ，在数据库中是以JSON形式例如：[“http://地址1”，“http://地址2”,…]。现在需要在将Java实体对象存储到数据库中时能够将对应的List< String >数据自动转换为JSON数组，同时在查询出对象时能够将JSON数组自动转换为List< String >。
+
+### JsonTypeHandler
+
+处理器实现, 需要继承 **BaseTypeHandler< T >** 类，实现我们的转换逻辑。其他类型将泛型 **T** 替换为具体的实体类即可。
+
+```java
+package com.lfj.blog.config.mybatis.handler;
+
+import com.alibaba.fastjson.JSON;
+import lombok.SneakyThrows;
+import org.apache.ibatis.type.BaseTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedJdbcTypes;
+import org.apache.ibatis.type.MappedTypes;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+@MappedTypes(value = { List.class })
+@MappedJdbcTypes(value = JdbcType.VARCHAR)
+public class JsonStringArrayTypeHandler extends BaseTypeHandler<List<String>> {
+
+	@Override
+	public void setNonNullParameter(PreparedStatement ps, int i, List<String> parameter, JdbcType jdbcType)
+			throws SQLException {
+		ps.setString(i, JSON.toJSONString(parameter));
+	}
+
+	@Override
+	@SneakyThrows
+	public List<String> getNullableResult(ResultSet rs, String columnName) {
+		String reString = rs.getString(columnName);
+		return JSON.parseArray(reString,String.class);
+	}
+
+	@Override
+	@SneakyThrows
+	public List<String> getNullableResult(ResultSet rs, int columnIndex) {
+		String reString = rs.getString(columnIndex);
+		return JSON.parseArray(reString,String.class);
+	}
+
+	@Override
+	@SneakyThrows
+	public List<String> getNullableResult(CallableStatement cs, int columnIndex) {
+		String reString = cs.getString(columnIndex);
+		return JSON.parseArray(reString,String.class);
+	}
+}
+```
+
+### Java实体类
+
++ 在实体类加上`@TableName(autoResultMap = true)`（不设置autoResultMap属性的话存入没问题，但是取出的时候该字段是null）
++  在`JSON`字段映射的属性加上`@TableField(typeHandler = JacksonTypeHandler.class)`；
+
+```java
+/**
+* 测试实体
+*/
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+@TableName(value = "test",autoResultMap = true)
+public class Test implements Serializable {
+    /**
+     * 数据库主键
+     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @Schema(description="数据库主键")
+    private Long id;
+
+    /**
+     * 工作情况图片列表,json数组
+     */
+    @TableField(value = "img_list",typeHandler = JsonStringArrayTypeHandler.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @Schema(description="工作情况图片列表,json数组")
+    @Size(max = 255,message = "工作情况图片列表,json数组最大长度要小于 255")
+    private List<String> imgList;
+
+    /**
+     * 创建时间
+     * */
+    @TableField(value = "create_time")
+    @Schema(description="创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
+}
+```
+
+### 配置文件
+
+```yml
+mybatis-plus:
+  type-handlers-package: com.lfj.blog.config.mybatis.handler  #增加此项配置, 写JsonTypeHandler所在包
+```
+
+###  SQL文件
+
+如果启动报错：No typehandler found for content....
+那么在对应的mapper文件里面对应的JSON字段 添加typeHandler
+
+```xml
+<resultMap id="BaseResultMap" type="com.test.entity.User">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="content" property="content" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+    </resultMap>
+```
+
+在`xml`中写`sql`语句时，需要将使用到 `JSON`字段的地方配置
+
+```sql
+<insert id="insertUser" parameterType="com.test.entity.User">
+        insert into 
+            user 
+        values(#{id},#{name},#{content,jdbcType=OTHER,typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler})
+    </insert>
+```
 
 ## 自动配置原理
 
