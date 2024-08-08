@@ -715,7 +715,9 @@ System.out.println(dto.getCreateTime());  //2024-01-20
 
 ### 单表查询
 
-#### 方式一:  CRUD接口方式 - Service
+#### 方式一:  CRUD接口方式 - Service (增删)
+
+客瑞的
 
 [MyBatis-Plus（九）Service的CRUD接口1：基本查询_listbyids_Zack_tzh的博客-CSDN博客](https://blog.csdn.net/Zack_tzh/article/details/107528997)
 
@@ -755,7 +757,7 @@ public class BootWebAdminApplicationTest {
     @Autowired
     UserService userService;
  
-    //saveOrUpdate()  保存或更新
+    //userService.saveOrUpdate()  如果主键存在，则更新该记录的相关字段, 没有保存
     
     /**
      * [插入一条数据]
@@ -1031,7 +1033,7 @@ public class BootWebAdminApplicationTest {
 }
 ```
 
-#### 方式二:  条件构造器方式 -Mapper
+#### 方式二:  条件构造器方式 -Mapper (查询, 更新)
 
 ![image-20231002145521470](SpringBoot3-数据访问.assets/image-20231002145521470.png)
 
@@ -1069,6 +1071,169 @@ public AjaxResult selectStudentByNumber(@RequestBody Student student) {
     return AjaxResult.success(result);
 }
 ```
+
+###### xxxxMapper.
+
+LambdaQueryWrapper：
+
+```java
+LambdaQueryWrapper<User> lambdaWrapper = new LambdaQueryWrapper<>();
+lambdaWrapper.eq(User::getAge, 20).like(User::getName, "张");
+```
+
+LambdaUpdateWrapper：
+
+```java
+LambdaUpdateWrapper<User> lambdaWrapper = new LambdaUpdateWrapper<>();
+lambdaWrapper.set(User::getAge, 30).eq(User::getName, "张三");
+int rows = userMapper.update(null, lambdaWrapper);
+```
+
+```
+    // UpdateWrapper<User> wrapper = new UpdateWrapper<User>()
+    //        .eq("id", userId);
+    // userMapper.deductBalanceByIds(money, wrapper);
+```
+
+###### xxxxService. (一般不用)
+
+**查询lambdaQuery**
+
+```mysql
+// com.star.learning.controller.UserController
+
+@GetMapping("/list")
+public List<User> list(UserQuery userQuery) {
+    // 1.组织条件
+    String username = userQuery.getUsername();
+    Integer status = userQuery.getStatus();
+    Integer minBalance = userQuery.getMinBalance();
+    Integer maxBalance = userQuery.getMaxBalance();
+    System.out.println("根据条件查询用户列表 => " + userQuery);
+    // 2.查询用户
+    List<User> users = userService.lambdaQuery()
+            .like(username != null, User::getUsername, username)
+            .eq(status != null, User::getStatus, status)
+            .ge(minBalance != null, User::getBalance, minBalance)
+            .le(maxBalance != null, User::getBalance, maxBalance)
+            .list();
+    System.out.println("查询结果 => " + users);
+    return users;
+}
+
+```
+
+**更新 lambdaUpdate**
+
+```mysql
+// com.star.learning.service.impl.UserServiceImpl
+
+@Override
+public void deductBalance(Long userId, Integer money) {
+    // 1.查询用户
+    User user = getById(userId);
+    System.out.println(user);
+    // 2.判断用户状态
+    if (user == null || user.getStatus() == 2) {
+        throw new RuntimeException("用户状态异常");
+    }
+    // 3.判断用户余额
+    if (user.getBalance() < money) {
+        throw new RuntimeException("用户余额不足");
+    }
+    // 4.扣减余额
+    int remainBalance = user.getBalance() - money;
+    lambdaUpdate()
+            // 更新余额
+            .set(User::getBalance, remainBalance)
+            // 动态判断是否更新status
+            .set(remainBalance == 0, User::getStatus, 2)
+            // 条件
+            .eq(User::getId, userId)
+            // 乐观锁
+            .eq(User::getBalance, user.getBalance())
+            .update();
+
+
+}
+
+```
+
+lambdaQuery与lambdaUpdate
+
+1. 等于
+
+```mysql
+//EQ 就是 EQUAL等于
+taskFlowService.lambdaQuery().eq(TaskFlow::getCreateTime,DateUtil.now())
+```
+
+2. 不等于
+
+```mysql
+//NE就是 NOT EQUAL不等于
+taskFlowService.lambdaQuery().ne(TaskFlow::getCreateTime,DateUtil.now());
+```
+
+3. 大于
+
+```mysql
+//GT 就是 GREATER THAN大于
+taskFlowService.lambdaQuery().gt(TaskFlow::getCreateTime,DateUtil.now());
+```
+
+4. 小于
+
+```mysql
+//LT 就是 LESS THAN小于
+taskFlowService.lambdaQuery().lt(TaskFlow::getCreateTime,DateUtil.now());
+```
+
+5. 大于等于
+
+```mysql
+//GE 就是 GREATER THAN OR EQUAL 大于等于
+taskFlowService.lambdaQuery().ge(TaskFlow::getCreateTime,DateUtil.now());
+```
+
+6. 小于等于
+
+```mysql
+//LE 就是 LESS THAN OR EQUAL 小于等于
+taskFlowService.lambdaQuery().le(TaskFlow::getCreateTime,DateUtil.now());
+```
+
+7. 根据id查询对象
+
+```mysql
+Student one = studentService.lambdaQuery().eq(Student::getSno, 1).one();
+```
+
+8. 带条件的查询集合
+
+```mysql
+List<Student> studentList = studentService.lambdaQuery().eq(Student::getAddress, "上海").list();
+```
+
+9. 带条件的删除
+
+```mysql
+studentService.lambdaUpdate().eq(Student::getName,"张三").eq(Student::getAge,15).remove();
+```
+
+ 10 .带条件的修改
+
+```mysql
+studentService.lambdaUpdate().set(Student::getAddress,"湖南").eq(Student::getSno,1).update();
+```
+
+11. 分页查询
+
+```mysql
+IPage<Student> studentIPage = studentService.page(new Page(current,size),new QueryWrapper<Student>().like(StrUtil.isNotBlank(name),"name",name));
+```
+
+ 
 
 用法
 
@@ -1163,7 +1328,7 @@ public class SelectTest {
     }
 
      /**
-	 * 根据名称查询
+	 * 根据名称查询(常用)
 	 *
 	 * @param name
 	 * @return
@@ -1188,6 +1353,16 @@ public class SelectTest {
         List<User> list = userMapper.selectList(query);
         list.forEach(System.out::println);
     }
+    
+    //
+    QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+	queryWrapper.lambda()
+        .like(User::getName, "雨")  // 使用Lambda表达式指定属性名
+        .between(User::getAge, 20, 40)  // 使用Lambda表达式指定属性名
+        .isNotNull(User::getEmail);  // 使用Lambda表达式指定属性名
+
+	List<User> list = userMapper.selectList(queryWrapper);
+
 
     /**
      * 名字中包含雨，并且年龄大于等于20且小于等于40，并且email不为空
@@ -1549,6 +1724,33 @@ void deleteUser(Long id);
 
 比较简单一般由插件直接生成
 
+#### 总结
+
+ LambdaQueryWrapper的使用
+
+- `eq(column, value)`: 等于
+- `ne(column, value)`: 不等于
+- `gt(column, value)`: 大于
+- `ge(column, value)`: 大于等于
+- `lt(column, value)`: 小于
+- `le(column, value)`: 小于等于
+- `like(column, value)`: 模糊查询
+- `notLike(column, value)`: 不模糊查询
+- `in(column, valueList)`: 在指定集合中
+- `notIn(column, valueList)`: 不在指定集合中
+- `isNull(column)`: 为空
+- `isNotNull(column)`: 不为空
+- `orderByAsc(column)`: 升序排序
+- `orderByDesc(column)`: 降序排序
+
+```mysql
+LambdaQueryWrapper<xxx> queryWrapper = new LambdaQueryWrapper<>();
+queryWrapper.xxx....
+List<xxx> list = userMapper.selectList(queryWrapper);   // 查询单表数据
+Integer count = userMapper.selectCount(queryWrapper);   // 查询数量
+IPage<xxx> userIPage = userMapper.selectPage(new Page<>(current, size) , queryWrapper); // 分页
+```
+
 ### 多表查询
 
 代码见[代码experiment02](https://github.com/Auroraol/BackFront/tree/master/2-后端/note01/7-Spring Boot3/sql/experiment02))
@@ -1856,6 +2058,18 @@ public void testSelectPage(){
     System.out.println("是否有上一页："+page.hasPrevious());
     System.out.println("是否有下一页："+page.hasNext());
 }
+
+// 或者
+Page<DigitalLibraryDO> digitalLibraryDOPage = digitalLibraryMapper.selectPage(new Page<>(curPage, pageSize), new QueryWrapper<DigitalLibraryDO>());
+
+// 或者 (推荐)
+LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+queryWrapper.like(User::getUsername , "k");
+IPage<User> userIPage = userMapper.selectPage(new Page<>(1 , 2) , queryWrapper);
+
+System.out.println("总页数： "+userIPage.getPages());
+System.out.println("总记录数： "+userIPage.getTotal());
+userIPage.getRecords().forEach(System.out::println);
 ```
 
 ```
@@ -2263,6 +2477,55 @@ public class ArticlePageQueryWrapper {
 }
 ```
 
+```java
+package com.lfj.blog.service.vo;
+
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.lfj.blog.entity.Article;
+import com.lfj.blog.entity.Category;
+import com.lfj.blog.entity.Tag;
+import com.lfj.blog.entity.User;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+
+import java.util.List;
+
+/**
+ * ArticleVo对象
+ * 文章返回前端对象
+ * 文章详细对象
+ **/
+@Data
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(title = "ArticleVo对象", description = "文章详细对象")
+public class ArticleVo extends Article {
+
+	@Schema(description = "作者信息")
+	private User user;
+
+	@Schema(description = "标签列表")
+	private List<Tag> tagList;
+
+	@Schema(description = "分类列表,顺序:root node2 node3")
+	private List<Category> categoryList;
+
+	@Schema(description = "上一篇")
+	private Article previous;
+
+	@Schema(description = "下一篇")
+	private Article next;
+
+	@Schema(description = "推荐分数")
+	private Double recommendScore;
+
+}
+```
+
 #### 编写mapper
 
 ```java
@@ -2407,6 +2670,49 @@ ArticleMapper.xml
 
 分析
 
+```
+{
+  "code": 200000,
+  "message": "成功",
+  "data": {
+    "id": 2,
+    "original": 1,
+    "categoryName": "一级分类二",
+    "categoryId": 2,
+    "title": "string",
+    "summary": "string",
+    "htmlContent": "string",
+    "cover": "string",
+    "status": 0,
+    "viewCount": 0,
+    "commentCount": 0,
+    "likeCount": 0,
+    "collectCount": 0,
+    "publishTime": "2020-01-02 20:24:16",
+    "updateTime": "2020-01-02 20:24:16",
+    "user": {
+      "id": 1,
+      "nickname": "小管家",
+      "avatar": "https://poile-img.nos-eastchina1.126.net/me.png"
+    },
+    "tagList": [
+      {
+        "id": 1,
+        "name": "测试"
+      }
+    ],
+    "previous": {
+      "id": 1,
+      "title": "标题"
+    },
+    "next": {
+      "id": 3,
+      "title": "string2"
+    }
+  }
+}
+```
+
 
 
 ```
@@ -2525,6 +2831,88 @@ public class ArticleVo extends Article {
 		page.setRecords(articleVoList);
 		return page;
 	}
+```
+
+### 例子4 (推荐)
+
+```java
+@Data
+public class EquipmentDoorPageVO {
+    @ApiModelProperty("设备自增id")
+    private Integer id;
+
+    @ApiModelProperty("设备名称")
+    private String equipmentName;
+
+    @ApiModelProperty("设备序列号")
+    private String equipmentSerialNumber;
+
+    @ApiModelProperty("设备ip地址")
+    private String equipmentIp;
+
+    @ApiModelProperty("设备型号id")
+    private Integer productId;
+
+    @ApiModelProperty("设备型号")
+    private String productName;
+
+    @ApiModelProperty(value = "门数量")
+    private Integer doorCount;
+
+    @ApiModelProperty(value = "读头数量")
+    private Integer readHeadCount;
+}
+```
+
+```mysql
+Page<EquipmentDoorPageVO> page = equipmentMapper.getEquipmentDoorPage(new Page<>(query.getCurPage(), query.getPageSize()), query, businessTye, regionIds);
+```
+
+```java
+Page<EquipmentDoorPageVO> getEquipmentDoorPage(Page<EquipmentDoorPageVO> page, @Param("query") EquipmentDoorPageQuery query, @Param("businessType") Integer businessType, @Param("regionIds") List<Integer> regionIds);
+```
+
+```mysql
+    <select id="getEquipmentDoorPage" resultType="com.fungxi.server.equipment.model.vo.EquipmentDoorPageVO">
+        select
+        e.id,
+        e.equipment_name,
+        e.equipment_serial_number,
+        e.equipment_ip,
+        e.product_id,
+        apt.product_chinese_name productName
+        from
+        (
+        (
+        SELECT equipment.*, 0 isRelate FROM equipment inner join apply_product apt on apt.id=equipment.product_id and
+        apt.business_type = #{businessType}
+        UNION
+        (SELECT e.*,eba.is_association isRelate FROM equipment e INNER JOIN equipment_business_association eba ON e.id =
+        eba.equipment_id and eba.business_type = #{businessType} and eba.is_association = 1))
+        ) e
+        inner join apply_product apt on apt.id=e.product_id
+        inner join region re on re.id = e.region_id
+        <where>
+            <if test="query.equipmentIp!=null and query.equipmentIp!=''">
+                and e.equipment_ip like CONCAT('%',#{query.equipmentIp},'%')
+            </if>
+            <if test="query.equipmentSerialNumber !=null and query.equipmentSerialNumber!=''">
+                and e.equipment_serial_number like CONCAT('%',#{query.equipmentSerialNumber},'%')
+            </if>
+            <if test="query.productName != null and query.productName != ''">
+                AND apt.product_chinese_name = #{query.productName}
+            </if>
+            <if test="query.equipmentName!=null and query.equipmentName!=''">
+                AND e.equipment_name like CONCAT('%',#{query.equipmentName},'%')
+            </if>
+            <if test="regionIds.size > 0">
+                AND e.region_id in
+                <foreach collection="regionIds" item="regionId" separator="," open="(" close=")">
+                    #{regionId}
+                </foreach>
+            </if>
+        </where>
+    </select>
 ```
 
 ## MySQL数据类型为 json
@@ -3367,7 +3755,7 @@ OrderInfo orderInfo = new OrderInfo();
 
 
 
-# 常用xml
+# xml 总结
 
 ```xml
     <!-- 查询上一篇和下一篇
@@ -3393,5 +3781,224 @@ OrderInfo orderInfo = new OrderInfo();
            and b.status = 0
          order by b.id limit 1)
     </select>
+```
+
+## MyBatis中的动态SQL
+
+[MyBatis——动态SQL的四个常用标签（＜if＞、＜where＞、＜foreach＞、＜sql＞）](https://blog.csdn.net/weixin_43823808/article/details/114393656)
+
+## `<resultMap>`
+
+**适用:** 
+
++ 如果实体的每个字段都和数据库中的字段名称 是不一样的，就采用的是ResultMap来对实体字段和数据库的字段进行统一的映射
+
++ 如果只是一两个字段是不一致的，则直接对不同的那两个字段起别名进行字段对应即可！
+
+**可以配置mybatis驼峰命名规则自动转换: **
+
+- 使用前提：
+
+  + 数据库表设计按照规范“字段名中各单词使用下划线"_"划分”；
+  + 即数据库(xxx_yyy)自动和java(xxxYyy)匹配
+
+- 使用好处：
+
+  + 省去mapper.xml文件中繁琐编写表字段列表与表实体类属性的映射关系，即编写resultMap
+
+  + 只需要为resultType指定数据库表对应
+
+  + 但是考虑程序的安全性以及映射灵活性，通常开发中还是将resultMap结合使用。
+
+    
+
+# 总结:crown:
+
+## VO/DTO
+
+适用: 
+
++ 单表查询且想要查询的不只是该表存在的字段
++ 多表查询
+
+### 分页配置
+
+开启MybatisPlus的[分页插件](https://so.csdn.net/so/search?q=分页插件&spm=1001.2101.3001.7020)
+
+```java
+@Configuration
+@MapperScan("com.example.nb_road.mapper")
+public class MyBatisPlusConfig {
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor(){
+        MybatisPlusInterceptor interceptor=new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        return interceptor;
+    }
+}
+```
+
+### 实体类及VO
+
+实体类：路段。路段中的roadId代表了所属道路的id，因此需要联表查询所属道路的名称。
+
+```java
+package com.example.nb_road.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+
+import java.io.Serializable;
+
+@TableName(value = "section")
+@Data
+public class RoadSection implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    @TableId(type = IdType.AUTO)
+    private Long id;
+    
+    private Long roadId;
+    
+    private Double length;
+    
+    private String start;
+    
+    private String end;
+    
+    private String coordinates;
+    
+    private Integer state;
+    
+    private Integer isDeleted;
+}
+```
+
+VO类在继承实体类的基础上，增加道路名称属性。
+
+```java
+package com.example.nb_road.entity.vo;
+
+import com.example.nb_road.entity.RoadSection;
+import lombok.Data;
+import lombok.ToString;
+
+@Data
+@ToString
+public class RoadSectionVO extends RoadSection {
+    private String roadName;
+}
+```
+
+### Mapper接口
+
+```java
+@Repository
+public interface RoadSectionMapper extends BaseMapper<RoadSection> {
+    /**
+     * 自定义分页查询
+     *
+     * @param page     分页对象
+     * @param roadName 其中一个查询参数，路段名称
+     * @return 包含的查询结果的分页对象
+     */
+    IPage<RoadSectionVO> selectPage(IPage<RoadSectionVO> page, @Param("roadName") String roadName);
+}
+```
+
+### Mapper文件（xml）
+
+这里做了一个条件判断，如果给定的路段名称为空，那么就不包含该项。
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.nb_road.mapper.RoadSectionMapper">
+    <select id="selectPage" resultType="com.example.nb_road.entity.vo.RoadSectionVO">
+        select s.id, r.road_name
+        from section s join road r on s.road_id = r.id
+        <where>
+            <if test="roadName != null and roadName != ''">and r.road_name = # {roadName}</if>
+        </where>
+    </select>
+</mapper>
+```
+
+### 测试
+
+```java
+@Slf4j
+@SpringBootTest
+class RoadSectionMapperTest {
+    @Autowired
+    private RoadSectionMapper roadSectionMapper;
+    
+    @Test
+    void testPage(){
+        // 构建分页对象
+        IPage<RoadSectionVO> page = new Page<>(1, 2);
+        // 调用查询方法
+        IPage<RoadSectionVO> roadSectionIPage = roadSectionMapper.selectPage(page, "雪里段");
+        // 从分页对象中取出查询结果
+        List<RoadSectionVO> records = roadSectionIPage.getRecords();
+        records.forEach(System.out::println);
+    }
+}
+```
+
+### 控制台输出
+
+```
+JDBC Connection [HikariProxyConnection@994185757 wrapping com.mysql.cj.jdbc.ConnectionImpl@7a2ab862] will not be managed by Spring
+==>  Preparing: SELECT COUNT(*) AS total FROM section s JOIN road r ON s.road_id = r.id WHERE r.road_name = ?
+==> Parameters: 雪里段(String)
+<==    Columns: total
+<==        Row: 3
+<==      Total: 1
+==>  Preparing: select s.id, r.road_name from section s join road r on s.road_id = r.id WHERE r.road_name = ? LIMIT ?
+==> Parameters: 雪里段(String), 2(Long)
+<==    Columns: id, road_name
+<==        Row: 1, 雪里段
+<==        Row: 2, 雪里段
+<==      Total: 2
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a53f215]
+RoadSectionVO(roadName=雪里段)
+RoadSectionVO(roadName=雪里段)
+```
+
+
+
+##  LambdaQueryWrapper
+
+适用:  单表查询且想要查询的就是该表存在的字段
+
+```java
+LambdaQueryWrapper<xxx> queryWrapper = new LambdaQueryWrapper<>();
+queryWrapper.xxx....
+
+List<xxx> list = userMapper.selectList(queryWrapper);   // 查询单表数据
+Integer count = userMapper.selectCount(queryWrapper);   // 查询数量
+IPage<xxx> userIPage = userMapper.selectPage(new Page<>(current, size) , queryWrapper); // 分页
+```
+
+LambdaWrapper去实现去重查询
+
+```java
+@Override
+    public Integer getCountAbPressure(String customerId, LocalDateTime firstDay, LocalDateTime lastDay, List<String> list, Integer type) {
+        QueryWrapper<CustomerBodyMetricsEntity> wrapper = new QueryWrapper<>();
+        wrapper.select("DISTINCT 去重字段")
+                .lambda()
+                .eq(CustomerBodyMetricsEntity::getCustomerId, customerId)
+                .ge(CustomerBodyMetricsEntity::getVersion, DateTimeUtil.dateTimeToTimestamp(firstDay))
+                .le(CustomerBodyMetricsEntity::getVersion, DateTimeUtil.dateTimeToTimestamp(lastDay))
+                .in(CustomerBodyMetricsEntity::getMetric, list)
+                .ne(CustomerBodyMetricsEntity::getLabel, 20);
+        return this.count(wrapper);
+    }
 ```
 
