@@ -1,0 +1,1 @@
+[Kafka收发消息核心参数详解_kafka 发送消息配置-CSDN博客](https://blog.csdn.net/qq_27740127/article/details/135040033)

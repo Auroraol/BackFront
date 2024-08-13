@@ -156,3 +156,163 @@
 目前只能手动切换
 
 ![image-20231218223826249](vscode%E4%BD%BF%E7%94%A8.assets/image-20231218223826249.png)
+
+
+
+
+
+# ssh
+
+ssh config配置文件的基本格式
+
+```
+Host   : hostName的别名
+HostName： 是目标主机的主机名，也就是平时我们使用ssh后面跟的地址名称。
+Port：指定的端口号。
+User：指定的登陆用户名。
+IdentifyFile：指定的私钥地址。
+```
+
+Mac 使用~/.ssh 的config 配置GitHub SSH keys：https://kunnan.blog.csdn.net/article/details/78234772
+
+## I 使用ssh config配置文件来管理ssh连接
+
+### 1.1 例子
+
+```
+# Private 192.168.2.125
+Host iPhone
+HostName  192.168.2.125
+User root 
+IdentityFile ~/.ssh/id_rsa_Theos125
+
+# Private gitlab.v6h5.
+Host gitlab.v6h5.cn
+HostName  gitlab.v6h5.
+User git
+IdentityFile ~/.ssh/id_rsa_qinbaowan
+```
+
+### 1.2 注意事项
+
+- 一定要记得配置Host 否则会导致其他的连接不上:`Permission denied (publickey,gssapi-keyex,gssapi-with-mic).`
+
+------
+
+```
+$ ssh iPhone
+root@192.168.2.125's password: 
+iPhone:~ root# 
+```
+
+- `将公钥传送到远程主机host上面` ssh-copy-id 记得指定认证文件
+
+```
+ssh-copy-id -i id_rsa_Theos125 root@192.168.2.131
+```
+
+## II 私钥文件的权限设置
+
+常见问题：`Permissions 0640 for '/Users/mac/.ssh/qctmac_id_rsa' are too open.`
+
+该文件不能被其他人访问，只要将所属组和其他人的read权限取消即可。
+
+```
+➜  .ssh chmod 600 qctmac_id_rsa
+➜  .ssh chmod 644 qctmac_id_rsa.pub
+
+-rw-r--r--@ 1 mac  staff   742  4  7 18:03 qctmac_id_rsa.pub
+-rw-------@ 1 mac  staff  3434  4  7 18:03 qctmac_id_rsa
+```
+
+## III 前置知识：免密码进行SSH连接
+
+1. 创建rsa：`ssh-keygen -t rsa -b 4096 -C "929118967@qq.com"`
+2. 配置config: `➜ .ssh touch config`
+3. 使用pbcopy或者ssh-copy-id进行拷贝公钥到对应的远程服务器
+
+```
+➜ .ssh pbcopy < ~/.ssh/qctmac_id_rsa.pub
+```
+
+![图片](vscode%E4%BD%BF%E7%94%A8.assets/640.webp)在这里插入图片描述
+
+使用ssh-copy-id进行报备
+
+> ssh-copy-id：千万不要把私钥泄漏！只是把公钥（*.pub 文件）复制给远程服务器;
+>
+> `$ ssh-copy-id -i ~/.ssh/id_rsa_Theos125 root@192.168.2.144 `(IP+默认端口 这里拷贝的是公钥，，如果是指定私钥ssh-copy-id 会自己寻找公钥。)
+
+如果是配置在公司Mac上，记得设置密码，并在更换Mac时移除掉 ～/.ssh/ 目录下的`xx_id_rsa/xx_id_rsa.pub`。
+
+> https://kunnan.blog.csdn.net/article/details/120466314
+
+### 3.1 创建 rsa
+
+```
+ssh-keygen -t rsa -b 4096 -C "929118967@qq.com"
+```
+
+### 3.2  配置 ssh config
+
+config文件的 语法
+
+```
+Host  别名
+HostName：是目标主机的主机名，也就是平时我们使用ssh后面跟的地址名称。
+Port：指定的端口号。
+User：指定的登陆用户名。
+IdentifyFile：指定的私钥地址。
+# Private 192.168.2.125
+Host iphone
+HostName  192.168.2.125
+User root 
+IdentityFile ~/.ssh/id_rsa_Theos125
+
+# Private github
+Host github.com
+HostName  github.com
+User git
+IdentityFile ~/.ssh/id_rsa
+
+# git clone git@codechina.csdn.net:u011018979/resume.git
+
+Host codechina.csdn.net
+HostName  codechina.csdn.net
+User git
+IdentityFile ~/.ssh/qctmac_id_rsa
+```
+
+### 3.3 测试连接
+
+```
+➜  csdn ssh -T git@codechina.csdn.net       
+Enter passphrase for key '/Users/mac/.ssh/qctmac_id_rsa': 
+Welcome to GitLab, @u011018979!
+```
+
+连接iPhone
+
+```
+$ ssh iPhone
+root@192.168.2.125's password: 
+iPhone:~ root# 
+```
+
+### 3.4 案例：配置GitHub SSH keys
+
+Enter ls -al ~/.ssh to see if existing SSH keys are present:
+
+> If you don't have an existing public and private key pair, or don't wish to use any that are available to connect to GitHub, then generate a new SSH key.`ssh-keygen -t rsa -b 4096 -C "929118967@qq.com"`
+
+添加对应的公钥到对应的远程服务器:` .ssh pbcopy < ~/.ssh/qctmac_id_rsa.pub`
+
+配置邮箱和用户名: `git config --global --edit`
+
+![图片](vscode%E4%BD%BF%E7%94%A8.assets/640-17235227168811.webp)在这里插入图片描述
+
+修改 author :` git commit --amend --reset-author`
+
+效果
+
+> ![图片](vscode%E4%BD%BF%E7%94%A8.assets/640-17235227168812.webp)在这里插入图片描述
