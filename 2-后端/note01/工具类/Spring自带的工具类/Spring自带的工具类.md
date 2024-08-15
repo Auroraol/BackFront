@@ -22,7 +22,7 @@ Apache [Commons-Lang3](https://so.csdn.net/so/search?q=Commons-Lang3&spm=1001.21
     <artifactId>commons-lang3</artifactId>
     <version>3.12.0</version>
 </dependency>
-12345
+
 ```
 
 ## 三、常用方法总结
