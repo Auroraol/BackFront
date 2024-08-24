@@ -910,6 +910,8 @@ RequestParam  带?  可以设置默认值, 不传值
 
 例子 http://localhost:8090/param?age=参数?name=参数
 
+![image-20240819135606709](SpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3.assets/image-20240819135606709.png)
+
 ```java
 @GetMapping("/param")
 public String hello(@RequestParam(value = "age",   defaultValue = "0") int age,      @RequestParam(value = "name", required = false, defaultValue = "") String name) {

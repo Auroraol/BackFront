@@ -1296,6 +1296,7 @@ public class SelectTest {
 
     @Test
     public void selectById() {
+         // 按id查询
         User user = userMapper.selectById(1087982257332887553L);
         System.out.println(user);
     }
@@ -1307,6 +1308,7 @@ public class SelectTest {
             1094590409767661570L,
             1094592041087729666L
         );
+         // 按id集合查询
         List<User> list = userMapper.selectBatchIds(ids);
         list.forEach(System.out::println);
     }
@@ -1321,8 +1323,10 @@ public class SelectTest {
         list.forEach(System.out::println);
     }
 
+     
     @Test
     public void selectList_all() {
+         // 查询所有
         List<User> list = userMapper.selectList(null);
         list.forEach(System.out::println);
     }
@@ -3828,7 +3832,7 @@ OrderInfo orderInfo = new OrderInfo();
 
 适用: 
 
-+ 单表查询且想要查询的不只是该表存在的字段
++ 单表查询且想要查询的不只是该表存在的字段  (不一定非得写xml, 可以都单表查询出来再拼接成vo)
 + 多表查询
 
 ### 分页配置
