@@ -3788,3 +3788,34 @@ public void msg(Object msg,
 }
 ```
 
+
+
+
+
+
+
+![image-20240829184904693](SpringCloud%20alibaba.assets/image-20240829184904693.png)
+
+
+
+
+
+```java
+    /**
+     * 接口调用详情
+     * @param id
+     * @returnoperation/record/page
+     */
+    @GetMapping("/call/log/interface/log/info")
+    InterfaceCallRecordInfoVO getInterfaceCallInfo(@RequestParam("id") String id);
+
+    @PostMapping(value = "/iot/user/operation/log/page")
+    Page<OperationRecordPageVO> operationRecordPage(@RequestBody OperationRecordPageQuery query);
+
+    /**
+     * 获取卡注册记录日志分页
+     */
+    @GetMapping("/card/register/operation/log/get/page")
+    Page<CardRegisterOperationRecordVO> pageCardRegisterLog(@SpringQueryMap CardRegisterOperationRecordQuery query);
+```
+
