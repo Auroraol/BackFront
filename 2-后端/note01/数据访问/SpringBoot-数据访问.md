@@ -1296,6 +1296,7 @@ public class SelectTest {
 
     @Test
     public void selectById() {
+         // 按id查询
         User user = userMapper.selectById(1087982257332887553L);
         System.out.println(user);
     }
@@ -1307,6 +1308,7 @@ public class SelectTest {
             1094590409767661570L,
             1094592041087729666L
         );
+         // 按id集合查询
         List<User> list = userMapper.selectBatchIds(ids);
         list.forEach(System.out::println);
     }
@@ -1321,8 +1323,10 @@ public class SelectTest {
         list.forEach(System.out::println);
     }
 
+     
     @Test
     public void selectList_all() {
+         // 查询所有
         List<User> list = userMapper.selectList(null);
         list.forEach(System.out::println);
     }
@@ -3787,6 +3791,16 @@ OrderInfo orderInfo = new OrderInfo();
 
 [MyBatis——动态SQL的四个常用标签（＜if＞、＜where＞、＜foreach＞、＜sql＞）](https://blog.csdn.net/weixin_43823808/article/details/114393656)
 
+
+
+## MyBatis foreach 标签常用方法总结
+
+[MyBatis之foreach的用法_mybatis foreach数组-CSDN博客](https://blog.csdn.net/qq_20236937/article/details/130704480?ops_request_misc=%7B%22request%5Fid%22%3A%22172362581016800207051703%22%2C%22scm%22%3A%2220140713.130102334.pc%5Fall.%22%7D&request_id=172362581016800207051703&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~hot_rank-4-130704480-null-null.142^v100^pc_search_result_base7&utm_term=mybatis之foreach用法&spm=1018.2226.3001.4187)
+
+
+
+
+
 ## `<resultMap>`
 
 **适用:** 
@@ -3818,7 +3832,7 @@ OrderInfo orderInfo = new OrderInfo();
 
 适用: 
 
-+ 单表查询且想要查询的不只是该表存在的字段
++ 单表查询且想要查询的不只是该表存在的字段  (不一定非得写xml, 可以都单表查询出来再拼接成vo)
 + 多表查询
 
 ### 分页配置
