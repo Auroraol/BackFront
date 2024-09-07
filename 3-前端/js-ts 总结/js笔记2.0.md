@@ -14,7 +14,48 @@ const anotherGlobalVar = 20;
 
 使用 `var` 声明的全局变量存在变量提升（hoisting）和潜在的全局污染问题，因此不推荐使用。
 
+# 工具类
 
+## 判断对象是否为空
+
+```java
+//输入想要检测的json数据 如果为空返回返回false
+export function isNullObject(model) {
+  if (typeof model === "object") {
+    let hasProp = false;
+    for (const prop in model) {
+        hasProp = true;
+        break;
+    }
+    if (hasProp) {
+        return false;
+    }
+    return true;
+  } else {
+      throw "model is not object";
+  }
+}
+```
+
+## 数据类型检测
+
+```javascript
+//检测变量的数据类型
+export function getParamType(item) {
+    if (item === null) return null;
+    if (item === undefined) return undefined;
+    return Object.prototype.toString.call(item).slice(8, -1);
+}
+//返回String Function Boolean Object Number
+```
+
+## 数组去重
+
+```javascript
+export function arrayUniq(array){
+  return Array.from(new Set(array));
+}
+```
 
 # 函数
 
@@ -23,6 +64,11 @@ const anotherGlobalVar = 20;
 **建议使用 `匿名函数` 或 `箭头函数` 来定义函数**：
 
 ```js
+// 方法0: 普通函数
+function add(a, b) {
+  return a + b;
+}
+
 //方法1:   匿名函数, 调用的方式，函数调用必须写到函数体下面
 const sum = function(a, b) {
 	return a + b;
@@ -173,6 +219,50 @@ function test1(a,b,...rest){
   // 调用函数
   config('http://baidu.com', 'get', 'json');
 </script>
+```
+
+# 模块
+
+导出
+
+```js
+/* 默认导出 */
+export default function() {
+    //......
+}; 
+
+/* 按需导出 */
+export const a = 10
+
+// 方法0: 普通函数
+export function add(a, b) {
+  return a + b;
+}
+
+//方法1:   匿名函数
+export const sum = function(a, b) {
+	return a + b;
+}
+
+//方法2:   箭头函数
+export const fn = () => {
+  console.log('内容')
+}
+
+
+// 或者用 as 来命名
+const e = 1;
+const f = 2;
+export { e as outE, f as outF };
+```
+
+导入
+
+```js
+// 默认导入时的接收名称可以任意名称，只要是合法的成员名称即可
+import result from './xxx.js'
+
+import { a, b as c, fn } from './xxx.js'
 ```
 
 # 面向对象
@@ -446,3 +536,47 @@ const obj4 = {...obj2, ...obj3};  // 合并对象
  
 console.log(obj4);         // {a:1, b:20, c:30}
 ```
+
+# 解构赋值
+
+JavaScript 对象解构赋值的基本语法：
+
+```js
+const { 属性1, 属性2, ... } = 对象;
+```
+
+其中，`属性1`, `属性2` 等是对象的属性名，`对象` 是要解构的对象。
+
+例如，假设有一个对象 `person`：
+
+```js
+const person = {
+  name: 'John',
+  age: 30,
+  gender: 'male'
+};
+```
+
+可以使用解构赋值来提取对象中的属性并赋值给变量：
+
+```js
+const { name, age } = person;
+console.log(name); // 输出: John
+console.log(age); // 输出: 30
+```
+
+此外，也可以在解构赋值语法中指定默认值：
+
+```js
+const { name, age, country = 'USA' } = person;
+console.log(country); // 输出: USA，因为 person 对象中没有 country 属性，所以使用了默认值
+```
+
+如果想要将解构赋值和重命名结合使用，可以在解构赋值语法中使用别名：
+
+```js
+const { name: fullName, age } = person;
+console.log(fullName); // 输出: John，因为我们将 person 对象的 name 属性重命名为 fullName
+```
+
+需要注意的是，解构赋值语法只能提取已经声明的变量。如果尝试提取一个未声明的变量，会导致错误。
