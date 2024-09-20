@@ -599,3 +599,157 @@ post(url, data, isNeedToken)
 
 ```
 
+# 补充
+
+**使用回调函数**
+
+```javascript
+cos.getObjectUrl(
+  {
+    Bucket: 'examplebucket-1250000000', // 填入您自己的存储桶，必须字段
+    Region: 'COS_REGION', // 存储桶所在地域，例如 ap-beijing，必须字段
+    Key: '头像.jpg', // 存储在桶里的对象键（例如1.jpg，a/b/test.txt），支持中文，必须字段
+    Sign: true, // 获取带签名的对象 URL
+  },
+  function (err, data) {
+    if (err) return console.log(err);
+    // url为对象访问 url
+    var url = data.Url;
+    // 复制 downloadUrl 的值到浏览器打开会自动触发下载
+    var downloadUrl =
+      url +
+      (url.indexOf('?') > -1 ? '&' : '?') +
+      'response-content-disposition=attachment;filename=图片.jpg'; // 补充强制下载的参数并重命名下载后的文件
+  }
+); 
+```
+
+**可以直接改成使用.then或者async**
+
+```javascript
+// 使用 .then() 和 .catch() 处理结果
+getObjectUrl({...}).then(url => {
+  console.log('Object URL:', url);
+}).catch(error => {
+  console.error('Error:', error.message);
+});
+
+// 或者使用 async/await
+async function fetchObjectUrl() {
+  try {
+    const url = await getObjectUrl({...});
+    console.log('Object URL:', url);
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+}
+```
+
+#  文件/url的上传/下载
+
+```ts
+import { Buffer } from 'buffer';
+import { isEmpty, isNotEmpty } from '@/wechat/utils/isEmpty';
+import { uploadFileStreamToCOS, urlByuploadFileToCOS } from '@/utils/oss'
+import path from 'path';
+
+const axios = require('axios');
+const fs = require('fs');
+const FormData = require('form-data');
+
+export default async function (ctx: FunctionContext) {
+  try {
+    const access_token = "lLFPw87EIffBoqfKh1Xk2sC3nZkEVSJDA7BbZstNzzhvSvTbZWDIlZIkS9nvGueNCfs10ZpzoLRimscNPtP5xsXBwBGGWda3-z-dXf0I0yzYoiVvF_8MMJYwaE5xQrlxqQWYZRZNiHMnRIO9DYuWawNRgyqDxmAjyYb0pRY2lR7j8bG7g4CVcD7pLVj9QB73vq_yjHp1UXkCJ8pZozXFEw"
+    const fileUrl = await getMediaUrlFromMediaId(access_token, "1ellechOCQ6O55gdXa7eeAqp-mcy63epUG_M_Tw_USXa4XdZ7A_I1sewiROx2HIve1daZFz5Cc5wMSj0cHpUIQQ");
+    console.info(fileUrl);
+  } catch (e) {
+    console.info(e)
+    return null;
+  }
+}
+
+/**
+ * 通过文件url, 上传临时素材, 返回media_id
+ * @param {string} accessToken 获取访问令牌
+ * @param {string} imageUrl 图片 URL
+ * @param {string} filesType 媒体文件类型，分别有图片（image）、语音（voice）、视频（video），普通文件（file）
+ *上传的媒体文件限制 图片（image）：10MB，支持JPG,PNG格式 语音（voice） ：2MB，播放长度不超过60s，仅支持AMR格式 视频（video） ：10MB，支持MP4格式 普通文件（file）：20MB
+ * 超出需要使用异步上传临时素材接口
+ */
+export async function getMediaIdFromMediaUrl(accessToken, imageUrl, filesType) {
+  try {
+    const url = `https://qyapi.weixin.qq.com/cgi-bin/media/upload?access_token=${accessToken}&type=${filesType}`;
+    // 获取远程文件的内容
+    const response = await axios({
+      url: imageUrl,
+      method: 'get',
+      responseType: 'arraybuffer'
+    });
+
+    const buffer = Buffer.from(response.data, 'binary');
+
+    // 创建 FormData 对象
+    const formData = new FormData();
+    formData.append('media', buffer, {
+      filename: 'image.png',
+      contentType: 'image/png'
+    });
+
+    // 上传临时素材API
+    const { data } = await axios({
+      url: url,
+      method: 'post',
+      data: formData,
+      headers: { ...formData.getHeaders() }
+    });
+    // console.log(data);
+    return data.media_id;
+
+  } catch (error) {
+    console.error('Error getting media:', error);
+    throw error;
+  }
+}
+
+/**
+ * 通过文件media_id, 获得临时素材, 返回url
+ * @param {string} accessToken 获取访问令牌
+ * @param {string} media_id 文件id
+ */
+export async function getMediaUrlFromMediaId(accessToken, mediaId) {
+  try {
+    // 拼接请求 URL
+    const url = `https://qyapi.weixin.qq.com/cgi-bin/media/get?access_token=${accessToken}&media_id=${mediaId}`;
+
+    // 获取远程文件的内容
+    const response = await axios({
+      url: url,
+      method: 'get',
+      responseType: 'arraybuffer'
+    });
+
+    const buffer = Buffer.from(response.data, 'binary');
+    // console.log("文件数据: ", buffer)
+
+    // 下载
+    // 提取文件名
+    const contentDisposition = response.headers['content-disposition'];
+    if (isEmpty(contentDisposition)) {
+      return
+    }
+    const fileNameMatch = contentDisposition.match(/filename="(.+?)"/);
+    const fileName = fileNameMatch ? fileNameMatch[1] : 'unknown.jpg';
+
+    // console.log("文件名称: ", fileName)
+
+    // 下载并保存到oss
+    const res = await urlByuploadFileToCOS(buffer, fileName)
+    return res;
+  } catch (error) {
+    console.error('Error getting url:', error);
+    throw error;
+  }
+}
+
+```
+
