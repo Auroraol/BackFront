@@ -138,7 +138,49 @@ https://cdjwc.webvpn.ccu.edu.cn/jsxsd/xskb/xskb_list.do
 
 ![img](Postman%E4%BD%BF%E7%94%A8.assets/970ccd291a7f40299ef9e9d08f86a067.png)
 
+# Postman 图文使用 
 
+![img](Postman%E4%BD%BF%E7%94%A8.assets/6e231ea76c87e57e0974ea1b9f31a948.png)
 
+####  发送GET请求示例
 
+1、 选择请求方法为GET
+
+2、 输入请求的URL（可以带参数）
+
+3、添加或修改参数和值
+
+4、点击“Send”发送
+
+![img](Postman%E4%BD%BF%E7%94%A8.assets/492ba5882a5a47108af24b56b48199f5.png)
+
+下半部分显示响应体，响应码，响应时间和数据大小。
+
+#### 2.4 发送POST表单请求
+
+发送普通POST表单和GET很类似，操作如下：
+
+![img](Postman%E4%BD%BF%E7%94%A8.assets/51ff3d365b8b74e9639ef070f1e94857.png)
+
+#### 2.5 发送POST+JSON请求
+
+Post有时候为了测试接口，需要通过Postman发送POST类型的JSON参数。
+
+对于不熟悉Postman的童鞋可能要搞半天，因此简单截图在此分享一下。
+
+![img](Postman%E4%BD%BF%E7%94%A8.assets/a8ef05d87155526aa8060dba366be6d1.png)
+
+选择请求方法为POST、输入URL、选择raw 和JSON然后按发送按钮获得返回结果。
+
+#### 2.6 将请求转成cURL命令等
+
+![img](Postman%E4%BD%BF%E7%94%A8.assets/fccdab46eebad2d43448033af6c713eb.png)
+
+点击Code可以选择要转化的代码
+
+![img](Postman%E4%BD%BF%E7%94%A8.assets/05b3e158090ce4e5b9ba0dc69cec70ae.png)
+
+还可以转换成Java的代码
+
+![img](Postman%E4%BD%BF%E7%94%A8.assets/37017797622ac8fcde5067126351fc19.png)
 
