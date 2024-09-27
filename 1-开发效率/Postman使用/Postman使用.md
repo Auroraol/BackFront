@@ -138,7 +138,9 @@ https://cdjwc.webvpn.ccu.edu.cn/jsxsd/xskb/xskb_list.do
 
 ![img](Postman%E4%BD%BF%E7%94%A8.assets/970ccd291a7f40299ef9e9d08f86a067.png)
 
+# Postman 导入导出 curl 命令详细步骤
 
+![img](Postman%E4%BD%BF%E7%94%A8.assets/6e231ea76c87e57e0974ea1b9f31a948.png)
 
 
 

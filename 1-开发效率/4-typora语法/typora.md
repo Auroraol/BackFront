@@ -643,5 +643,37 @@ ______________________________
 
 ![img](typora.assets/f0f1d0460f7049eab7a42e761364ede1tplv-jbbdkfciu3-image00.image)
 
+# Markdown 内嵌 HTML 语法
 
+[Markdown 内嵌 HTML 语法 - bitlogic - 博客园 (cnblogs.com)](https://www.cnblogs.com/bitlogic/p/7705258.html)
+
+markdown 左右分栏内嵌代码
+
+```
+<div style="column-count: 2; column-gap: 20px;">
+    <div>
+        这里是左侧内容。
+    </div>
+    <div>
+        这里是右侧内容。
+    </div>
+</div>
+ 
+<div style="column-count: 2; column-gap: 20px;">
+    <div>
+        ```python
+        # 左侧代码示例
+        def hello_world():
+            print("Hello, World!")
+        ```
+    </div>
+    <div>
+        ```python
+        # 右侧代码示例
+        def greet(name):
+            print(f"Hello, {name}!")
+        ```
+    </div>
+</div>
+```
 
