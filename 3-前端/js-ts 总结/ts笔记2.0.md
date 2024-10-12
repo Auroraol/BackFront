@@ -700,3 +700,56 @@ console.log(fullName); // 输出: John，因为我们将 person 对象的 name �
 ```
 
 需要注意的是，解构赋值语法只能提取已经声明的变量。如果尝试提取一个未声明的变量，会导致错误。
+
+# 字符串拼接
+
+## 1. 模板字符串（Template Strings）
+
+```ts
+const url = `https://api.weixin.qq.com/product/service/check_auth?component_access_token=${component_access_token}`;
+```
+
+## 2. 字符串连接（Concatenation）
+
+```ts
+const component_access_token = 'your-component-access-token';
+
+const url = 'https://api.weixin.qq.com/product/service/check_auth?component_access_token=' + component_access_token;
+
+console.log(url); // 输出：https://api.weixin.qq.com/product/service/check_auth?component_access_token=your-component-access-token
+```
+
+## 3. 使用 url 模块（Node.js）
+
+如果你在 Node.js 环境中，可以使用 url 模块来构建 URL：
+
+```ts
+import { URL } from 'url';
+
+const component_access_token = 'your-component-access-token';
+
+const url = new URL('https://api.weixin.qq.com/product/service/check_auth');
+url.searchParams.set('component_access_token', component_access_token);
+
+console.log(url.toString()); // 输出：https://api.weixin.qq.com/product/service/check_auth?component_access_token=your-component-access-token
+```
+
+## 3. 使用 qs 库
+
+如果你需要更复杂的查询字符串处理，可以使用 qs 库：
+
+```ts
+import qs from 'qs';
+
+const component_access_token = 'your-component-access-token';
+
+const query = qs.stringify({
+    component_access_token: component_access_token
+});
+
+const url = `https://api.weixin.qq.com/product/service/check_auth?${query}`;
+
+console.log(url); // 输出：https://api.weixin.qq.com/product/service/check_auth?component_access_token=your-component-access-token
+
+```
+
