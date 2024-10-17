@@ -92,6 +92,7 @@ const Helper = {
     },
     /**
      * [使用授权码换取公众号或小程序的接口调用凭据和授权信息]
+     * 回调中拿到的auth_code授权码，来获取公众号的授权信息的操作
      * 缓存Auth
      */
     async setAuth (authorizationCode) {

@@ -580,3 +580,49 @@ console.log(fullName); // 输出: John，因为我们将 person 对象的 name �
 ```
 
 需要注意的是，解构赋值语法只能提取已经声明的变量。如果尝试提取一个未声明的变量，会导致错误。
+
+
+
+
+
+# Node.js
+
+```js
+const express = require('express');
+const app = express();
+
+// 第一个中间件：记录请求信息
+app.use((req, res, next) => {
+    console.log(`请求方法: ${req.method}, 请求路径: ${req.path}`);
+    next(); // 将请求传递给下一个中间件
+});
+
+// 第二个中间件：模拟身份验证
+app.use((req, res, next) => {
+    const isAuthenticated = true; // 假设用户已认证
+    if (isAuthenticated) {
+        next(); // 继续处理请求
+    } else {
+        res.status(401).send('未授权'); // 如果未认证，发送 401 响应
+    }
+});
+
+// 处理特定路由的请求
+app.get('/dashboard', (req, res) => {
+    res.send('欢迎来到用户仪表板！'); // 发送响应
+});
+
+// 启动服务器
+app.listen(3000, () => {
+    console.log('服务器正在运行，端口: 3000');
+});
+
+```
+
+| 特性           | `res.end()`                     | `res.send()`                             |
+| -------------- | ------------------------------- | ---------------------------------------- |
+| **模块**       | Node.js 原生 `http` 模块        | Express.js 框架                          |
+| **功能**       | 结束响应并可发送内容            | 发送响应并自动结束                       |
+| **参数**       | 可接收一个可选的字符串或 Buffer | 接收任意数据类型（字符串、对象、数组等） |
+| **自动设置头** | 不自动设置响应头                | 根据数据类型自动设置 Content-Type        |
+| **用法**       | 适合简单的 HTTP 服务器          | 适合 Express.js 应用程序                 |

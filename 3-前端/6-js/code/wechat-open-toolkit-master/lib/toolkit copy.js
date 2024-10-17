@@ -161,8 +161,6 @@ class Toolkit extends EventEmitter {
    
     }
 
-
-
     // 当授权方 Js Api Ticket 更新时触发
     onRefreshAuthorizerJsApiTicket (data) {
      
