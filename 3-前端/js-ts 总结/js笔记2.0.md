@@ -265,6 +265,95 @@ import result from './xxx.js'
 import { a, b as c, fn } from './xxx.js'
 ```
 
+例子
+
+### 使用命名导出
+
+```ts
+// constants.js
+
+// 定义常量
+export const AUTH_TYPE_MP = 1;               // 授权方手机端只展示公众号列表
+export const AUTH_TYPE_MINI_PROGRAM = 2;     // 授权方手机端只展示小程序列表
+export const AUTH_TYPE_BOTH = 3;             // 授权方手机端展示公众号和小程序列表
+
+export const PAGE_STYLE_PC = 1;              // 适用于PC的页面样式
+export const PAGE_STYLE_MOBILE = 2;          // 适用于移动设备的页面样式
+
+// 导出函数
+export function clearQuota() { /* ... */ }
+export function getComponentAccessToken() { /* ... */ }
+export function getPreAuthCode() { /* ... */ }
+export function getAuthorizationUrl() { /* ... */ }
+export function getAuthorizerList() { /* ... */ }
+
+//在其他模块中，您可以像这样导入所需的常量和函数：
+import { 
+    clearQuota, 
+    getComponentAccessToken, 
+    getPreAuthCode, 
+    getAuthorizationUrl, 
+    getAuthorizerList,
+    AUTH_TYPE_MP, 
+    AUTH_TYPE_MINI_PROGRAM, 
+    AUTH_TYPE_BOTH, 
+    PAGE_STYLE_PC, 
+    PAGE_STYLE_MOBILE 
+} from './constants.js';
+```
+
+### 使用默认导出（封装所有）
+
+```ts
+// constants.js
+
+// 定义常量
+const AUTH_TYPE_MP = 1;               // 授权方手机端只展示公众号列表
+const AUTH_TYPE_MINI_PROGRAM = 2;     // 授权方手机端只展示小程序列表
+const AUTH_TYPE_BOTH = 3;             // 授权方手机端展示公众号和小程序列表
+
+const PAGE_STYLE_PC = 1;              // 适用于PC的页面样式
+const PAGE_STYLE_MOBILE = 2;          // 适用于移动设备的页面样式
+
+// 定义函数
+function clearQuota() { /* ... */ }
+function getComponentAccessToken() { /* ... */ }
+function getPreAuthCode() { /* ... */ }
+function getAuthorizationUrl() { /* ... */ }
+function getAuthorizerList() { /* ... */ }
+
+// 默认导出一个对象
+export default {
+    clearQuota, 
+    getComponentAccessToken, 
+    getPreAuthCode, 
+    getAuthorizationUrl, 
+    getAuthorizerList,
+    AUTH_TYPE_MP, 
+    AUTH_TYPE_MINI_PROGRAM, 
+    AUTH_TYPE_BOTH, 
+    PAGE_STYLE_PC, 
+    PAGE_STYLE_MOBILE
+};
+
+//在其他模块中，您可以这样导入：
+import constants from './constants.js';
+
+const { 
+    clearQuota, 
+    getComponentAccessToken, 
+    getPreAuthCode, 
+    getAuthorizationUrl, 
+    getAuthorizerList,
+    AUTH_TYPE_MP, 
+    AUTH_TYPE_MINI_PROGRAM, 
+    AUTH_TYPE_BOTH, 
+    PAGE_STYLE_PC, 
+    PAGE_STYLE_MOBILE 
+} = constants;
+
+```
+
 # 面向对象
 
 详细见[面向对象1笔记](.\参考\第3天(重要).md)
@@ -442,6 +531,114 @@ user.sayHi3();  //动态2-小明
 ## 方法3: class
 
 ECMAScript 6 新增,  详细见[面向对象2笔记](.\参考\第4天(重要).md)
+
+要将 `Component` 和 `Authorizer` 模块中的所有方法都添加到 `Toolkit` 类中，可以使用 JavaScript 的 `Object.assign()` 方法或 ES6 的扩展运算符。下面将介绍如何实现这一目标。
+
+### 添加其他文件导出的方法
+
+#### 1. 方式1 使用 `Object.assign()`
+
+你可以通过 `Object.assign()` 方法将 `Component` 和 `Authorizer` 的所有方法添加到 `Toolkit` 类的原型上，这样 `Toolkit` 的实例就可以直接访问这些方法。
+
+```js
+javascriptCopy Codeimport Component from "@/wechat_shop/utils/component"; // 引入 Component 模块
+import Authorizer from "@/wechat_shop/utils/authorizer"; // 引入 Authorizer 模块
+
+// 定义事件常量
+class Toolkit {
+    static EVENT_COMPONENT_VERIFY_TICKET = 'event_component_verify_ticket';
+    static EVENT_AUTHORIZED = 'event_authorized';
+    static EVENT_UPDATE_AUTHORIZED = 'event_update_authorized';
+    static EVENT_UNAUTHORIZED = 'event_unauthorized';
+    static EVENT_COMPONENT_ACCESS_TOKEN = 'event_component_access_token';
+    static EVENT_AUTHORIZER_ACCESS_TOKEN = 'event_authorizer_access_token';
+    static EVENT_AUTHORIZER_JSAPI_TICKET = 'event_authorizer_jsapi_ticket';
+
+    constructor({ list }) {
+        this.list = list;
+    }
+
+    // 其他 Toolkit 方法...
+}
+
+// 将 Component 和 Authorizer 的方法添加到 Toolkit 的原型上
+Object.assign(Toolkit.prototype, Component);
+Object.assign(Toolkit.prototype, Authorizer);
+
+// 假设你已有的 list 定义
+let list = [
+    {
+        componentAppId: wechat_shop_app.appid,
+        componentAppSecret: wechat_shop_app.appsecret,
+        token: wechat_shop_app.token,
+        encodingAESKey: wechat_shop_app.encodingAESKey
+    }
+];
+
+// 实例化并导出 Toolkit
+const toolkitInstance = new Toolkit({ list });
+export default toolkitInstance;
+```
+
+#### 2. 方式2 使用扩展运算符
+
+如果你希望在构造函数中动态地添加方法，可以使用扩展运算符来将 `Component` 和 `Authorizer` 的所有方法合并到 `Toolkit` 的实例中：
+
+```js
+javascriptCopy Codeimport Component from "@/wechat_shop/utils/component"; // 引入 Component 模块
+import Authorizer from "@/wechat_shop/utils/authorizer"; // 引入 Authorizer 模块
+
+// 定义事件常量
+class Toolkit {
+    static EVENT_COMPONENT_VERIFY_TICKET = 'event_component_verify_ticket';
+    static EVENT_AUTHORIZED = 'event_authorized';
+    static EVENT_UPDATE_AUTHORIZED = 'event_update_authorized';
+    static EVENT_UNAUTHORIZED = 'event_unauthorized';
+    static EVENT_COMPONENT_ACCESS_TOKEN = 'event_component_access_token';
+    static EVENT_AUTHORIZER_ACCESS_TOKEN = 'event_authorizer_access_token';
+    static EVENT_AUTHORIZER_JSAPI_TICKET = 'event_authorizer_jsapi_ticket';
+
+    constructor({ list }) {
+        this.list = list;
+
+        // 使用扩展运算符将方法添加到实例
+        Object.assign(this, Component);
+        Object.assign(this, Authorizer);
+    }
+
+    // 其他 Toolkit 方法...
+}
+
+// 假设你已有的 list 定义
+let list = [
+    {
+        componentAppId: wechat_shop_app.appid,
+        componentAppSecret: wechat_shop_app.appsecret,
+        token: wechat_shop_app.token,
+        encodingAESKey: wechat_shop_app.encodingAESKey
+    }
+];
+
+// 实例化并导出 Toolkit
+const toolkitInstance = new Toolkit({ list });
+export default toolkitInstance;
+```
+
+#### 3. 使用示例
+
+在其他模块中，你可以直接调用 `toolkitInstance` 的方法：
+
+```js
+import toolkitInstance from './path/to/toolkit';
+
+// 调用从 Component 和 Authorizer 中继承的方法
+toolkitInstance.someComponentMethod(); // 调用 Component 中的方法
+toolkitInstance.someAuthorizerMethod(); // 调用 Authorizer 中的方法
+```
+
+
+
+
 
 
 
@@ -626,3 +823,61 @@ app.listen(3000, () => {
 | **参数**       | 可接收一个可选的字符串或 Buffer | 接收任意数据类型（字符串、对象、数组等） |
 | **自动设置头** | 不自动设置响应头                | 根据数据类型自动设置 Content-Type        |
 | **用法**       | 适合简单的 HTTP 服务器          | 适合 Express.js 应用程序                 |
+
+
+
+## node.js 返回html
+
+```js
+import cloud from '@lafjs/cloud'
+import { getComponentAccessToken } from "@/wechat_shop/utils/wxContent"
+// import { getPreAuthCode, getAuthorizationUrl } from "@/wechat_shop/utils/component"
+import { wechat_shop_app } from "@/utils/const"
+import { succRes, failRes } from '@/utils/internal_response'
+import Component from "@/wechat_shop/utils/component"
+import toolkit from '@/wechat_shop/utils/toolkit'; //
+
+// 测试
+export default async function (ctx: FunctionContext) {
+  // ctx.response.status(200).send('EVENT RECEIVED')
+  try {
+    const res = ctx.response
+
+    // 生成授权 URL
+    const url = await toolkit.auth(wechat_shop_app.appid, wechat_shop_app.authCallbackUrl);
+    console.info(url);
+
+    // 不能直接将授权url复制到浏览器然后打开
+    const html = `
+      <!DOCTYPE html>
+      <html lang="zh">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>授权页面</title>
+          <style>
+              .center {
+                  text-align: center;
+                  margin: 20px;
+              }
+          </style>
+      </head>
+      <body>
+      <div class="center">
+          <h2>点击下面的链接进行授权</h2>
+          <a href="${url}">授权</a>
+      </div>
+      </body>
+      </html>
+    `;
+
+    res.send(html); // 直接发送 HTML
+  } catch (err) {
+    // 错误处理并渲染错误信息
+    console.error('Error:', err);
+    ctx.body = failRes(err.message); // 返回错误信息
+  }
+}
+```
+
+![image-20241018123929832](js%E7%AC%94%E8%AE%B02.0.assets/image-20241018123929832.png)

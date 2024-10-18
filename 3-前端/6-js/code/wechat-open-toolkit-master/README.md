@@ -182,7 +182,7 @@ this.onReceiveComponentVerifyTicket(data)。
 toolkit.on('component_verify_ticket', (data) => {...})
 ```
 
-
+先走函数里面在走函数外部
 
 ### 接入 co-wechat-api 和 wechat-api 示例代码
 

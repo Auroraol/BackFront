@@ -49,7 +49,7 @@ async function getJsApiTicket(authorizerAccessToken) {
 }
 
 /**
- * 获取授权方的账号基本信息 [使用授权码换取公众号或小程序的接口调用凭据和授权信息]  // 一般用来刷新授权token  //获取/刷新token
+ * 获取授权方的账号基本信息 [使用授权码换取公众号或小程序的接口调用凭据和授权信息]  
  * @param {string} componentAppId 第三方平台APPID
  * @param {string} componentAccessToken 第三方平台 access token
  * @param {string} authorizerAppId 授权方APPID

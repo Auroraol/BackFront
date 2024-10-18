@@ -1,13 +1,13 @@
-import cloud from '@lafjs/cloud'
-import { saveComponentVerifyTicket } from '@/wechat_shop/utils/wxContent'
-import { parseXMLSync,buildXMLSync } from "@/wechat_shop/utils/xml"
+import { parseXMLSync, buildXMLSync } from "@/wechat_shop/utils/xml"
 import { wechat_shop_app } from "@/utils/const"
-import { readComponentAccessToken } from "@/wechat_shop/utils/wxContent"
-import { getAuthorizerAccessToken } from '@/wechat_shop/utils/service'
+import { isEmpty, isNotEmpty } from '@/wechat_shop/utils/isEmpty'
+import { updateAuthInfo } from '@/utils/postgrest'
 
-import Component from "@/wechat_shop/utils/component"
+import Component from "@/wechat_shop/service/component"
+import Authorizer from "@/wechat_shop/service/authorizer"
+import WechatResponder from '@/wechat_shop/utils/wechatResponder'
+import MSG_TPL from "@/wechat_shop/utils/msg_tpl"
 
-const MSG_TPL = require('@/wechat_shop/utils/utils/msg_tpl')
 const WechatEncrypt = require('wechat-encrypt')
 const EventEmitter = require('events')
 
@@ -18,6 +18,7 @@ const EVENT_UPDATE_AUTHORIZED = 'updateauthorized'              // 授权更新[
 const EVENT_UNAUTHORIZED = 'unauthorized'                       // 授权取消[推送]
 const EVENT_COMPONENT_ACCESS_TOKEN = 'component_access_token'    // 当startComponentAccessTokenTimer()函数触发, 在component_access_token需要刷新时触发[触发器刷新] 
 const EVENT_AUTHORIZER_ACCESS_TOKEN = 'authorizer_access_token' // 当startAuthorizerAccessTokenTimer()函数触发, 在access token需要刷新时触发[触发器刷新] 
+const EVENT_ERROR = 'error' // 错误
 
 // 全网发布自动化测试的账号
 const AUTO_TEST_MP_APPID = 'wx570bc396a51b8ff8' // 测试公众号APPID
@@ -33,6 +34,7 @@ class Toolkit extends EventEmitter {
   componentMap = {} // 第三方平台列表
   static instance = null;
 
+  // 初始化
   constructor(options) {
     super(); // 调用父类构造函数
 
@@ -59,37 +61,42 @@ class Toolkit extends EventEmitter {
 
   // 当接收到 component_verify_ticket 时触发
   async onReceiveComponentVerifyTicket(data) {
-    //微信服务器会向其 ”授权事件接收URL” 每隔 10 分钟以 POST 的方式推送 component_verify_ticket，
-    /**
-    <xml>
-        <AppId>some_appid</AppId>
-        <CreateTime>1413192605</CreateTime>
-        <InfoType>component_verify_ticket</InfoType>
-        <ComponentVerifyTicket>some_verify_ticket</ComponentVerifyTicket>
-    </xml>
-    */
     console.log('接收到的组件验证票据:', data);
-    await saveComponentVerifyTicket(data.ComponentVerifyTicket);
+    await Component.saveComponentVerifyTicket(data.ComponentVerifyTicket);
   }
 
   // 当 第三方平台component_access_token 刷新时触发
-  async onRefreshComponentAccessToken(data) {
-    // let { componentAppId } = data
-    // Object.assign(componentMap[componentAppId], data) // 更新 component access token
-
-    // if (!componentMap[componentAppId].fetchTimer) {
-    //     this.startFetchAuthorizerListTimer(componentAppId)  //获取第三方平台下已授权的全部授权方账号
-    // }
+  async onRefreshComponentAccessToken() {
+    console.log('刷新 第三方平台component_access_token');
+    // 刷新componentAccessToken
+    await Component.saveOrRefreshComponentAccessToken()
   }
 
   /**
    * 当 授权方access token 刷新时触发
   */
-  async onRefreshAuthorizerAccessToken(data) {
+  async onRefreshAuthorizerAccessToken(authInfo: any) {
+    console.log('刷新 授权方access token');
+    const componentAccessToken = await Component.readComponentAccessToken()
+    // 发起获取刷新access token的post请求
+    const data = await Authorizer.refreshAuthorizerAccessToken(componentAccessToken, authInfo.account, authInfo.shop_id, authInfo.refresh_token)
+    if (isEmpty(data)) {
+      console.log("发起刷新token请求失败")
+      return
+    }
 
+    const now = Date.now()
+    const et = Math.floor(now / 1000) + data.expires_in
+    authInfo.access_token = data.authorizer_access_token
+    authInfo.refresh_token = data.authorizer_refresh_token
+    authInfo.expired_time = et
+    authInfo.refresh_expired_time = et
+    authInfo.extra_info = componentAccessToken
+    let result = await updateAuthInfo(authInfo)
+    console.log("update result", result)
   }
 
-  // 当有新的授权方授权给第三方平台时触发
+  // 当有新的授权方授权给第三方平台时触发 TODO
   async onAuthorized(data) {
     /**
       <xml>
@@ -102,62 +109,62 @@ class Toolkit extends EventEmitter {
         <PreAuthCode>预授权码</PreAuthCode>
       <xml>
     */
+    console.log("当有新的授权方授权给第三方平台时触发")
     const { AppId, AuthorizationCode } = data
-    const componentAccessToken = await readComponentAccessToken()  // 从云数据库中读取应用token
-    await getAuthorizerAccessToken(AppId, AuthorizationCode, componentAccessToken)
+    const componentAccessToken = await Component.readComponentAccessToken()  // 从云数据库中读取应用token
+    await Authorizer.getAuthorizerAccessToken(AppId, AuthorizationCode, componentAccessToken)
   }
 
   // 当授权方取消授权时触发
   onUnauthorized(data) {
 
+    console.log("当授权方取消授权时触发")
   }
 
   /**
    * 定时刷新 第三方平台access token(2小时)
-   * @param {string} componentAppId 第三方平台APPID
    */
-  async startComponentAccessTokenTimer(componentAppId) {
-      this.emit(EVENT_COMPONENT_ACCESS_TOKEN, ret) // 触发第三方平台access token更新事件
+  async startComponentAccessTokenTimer() {
+    this.emit(EVENT_COMPONENT_ACCESS_TOKEN) // 触发第三方平台access token更新事件
   }
 
   /**
    * 定时刷新 授权方access token(2小时)
-   * @param {string} componentAppId 第三方平台APPID
-   * @param {string} authorizerAppId 授权方APPID
+   * @param {object} authInfo 认证信息
    */
-  async startAuthorizerAccessTokenTimer(componentAppId, authorizerAppId) {
-    this.emit(EVENT_AUTHORIZER_ACCESS_TOKEN, ret) // 触发授权方access token更新事件
+  async startAuthorizerAccessTokenTimer(authInfo: any) {
+    this.emit(EVENT_AUTHORIZER_ACCESS_TOKEN, authInfo) // 触发授权方access token更新事件
   }
 
-   /**
-   * 获取第三方平台下已授权的全部授权方账号
-   * @param {string} componentAppId 第三方平台APPID
-   */
-   async startFetchAuthorizerListTimer(componentAppId) {
-    let { component_access_token, fetchRetryTimes = 0, offset = 0 } = componentMap[componentAppId]
+  /**
+  * 获取第三方平台下已授权的全部授权方账号
+  * @param {string} componentAppId 第三方平台APPID
+  */
+  async startFetchAuthorizerListTimer(componentAppId) {
+    // let { component_access_token, fetchRetryTimes = 0, offset = 0 } = componentMap[componentAppId]
 
-    try {
-        // 获取第三方平台下已授权的授权方列表
-        let ret = await Component.getAuthorizerList(componentAppId, component_access_token, offset)
-        let { list, total_count } = ret
-        if (offset >= total_count) return
+    // try {
+    //   // 获取第三方平台下已授权的授权方列表
+    //   let ret = await Component.getAuthorizerList(componentAppId, component_access_token, offset)
+    //   let { list, total_count } = ret
+    //   if (offset >= total_count) return
 
-        list.forEach(item => componentMap[`${componentAppId}/${item.authorizer_appid}`] = item)
-        
-        // 定时刷新授权方的access token
-        list.forEach(item => this.startAuthorizerAccessTokenTimer(componentAppId, item.authorizer_appid))
+    //   list.forEach(item => componentMap[`${componentAppId}/${item.authorizer_appid}`] = item)
 
-        timeout = 0 // 如果成功，则立即获取下一页
-        componentMap[componentAppId].offset = offset + list.length // 更新偏移值
-        componentMap[componentAppId].fetchRetryTimes = 0 // 如果成功调用，则重试次数和间隔时长回到初始值
-    } catch (err) {
-        this.emit('error', err)
-        timeout = Math.min(RETRY_TIMEOUT * Math.pow(2, fetchRetryTimes), DELAY_UPPER_LIMIT) // 重试的间隔时长按指数级增长，且不大于 setTimeout 的上限值
-        componentMap[componentAppId].fetchRetryTimes = fetchRetryTimes + 1 // 各个第三方平台分别存储重试次数，间隔时长不互相影响
-    }
+    //   // 定时刷新授权方的access token
+    //   list.forEach(item => this.startAuthorizerAccessTokenTimer(componentAppId, item.authorizer_appid))
 
-    clearTimeout(componentMap[componentAppId].fetchTimer) // 清理旧的定时器
-    componentMap[componentAppId].fetchTimer = setTimeout(this.startFetchAuthorizerListTimer.bind(this, componentAppId), timeout)
+    //   timeout = 0 // 如果成功，则立即获取下一页
+    //   componentMap[componentAppId].offset = offset + list.length // 更新偏移值
+    //   componentMap[componentAppId].fetchRetryTimes = 0 // 如果成功调用，则重试次数和间隔时长回到初始值
+    // } catch (err) {
+    //   this.emit('error', err)
+    //   timeout = Math.min(RETRY_TIMEOUT * Math.pow(2, fetchRetryTimes), DELAY_UPPER_LIMIT) // 重试的间隔时长按指数级增长，且不大于 setTimeout 的上限值
+    //   componentMap[componentAppId].fetchRetryTimes = fetchRetryTimes + 1 // 各个第三方平台分别存储重试次数，间隔时长不互相影响
+    // }
+
+    // clearTimeout(componentMap[componentAppId].fetchTimer) // 清理旧的定时器
+    // componentMap[componentAppId].fetchTimer = setTimeout(this.startFetchAuthorizerListTimer.bind(this, componentAppId), timeout)
   }
 
 
@@ -207,7 +214,7 @@ class Toolkit extends EventEmitter {
         Message: "events函数错误",
         Error: error
       }
-      this.emit('error', err)
+      this.emit(EVENT_ERROR, err)
     }
   }
 
@@ -216,9 +223,9 @@ class Toolkit extends EventEmitter {
    * @param {string} componentAppId 第三方平台APPID
    */
   async message(componentAppId, ctx: FunctionContext) {
+    const res = ctx.response
     try {
       const { msg_signature, timestamp, nonce } = ctx.query;
-      const res = ctx.response
       // console.log("参数", ctx.query)
       let xmlStr = ctx.body.xml
       const AppId = xmlStr.appid[0]
@@ -243,47 +250,47 @@ class Toolkit extends EventEmitter {
         res.send();
       }
     } catch (error) {
-      !res.finished && res.send('success') // 当发生错误时，正常响应微信服务器
+      res.send('success') // 当发生错误时，正常响应微信服务器
       const err = {
         Message: "message函数错误",
         Error: error
       }
-      this.emit('error', err)
+      this.emit(EVENT_ERROR, err)
     }
   }
 
   // 返回全网发布测试的中间件
   async autoTest(componentAppId, query) {
-    let { Content = '', FromUserName, ToUserName } = req.wechat
-    let strList = null
+    // let { Content = '', FromUserName, ToUserName } = req.wechat
+    // let strList = null
 
-    try {
-      // 如果接收消息的授权方是测试公众号或测试小程序，则执行预设的测试用例
-      if ([AUTO_TEST_MP_NAME, AUTO_TEST_MINI_PROGRAM_NAME].includes(ToUserName)) {
-        console.log('\n\n\n>>> 检测到全网发布测试 <<<\n\n\n')
-        console.log('打印消息主体:')
-        console.log(req.wechat)
-        if (Content === AUTO_TEST_TEXT_CONTENT) {
-          res.text(AUTO_TEST_REPLY_TEXT)
-          console.log(`\n>>> 测试用例：被动回复消息；状态：已回复；回复内容：${AUTO_TEST_REPLY_TEXT} <<<\n`)
-        } else if ((strList = Content.split(':'))[0] === 'QUERY_AUTH_CODE') {
-          res.end('')
-          let { component_access_token } = componentMap[`${componentAppId}`]
-          let { authorization_info: { authorizer_access_token } } = await Authorizer.getAccessToken(componentAppId, component_access_token, strList[1])
-          let content = `${strList[1]}_from_api`
-          let ret = await Authorizer.send(authorizer_access_token, FromUserName, 'text', { content })
-          console.log(`\n>>> 测试用例：主动发送客服消息；状态：已发送；响应结果：${JSON.stringify(ret)}；发送内容：${content} <<<\n`)
-        }
-      } else {
-        next && next()
-      }
-    } catch (error) {
-      const err = {
-        Message: "message函数错误",
-        Error: error
-      }
-      this.emit('error', err)
-    }
+    // try {
+    //   // 如果接收消息的授权方是测试公众号或测试小程序，则执行预设的测试用例
+    //   if ([AUTO_TEST_MP_NAME, AUTO_TEST_MINI_PROGRAM_NAME].includes(ToUserName)) {
+    //     console.log('\n\n\n>>> 检测到全网发布测试 <<<\n\n\n')
+    //     console.log('打印消息主体:')
+    //     console.log(req.wechat)
+    //     if (Content === AUTO_TEST_TEXT_CONTENT) {
+    //       res.text(AUTO_TEST_REPLY_TEXT)
+    //       console.log(`\n>>> 测试用例：被动回复消息；状态：已回复；回复内容：${AUTO_TEST_REPLY_TEXT} <<<\n`)
+    //     } else if ((strList = Content.split(':'))[0] === 'QUERY_AUTH_CODE') {
+    //       res.end('')
+    //       let { component_access_token } = componentMap[`${componentAppId}`]
+    //       let { authorization_info: { authorizer_access_token } } = await Authorizer.getAccessToken(componentAppId, component_access_token, strList[1])
+    //       let content = `${strList[1]}_from_api`
+    //       let ret = await Authorizer.send(authorizer_access_token, FromUserName, 'text', { content })
+    //       console.log(`\n>>> 测试用例：主动发送客服消息；状态：已发送；响应结果：${JSON.stringify(ret)}；发送内容：${content} <<<\n`)
+    //     }
+    //   } else {
+    //     next && next()
+    //   }
+    // } catch (error) {
+    //   const err = {
+    //     Message: "message函数错误",
+    //     Error: error
+    //   }
+    //   this.emit('error', err)
+    // }
   }
 
   /**
@@ -304,20 +311,25 @@ class Toolkit extends EventEmitter {
    * @returns {Promise<string>} 返回一个 Promise，解析为授权 URL。
    */
   async auth(componentAppId, redirectUrl, authType = Component.AUTH_TYPE_ALL, pageStyle = Component.PAGE_STYLE_PC) {
-    console.log(componentAppId)
-    const componentAccessToken = await readComponentAccessToken()
+    const componentAccessToken = await Component.readComponentAccessToken()
+    // console.log("componentAccessToken", componentAccessToken)/
     try {
       // 获取预授权码
       const pre_auth_code = await Component.getPreAuthCode(componentAppId, componentAccessToken)
+      // console.log(pre_auth_code)
+      if (isEmpty(pre_auth_code)) {
+        return this.emit(EVENT_ERROR, "auth函数, 获取预授权码错误")
+      }
       // 获取第三方平台授权URL
       const url = Component.getAuthorizationUrl(componentAppId, pre_auth_code, redirectUrl, authType, pageStyle)
+      // console.log(url)
       return url
     } catch (error) {
       const err = {
         Message: "auth函数错误",
         Error: error
       }
-      this.emit('error', err)
+      this.emit(EVENT_ERROR, err)
     }
   }
 
@@ -338,6 +350,14 @@ class Toolkit extends EventEmitter {
 //   EVENT_COMPONENT_ACCESS_TOKEN, EVENT_AUTHORIZER_ACCESS_TOKEN,
 // })
 
+// 将 Component 和 Authorizer 的方法添加到 Toolkit 的原型上
+Object.assign(Toolkit.prototype, Component);
+Object.assign(Toolkit.prototype, Authorizer);
+Object.assign(Toolkit.prototype, {
+  EVENT_COMPONENT_VERIFY_TICKET, EVENT_AUTHORIZED, EVENT_UPDATE_AUTHORIZED, EVENT_UNAUTHORIZED,
+  EVENT_COMPONENT_ACCESS_TOKEN, EVENT_AUTHORIZER_ACCESS_TOKEN
+});
+
 let list = [
   {
     componentAppId: wechat_shop_app.appid,
@@ -349,10 +369,4 @@ let list = [
 
 const toolkitInstance = new Toolkit({ list }); // 创建唯一实例
 export default toolkitInstance; // 导出实例
-
-
-// 授权回调地址url可以得到 
-
-// 通过授权码获取授权信息
-// 刷新授权方access_token
 

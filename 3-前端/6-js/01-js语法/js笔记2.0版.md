@@ -1,3 +1,7 @@
+# 注释
+
+[函数/方法注释 | JavaScript 编码规范 (itmyhome.com)](https://itmyhome.com/js/han_6570_fang_fa_zhu_shi.html)
+
 # 变量
 
 

@@ -1,3 +1,24 @@
+# 注释
+
+```ts
+  /**
+   * 返回第三方授权处理的中间件，返回授权URL
+   * 
+   * @param {string} componentAppId - 第三方平台的应用 ID。
+   * @param {string} redirectUrl - 授权成功后的回调地址。
+   * @param {number} [authType=Component.AUTH_TYPE_BOTH] - 第三方平台授权类型，默认值为 `Component.AUTH_TYPE_BOTH`。
+   *  - 1: 授权方手机端只展示公众号列表
+   *  - 2: 授权方手机端只展示小程序列表
+   *  - 3: 授权方手机端展示公众号和小程序列表
+   * @param {number} [pageStyle=Component.PAGE_STYLE_PC] - 第三方平台授权页样式，默认值为 `Component.PAGE_STYLE_PC`。
+   *  - 1: 适用于PC的页面样式
+   *  - 2: 适用于移动设备的页面样式
+   * @returns {Promise<string>} 返回一个 Promise，解析为授权 URL。
+   */
+```
+
+
+
 # 变量
 
 **使用 `let` 或 `const` 来定义变量,  不要使用`var`**：
@@ -385,6 +406,97 @@ import result from './xxx.js'
 import { a, b as c, fn } from './xxx.js'
 ```
 
+例子
+
+### 使用命名导出
+
+```ts
+// constants.js
+
+// 定义常量
+export const AUTH_TYPE_MP = 1;               // 授权方手机端只展示公众号列表
+export const AUTH_TYPE_MINI_PROGRAM = 2;     // 授权方手机端只展示小程序列表
+export const AUTH_TYPE_BOTH = 3;             // 授权方手机端展示公众号和小程序列表
+
+export const PAGE_STYLE_PC = 1;              // 适用于PC的页面样式
+export const PAGE_STYLE_MOBILE = 2;          // 适用于移动设备的页面样式
+
+// 导出函数
+export function clearQuota() { /* ... */ }
+export function getComponentAccessToken() { /* ... */ }
+export function getPreAuthCode() { /* ... */ }
+export function getAuthorizationUrl() { /* ... */ }
+export function getAuthorizerList() { /* ... */ }
+
+//在其他模块中，您可以像这样导入所需的常量和函数：
+import { 
+    clearQuota, 
+    getComponentAccessToken, 
+    getPreAuthCode, 
+    getAuthorizationUrl, 
+    getAuthorizerList,
+    AUTH_TYPE_MP, 
+    AUTH_TYPE_MINI_PROGRAM, 
+    AUTH_TYPE_BOTH, 
+    PAGE_STYLE_PC, 
+    PAGE_STYLE_MOBILE 
+} from './constants.js';
+```
+
+### 使用默认导出（封装所有）
+
+```ts
+// constants.js
+
+// 定义常量
+const AUTH_TYPE_MP = 1;               // 授权方手机端只展示公众号列表
+const AUTH_TYPE_MINI_PROGRAM = 2;     // 授权方手机端只展示小程序列表
+const AUTH_TYPE_BOTH = 3;             // 授权方手机端展示公众号和小程序列表
+
+const PAGE_STYLE_PC = 1;              // 适用于PC的页面样式
+const PAGE_STYLE_MOBILE = 2;          // 适用于移动设备的页面样式
+
+// 定义函数
+function clearQuota() { /* ... */ }
+function getComponentAccessToken() { /* ... */ }
+function getPreAuthCode() { /* ... */ }
+function getAuthorizationUrl() { /* ... */ }
+function getAuthorizerList() { /* ... */ }
+
+// 默认导出一个对象
+export default {
+    clearQuota, 
+    getComponentAccessToken, 
+    getPreAuthCode, 
+    getAuthorizationUrl, 
+    getAuthorizerList,
+    AUTH_TYPE_MP, 
+    AUTH_TYPE_MINI_PROGRAM, 
+    AUTH_TYPE_BOTH, 
+    PAGE_STYLE_PC, 
+    PAGE_STYLE_MOBILE
+};
+
+//在其他模块中，您可以这样导入：
+import constants from './constants.js';
+
+const { 
+    clearQuota, 
+    getComponentAccessToken, 
+    getPreAuthCode, 
+    getAuthorizationUrl, 
+    getAuthorizerList,
+    AUTH_TYPE_MP, 
+    AUTH_TYPE_MINI_PROGRAM, 
+    AUTH_TYPE_BOTH, 
+    PAGE_STYLE_PC, 
+    PAGE_STYLE_MOBILE 
+} = constants;
+
+```
+
+
+
 # 面向对象 : TODO
 
 详细见[面向对象1笔记](.\参考\第3天(重要).md)
@@ -750,6 +862,51 @@ const query = qs.stringify({
 const url = `https://api.weixin.qq.com/product/service/check_auth?${query}`;
 
 console.log(url); // 输出：https://api.weixin.qq.com/product/service/check_auth?component_access_token=your-component-access-token
+
+```
+
+# 请求参数拼接
+
+## @querystring
+
+const querystring = require('querystring')
+
+```ts
+let url = 'https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_info'
+let query = { component_access_token: "AAA" }
+url += '?' + querystring.stringify(query)
+
+// 结果
+https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_info?component_access_token=AAA
+```
+
+或者
+
+```ts
+
+export function getAuthorizationUrl(componentAppId, preAuthCode, redirectUrl, authType, pageStyle) {
+  let url = {
+    [PAGE_STYLE_PC]: 'https://mp.weixin.qq.com/cgi-bin/componentloginpage',
+    [PAGE_STYLE_MOBILE]: 'https://mp.weixin.qq.com/safe/bindcomponent'
+  }[pageStyle]
+
+  let query = { component_appid: componentAppId, pre_auth_code: preAuthCode, redirect_uri: redirectUrl }
+
+  if (typeof authType === 'number') {
+    Object.assign(query, { auth_type: authType })
+  } else if (typeof authType === 'string') {
+    Object.assign(query, { biz_appid: authType })
+  }
+
+  if (pageStyle === PAGE_STYLE_MOBILE) {
+    Object.assign(query, { action: 'bindcomponent', no_scan: 1 })
+    url += '?' + querystring.stringify(query) + '#wechat_redirect'
+  } else if (pageStyle === PAGE_STYLE_PC) {
+    url += '?' + querystring.stringify(query)
+  }
+
+  return url
+}
 
 ```
 
