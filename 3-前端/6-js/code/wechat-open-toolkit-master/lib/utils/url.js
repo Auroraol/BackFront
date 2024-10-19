@@ -16,7 +16,7 @@ export default async function (ctx: FunctionContext) {
 
     // 生成第三方授权 URL
     let url = await toolkit.auth(wechat_shop_app.appid, wechat_shop_app.authCallbackUrl);
-    url += '& state' + encodeURIComponent(extraInfo)
+    url += '&state' + encodeURIComponent(extraInfo)
     console.info(url);
 
     // 不能直接将授权url复制到浏览器然后打开
@@ -59,7 +59,7 @@ export async function genWechatShopUrl(extraInfo: any, ctx: FunctionContext) {
     const res = ctx.response
     // 生成授权 URL
     let url = await toolkit.auth(wechat_shop_app.appid, wechat_shop_app.authCallbackUrl);
-    url += '& state' + encodeURIComponent(extraInfo)
+    url += '&state' + encodeURIComponent(extraInfo)
     console.info(url);
 
     // 不能直接将授权url复制到浏览器然后打开

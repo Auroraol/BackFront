@@ -95,9 +95,10 @@ function getAuthorizationUrl(componentAppId, preAuthCode, redirectUrl, authType,
 }
 
 /**
- * 获取第三方平台的授权方列表
+ * 获取第三方平台的授权方列表 (没有使用)
  * @param {string} componentAppId 第三方平台APPID
  * @param {string} componentAccessToken 第三方平台access token
+ * https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/Account_Authorization/api_get_authorizer_list.html#%E8%AF%B7%E6%B1%82%E5%9C%B0%E5%9D%80
  */
 async function getAuthorizerList(componentAppId, componentAccessToken, offset) {
     let url = 'https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_list'

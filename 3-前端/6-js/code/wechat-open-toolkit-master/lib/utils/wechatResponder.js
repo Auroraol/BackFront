@@ -1,3 +1,5 @@
+const WechatEncrypt = require('wechat-encrypt')
+
 class WechatResponder {
     constructor(componentAppId, encodingAESKey, token) {
         this.componentAppId = componentAppId;
@@ -31,7 +33,13 @@ class WechatResponder {
         return xml; // 返回生成的 XML
     }
 
-    // 处理回复逻辑
+    /**
+     * 回复
+     * @param {*} msgTemplates 消息模版
+     * @param {*} fromUserName 
+     * @param {*} toUserName 
+     * @returns 
+     */
     reply(msgTemplates, fromUserName, toUserName) {
         let replies = {};
         Object.entries(msgTemplates).forEach(([key, val]) => {

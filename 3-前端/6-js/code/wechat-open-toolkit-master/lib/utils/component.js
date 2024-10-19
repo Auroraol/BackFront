@@ -195,20 +195,21 @@ function getAuthorizationUrl(componentAppId, preAuthCode, redirectUrl, authType,
   return url
 }
 
-// /**
-//  * 获取第三方平台的授权方列表
-//  * @param {string} componentAppId 第三方平台APPID
-//  * @param {string} componentAccessToken 第三方平台access token
-//  */
-// async function getAuthorizerList(componentAppId, componentAccessToken, offset) {
-//   let url = 'https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_list'
-//   let query = { component_access_token: componentAccessToken }
-//   let body = { component_appid: componentAppId, offset, count: PAGE_SIZE }
-//   url += '?' + querystring.stringify(query)
+/**
+ * 获取第三方平台的授权方列表 (没有使用)
+ * @param {string} componentAppId 第三方平台APPID
+ * @param {string} componentAccessToken 第三方平台access token
+ * @document 文档: https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/Account_Authorization/api_get_authorizer_list.html#%E8%AF%B7%E6%B1%82%E5%9C%B0%E5%9D%80
+ */
+async function getAuthorizerList(componentAppId, componentAccessToken, offset) {
+  let url = 'https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_list'
+  let query = { component_access_token: componentAccessToken }
+  let body = { component_appid: componentAppId, offset, count: PAGE_SIZE }
+  url += '?' + querystring.stringify(query)
 
-//   let ret = await https.post(url, body)
-//   return validator(ret)
-// }
+  const { data } = await axios.post(url, body);
+  return data
+}
 
 // 默认导出一个对象
 export default {

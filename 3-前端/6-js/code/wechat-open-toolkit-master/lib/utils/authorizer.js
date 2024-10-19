@@ -1,19 +1,22 @@
+/** 处理授权方相关函数 */
 import { wechat_shop_app } from "@/utils/const"
 import { isEmpty, isNotEmpty } from '@/wechat_shop/utils/isEmpty'
-const querystring = require('querystring')
 
+const querystring = require('querystring')
 const axios = require('axios');
 
-/**
- * 处理授权方相关函数 
-*/
-
+// 授权方网页授权类型
+const OAUTH_TYPE_BASE = 'snsapi_base' // 基本授权可以得到用户openId
+const OAUTH_TYPE_USERINFO = 'snsapi_userinfo' // 用户信息授权可以得到用户openId、unionId、头像和昵称
 
 /**
  * 获取授权信息
- * 从回调中拿到的auth_code授权码，来获取授权方的授权信息的操作
+ * 从授权回调中获得auth_code授权码，来获取授权方的授权信息
+ * @param {string} componentAppId 第三方平台APPID
+ * @param {string} componentAccessToken 第三方平台access token
+ * @param {string} authorizationCode 授权码
  * @document 文档:https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/authorization_info.html
-*/
+ */
 async function getAuthorizerAccessToken(componentAppid: string, authorizationCode: string, componentAccessToken: string) {
   try {
     let url = wechat_shop_app.getAuthorizerAccessTokenByAuthorizationCodeUrl;
@@ -26,7 +29,7 @@ async function getAuthorizerAccessToken(componentAppid: string, authorizationCod
     };
 
     const { data } = await axios.post(url, body);
-    // console.log(data)
+    console.log("获取授权信息",data)
     /**
     {
       authorization_info: {
@@ -60,18 +63,16 @@ async function getAuthorizerAccessToken(componentAppid: string, authorizationCod
   }
 }
 
-
 /**
  * 获取/刷新接口调用令牌
  * @param {string} componentAccessToken 第三方平台component_access_token
  * @param {string} componentAppid 第三方平台appid
  * @param {string} authorizerAppid 授权方appid
- * @param {string} authorizerRefreshToken 刷新令牌
+ * @param {string} authorizerRefreshToken 授权方刷新令牌
  * @document 文档: https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/api_authorizer_token.html
  */
 async function refreshAuthorizerAccessToken(componentAccessToken: string, componentAppid: number, authorizerAppid: number, authorizerRefreshToken: string) {
   try {
-
     let url = wechat_shop_app.refreshAuthorizerAccessTokenUrl;
     const query = { component_access_token: componentAccessToken }
     url += '?' + querystring.stringify(query)
@@ -85,6 +86,55 @@ async function refreshAuthorizerAccessToken(componentAccessToken: string, compon
 
     console.log(data)
     return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * 获取授权账号详情
+ * @param {string} componentAppId 第三方平台APPID
+ * @param {string} componentAccessToken 第三方平台 access token
+ * @param {string} authorizerAppId 授权方APPID
+ */
+async function getAuthorizerInfo(componentAppId, componentAccessToken, authorizerAppId) {
+  try {
+    let url = 'https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_info'
+    let query = { component_access_token: componentAccessToken }
+    let body = { component_appid: componentAppId, authorizer_appid: authorizerAppId }
+    url += '?' + querystring.stringify(query)
+
+    const { data } = await axios.post(url, body)
+    console.log("获取授权账号详情", data)
+    return data
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * 发送客服消息
+ * @param {string} authorizerAccessToken 授权方access token
+ * @param {string} openId 微信用户openId
+ * @param {string} type 消息类型
+ * @param {Object} content 消息主体
+ */
+async function send(authorizerAccessToken, openId, type, content) {
+  try {
+    let url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send'
+    let query = {
+        access_token: authorizerAccessToken
+    }
+    let body = {
+        touser: openId,
+        msgtype: type,
+        [type]: content
+    }
+    url += '?' + querystring.stringify(query)
+
+    const { data } = await axios.post(url, body)
+    console.log("发送客服消息", data)
+    return data
   } catch (error) {
     throw error;
   }
@@ -173,11 +223,11 @@ async function saveAuthorizationInformation(data: any, componentAppid: string, c
   }
 }
 
-
 // 默认导出一个对象
 export default {
   getAuthorizerAccessToken,
-  refreshAuthorizerAccessToken
+  refreshAuthorizerAccessToken,
+  send
 };
 
 

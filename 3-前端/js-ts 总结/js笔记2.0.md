@@ -534,6 +534,105 @@ ECMAScript 6 新增,  详细见[面向对象2笔记](.\参考\第4天(重要).md
 
 要将 `Component` 和 `Authorizer` 模块中的所有方法都添加到 `Toolkit` 类中，可以使用 JavaScript 的 `Object.assign()` 方法或 ES6 的扩展运算符。下面将介绍如何实现这一目标。
 
+### 使用
+
+#### 传统方法
+
+```js
+function Point(x, y) {
+  this.x = x;
+  this.y = y;
+}
+ 
+Point.prototype.toString = function () {
+  return '(' + this.x + ', ' + this.y + ')';
+};
+ 
+var p = new Point(1, 2);
+```
+
+#### ES6 的`class`
+
+```js
+class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+ 
+  toString() {
+    return '(' + this.x + ', ' + this.y + ')';
+  }
+}
+```
+
+#### 综合
+
+```js
+class Point {
+  #a;
+  #b;
+    
+  constructor() {
+    // ...
+  }
+ 
+  toString() {
+    // ...
+  }
+ 
+  toValue() {
+    // ...
+  }
+  // 静态属性
+  static myStaticProp = 42;  
+    
+  // 静态方法
+  static classMethod() {
+    return 'hello';
+  }
+    
+  // 私有属性
+   #count = 0;
+
+  // 使用私有属性  
+  increment() {
+    this.#count++;
+  }
+    
+  // 私有方法
+  #sum() {
+    return #a + #b;
+  }
+  printSum() {
+    console.log(this.#sum());
+  }  
+}
+
+// 使用静态方法
+Point.classMethod()
+Point.myStaticProp
+
+/**********************************/
+ 
+// 传统等同于
+Point.prototype = {
+  constructor() {},
+  toString() {},
+  toValue() {},
+};
+```
+
+总结:
+
++ 类的所有方法都定义在类的`prototype`属性上面。
+
++ 静态方法（类的方法。加static）
+
++ 静态属性（类的属性，加static）
++ 私有方法（类的方法。加#）
++ 私有属性（类的属性。加#）
+
 ### 添加其他文件导出的方法
 
 #### 1. 方式1 使用 `Object.assign()`
@@ -635,12 +734,6 @@ import toolkitInstance from './path/to/toolkit';
 toolkitInstance.someComponentMethod(); // 调用 Component 中的方法
 toolkitInstance.someAuthorizerMethod(); // 调用 Authorizer 中的方法
 ```
-
-
-
-
-
-
 
 # 运算符（...）
 
