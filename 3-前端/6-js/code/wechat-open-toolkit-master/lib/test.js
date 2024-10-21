@@ -20,7 +20,8 @@ const EVENT_COMPONENT_ACCESS_TOKEN = 'component_access_token'    // 当startComp
 const EVENT_AUTHORIZER_ACCESS_TOKEN = 'authorizer_access_token'  // 当startAuthorizerAccessTokenTimer()函数触发, 在access token需要刷新时触发[触发器刷新] 
 const EVENT_ERROR = 'error' // 错误
 
-// 全网发布自动化测试的账号
+// 全网发布自动化测试的账号 
+// 文档: https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/operation/thirdparty/releases_instructions.html
 const AUTO_TEST_MP_APPID = 'wx570bc396a51b8ff8' // 测试公众号APPID
 const AUTO_TEST_MP_NAME = 'gh_3c884a361561' // 测试公众号名称
 const AUTO_TEST_MINI_PROGRAM_APPID = 'wxd101a85aa106f53e' // 测试小程序APPID
@@ -55,6 +56,7 @@ class Toolkit extends EventEmitter {
     this.on(EVENT_COMPONENT_ACCESS_TOKEN, this.#onRefreshComponentAccessToken);
     this.on(EVENT_AUTHORIZER_ACCESS_TOKEN, this.#onRefreshAuthorizerAccessToken);
     this.on(EVENT_AUTHORIZED, this.#onAuthorized);
+    this.on(EVENT_UPDATE_AUTHORIZED, this.#updateauthorized);
     this.on(EVENT_UNAUTHORIZED, this.#onUnauthorized);
   }
 
@@ -128,6 +130,29 @@ class Toolkit extends EventEmitter {
     }
   }
 
+  // 当更新授权方授权给第三方平台时触发
+  async #updateauthorized(data) {
+    try {
+      /**
+       <xml>
+        <AppId>第三方平台appid</AppId>
+        <CreateTime>1413192760</CreateTime>
+        <InfoType>updateauthorized</InfoType>
+        <AuthorizerAppid>公众号appid</AuthorizerAppid>
+        <AuthorizationCode>授权码</AuthorizationCode>
+        <AuthorizationCodeExpiredTime>过期时间</AuthorizationCodeExpiredTime>
+        <PreAuthCode>预授权码</PreAuthCode>
+      <xml>
+      */
+      console.log("当更新授权方授权给第三方平台时触发")
+      const { AppId, AuthorizationCode } = data
+      const componentAccessToken = await Component.readComponentAccessToken()  // 从云数据库中读取应用token
+      await Authorizer.getAuthorizerAccessToken(AppId, AuthorizationCode, componentAccessToken)
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // 当授权方取消授权时触发
   async #onUnauthorized(data) {
     console.log("当授权方取消授权时触发")
@@ -152,7 +177,7 @@ class Toolkit extends EventEmitter {
   /**
    * 返回第三方平台授权事件的中间件, [授权事件接收配置] /callback
    * @param {*} ctx 
-   * @document 文档: https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/message_push.html
+   * @document 文档: 
    */
   async events(ctx: FunctionContext) {
     try {
@@ -203,31 +228,35 @@ class Toolkit extends EventEmitter {
   }
 
   /**
-   * 返回授权方消息处理的中间件,  [消息与事件接收配置] /{APPID}/callback  //TODO
+   * 返回授权方消息处理的中间件,  [消息与事件接收配置] /{APPID}/callback  
+   * 代理: engine.xiaoduoai.com/wechat_shop/init/$APPID$/callback
    * @param {string} componentAppId 第三方平台APPID
+   * @document 文档: https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/message_push.html
    */
-  async message(componentAppId, ctx: FunctionContext) {
+  async message(appId: string, ctx: FunctionContext) {
+    const res = ctx.response
     try {
-      const res = ctx.response
       const { msg_signature, timestamp, nonce } = ctx.query;
-      // console.log("参数", ctx.query)
       let xmlStr = ctx.body.xml
-      const AppId = xmlStr.appid[0]
       const Encrypt = xmlStr.encrypt[0]
+      console.log(Encrypt)
       // 读取第三方平台配置
-      let { encodingAESKey, token } = this.componentMap[AppId]
+      let { encodingAESKey, token } = this.componentMap[wechat_shop_app.appid]
       //  签名校验
-      let wechatEncrypt = new WechatEncrypt({ appId: AppId, encodingAESKey, token })
+      console.log(appId, encodingAESKey, token, ctx.query)
+      let wechatEncrypt = new WechatEncrypt({ appId, encodingAESKey, token })
       let signature = wechatEncrypt.genSign({ timestamp, nonce, encrypt: Encrypt })
+      console.log(signature, msg_signature)
       if (signature === msg_signature) {
         let str = wechatEncrypt.decode(Encrypt)
         let xml: any = await parseXMLSync(str)  // 解析XML数据成JS对象
         console.log("解析XML数据成JS对象: ", xml)
         let { FromUserName, ToUserName } = xml
+
         /* 回复图文消息 */
-        const responder = new WechatResponder(componentAppId, encodingAESKey, token);
+        const responder = new WechatResponder(wechat_shop_app.appid, encodingAESKey, token);
         const replies = responder.reply(MSG_TPL, FromUserName, ToUserName);
-        console.log("回复图文消息",replies);
+        console.log("回复图文消息", replies);
         res.send(replies);
       } else {
         console.warn('签名校验失败')
@@ -244,9 +273,9 @@ class Toolkit extends EventEmitter {
   }
 
   // 返回全网发布测试的中间件
-  async autoTest(componentAppId, ctx: FunctionContext) {
-    const req = ctx.response
-    const res = ctx.response
+  async autoTest(ctx: FunctionContext) {
+    const res: any = ctx.response
+    const req: any = ctx.request
     let { Content = '', FromUserName, ToUserName } = req.wechat
     let strList = null
 
@@ -261,8 +290,9 @@ class Toolkit extends EventEmitter {
           console.log(`\n>>> 测试用例：被动回复消息；状态：已回复；回复内容：${AUTO_TEST_REPLY_TEXT} <<<\n`)
         } else if ((strList = Content.split(':'))[0] === 'QUERY_AUTH_CODE') {
           res.end('')
-          let { component_access_token } = componentMap[`${componentAppId}`]
-          let { authorization_info: { authorizer_access_token } } = await Authorizer.getAuthorizerAccessToken(componentAppId, component_access_token, strList[1])
+          const componentAccessToken = await Component.readComponentAccessToken()  // 从云数据库中读取应用token
+          // TODO
+          let authorizer_access_token = await Authorizer.getAuthorizerAccessToken(wechat_shop_app.appid, componentAccessToken, strList[1])
           let content = `${strList[1]}_from_api`
           let ret = await Authorizer.send(authorizer_access_token, FromUserName, 'text', { content })
           console.log(`\n>>> 测试用例：主动发送客服消息；状态：已发送；响应结果：${JSON.stringify(ret)}；发送内容：${content} <<<\n`)
@@ -300,9 +330,10 @@ class Toolkit extends EventEmitter {
     // console.log("componentAccessToken", componentAccessToken)/
     try {
       const componentAccessToken = await Component.readComponentAccessToken()
+      console.log("componentAccessToken:", componentAccessToken)
       // 获取预授权码
       const pre_auth_code = await Component.getPreAuthCode(componentAppId, componentAccessToken)
-      // console.log(pre_auth_code)
+      console.log("预授权码:", pre_auth_code)
       if (isEmpty(pre_auth_code)) {
         return this.emit(EVENT_ERROR, "auth函数, 获取预授权码错误")
       }
@@ -350,4 +381,3 @@ let list = [
 
 const toolkitInstance = new Toolkit({ list }); // 创建唯一实例
 export default toolkitInstance; // 导出实例
-
