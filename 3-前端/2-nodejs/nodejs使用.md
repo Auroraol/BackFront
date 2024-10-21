@@ -1641,6 +1641,12 @@ let loginSuss= await mysqlUtil.exec(loginSql,mysqlUtil.formatParams(name))
 
 # nodejs 版本管理工具 nvmw
 
+直接参考: :crossed_swords:
+
+[nvm的安装使用和理解 - 男孩亮亮 - 博客园](https://www.cnblogs.com/liangziaha/p/18472023)
+
+
+
 [execjs](https://so.csdn.net/so/search?q=execjs&spm=1001.2101.3001.7020) 库只支持 nodejs 14.0.0 以上的版本，win7 最高只支持 node 13.14.0 版本
 
 nvmw：Windows [nodejs](https://so.csdn.net/so/search?q=nodejs&spm=1001.2101.3001.7020) 版本管理工具，方便进行版本切换及安装删除

@@ -251,7 +251,7 @@ class Toolkit extends EventEmitter {
         let str = wechatEncrypt.decode(Encrypt)
         let xml: any = await parseXMLSync(str)  // 解析XML数据成JS对象
         console.log("解析XML数据成JS对象: ", xml)
-        let { FromUserName, ToUserName } = xml
+        let { FromUserName, ToUserName } = xml  //
 
         /* 回复图文消息 */
         const responder = new WechatResponder(wechat_shop_app.appid, encodingAESKey, token);
@@ -276,10 +276,26 @@ class Toolkit extends EventEmitter {
   async autoTest(ctx: FunctionContext) {
     const res: any = ctx.response
     const req: any = ctx.request
-    let { Content = '', FromUserName, ToUserName } = req.wechat
-    let strList = null
 
     try {
+      const { msg_signature, timestamp, nonce } = ctx.query;
+      let xmlStr = ctx.body.xml
+      const Encrypt = xmlStr.encrypt[0]
+      console.log(Encrypt)
+      // 读取第三方平台配置
+      let { encodingAESKey, token } = this.componentMap[wechat_shop_app.appid]
+      //  签名校验
+      console.log(appId, encodingAESKey, token, ctx.query)
+      let wechatEncrypt = new WechatEncrypt({ appId, encodingAESKey, token })
+      let signature = wechatEncrypt.genSign({ timestamp, nonce, encrypt: Encrypt })
+      console.log(signature, msg_signature)
+      if (signature === msg_signature) {
+        let str = wechatEncrypt.decode(Encrypt)
+        let xml: any = await parseXMLSync(str)  // 解析XML数据成JS对象
+        console.log("解析XML数据成JS对象: ", xml)
+        let { Content = '',FromUserName, ToUserName } = xml  //
+      let strList = null
+
       // 如果接收消息的授权方是测试公众号或测试小程序，则执行预设的测试用例
       if ([AUTO_TEST_MP_NAME, AUTO_TEST_MINI_PROGRAM_NAME].includes(ToUserName)) {
         console.log('\n\n\n>>> 检测到全网发布测试 <<<\n\n\n')
@@ -292,7 +308,7 @@ class Toolkit extends EventEmitter {
           res.end('')
           const componentAccessToken = await Component.readComponentAccessToken()  // 从云数据库中读取应用token
           // TODO
-          let authorizer_access_token = await Authorizer.getAuthorizerAccessToken(wechat_shop_app.appid, componentAccessToken, strList[1])
+          let authorizer_access_token = await Authorizer.getAuthorizerInfo(wechat_shop_app.appid, componentAccessToken, strList[1])
           let content = `${strList[1]}_from_api`
           let ret = await Authorizer.send(authorizer_access_token, FromUserName, 'text', { content })
           console.log(`\n>>> 测试用例：主动发送客服消息；状态：已发送；响应结果：${JSON.stringify(ret)}；发送内容：${content} <<<\n`)
@@ -300,6 +316,7 @@ class Toolkit extends EventEmitter {
       } else {
         console.log("检测到非测试消息")
       }
+    }
     } catch (error) {
       const err = {
         Message: "返回全网发布测试的中间件错误",
