@@ -10,6 +10,7 @@ import MSG_TPL from "@/wechat_shop/utils/msg_tpl"
 
 const WechatEncrypt = require('wechat-encrypt')
 const EventEmitter = require('events')
+const sprintf = require('sprintf-js').sprintf;
 
 // 事件列表
 const EVENT_COMPONENT_VERIFY_TICKET = 'component_verify_ticket'  // 当微信服务器向第三方服务器推送 ticket 时触发[推送]
@@ -124,7 +125,7 @@ class Toolkit extends EventEmitter {
       console.log("当有新的授权方授权给第三方平台时触发")
       const { AppId, AuthorizationCode } = data
       const componentAccessToken = await Component.readComponentAccessToken()  // 从云数据库中读取应用token
-      await Authorizer.getAuthorizerAccessToken(AppId, AuthorizationCode, componentAccessToken)
+      await Authorizer.getAuthorizerInfoByAuthCode(AppId, AuthorizationCode, componentAccessToken)
     } catch (error) {
       throw error;
     }
@@ -147,7 +148,7 @@ class Toolkit extends EventEmitter {
       console.log("当更新授权方授权给第三方平台时触发")
       const { AppId, AuthorizationCode } = data
       const componentAccessToken = await Component.readComponentAccessToken()  // 从云数据库中读取应用token
-      await Authorizer.getAuthorizerAccessToken(AppId, AuthorizationCode, componentAccessToken)
+      await Authorizer.getAuthorizerInfoByAuthCode(AppId, AuthorizationCode, componentAccessToken)
     } catch (error) {
       throw error;
     }
@@ -177,7 +178,7 @@ class Toolkit extends EventEmitter {
   /**
    * 返回第三方平台授权事件的中间件, [授权事件接收配置] /callback
    * @param {*} ctx 
-   * @document 文档: 
+   * @document 文档: https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/authorize_event.html
    */
   async events(ctx: FunctionContext) {
     try {
@@ -228,36 +229,73 @@ class Toolkit extends EventEmitter {
   }
 
   /**
-   * 返回授权方消息处理的中间件,  [消息与事件接收配置] /{APPID}/callback  
+   * 返回授权方消息处理的中间件,  [消息与事件接收配置] /{APPID}/callback 
    * 代理: engine.xiaoduoai.com/wechat_shop/init/$APPID$/callback
    * @param {string} componentAppId 第三方平台APPID
    * @document 文档: https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/message_push.html
    */
-  async message(appId: string, ctx: FunctionContext) {
-    const res = ctx.response
+  async message(ctx: FunctionContext) {
+    const res: any = ctx.response
+    const req: any = ctx.request
     try {
-      const { msg_signature, timestamp, nonce } = ctx.query;
+      const { appid, msg_signature, timestamp, nonce } = ctx.query;
       let xmlStr = ctx.body.xml
       const Encrypt = xmlStr.encrypt[0]
-      console.log(Encrypt)
+      // console.log(Encrypt)
       // 读取第三方平台配置
       let { encodingAESKey, token } = this.componentMap[wechat_shop_app.appid]
       //  签名校验
-      console.log(appId, encodingAESKey, token, ctx.query)
-      let wechatEncrypt = new WechatEncrypt({ appId, encodingAESKey, token })
+      let wechatEncrypt = new WechatEncrypt({ appId: appid, encodingAESKey, token })
       let signature = wechatEncrypt.genSign({ timestamp, nonce, encrypt: Encrypt })
-      console.log(signature, msg_signature)
+      // console.log(signature, msg_signature)
       if (signature === msg_signature) {
         let str = wechatEncrypt.decode(Encrypt)
         let xml: any = await parseXMLSync(str)  // 解析XML数据成JS对象
         console.log("解析XML数据成JS对象: ", xml)
-        let { FromUserName, ToUserName } = xml  //
-
-        /* 回复图文消息 */
-        const responder = new WechatResponder(wechat_shop_app.appid, encodingAESKey, token);
-        const replies = responder.reply(MSG_TPL, FromUserName, ToUserName);
-        console.log("回复图文消息", replies);
-        res.send(replies);
+        let { Content = '', FromUserName, ToUserName } = xml
+        //let Content = xml.debug_str
+        if (Content === '') {
+          /* 回复图文消息 */
+          const responder = new WechatResponder(wechat_shop_app.appid, encodingAESKey, token);
+          const replies: any = responder.reply(MSG_TPL, FromUserName, ToUserName);
+          console.log("回复图文消息", replies.text);
+          // res.send(replies.text);
+        } else {
+          /* 回全网发布测试的图文消息 */
+          console.log("Content", Content)
+          try {
+            // 如果接收消息的授权方是测试公众号或测试小程序，则执行预设的测试用例
+            if ([AUTO_TEST_MP_NAME, AUTO_TEST_MINI_PROGRAM_NAME].includes(ToUserName)) {
+              console.log('\n\n\n>>> 检测到全网发布测试 <<<\n\n\n')
+              console.log('打印消息主体:')
+              if (Content === AUTO_TEST_TEXT_CONTENT) {
+                const resmsg = this.responseText2(FromUserName, ToUserName, AUTO_TEST_REPLY_TEXT)
+                console.log("文本:", resmsg)
+                res.send(resmsg)
+                console.log(`\n>>> [返回普通文本消息]测试用例：被动回复消息；状态：已回复；回复内容：${AUTO_TEST_REPLY_TEXT} <<<\n`)
+              } else if (Content.includes('QUERY_AUTH_CODE')) {
+                res.end('')
+                const authorizationCode = Content.replace('QUERY_AUTH_CODE:', '');
+                const componentAccessToken = await Component.readComponentAccessToken()  // 从云数据库中读取应用token
+                // console.log(componentAccessToken)
+                let authorizerAccessToken = await Authorizer.getAuthorizerAccessToken(wechat_shop_app.appid, authorizationCode, componentAccessToken)
+                // console.log(authorizerAccessToken)
+                let content = `${authorizationCode}_from_api`
+                // console.log(content)
+                let ret = await Authorizer.send(authorizerAccessToken, FromUserName, 'text', { content })
+                console.log(`\n>>> [返回Api文本消息]测试用例：主动发送客服消息；状态：已发送；响应结果：${JSON.stringify(ret)}；发送内容：${content} <<<\n`)
+              }
+            } else {
+              console.log("检测到非测试消息")
+            }
+          } catch (error) {
+            const err = {
+              Message: "返回全网发布测试的中间件错误",
+              Error: error
+            }
+            this.emit(EVENT_ERROR, err)
+          }
+        }
       } else {
         console.warn('签名校验失败')
         res.send();
@@ -272,59 +310,73 @@ class Toolkit extends EventEmitter {
     }
   }
 
-  // 返回全网发布测试的中间件
-  async autoTest(ctx: FunctionContext) {
-    const res: any = ctx.response
-    const req: any = ctx.request
-
-    try {
-      const { msg_signature, timestamp, nonce } = ctx.query;
-      let xmlStr = ctx.body.xml
-      const Encrypt = xmlStr.encrypt[0]
-      console.log(Encrypt)
-      // 读取第三方平台配置
-      let { encodingAESKey, token } = this.componentMap[wechat_shop_app.appid]
-      //  签名校验
-      console.log(appId, encodingAESKey, token, ctx.query)
-      let wechatEncrypt = new WechatEncrypt({ appId, encodingAESKey, token })
-      let signature = wechatEncrypt.genSign({ timestamp, nonce, encrypt: Encrypt })
-      console.log(signature, msg_signature)
-      if (signature === msg_signature) {
-        let str = wechatEncrypt.decode(Encrypt)
-        let xml: any = await parseXMLSync(str)  // 解析XML数据成JS对象
-        console.log("解析XML数据成JS对象: ", xml)
-        let { Content = '',FromUserName, ToUserName } = xml  //
-      let strList = null
-
-      // 如果接收消息的授权方是测试公众号或测试小程序，则执行预设的测试用例
-      if ([AUTO_TEST_MP_NAME, AUTO_TEST_MINI_PROGRAM_NAME].includes(ToUserName)) {
-        console.log('\n\n\n>>> 检测到全网发布测试 <<<\n\n\n')
-        console.log('打印消息主体:')
-        console.log(req.wechat)
-        if (Content === AUTO_TEST_TEXT_CONTENT) {
-          res.text(AUTO_TEST_REPLY_TEXT)
-          console.log(`\n>>> 测试用例：被动回复消息；状态：已回复；回复内容：${AUTO_TEST_REPLY_TEXT} <<<\n`)
-        } else if ((strList = Content.split(':'))[0] === 'QUERY_AUTH_CODE') {
-          res.end('')
-          const componentAccessToken = await Component.readComponentAccessToken()  // 从云数据库中读取应用token
-          // TODO
-          let authorizer_access_token = await Authorizer.getAuthorizerInfo(wechat_shop_app.appid, componentAccessToken, strList[1])
-          let content = `${strList[1]}_from_api`
-          let ret = await Authorizer.send(authorizer_access_token, FromUserName, 'text', { content })
-          console.log(`\n>>> 测试用例：主动发送客服消息；状态：已发送；响应结果：${JSON.stringify(ret)}；发送内容：${content} <<<\n`)
-        }
-      } else {
-        console.log("检测到非测试消息")
-      }
+  responseText(fromUserName, toUserName, content) {
+    if (!content) {
+      return '';
     }
-    } catch (error) {
-      const err = {
-        Message: "返回全网发布测试的中间件错误",
-        Error: error
-      }
-      this.emit(EVENT_ERROR, err)
-    }
+    const xmlTpl = `
+        <xml>
+            <ToUserName><![CDATA[${toUserName}]]></ToUserName>
+            <FromUserName><![CDATA[${fromUserName}]]></FromUserName>
+            <CreateTime>${Date.now()}</CreateTime>
+            <MsgType><![CDATA[text]]></MsgType>
+            <Content><![CDATA[${content}]]></Content>
+        </xml>
+    `;
+    return xmlTpl;
   }
+
+  responseText2(fromUserName, toUserName, content) {
+    if (!content) {
+      return '';
+    }
+    const xmlTpl =
+      `<xml>
+            <ToUserName><![CDATA[%s]]></ToUserName>
+            <FromUserName><![CDATA[%s]]></FromUserName>
+            <CreateTime>%d</CreateTime>
+            <MsgType><![CDATA[text]]></MsgType>
+            <Content><![CDATA[%s]]></Content>
+        </xml>`;
+    return sprintf(xmlTpl, fromUserName, toUserName, Date.now(), content);
+  }
+
+  // 返回全网发布测试的中间件
+  // async autoTest(ctx: FunctionContext) {
+  //   const res: any = ctx.response
+  //   const req: any = ctx.request
+  //   let { Content = '', FromUserName, ToUserName } = req.wechat
+  //   let strList = null
+
+  //   try {
+  //     // 如果接收消息的授权方是测试公众号或测试小程序，则执行预设的测试用例
+  //     if ([AUTO_TEST_MP_NAME, AUTO_TEST_MINI_PROGRAM_NAME].includes(ToUserName)) {
+  //       console.log('\n\n\n>>> 检测到全网发布测试 <<<\n\n\n')
+  //       console.log('打印消息主体:')
+  //       console.log(req.wechat)
+  //       if (Content === AUTO_TEST_TEXT_CONTENT) {
+  //         res.text(AUTO_TEST_REPLY_TEXT)
+  //         console.log(`\n>>> 测试用例：被动回复消息；状态：已回复；回复内容：${AUTO_TEST_REPLY_TEXT} <<<\n`)
+  //       } else if ((strList = Content.split(':'))[0] === 'QUERY_AUTH_CODE') {
+  //         res.end('')
+  //         const componentAccessToken = await Component.readComponentAccessToken()  // 从云数据库中读取应用token
+  //         // TODO
+  //         let authorizerAccessToken = await Authorizer.getAuthorizerAccessToken(wechat_shop_app.appid, componentAccessToken, strList[1])
+  //         let content = `${strList[1]}_from_api`
+  //         let ret = await Authorizer.send(authorizerAccessToken, FromUserName, 'text', { content })
+  //         console.log(`\n>>> 测试用例：主动发送客服消息；状态：已发送；响应结果：${JSON.stringify(ret)}；发送内容：${content} <<<\n`)
+  //       }
+  //     } else {
+  //       console.log("检测到非测试消息")
+  //     }
+  //   } catch (error) {
+  //     const err = {
+  //       Message: "返回全网发布测试的中间件错误",
+  //       Error: error
+  //     }
+  //     this.emit(EVENT_ERROR, err)
+  //   }
+  // }
 
   /**
    * 返回第三方授权处理的中间件，返回授权URL

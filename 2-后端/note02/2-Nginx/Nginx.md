@@ -1149,3 +1149,36 @@ server {
 
 ```
 
+# 补充
+
+## 重定向
+
+```yaml
+http {
+    server {
+        listen 80;
+        server_name your_domain.com;
+
+        location ~ ^/wechat_shop/init/(.+)/callback(/.*)?$ {
+            set $appid $1;
+            set $path $2;
+
+            # 确保查询字符串被正确传递
+            return 301 https://ktpbpv.faas.xiaoduoai.com/wechat_shop/init/callback?appid=$appid${path}$is_args$query_string;
+        }
+    }
+}
+```
+
+测试：
+
+```
+$ curl -Ik https://engine.xiaoduoai.com/wechat_shop/init/12345/callback?foo=bar&id=ss
+```
+
+预期的重定向URL应该是：
+
+```
+https://ktpbpv.faas.xiaoduoai.com/wechat_shop/init/callback?appid=12345&foo=bar&id=ss
+```
+
