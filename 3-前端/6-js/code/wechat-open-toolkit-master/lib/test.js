@@ -7,6 +7,7 @@ import Component from "@/wechat_shop/service/component"
 import Authorizer from "@/wechat_shop/service/authorizer"
 import WechatResponder from '@/wechat_shop/utils/wechatResponder'
 import MSG_TPL from "@/wechat_shop/utils/msg_tpl"
+import { send } from "./authorizer"
 
 const WechatEncrypt = require('wechat-encrypt')
 const EventEmitter = require('events')
@@ -252,14 +253,18 @@ class Toolkit extends EventEmitter {
         let str = wechatEncrypt.decode(Encrypt)
         let xml: any = await parseXMLSync(str)  // 解析XML数据成JS对象
         console.log("解析XML数据成JS对象: ", xml)
-        let { Content = '', FromUserName, ToUserName } = xml
+        let { Content = '', FromUserName, ToUserName, MsgType,  Event} = xml
         //let Content = xml.debug_str
-        if (Content === '') {
-          /* 回复图文消息 */
-          const responder = new WechatResponder(wechat_shop_app.appid, encodingAESKey, token);
-          const replies: any = responder.reply(MSG_TPL, FromUserName, ToUserName);
-          console.log("回复图文消息", replies.text);
-          // res.send(replies.text);
+        // 判断该数据包是否是订阅（用户关注）的事件推送
+        if (Content === '' && MsgType === 'event') {
+            // if(Event==='subscribe'){
+            //   const map = { public_name: ToUserName };
+            //   const cont = await SubscribeModel.findOne({ where: map }); // 假设使用ORM进行查询
+            //   // 回复用户消息
+            //   const content = cont.content;
+            //   const resMsg = responseText(postObj, content);
+            //   res.send(resMsg)
+            // }
         } else {
           /* 回全网发布测试的图文消息 */
           console.log("Content", Content)
@@ -268,20 +273,26 @@ class Toolkit extends EventEmitter {
             if ([AUTO_TEST_MP_NAME, AUTO_TEST_MINI_PROGRAM_NAME].includes(ToUserName)) {
               console.log('\n\n\n>>> 检测到全网发布测试 <<<\n\n\n')
               console.log('打印消息主体:')
-              if (Content === AUTO_TEST_TEXT_CONTENT) {
-                const resmsg = this.responseText2(FromUserName, ToUserName, AUTO_TEST_REPLY_TEXT)
-                console.log("文本:", resmsg)
-                res.send(resmsg)
+              if (MsgType === 'text'  &&  Content === AUTO_TEST_TEXT_CONTENT) {
+                // 第三方平台全网发布检测普通文本消息测试
+                time = Date.now()
+                const xmlTpl = this.responseText(FromUserName, ToUserName,time, AUTO_TEST_REPLY_TEXT)
+                let Encrypt = wechatEncrypt.encode(xmlTpl) // 加密内容
+                let TimeStamp = time // 时间戳
+                let Nonce = Math.random().toString(36).slice(2, 18) // 随机字符串
+                let MsgSignature = wechatEncrypt.genSign({ timestamp: TimeStamp, nonce: Nonce, encrypt: Encrypt }) // 签名
+                resMsg = buildObject({ Encrypt, TimeStamp, Nonce, MsgSignature })
+
+                res.send(resMsg)
+
                 console.log(`\n>>> [返回普通文本消息]测试用例：被动回复消息；状态：已回复；回复内容：${AUTO_TEST_REPLY_TEXT} <<<\n`)
               } else if (Content.includes('QUERY_AUTH_CODE')) {
+                // 第三方平台全网发布检测返回api文本消息测试
                 res.end('')
                 const authorizationCode = Content.replace('QUERY_AUTH_CODE:', '');
                 const componentAccessToken = await Component.readComponentAccessToken()  // 从云数据库中读取应用token
-                // console.log(componentAccessToken)
                 let authorizerAccessToken = await Authorizer.getAuthorizerAccessToken(wechat_shop_app.appid, authorizationCode, componentAccessToken)
-                // console.log(authorizerAccessToken)
                 let content = `${authorizationCode}_from_api`
-                // console.log(content)
                 let ret = await Authorizer.send(authorizerAccessToken, FromUserName, 'text', { content })
                 console.log(`\n>>> [返回Api文本消息]测试用例：主动发送客服消息；状态：已发送；响应结果：${JSON.stringify(ret)}；发送内容：${content} <<<\n`)
               }
@@ -310,19 +321,28 @@ class Toolkit extends EventEmitter {
     }
   }
 
-  responseText(fromUserName, toUserName, content) {
+  encryptMsg(xmlTpl, time) {
+    let Encrypt = wechatEncrypt.encode(xmlTpl) // 加密内容
+    let TimeStamp = time // 时间戳
+    let Nonce = Math.random().toString(36).slice(2, 18) // 随机字符串
+    let MsgSignature = wechatEncrypt.genSign({ timestamp: TimeStamp, nonce: Nonce, encrypt: Encrypt }) // 签名
+
+    xml = buildObject({ Encrypt, TimeStamp, Nonce, MsgSignature })
+    return xml;
+  }
+
+  responseText(fromUserName, toUserName, time,content) {
     if (!content) {
       return '';
     }
-    const xmlTpl = `
-        <xml>
-            <ToUserName><![CDATA[${toUserName}]]></ToUserName>
-            <FromUserName><![CDATA[${fromUserName}]]></FromUserName>
-            <CreateTime>${Date.now()}</CreateTime>
-            <MsgType><![CDATA[text]]></MsgType>
-            <Content><![CDATA[${content}]]></Content>
-        </xml>
-    `;
+    const xmlTpl = 
+`<xml>
+    <ToUserName><![CDATA[${fromUserName}]]></ToUserName>
+    <FromUserName><![CDATA[${toUserName}]]></FromUserName>
+    <CreateTime>${time}</CreateTime>
+    <MsgType><![CDATA[text]]></MsgType>
+    <Content><![CDATA[${content}]]></Content>
+</xml>`;
     return xmlTpl;
   }
 
