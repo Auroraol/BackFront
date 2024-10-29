@@ -1151,7 +1151,61 @@ server {
 
 # 补充
 
-## 重定向
+## nginx代理转发说明
+
+### 1、nginx 默认转发header，个别字段除外
+
+说明：
+
+（1）proxy_hide_header
+
+语法:	proxy_hide_header field;
+默认值:	—
+上下文:	http, server, location
+**nginx默认不会将“Date”、“Server”、“X-Pad”，和“X-Accel-...”响应头发送给客户端。**
+
+proxy_hide_header指令则可以设置额外的响应头，这些响应头也不会发送给客户端。相反的，如果希望允许传递某些响应头给客户端，可以使用proxy_pass_header指令。
+
+（2）proxy_pass_header（其功能与proxy_hide_header相反，会将原来不允许转发的改为允许转发）
+
+语法:	proxy_pass_header field;
+默认值:	—
+上下文:	http, server, location
+允许传送被屏蔽的后端服务器响应头到客户端。
+
+（3）proxy_set_header
+
+语法:	proxy_set_header field value;
+默认值:	
+proxy_set_header Host $proxy_host;
+proxy_set_header Connection close;
+上下文:	http, server, location
+允许重新定义或者添加发往后端服务器的请求头。value可以包含文本、变量或者它们的组合。 当且仅当当前配置级别中没有定义proxy_set_header指令时，会从上面的级别继承配置。 默认情况下，只有两个请求头会被重新定义：
+
+proxy_set_header Host       $proxy_host;
+proxy_set_header Connection close;
+如果不想改变请求头“Host”的值，可以这样来设置：
+
+proxy_set_header Host       $http_host;
+但是，如果客户端请求头中没有携带这个头部，那么传递到后端服务器的请求也不含这个头部。 这种情况下，更好的方式是使用$host变量——它的值在请求包含“Host”请求头时为“Host”字段的值，在请求未携带“Host”请求头时为虚拟主机的主域名：
+
+proxy_set_header Host       $host;
+此外，服务器名可以和后端服务器的端口一起传送：
+
+proxy_set_header Host       $host:$proxy_port;
+如果某个请求头的值为空，那么这个请求头将不会传送给后端服务器：
+
+proxy_set_header Accept-Encoding "";
+
+### 2、nginx 默认转发body
+
+proxy_pass_request_body（默认是打开的）
+
+```
+proxy_pass_request_body on | off;
+```
+
+### 3. 重定向案例
 
 ```yaml
 http {
