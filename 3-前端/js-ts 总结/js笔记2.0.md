@@ -974,3 +974,9 @@ export default async function (ctx: FunctionContext) {
 ```
 
 ![image-20241018123929832](js%E7%AC%94%E8%AE%B02.0.assets/image-20241018123929832.png)
+
+
+
+
+
+js默认值
