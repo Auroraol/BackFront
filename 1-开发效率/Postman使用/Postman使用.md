@@ -145,3 +145,30 @@ https://cdjwc.webvpn.ccu.edu.cn/jsxsd/xskb/xskb_list.do
 
 
 [Postman 导入curl 、导出成curl、导出成对应语言代码-CSDN博客](https://blog.csdn.net/qq_41767116/article/details/121463916)
+
+
+
+# postman
+
+写一个后端接口，肯定离不开后续的调试，所以我使用了 **[Postman](https://apifox.com/apiskills/what-is-postman/)** 来进行**上传图片接口**的调试，调试步骤也很简单：
+
+- **第一步：填写请求** **URL**
+- **第二步：选择请求类型**
+- **第三步：选择发送文件**
+- **第四步：点击发送按钮**
+- **第五步：拿到响应结果**
+
+![Postman 发送 Post 请求并上传文件](Postman%E4%BD%BF%E7%94%A8.assets/image-1290.png)
+
+
+
+
+
+# grpc
+
+![grpc请求填写](Postman%E4%BD%BF%E7%94%A8.assets/f648c1d5915332af0246f2ff69d379ca.png)
+
+[Postman调用grpc接口_postman grpc-CSDN博客](https://blog.csdn.net/weixin_43807568/article/details/124738638)
+
+
+
