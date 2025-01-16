@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        enabled: false
+      discovery:
+        server-addr: # yours
+        namespace: # yours
+  thymeleaf:
+    cache: false

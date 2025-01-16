@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package proto;
+
+service UserService {
+    //用户注册
+    rpc Signup (SignupReq) returns (CommonAck){}
+}
+
+message CommonAck {
+    int32 Code = 1;
+    string Message = 2;
+}
+
+message SignupReq {
+    string UserName = 1;
+    string Password = 2;
+}
+

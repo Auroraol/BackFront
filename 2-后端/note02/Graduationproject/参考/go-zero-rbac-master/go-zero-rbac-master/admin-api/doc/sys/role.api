@@ -1,0 +1,95 @@
+syntax = "v1"
+
+info(
+    title: "aso-admin-api-user"
+    desc: "后台user相关"
+    author: "thunur"
+    email: "thunur@qq.com"
+    version: "v1"
+)
+
+type RoleListPageReq {
+    Page                int64     `json:"page"`
+    Size                int64     `json:"size"`
+    Sort                string    `json:"sort,optional"`
+    Oder                string    `json:"order,optional"`
+    KeyWord             string    `json:"keyWord,optional"`
+}
+
+type RoleData {
+    Id                   int64    `json:"id"`
+    CreateTime           string   `json:"createTime"`
+    UpdateTime           string   `json:"updateTime"`
+    Name                 string   `json:"name"`
+    Label                string   `json:"label"`
+    Remark               string   `json:"remark"`
+    Relevance            int64    `json:"relevance"`
+    MenuIdList           []int64  `json:"menuIdList"`
+    DepartmentIdList     []int64  `json:"departmentIdList"`
+}
+
+type RoleAddReq {
+    Name                 string   `json:"name"`
+    Label                string   `json:"label"`
+    Remark               string   `json:"remark,optional"`
+    Relevance            int64    `json:"relevance"`
+    MenuIdList           []int64  `json:"menuIdList"`
+    DepartmentIdList     []int64  `json:"departmentIdList"`
+}
+
+type RoleDeleteReq {
+    Ids                 []int64   `json:"ids"`
+}
+
+type RoleInfoReq {
+    Id                  int64     `form:"id"`
+}
+
+type RoleUpdateReq {
+    Id                   int64    `json:"id"`
+    Name                 string   `json:"name"`
+    Label                string   `json:"label"`
+    Remark               string   `json:"remark,optional"`
+    Relevance            int64    `json:"relevance"`
+    MenuIdList           []int64  `json:"menuIdList"`
+    DepartmentIdList     []int64  `json:"departmentIdList"`
+}
+
+@server(
+    jwt: Auth
+    group: sys/role
+    middleware: Authority
+)
+
+service admin-api {
+    @doc(
+        summary: "角色分页列表"
+    )
+    @handler RolePage
+    post /api/sys/role/page (RoleListPageReq) returns (PageResp)
+    @doc(
+        summary: "角色列表"
+    )
+    @handler RoleList
+    get /api/sys/role/list () returns (Resp)
+    @doc(
+        summary: "角色添加"
+    )
+    @handler RoleAdd
+    post /api/sys/role/add (RoleAddReq) returns (Resp)
+    @doc(
+        summary: "角色信息"
+    )
+    @handler RoleInfo
+    get /api/sys/role/info (RoleInfoReq) returns (Resp)
+    @doc(
+        summary: "角色删除"
+    )
+    @handler RoleDelete
+    delete /api/sys/role/delete (RoleDeleteReq) returns (Resp)
+    @doc(
+        summary: "角色更新"
+    )
+    @handler RoleUpdate
+    put /api/sys/role/update (RoleUpdateReq) returns (Resp)
+}

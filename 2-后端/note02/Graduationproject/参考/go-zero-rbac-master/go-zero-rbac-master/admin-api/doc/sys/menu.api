@@ -1,0 +1,94 @@
+syntax = "v1"
+
+info(
+    title: "aso-admin-api-user"
+    desc: "后台菜单管理"
+    author: "thunur"
+    email: "thunur@qq.com"
+    version: "v1"
+)
+// 菜单数据
+type MenuData {
+    Id         int64     `json:"id"`         // ID
+    CreateTime string    `json:"createTime"` // 创建时间
+    UpdateTime string    `json:"updateTime"` // 更新时间
+    ParentId   int64     `json:"parentId"`   // 父菜单ID
+    Name       string    `json:"name"`       // 菜单名称
+    Router     string    `json:"router"`     // 菜单地址
+    Perms      string    `json:"perms"`      // 权限标识
+    Type       int64     `json:"type"`       // 类型 0：目录 1：菜单 2：按钮
+    Icon       string    `json:"icon"`       // 图标
+    OrderNum   int64     `json:"orderNum"`   // 排序
+    ViewPath   string    `json:"viewPath"`   // 视图地址
+    KeepAlive  bool     `json:"keepAlive"`  // 路由缓存
+    IsShow     bool     `json:"isShow"`     // 父菜单名称
+}
+
+type MenuInfoReq {
+    Id int64  `form:"id"`
+}
+
+type MenuAddReq {
+    ParentId   int64     `json:"parentId,optional"`   // 父菜单ID
+    Name       string    `json:"name"`       // 菜单名称
+    Router     string    `json:"router,optional"`     // 菜单地址
+    Perms      string    `json:"perms,optional"`      // 权限标识
+    Type       int64     `json:"type"`       // 类型 0：目录 1：菜单 2：按钮
+    Icon       string    `json:"icon,optional"`       // 图标
+    OrderNum   int64     `json:"orderNum,optional"`   // 排序
+    ViewPath   string    `json:"viewPath,optional"`   // 视图地址
+    KeepAlive  bool      `json:"keepAlive,optional"`  // 路由缓存
+    IsShow     bool      `json:"isShow,default=true,optional"`     // 父菜单名称
+}
+
+type MenuUpdateReq {
+    Id         int64     `json:"id"`         // ID
+    ParentId   int64     `json:"parentId,optional"`   // 父菜单ID
+    Name       string    `json:"name"`       // 菜单名称
+    Router     string    `json:"router,optional"`     // 菜单地址
+    Perms      string    `json:"perms,optional"`      // 权限标识
+    Type       int64     `json:"type"`       // 类型 0：目录 1：菜单 2：按钮
+    Icon       string    `json:"icon,optional"`       // 图标
+    OrderNum   int64     `json:"orderNum,optional"`   // 排序
+    ViewPath   string    `json:"viewPath,optional"`   // 视图地址
+    KeepAlive  bool      `json:"keepAlive,default=false,optional"`  // 路由缓存
+    IsShow     bool      `json:"isShow,default=true,optional"`     // 父菜单名称
+}
+
+type MenuDeleteReq {
+    Ids      []int64       `json:"ids"`
+}
+
+@server(
+    jwt: Auth
+    group: sys/menu
+    middleware: Authority
+)
+
+service admin-api {
+    @doc(
+        summary: "菜单列表"
+    )
+    @handler MenuList
+    get /api/sys/menu/list () returns (Resp)
+    @doc(
+        summary: "菜单信息"
+    )
+    @handler MenuInfo
+    get /api/sys/menu/info (MenuInfoReq) returns (Resp)
+    @doc(
+        summary: "菜单更新"
+    )
+    @handler MenuUpdate
+    put /api/sys/menu/update (MenuUpdateReq) returns (Resp)
+    @doc(
+        summary: "菜单添加"
+    )
+    @handler MenuAdd
+    post /api/sys/menu/add (MenuAddReq) returns (Resp)
+    @doc(
+        summary: "菜单删除"
+    )
+    @handler MenuDelete
+    delete /api/sys/menu/delete (MenuDeleteReq) returns (Resp)
+}

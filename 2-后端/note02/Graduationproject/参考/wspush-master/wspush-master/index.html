@@ -1,0 +1,54 @@
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type='text/javascript'>
+                if (!window.WebSocket) { 
+                        //连 WebSocket 这个对象都没有，那说明客户端根本就不支持 WebSocket 
+                        alert("WebSocket is not supported!"); 
+                } else { 
+                        var socket = { 
+                                start : function() { 
+                                        //注意协议前缀不再是 http，而是 ws，https 相对应的是 wss 
+                                        var location = "ws://localhost:8123/ws";
+                                        this._ws = new WebSocket(location); 
+                                        //握手成功建立连接之后触发 
+                                        this._ws.onopen = this.whenOpen; 
+                                        //当接收到服务端推过来的消息时触发 
+                                        this._ws.onmessage = this.whenMessage; 
+                                        //当连接断开时触发 
+                                        this._ws.onclose = this.whenClose; 
+                                }, 
+                                whenOpen : function(m) { 
+                                        console.log("the connection is open;Handshake is ok");
+                                }, 
+                                sendMsg : function(message) { 
+                                        if (this._ws) { 
+                                                //除了几个事件驱动回调函数之外，WebSocket 还内置一个 send 方法 
+                                                this._ws.send(message); 
+                                        }                                 }, 
+                                whenMessage : function(m) {
+                                    console.log("received: " + m.data);
+                                        $("#msgSpan").html(m.data); 
+                                }, 
+                                whenClose : function(m) { 
+                                        this._ws = null; 
+                                } 
+                        }; 
+                        socket.start(); 
+                        $(function() { 
+                                $("#sendBtn").click(function() { 
+                                        socket.sendMsg($("#sendTxt").val());
+                                }); 
+                        }); 
+                } 
+        </script>
+</head>
+<body>
+<h3>WebSocket 实例</h3>
+<input type="text" id="sendTxt">
+<input type="button" value="发送" id="sendBtn"><br><br>
+服务端回送的消息：<span id="msgSpan"></span><br>
+</body>
+</html> 

@@ -1,0 +1,60 @@
+syntax = "v1"
+
+info(
+    title: "aso-admin-api-user"
+    desc: "后台user相关"
+    author: "thunur"
+    email: "thunur@qq.com"
+    version: "v1"
+)
+
+type captchaRequest {
+    Width  int `form:"width"`
+    Height int `form:"height"`
+}
+
+
+type loginRequest {
+    Username   string `json:"username"`
+    Password   string `json:"password"`
+    CaptchaId  string `json:"captchaId"`
+    VerifyCode string `json:"verifyCode"`
+}
+
+
+// 通用方法
+@server(
+    group: sys/common
+)
+
+service admin-api {
+    @doc(
+        summary: "验证码"
+    )
+    @handler Captcha
+    get /api/sys/common/captcha (captchaRequest) returns (Resp)
+    @doc(
+        summary: "登录"
+    )
+    @handler UserLogin
+    post /api/sys/common/login (loginRequest) returns (Resp)
+}
+
+@server(
+    jwt: Auth
+    middleware: Authority
+    group: sys/common
+)
+
+service admin-api {
+    @doc(
+        summary: "个人信息"
+    )
+    @handler Person
+    get /api/sys/common/person () returns (Resp)
+    @doc(
+        summary: "个人菜单"
+    )
+    @handler PermsMenus
+    get /api/sys/common/menus () returns (Resp)
+}

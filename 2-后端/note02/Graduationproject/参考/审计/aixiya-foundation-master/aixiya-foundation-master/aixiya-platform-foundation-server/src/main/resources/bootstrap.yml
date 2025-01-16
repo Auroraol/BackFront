@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: foundation-center
+  profiles:
+    active: local
+  thymeleaf:
+    cache: false

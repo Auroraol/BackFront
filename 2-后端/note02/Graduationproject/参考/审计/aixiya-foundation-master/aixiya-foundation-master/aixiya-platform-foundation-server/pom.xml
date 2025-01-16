@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>aixiya-platform-foundation</artifactId>
+        <groupId>aixiya.framework.backend</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>aixiya-platform-foundation-server</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- huawei-obs-->
+        <dependency>
+            <groupId>com.huaweicloud</groupId>
+            <artifactId>esdk-obs-java</artifactId>
+            <version>${huaweicloud.obs.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--aixiya start-->
+
+        <dependency>
+            <groupId>aixiya.framework.backend</groupId>
+            <artifactId>framework-datasource-starter</artifactId>
+            <version>${aixiya-framework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>aixiya.framework.backend</groupId>
+            <artifactId>framework-redis-starter </artifactId>
+            <version>${aixiya-framework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>aixiya.framework.backend</groupId>
+            <artifactId>framework-security-starter</artifactId>
+            <version>${aixiya-framework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>aixiya.framework.backend</groupId>
+            <artifactId>framework-log-starter</artifactId>
+            <version>${aixiya-framework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>aixiya.framework.backend</groupId>
+            <artifactId>aixiya-platform-foundation-api</artifactId>
+            <version>${aixiya-framework.version}</version>
+        </dependency>
+
+        <!--baidu start-->
+        <!--sms -->
+        <dependency>
+            <groupId>com.baidubce</groupId>
+            <artifactId>bce-java-sdk</artifactId>
+            <version>0.10.133</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+
+                <!-- <exclusion>
+                     <groupId>ch.qos.logback</groupId>
+                     <artifactId>logback-classic</artifactId>
+                 </exclusion>
+                 <exclusion>
+                     <groupId>ch.qos.logback</groupId>
+                     <artifactId>logback-core</artifactId>
+                 </exclusion>-->
+            </exclusions>
+        </dependency>
+        <!--ocr-->
+        <dependency>
+            <groupId>com.baidu.aip</groupId>
+            <artifactId>java-sdk</artifactId>
+            <version>4.15.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--zipkin-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zipkin</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+        </dependency>
+        <!--log el-->
+        <!--<dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+            <version>3.1.0</version>
+        </dependency>-->
+
+        <!--kafka appender-->
+        <!--<dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.danielwegener</groupId>
+            <artifactId>logback-kafka-appender</artifactId>
+            <version>0.2.0-RC2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+        </dependency>-->
+    </dependencies>
+
+
+
+    <build>
+        <finalName>aixiya-platform-foundation</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,121 @@
+server:
+  port: 18013
+  tomcat:
+    max-swallow-size: 50MB
+spring:
+  kafka:
+    bootstrap-servers: # yours
+    producer:
+      retries: 0
+      batch-size: 16384
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      enable-auto-commit: true
+      auto-commit-interval: 1s
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  zipkin:
+    sender:
+      type: kafka
+  sleuth:
+    sampler:
+      probability: 1
+  datasource:
+    dynamic:
+      hikari:
+        connection-timeout: 30000
+        max-lifetime: 1800000
+        max-pool-size: 20
+        min-idle: 5
+        connection-test-query: select 1
+        pool-name: FebsHikariCP
+      primary: base
+      datasource:
+        base:
+          username: # yours
+          password: # yours
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://# yours?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8
+  redis:
+    database: 1
+    host: # yours
+    port: 6379
+    lettuce:
+      pool:
+        min-idle: 8
+        max-idle: 500
+        max-active: 2000
+        max-wait: 8s
+    timeout: 10s
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      resolve-lazily: true
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    jdbc-type-for-null: null
+  log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    banner: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+aixiya:
+  platform:
+    security:
+      enable: true
+      only-fetch-by-gateway: false
+      anon-uris: /public/**
+    log:
+      filter:
+        enable: true
+        annoUrlPatterns: /storage/download/file,/simple/ocr,/storage/upload/simple
+      console:
+        enable: true
+      kafka:
+        bootstrap-servers: # yours
+security:
+  oauth2:
+    resource:
+      id: ${spring.application.name}
+      user-info-uri: http://auth-center/user
+      loadBalanced: true
+csc:
+  platform:
+    huawei:
+      endPoint: # yours
+      ak: # yours
+      sk: # yours
+      publicBucker: # yours
+      privateBucker: # yours
+      socketTimeout: 30000
+      connectionTimeout: 10000
+sms:
+  baidu:
+    ak: # yours
+    sk: # yours
+    endpoint: http://smsv3.bj.baidubce.com
+  verification:
+    template: # yours
+    signatureId: # yours
+    businessKey: BUSINESS_TYPE
+    verificationCodeKey: VERIFICATION_CODE
+ocr:
+  baidu:
+    aipAppId: # yours
+    aipApiKey: # yours
+    aipSecretKey: # yours
+logging:
+  config: classpath:aixiya-logback.xml

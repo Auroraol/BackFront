@@ -1,0 +1,66 @@
+### 用户添加
+POST http://{{host}}/user/create
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Token:{{token}}
+
+{
+  "UserName": "test",
+  "Password": "123456"
+}
+
+### 用户编辑
+POST http://{{host}}/user/update
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Token:{{token}}
+
+{
+  "Id": 1,
+  "Email": "test@qq.com"
+}
+
+
+### 用户删除
+POST http://{{host}}/user/del
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Token:{{token}}
+
+{
+  "Id": 2
+}
+
+
+### 获取单条用户
+POST http://{{host}}/user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Token:{{token}}
+
+{
+  "Id": 2
+}
+
+### 获取多条用户
+GET http://{{host}}/users
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Token:{{token}}
+
+
+### 获取用户文件列表
+POST http://{{host}}/userfiles
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Token:{{token}}
+
+###
+
+

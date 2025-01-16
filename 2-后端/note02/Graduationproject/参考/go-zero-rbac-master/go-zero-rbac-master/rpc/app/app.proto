@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package app;
+
+// 相册分类
+message AppListTypeReq {
+
+}
+
+message AppListTypeData {
+  int64 id = 1;
+  string createTime = 2;
+  string updateTime = 3;
+  string name = 4;
+}
+
+message AppListTypeResp {
+  repeated AppListTypeData list = 1;
+}
+
+message AppAddTypeReq {
+  string name = 1;
+}
+message AppAddTypeResp {
+  int64 pong = 1;
+}
+message AppUpdateTypeReq {
+  int64 id = 1;
+  string name = 2;
+}
+message AppUpdateTypeResp {
+  int64 pong = 1;
+}
+message AppDeleteTypeReq {
+  repeated int64 ids = 1;
+}
+message AppDeleteTypeResp {
+  int64 pong = 1;
+}
+// end
+// 相册列表
+message AppPageItemReq {
+  int64 classifyId = 1;
+  int64 page = 2;
+  int64 size = 3;
+  int64 total = 4;
+}
+
+message AppPageItemData {
+  int64 id = 1;
+  string createTime = 2;
+  string updateTime = 3;
+  string url = 4;
+  string type = 5;
+  int64 classifyId = 6;
+}
+
+message AppPageItemResp {
+  repeated AppPageItemData list = 1;
+  int64 total = 2;
+}
+
+message AppAddItemReq {
+  int64 classifyId = 1;
+  string type = 2;
+  string url = 3;
+}
+
+message AppAddItemResp {
+  int64 pong = 1;
+}
+
+service App {
+  // 相册类型
+  rpc AppListType(AppListTypeReq) returns(AppListTypeResp);
+  // 相册类型添加
+  rpc AppAddType(AppAddTypeReq) returns(AppAddTypeResp);
+  // 相册类型更新
+  rpc AppUpdateType(AppUpdateTypeReq) returns(AppUpdateTypeResp);
+  // 相册类型删除
+  rpc AppDeleteType(AppDeleteTypeReq) returns(AppDeleteTypeResp);
+  // 相册类型列表
+
+  // 相册列表
+  rpc AppPageItem(AppPageItemReq) returns(AppPageItemResp);
+  // 相册列表插入
+  rpc AppAddItem(AppAddItemReq) returns(AppAddItemResp);
+}

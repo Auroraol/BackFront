@@ -1,0 +1,300 @@
+syntax = "proto3";
+
+package wechat;
+
+// 微信配置请求
+message WechatInfoRequest {
+  int64 Type = 1;
+}
+
+// 微信配置返回
+message WechatInfoResponse {
+  int64 id = 1;
+  int64 type = 2;
+  string value = 4;
+}
+
+// 微信配置更新请求
+message WechatInfoUpdateRequest {
+  int64 id = 1;
+  int64 type = 2;
+  string value = 4;
+}
+
+// 微信配置更新返回
+message WechatInfoUpdateResponse {
+  int64 pong = 1;
+}
+
+// 图文选择器请求
+message MaterialReq {
+  int64 page = 1;
+  int64 size = 2;
+  int64 total = 3;
+}
+
+// 图文选择器返回数据结构体
+message MaterialData {
+  int64 id = 1;
+  string title = 2;
+  string createTime = 3;
+  string updateTime = 4;
+  bool type = 5;
+  string thumb = 6;
+}
+// 图文需验证器返回结构体
+message MaterialResp {
+  repeated MaterialData list = 1;
+  int64 total = 2;
+}
+
+// 微信图文列表请求
+message WechatMaterialItemReq {
+  int64 mediaId = 1;
+}
+// 微信图文列表数据结构体
+message WechatMaterialItemData {
+  string createTime = 1;
+  string updateTime = 2;
+  string url = 3;
+  string type = 4;
+  string title = 5;
+  string author = 6;
+  string cover = 7;
+  string summary = 8;
+  string content = 9;
+  string content_source_url = 10;
+  int64 sort = 11;
+  int64 hits = 12;
+  int64 media_key = 13;
+}
+// 微信图文列表返回结构体
+message WechatMaterialItemResponse {
+  repeated WechatMaterialItemData list = 1;
+}
+
+// 图文新增
+message MaterialAddReq {
+  string title = 1;
+  string thumb = 2;
+  bool type = 3;
+}
+
+//图文新增返回
+message MaterialAddResp {
+  int64 id = 1;
+}
+
+// 图文列表新增
+message MaterialItemAddReq {
+  string createTime = 1;
+  string updateTime = 2;
+  string url = 3;
+  string type = 4;
+  string title = 5;
+  string author = 6;
+  string cover = 7;
+  string summary = 8;
+  string content = 9;
+  string content_source_url = 10;
+  int64 sort = 11;
+  int64 hits = 12;
+  int64 media_key = 13;
+}
+
+// 图文列表新增返回
+message MaterialItemResp {}
+
+message KeyWordRelyPageReq{
+  int64 page = 1;
+  int64 size = 2;
+  string order = 3;
+  string sort = 4;
+  string keyWord = 5;
+}
+
+message KeyWordReplyData {
+  int64 id = 1;
+  string name = 2;
+  string key = 3;
+  bool match = 4;
+  string type = 5;
+  int64 mediaId = 6;
+  string text = 7;
+  string url = 8;
+  string createTime = 9;
+  string updateTime = 10;
+}
+
+message KeyWordReplyUpdateReq {
+  int64 id = 1;
+  string name = 2;
+  string key = 3;
+  bool match = 4;
+  string type = 5;
+  int64 mediaId = 6;
+  string text = 7;
+  string url = 8;
+  string createTime = 9;
+  string updateTime = 10;
+}
+message KeyWordReplyUpdateResp {}
+
+message KeyWordReplyPageResp {
+  repeated KeyWordReplyData list = 1;
+  int64 total = 2;
+}
+
+message KeyWordReplyAddData {
+  string name = 1;
+  string key = 2;
+  bool match = 3;
+  string type = 4;
+  int64 mediaId = 5;
+  string text = 6;
+  string url = 7;
+}
+message KeyWordReplyAddResp {}
+
+message KeyWordReplyDeleteReq {
+  repeated int64 ids = 1;
+}
+message KeyWordReplyDeleteResp {}
+
+// 关键词回复详情请求
+message KeyWordReplyInfoReq {
+  int64 id = 1;
+}
+// 关键词回复详情返回
+message KeyWordReplyInfoResp {
+  int64 id = 1;
+  string name = 2;
+  string key = 3;
+  bool match = 4;
+  string type = 5;
+  int64 mediaId = 6;
+  string text = 7;
+  string url = 8;
+  string createTime = 9;
+  string updateTime = 10;
+}
+
+// 关键词回复
+message ReplyMessageReq {
+  string key = 1;
+}
+message ReplyMessageResp {
+  int64 id = 1;
+  string name = 2;
+  string key = 3;
+  bool match = 4;
+  string type = 5;
+  int64 mediaId = 6;
+  string text = 7;
+  string url = 8;
+  string createTime = 9;
+  string updateTime = 10;
+}
+
+// 菜单相关
+message MenuAddReq {
+  int64 Id = 1;
+  int64 Pid = 2;
+  string Type = 3;
+  string Name = 4;
+  string URL = 5;
+  int64 MediaID = 6;
+  string MsgType = 7;
+  string AppID = 8;
+  string PagePath = 9;
+  string CreateTime = 10;
+  string UpdateTime = 11;
+  string Text = 12;
+  string Pic = 13;
+}
+
+message MenuAddResp {
+  int64 id = 1;
+}
+
+message MenuClearReq {}
+message MenuClearResp {}
+
+message MenuListReq {
+  int64 id = 1;
+}
+
+message MenuListData {
+  int64 Id = 1;
+  int64 Pid = 2;
+  string Type = 3;
+  string Name = 4;
+  string URL = 5;
+  int64 MediaID = 6;
+  string MsgType = 7;
+  string AppID = 8;
+  string PagePath = 9;
+  string CreateTime = 10;
+  string UpdateTime = 11;
+  string Text = 12;
+  string Pic = 13;
+  repeated MenuListData SubButton = 14;
+}
+message MenuListResp {
+  repeated MenuListData list = 1;
+}
+
+message MenuInfoReq {
+  int64 Id = 1;
+  string filed = 2;
+}
+message MenuInfoResp {
+  int64 Id = 1;
+  int64 Pid = 2;
+  string Type = 3;
+  string Name = 4;
+  string URL = 5;
+  int64 MediaID = 6;
+  string MsgType = 7;
+  string AppID = 8;
+  string PagePath = 9;
+  string CreateTime = 10;
+  string UpdateTime = 11;
+  string Text = 12;
+  string Pic = 13;
+}
+
+service Wechat {
+  //Info 配置信息
+  rpc Info(WechatInfoRequest) returns(WechatInfoResponse);
+  //Update 更新配置
+  rpc Update(WechatInfoUpdateRequest) returns(WechatInfoUpdateResponse);
+  //MaterialPage 图文选择器列表
+  rpc MaterialPage(MaterialReq) returns(MaterialResp);
+  // MateRialAdd 图文添加
+  rpc MaterialAdd(MaterialAddReq) returns(MaterialAddResp);
+  //MaterialItem 素材内容
+  rpc MaterialItem(WechatMaterialItemReq) returns(WechatMaterialItemResponse);
+  //MaterialItemAdd 素材内容添加
+  rpc MaterialItemAdd(MaterialItemAddReq) returns(MaterialItemResp);
+  //KeyWordReplyPage 关键词回复列表
+  rpc KeyWordReplyPage(KeyWordRelyPageReq) returns(KeyWordReplyPageResp);
+  //KeyWordAdd 关键词回复添加
+  rpc KeyWordAdd(KeyWordReplyAddData) returns(KeyWordReplyAddResp);
+  //KeyWordDelete 关键词删除
+  rpc KeyWordDelete(KeyWordReplyDeleteReq) returns(KeyWordReplyDeleteResp);
+  //KeyWordInfo 关键词详情
+  rpc KeyWordInfo(KeyWordReplyInfoReq) returns(KeyWordReplyInfoResp);
+  //KeyWordUpdate 关键词更新
+  rpc KeyWordUpdate(KeyWordReplyUpdateReq) returns(KeyWordReplyUpdateResp);
+  //ReplyMessage 关键词回复
+  rpc ReplyMessage(ReplyMessageReq) returns(ReplyMessageResp);
+  //MenuAdd 菜单添加
+  rpc MenuAdd(MenuAddReq) returns(MenuAddResp);
+  //MenuClear 菜单清空
+  rpc MenuClear(MenuClearReq) returns(MenuClearResp);
+  //MenuList 菜单列表
+  rpc MenuList(MenuListReq) returns(MenuListResp);
+  //MenuInfo 菜单信息
+  rpc MenuInfo(MenuInfoReq) returns(MenuInfoResp);
+}

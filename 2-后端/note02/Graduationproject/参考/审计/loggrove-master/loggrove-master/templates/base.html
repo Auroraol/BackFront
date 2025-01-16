@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<!--
+ Created by zhouwang.
+-->
+<html lang="cn" style="height: 100%">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %}{% end %}</title>
+
+    <link rel="Shortcut Icon" href="{{ static_url('img/favicon.ico') }}">
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{{ static_url('sb-admin-2/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="{{ static_url('sb-admin-2/vendor/metisMenu/metisMenu.min.css') }}" rel="stylesheet">
+
+    <!-- Social Buttons CSS -->
+    <link href="{{ static_url('sb-admin-2/vendor/bootstrap-social/bootstrap-social.css') }}" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="{{ static_url('sb-admin-2/vendor/datatables-plugins/dataTables.bootstrap.css') }}" rel="stylesheet">
+
+    <!-- DataTables Responsive CSS -->
+    <link href="{{ static_url('sb-admin-2/vendor/datatables-responsive/dataTables.responsive.css') }}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ static_url('sb-admin-2/dist/css/sb-admin-2.css') }}" rel="stylesheet">
+
+    <!-- Font-awesome CSS -->
+    <link href="{{ static_url('sb-admin-2/vendor/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
+
+    <!-- Bootstrap-select CSS -->
+    <link href="{{ static_url('bootstrap-select-1.13.1/dist/css/bootstrap-select.min.css') }}" rel="stylesheet">
+
+    <!-- Bootstrap-datetimepicker CSS -->
+    <link href="{{ static_url('bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
+
+    <!-- Bootstrap-table CSS -->
+    <link href="{{ static_url('bootstrap-table/dist/bootstrap-table.min.css') }}" rel="stylesheet">
+
+    <!-- Bootstrap-tag CSS -->
+    <link href="{{ static_url('bootstrap-tagsinput-latest/dist/bootstrap-tagsinput.css') }}" rel="stylesheet">
+
+    <style>
+        .error_text {color: #FFCC00}
+        #profileModal small {margin-bottom: 5px}
+        #profileModal span {font-size: 14px}
+
+        {% if requser.get('role') == 1 or requser.get('username') == 'guest' %}
+        .role1 {display: inline}
+        .role2 {display: inline}
+        {% elif requser.get('role') == 2 %}
+        .role1 {display: none}
+        .role2 {display: inline}
+        {% else %}
+        .role1 {display: none}
+        .role2 {display: none}
+        {% end %}
+    </style>
+    {% block style %}
+    {% end %}
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- jQuery -->
+    <script src="{{ static_url('sb-admin-2/vendor/jquery/jquery.min.js') }}"></script>
+
+    <script src="{{ static_url('js/base.js') }}"></script>
+    <script src="{{ static_url('js/locale.js') }}"></script>
+    <script>
+        language = get_language()
+    </script>
+    {% block head_js %}
+    {% end %}
+</head>
+
+<body style="height: 100%">
+    <div id="wrapper" style="height: 100%;">
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0; border-bottom:1px solid #ddd ; background-color:#303030">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar" style="background-color: #fff"></span>
+                    <span class="icon-bar" style="background-color: #fff"></span>
+                    <span class="icon-bar" style="background-color: #fff"></span>
+                </button>
+
+                <a class="navbar-brand" href="/" style="color: #fff; padding-top: 8px">
+                    <img src="/static/img/logo.png" style="width:35px; float: left; margin-right: 12px; border: 1px solid #E8E8E8; border-radius:5px;" alt=""/>
+                    <span style="font-weight:300;letter-spacing:2px; font-size: 23px; float: left; margin-top: 8px; color: #FFFFFF">Loggrove</span>
+                </a>
+            </div>
+
+            <ul class="nav navbar-top-links navbar-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" style="background-color: #303030">
+                        <i class="fa fa-flag fa-fw" style="color: #fff"></i> <i class="fa fa-caret-down" style="color: #fff"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="#" onclick="document.cookie='language=cn; path=/'; location.reload()"> 中文</a>
+                        </li>
+                        <li><a href="#" onclick="document.cookie='language=en; path=/'; location.reload()"> English</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" style="background-color: #303030">
+                        <i class="fa fa-user fa-fw" style="color: #fff"></i> <i class="fa fa-caret-down" style="color: #fff"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="#" onclick="open_show_profile_modal()"><i class="fa fa-user fa-fw"></i> <script>document.write(_("Profile"))</script></a>
+                        </li>
+                        <li><a href="#" data-toggle="modal" data-target="#changePasswordModal"><i class="fa fa-gear fa-fw"></i> <script>document.write(_("Change password"))</script></a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="#" onclick="logout()"><i class="fa fa-sign-out fa-fw"></i> <script>document.write(_("Logout"))</script></a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    {% include "nav.html" %}
+
+                </div>
+            </div>
+        </nav>
+
+
+        <div id="page-wrapper" style="height: calc(100% - 55px)">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="page-header" style="padding-bottom: 0px;margin-top: 20px; border-bottom: 1px solid #ddd">
+                        <div class="breadcrumb" style="background-color: #ffffff; margin-bottom: 0px; font-size: 16px">
+                            {% block breadcrumb %}{% end %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="height: calc(100% - 100px); overflow-y: scroll;">
+                <div class="col-sm-12">
+                    {% if requser.get('username') == 'guest' %}
+                    <div class="alert alert-success alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert"
+                                aria-hidden="true">
+                            &times;
+                        </button>
+                        <a href="https://github.com/olajowon/loggrove/" target="_blank">逛完请留步，点我 star 一下，鼓励一下开发者！ <i class="fa fa-star" aria-hidden="true"></i> star！</a><br>
+
+                        <span>这里的 添加、编辑、删除按钮、用户页面、审计页面 仅让 guest 用户能够预览，想要更多的操作及权限，<a href="https://github.com/olajowon/loggrove/" target="_blank">请点我下载 Loggrove</a>。</span><br>
+                        <!--<span>注2：如果仅需要对日志监控报警的功能，另一项目 Logmonit 则是更好的选择，<a href="https://github.com/olajowon/logmonit/" target="_blank">请点我前往 Logmonit</a>。</span>-->
+                    </div>
+                    {% end %}
+                    {% block content %}{% end %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- qq二维码模态框（qq Modal） -->
+    <div class="modal fade" id="qqModal" tabindex="-1" role="dialog" aria-labelledby="qqModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="qqLabel">
+                        <i class="fa fa-qq fa-fw" style=""></i> <script>document.write(_("Join chat"))</script>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                     <img src="/static/img/qq.png" style="width: 100%" alt=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户信息模态框（User Profile Modal） -->
+    <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="profileLabel">
+                        <i class="fa fa-user fa-fw" style=""></i> <script>document.write(_("Profile"))</script>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-lg-12">
+                            <blockquote>
+                                <span><script>document.write(_("Username"))</script></span>
+                                <small>
+                                    <cite></cite>
+                                </small>
+                                <span>ID</span>
+                                <small>
+                                    <cite></cite>
+                                </small>
+                                <span><script>document.write(_("Fullname"))</script></span>
+                                <small>
+                                    <cite></cite>
+                                </small>
+                                <span><script>document.write(_("Email"))</script></span>
+                                <small>
+                                    <cite></cite>
+                                </small>
+                                <span><script>document.write(_("Role"))</script></span>
+                                <small>
+                                    <cite></cite>
+                                </small>
+                                <span><script>document.write(_("Join time"))</script></span>
+                                <small>
+                                    <cite></cite>
+                                </small>
+                                <span><script>document.write(_("Login time"))</script></span>
+                                <small>
+                                    <cite></cite>
+                                </small>
+                                <span><script>document.write(_("Expire time"))</script></span>
+                                <small>
+                                    <cite></cite>
+                                </small>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><script>document.write(_("Close"))</script>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改密码模态框（Change password Modal） -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="changePasswordLabel">
+                        <i class="fa fa-pencil-square-o fa-fw" style=""></i> <script>document.write(_("Change password"))</script>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-lg-12">
+                            <div></div>
+                            <form role="form" id="change_password_form" class="form-horizontal">
+                                {% raw xsrf_form_html() %}
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <label><script>document.write(_("Old password"))</script> *</label>
+                                        <input class="form-control" type="password" name="old_password" placeholder="Old password">
+                                        <span class="error_text"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <label><script>document.write(_("New password"))</script> *</label>
+                                        <input class="form-control" type="password" name="new_password" placeholder="New password">
+                                        <span class="error_text"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <label><script>document.write(_("Confirm password"))</script> *</label>
+                                        <input class="form-control" type="password" name="confirm_password" placeholder="Confirm password">
+                                        <span class="error_text"></span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><script>document.write(_("Close"))</script>
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="change_password()">
+                        <script>document.write(_("Submit"))</script>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{{ static_url('sb-admin-2/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="{{ static_url('sb-admin-2/vendor/metisMenu/metisMenu.min.js') }}"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="{{ static_url('sb-admin-2/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ static_url('sb-admin-2/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ static_url('sb-admin-2/vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="{{ static_url('sb-admin-2/dist/js/sb-admin-2.js') }}"></script>
+
+    <!-- Bootstrap-select JavaScript -->
+    <script src="{{ static_url('bootstrap-select-1.13.1/dist/js/bootstrap-select.min.js') }}"></script>
+
+    <!-- Bootstrap-datetimepicker JavaScript -->
+    <script src="{{ static_url('bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js') }}"></script>
+    <script src="{{ static_url('bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js') }}"></script>
+
+    <!-- Highcharts JavaScript -->
+    <script src="{{ static_url('highcharts-6.1.0/code/highcharts.js') }}"></script>
+    <script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+
+    <!-- Bootstrap-table JavaScript -->
+    <script src="{{ static_url('bootstrap-table/dist/bootstrap-table.min.js') }}"></script>
+    <!-- Bootstrap-table zh-CN JavaScript -->
+    <script src="{{ static_url('bootstrap-table/dist/bootstrap-table-zh-CN.js') }}"></script>
+
+    <script src="{{ static_url('bootstrap-3-typeahead/bootstrap3-typeahead.js') }}"></script>
+
+    <script src="https://cdn.bootcss.com/toastr.js/2.1.4/toastr.min.js"></script>
+
+
+    <!-- Bootstrap-tag JavaScript -->
+    <script src="{{ static_url('bootstrap-tagsinput-latest/dist/bootstrap-tagsinput.js') }}"></script>
+    <script>
+        $(function(){
+            $("form input[type='password']").blur(function(){
+                var form_obj = $(this).parents("form")
+                if (form_obj.attr("id") == "change_password_form"){
+                    var password_obj1 = form_obj.find("input[type='password']").eq(1)
+                    var password_obj2 = form_obj.find("input[type='password']").eq(2)
+                }else{
+                    var password_obj1 = form_obj.find("input[type='password']").eq(0)
+                    var password_obj2 = form_obj.find("input[type='password']").eq(1)
+                }
+                if(password_obj2.val() && password_obj1.val()){
+                    if(password_obj2.val() != password_obj1.val()){
+                        password_obj2.next().html(_("Confirm password is incorrect")).css('color', '#FFCC33');
+                    }else{
+                        password_obj2.next().empty()
+                    }
+                }else if (password_obj1.val() && !password_obj2.val()){
+                    password_obj2.next().empty()
+                }else if (!password_obj1.val() && password_obj2.val()){
+                    password_obj2.next().html(_("Invalid password confirmation")).css('color', '#FFCC33');
+                }else if (!password_obj1.val() && !password_obj2.val()){
+                    password_obj2.next().empty()
+                }
+            });
+        })
+    </script>
+    {% block body_js %}
+    {% end %}
+</body>
+</html>

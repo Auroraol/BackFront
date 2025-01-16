@@ -1,0 +1,56 @@
+import "sys/common.api"
+import "sys/menu.api"
+import "sys/user.api"
+import "sys/dept.api"
+import "sys/role.api"
+
+import "wechat/config.api"
+import "wechat/material.api"
+import "wechat/menu.api"
+import "wechat/reply.api"
+
+import "app/item.api"
+import "app/type.api"
+
+info(
+	title: "aso-admin-api"
+	desc: "后台相关api接口"
+	author: "thunur"
+	email: "thunur@qq.com"
+	version: "v1"
+)
+
+// 通用页码请求
+type PageReq {
+	Page    int64  `json:"page"`
+	Size    int64  `json:"size"`
+	Sort    string `json:"sort,optional"`
+	Oder    string `json:"order,optional"`
+	KeyWord string `json:"keyWord,optional"`
+}
+
+// 通用页码结构体
+type PageData {
+	Page  int64 `json:"page"`
+	Size  int64 `json:"size"`
+	Total int64 `json:"total"`
+}
+
+type PageListData {
+	List       interface{} `json:"list"`
+	Pagination PageData    `json:"pagination"`
+}
+
+// 通用翻页返回结构体
+type PageResp {
+	Code int64        `json:"code"`
+	Data PageListData `json:"data"`
+	Msg  string       `json:"msg"`
+}
+
+// 通用返回结构体
+type Resp {
+	Code int64       `json:"code"`
+	Data interface{} `json:"data"`
+	Msg  string      `json:"msg"`
+}

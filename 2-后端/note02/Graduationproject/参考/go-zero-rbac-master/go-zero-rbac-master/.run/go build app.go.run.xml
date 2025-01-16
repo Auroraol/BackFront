@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="文件管理" type="GoApplicationRunConfiguration" factoryName="Go Application" folderName="微服务">
+    <module name="aso-zero" />
+    <working_directory value="$PROJECT_DIR$/rpc/app" />
+    <go_parameters value="-i" />
+    <parameters value="-f etc/app.yaml" />
+    <kind value="FILE" />
+    <package value="aso" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/rpc/app/app.go" />
+    <method v="2" />
+  </configuration>
+</component>

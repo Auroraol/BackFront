@@ -1,0 +1,19 @@
+syntax = "v1"
+
+info(
+	title: "前端api"
+	desc: "微信相关api"
+	author: "type author here"
+	email: "type email here"
+	version: "type version here"
+)
+
+@server(
+	group: wechat/interface
+)
+service wechat-api {
+	@handler WechatInterface
+	get /wechat/index () returns()
+	@handler Wechat
+	post /wechat/index () returns()
+}
