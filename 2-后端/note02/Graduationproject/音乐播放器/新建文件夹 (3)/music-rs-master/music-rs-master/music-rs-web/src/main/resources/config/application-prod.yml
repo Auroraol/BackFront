@@ -1,0 +1,24 @@
+# 生产环境
+# 关闭thymeleaf缓存
+spring:
+  thymeleaf:
+    cache: false
+  #  数据库配置
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/music_rs?serverTimezone=UTC
+    driver-class-name: com.mysql.jdbc.Driver
+
+# mybatis配置
+mybatis:
+  mapper-locations: classpath:/mybatis/mappers/*.xml
+
+# 端口配置
+server:
+  port: 8082
+  #  主机地址配置，用于生产环境部署，spring boot内置tomcat，进行配置之后可以提供ipv4访问，否则需要使用ipv6访问
+  address: 0.0.0.0
+
+# redis配置
+#spring.redis.host=localhost

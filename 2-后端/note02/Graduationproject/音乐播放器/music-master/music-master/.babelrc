@@ -1,0 +1,57 @@
+{
+  "comments": false,
+  "env": {
+    "test": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": {
+              "node": 7
+            }
+          }
+        ]
+      ],
+      "plugins": [
+        "istanbul"
+      ]
+    },
+    "main": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": {
+              "node": "current"
+            }
+          }
+        ]
+      ]
+    },
+    "renderer": {
+      "presets": [
+        [
+          "@babel/preset-env"
+        ]
+      ],
+      "plugins": [
+        "transform-vue-jsx"
+      ]
+    },
+    "web": {
+      "presets": [
+        [
+          "@babel/preset-env"
+        ]
+      ],
+      "plugins": [
+        "transform-vue-jsx"
+      ]
+    }
+  },
+  "plugins": [
+    "@babel/plugin-transform-runtime",
+    "@babel/plugin-proposal-object-rest-spread",
+    "@babel/plugin-proposal-class-properties"
+  ]
+}

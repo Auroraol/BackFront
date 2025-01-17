@@ -1,0 +1,52 @@
+# 开发环境
+# 关闭thymeleaf缓存
+spring:
+  thymeleaf:
+    cache: false
+#  security:
+#    user:
+#      name: user
+#      password: user
+  #  数据库配置
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/music_db?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    # 这里使用docker进行进行映射，将docker中mysql服务映射到本地的3309端口
+    #    url: jdbc:mysql://localhost:3309/music_rs?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    driver-class-name: com.mysql.jdbc.Driver
+  # 配置redis
+#  redis:
+#    # 远程主机，服务器地址
+#    host: 121.43.163.246
+#    # 服务端口
+#    port: 6379
+#    # 服务器密码
+#    password: root
+#    # 数据库索引
+#    database: 0
+#    # 连接超时
+#    jedis:
+#      pool:
+#        # 线程池最大激活数
+#        max-active: 8
+#        # 最大等待时长（毫秒）
+#        max-wait: 3000
+#        # 最大空闲等待连接
+#        max-idle: 20
+#        # 最小空闲连接
+#        min-idle: 2
+#    # 连接超时时间（毫秒）
+#    connect-timeout: 5000
+
+# mybatis配置
+mybatis:
+  mapper-locations: classpath:/mybatis/mappers/*.xml
+
+# 端口配置
+server:
+  port: 8082
+  #  主机地址配置，用于生产环境部署，spring boot内置tomcat，进行配置之后可以提供ipv4访问，否则需要使用ipv6访问
+  address: 0.0.0.0
+# redis配置
+#spring.redis.host=localhost
