@@ -14109,7 +14109,40 @@ defineExpose({count, hello})
 </template>
 ```
 
-- 
+#### 案例
+
+element表格点击行即选中该行复选框
+
+```vue
+<el-table ref="multipleTable" :data="tableData" highlight-current-row tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange" @row-click="handleRowClick">
+</el-table>
+ 
+<script>
+  export default {
+    methods: {
+      //点击复选框触发，复选框样式的改变
+      handleSelectionChange(val) {
+        this.multipleSelection = val;
+      },
+      //点击行触发，选中或不选中复选框
+      handleRowClick(row, column, event){
+          this.$refs.multipleTable.toggleRowSelection(row);
+      }
+    }
+  }      
+</script>
+```
+
+```vue
+const multipleTable = ref()
+const handleRowClick = (row) => {
+  selectFiles.value = [row]
+  //通过ref绑定来操作bom元素
+  multipleTable.value.toggleRowSelection(row)
+}
+```
+
+![img](D:\Github\BackFront\3-前端\12-前端开发框架\Vue笔记整合\vue3.x\vue笔记2.0.assets\5ad5d9d995df3d74d2cd65277d82dfb9.gif)
 
 # $ref语法糖
 
@@ -16269,3 +16302,123 @@ ttc 文件拆分为 ttf 文件
 | LXGW WenKai Mono       | `LXGW WenKai Mono`       | `normal`      |
 | LXGW WenKai Mono Bold  | `LXGW WenKai Mono`       | `bold`        |
 | LXGW WenKai Mono Light | `LXGW WenKai Mono Light` | `normal`      |
+
+#  Vue 组合式 API 的钩子函数
+
+
+
+
+
+# Vue 的响应式系统可能触发多次重渲染
+
+无法正确渲染
+
+```
+
+// 表格列定义
+const columns = ref([
+  {
+    label: "文件名",
+    field: "filename",
+    sortable: true,
+    width: "50%"
+  },
+  {
+    label: "修改时间",
+    field: "updateTime",
+    sortable: true,
+    formatFn: (value) => formatDate(value)
+  },
+  {
+    label: "大小",
+    field: "fileSize",
+    sortable: true,
+    formatFn: (value) => formatFileSize(value)
+  }
+])
+
+```
+
+改成
+
+```
+// 使用 computed 来缓存格式化后的数据
+const formattedFileList = computed(() => {
+  return fileList.value.map(file => ({
+    ...file,
+    formattedSize: formatFileSize(file.fileSize),
+    formattedDate: formatDate(file.updateTime)
+  }))
+})
+
+// 修改表格列定义
+const columns = ref([
+  {
+    label: "文件名",
+    field: "filename",
+    sortable: true,
+    width: "50%"
+  },
+  {
+    label: "修改时间",
+    field: "formattedDate",  // 使用预先格式化的字段
+    sortable: true
+  },
+  {
+    label: "大小",
+    field: "formattedSize",  // 使用预先格式化的字段
+    sortable: true
+  }
+])
+
+// 修改数据源
+const tableRows = computed(() => formattedFileList.value)
+
+```
+
+# [vue3 项目中出现的空白页面的总结(巨坑)
+
+
+
+解决:
+
+<span style="color:red">template中必须有且只有一个一级节点,但是恰恰这句话有毒,它并且是不能注释.!!!</span>
+一、背景
+
+开局先说一句!!!! 好坑!!!!!,我遇到的空白页面的问题，不是路由懒加载的原因，是在点击路由完整的状态下，点击菜单跳转页面，出现的空白页面，不能触发页面中任何钩子函数，但是路由是跳了的，重新刷新页面，页面内容即可出现，而且空白出现率相当高。打开浏览器控制台和项目控制台都不报错 ,**我能想到出现这种原因template中必须有且只有一个一级节点,但是恰恰这句话有毒,它并且是不能注释.**
+
+二、实现
+
+![image](D:\Github\BackFront\3-前端\12-前端开发框架\Vue笔记整合\vue3.x\vue笔记2.0.assets\1593465-20231128143212128-165857259.png)
+
+template中必须有且只有一个一级节点,但是恰恰这句话有毒,它并且是不能注释.去掉注释写或把注释写在最里面就可以了,点击菜单跳转页面，就不会出现的空白页面.
+
+**还有一种报错**
+![image](D:\Github\BackFront\3-前端\12-前端开发框架\Vue笔记整合\vue3.x\vue笔记2.0.assets\1593465-20231128145316432-80026030.png)
+template中多个一级节点,也会出现这种情况
+
+
+
+
+
+# 纯CSS解决滚动条显示和消失时导致页面抖动的问题
+
+
+
+## [如何阻止模态框 (Modal / Popup / Dialog) 弹出后 Body 可滚动](https://minimalistying.com/PreventModalScroll)
+
+
+
+[网站滚动条问题 由于滚动条出现消失造成页面抖动 && 自定义滚动条样式_网页滚动条消失的解决方法-CSDN博客](https://blog.csdn.net/m0_52687650/article/details/131293328) 
+
+[避免滚动条引发的页面布局抖动滚动条的出现有时会引起页面布局的抖动，尤其是当页面从有滚动条到无滚动条（或反之）状态切换时。 - 掘金](https://juejin.cn/post/7340926094613381130)
+
+
+
+
+
+
+
+
+
+[vue组件推荐 - 朝朝暮Mu - 博客园](https://www.cnblogs.com/feel-myself/p/17276844.html)
