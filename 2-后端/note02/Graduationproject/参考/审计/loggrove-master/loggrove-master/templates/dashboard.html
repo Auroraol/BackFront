@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% block title %}
+Dashboard
+{% end %}
+{% block style %}
+<style>
+    #myprofile small {margin-bottom: 5px}
+    #myprofile span {font-size: 14px}
+</style>
+{% end %}
+{% block head_js %}
+<script src="{{ static_url('js/user.js') }}"></script>
+{% end %}
+{% block breadcrumb %}
+<li><i class="fa fa-dashboard fa-fw"></i> Dashboard</li>
+{% end %}
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-12 col-lg-10" style="clear: both">
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-users fa-4x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge">
+                                    <span id="online_user_count"></span>/<span id="user_count"></span>
+                                </div>
+                                <div><script>document.write(_("Online"))</script>/<script>document.write(_("User"))</script></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<a href="#">-->
+                    <!--<div class="panel-footer">-->
+                    <!--<span class="pull-left">View Details</span>-->
+                    <!--<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>-->
+                    <!--<div class="clearfix"></div>-->
+                    <!--</div>-->
+                    <!--</a>-->
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-green">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-file fa-4x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge">
+                                    <span id="logfile_count"></span>
+                                </div>
+                                <div><script>document.write(_("Log"))</script></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<a href="#">-->
+                    <!--<div class="panel-footer">-->
+                    <!--<span class="pull-left">View Details</span>-->
+                    <!--<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>-->
+                    <!--<div class="clearfix"></div>-->
+                    <!--</div>-->
+                    <!--</a>-->
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-yellow">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-server fa-4x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge" id="host_count">0</div>
+                                <div><script>document.write(_("Host"))</script></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<a href="#">-->
+                    <!--<div class="panel-footer">-->
+                    <!--<span class="pull-left">View Details</span>-->
+                    <!--<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>-->
+                    <!--<div class="clearfix"></div>-->
+                    <!--</div>-->
+                    <!--</a>-->
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-red">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-cogs fa-4x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge" id="monitor_item_count">0</div>
+                                <div><script>document.write(_("Monitor item"))</script></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<a href="#">-->
+                    <!--<div class="panel-footer">-->
+                    <!--<span class="pull-left">View Details</span>-->
+                    <!--<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>-->
+                    <!--<div class="clearfix"></div>-->
+                    <!--</div>-->
+                    <!--</a>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12 col-lg-10" style="clear: both">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="panel panel-default" id="myprofile">
+                    <div class="panel-heading">
+                        <div class="panel-title"><i class="fa fa-user fa-fw"></i> <script>document.write(_("My profile"))</script></div>
+                    </div>
+                    <div class="panel-body">
+                        <blockquote>
+                            <span><script>document.write(_("Username"))</script></span>
+                            <small>
+                                <cite></cite>
+                            </small>
+                            <span>ID</span>
+                            <small>
+                                <cite></cite>
+                            </small>
+                            <span><script>document.write(_("Fullname"))</script></span>
+                            <small>
+                                <cite></cite>
+                            </small>
+                            <span><script>document.write(_("Email"))</script></span>
+                            <small>
+                                <cite></cite>
+                            </small>
+                            <span><script>document.write(_("Role"))</script></span>
+                            <small>
+                                <cite></cite>
+                            </small>
+                            <span><script>document.write(_("Join time"))</script></span>
+                            <small>
+                                <cite></cite>
+                            </small>
+                            <span><script>document.write(_("Login time"))</script></span>
+                            <small>
+                                <cite></cite>
+                            </small>
+                            <span><script>document.write(_("Expire time"))</script></span>
+                            <small>
+                                <cite></cite>
+                            </small>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="panel-title"><i class="fa fa-calendar-check-o fa-fw"></i> <script>document.write(_("History"))</script> (<script>document.write(_("Limit 100"))</script>)</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="table-responsive" style="border: 0">
+                            <table width="100%" id="history_table">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% end %}
+{% block body_js %}
+<script>
+    $.ajax({
+        url:"/dashboard/",
+        type:"GET",
+        data:'',
+        success:function (result) {
+            var response_data = jQuery.parseJSON(result)
+            $("#logfile_count").text(response_data["data"][0]["logfile_count"])
+            $("#host_count").text(response_data["data"][0]["host_count"])
+            $("#monitor_item_count").text(response_data["data"][0]["monitor_item_count"])
+            $("#user_count").text(response_data["data"][0]["user_count"])
+            $("#online_user_count").text(response_data["data"][0]["online_user_count"])
+        },
+        error:function (result) {}
+    })
+
+    $.ajax({
+        url:"/profile/",
+        type:"GET",
+        data:'',
+        success:function (result) {
+            var response_data = jQuery.parseJSON(result)
+            var cite_objs = $("#myprofile").find("cite")
+            cite_objs.eq(0).text(response_data["data"][0]["username"])
+            cite_objs.eq(1).text(response_data["data"][0]["id"])
+            cite_objs.eq(2).text(response_data["data"][0]["fullname"])
+            cite_objs.eq(3).text(response_data["data"][0]["email"])
+            cite_objs.eq(4).text((response_data["data"][0]["role"]=="1" ?  _("Superadmin") : (response_data["data"][0]=="2" ? _("Admin") : _("Ordinaryuser"))))
+            cite_objs.eq(5).text(response_data["data"][0]["join_time"])
+            cite_objs.eq(6).text(response_data["data"][0]["login_time"])
+            cite_objs.eq(7).text(response_data["data"][0]["expire_time"])
+        },
+        error:function (result) {}
+    })
+
+    $(function(){
+        $('#history_table').bootstrapTable({
+            locale: language,
+            columns: [ {
+                field: 'record_time',
+                title: _("Record time"),
+                sortable: true,
+            }, {
+                field: 'uri',
+                title: 'Uri',
+                sortable: true
+            }, {
+                field: 'method',
+                title: 'Method',
+                sortable: true
+            },],
+            toggle: "table",
+            pagination: true,
+            sortName: 'record_time',
+            sortOrder: 'desc',
+            url:"/historys/",
+            responseHandler:function(data){
+                return data["data"]
+            }
+        });
+    })
+</script>
+{% end %}

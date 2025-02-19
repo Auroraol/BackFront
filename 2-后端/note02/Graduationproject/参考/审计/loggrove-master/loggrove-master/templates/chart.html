@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% block title %}
+监控图表
+{% end %}
+{% block head_js %}
+<script>
+    now = new Date();
+    today = strDateForChart(now, "day")
+    yesterday = strDateForChart(new Date(new Date().setDate(now.getDate()-1)), "day")
+    last_week_same_day = strDateForChart(new Date(new Date().setDate(now.getDate()-7)), "day")
+    last_month_same_day = strDateForChart(new Date(new Date().setMonth(now.getMonth()-1)), "day")
+    last_year_same_day = strDateForChart(new Date(new Date().setFullYear(now.getFullYear()-1)), "day")
+</script>
+{% end %}
+{% block breadcrumb %}
+<li><i class="fa fa-line-chart fa-fw"></i>
+    <script>document.write(_("Charts"))</script>
+</li>
+{% end %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-12 col-lg-10">
+        <div class="row" style="margin-bottom: 5px">
+            <div class="col-sm-12 col-lg-12">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href=".interval" data-toggle="tab">
+                        <script>document.write(_("Continuous time"))</script>
+                    </a>
+                    </li>
+                    <li><a href=".contrast" data-toggle="tab">
+                        <script>document.write(_("Date comparison"))</script>
+                    </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-sm-12 col-lg-12">
+                        <form role="form" class="form-horizontal tab-content">
+                            <div></div>
+                            <div class="form-group item-group">
+                                <div class="col-sm-3">
+                                    <input type="text" name="logfile" class="form-control"
+                                           placeholder="日志文件" autocomplete="off"
+                                           data-provide="typeahead">
+                                    <span name="logfile_error" class="error_text"></span>
+                                </div>
+                                <div class="col-sm-3">
+                                    <select class="form-control selectpicker" multiple name="host"
+                                            data-live-search="true" title="主机地址">
+                                    </select>
+                                </div>
+                                <div class="col-sm-3">
+                                    <select class="form-control selectpicker" multiple name="monitor_item"
+                                            data-live-search="true" title="监控项">
+                                    </select>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div>
+                                        <button type="button" class="btn  btn-default" onclick="del_item_group(this)"><i
+                                                class="fa fa-minus"></i></button>
+                                        <button type="button" class="btn  btn-default" onclick="add_item_group(this)"><i
+                                                class="fa fa-plus"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane active form-group interval" style="margin-top: 30px">
+                                <div class="col-sm-12">
+                                    <button type="button" class="btn btn-default btn-sm" onclick="show_interval_chart('Last 1h')">
+                                        <script>document.write(_("Last 1h"))</script>
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-sm" onclick="show_interval_chart('Last 6h')">
+                                        <script>document.write(_("Last 6h"))</script>
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-sm" onclick="show_interval_chart('Last 12h')">
+                                        <script>document.write(_("Last 12h"))</script>
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-sm" onclick="show_interval_chart('Last 24h')">
+                                        <script>document.write(_("Last 24h"))</script>
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-sm" onclick="show_interval_chart('Last 2d')">
+                                        <script>document.write(_("Last 2d"))</script>
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-sm" onclick="show_interval_chart('Last 7d')">
+                                        <script>document.write(_("Last 7d"))</script>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="tab-pane active form-group interval">
+                                <div class="col-sm-6 col-lg-5">
+                                    <input type="text" class="form-control form_datetime" name="begin_time" placeholder="开始时间">
+                                    <span class="error_text" name="begin_time_error"></span>
+                                </div>
+                                <div class="col-sm-6 col-lg-5">
+                                    <input type="text" class="form-control form_datetime" name="end_time" placeholder="结束时间">
+                                    <span class="error_text" name="end_time_error"></span>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane active form-group interval">
+                                <div class="col-sm-12">
+                                    <button type="button" class="btn btn-default" onclick="show_interval_chart()">
+                                        <script>document.write(_("View"))</script>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade form-group contrast" style="margin-top: 30px">
+                                <div class="col-sm-12">
+                                    <button type="button" class="btn btn-default btn-sm" onclick="show_contrast_chart(yesterday)">
+                                        <script>document.write(_("Yesterday"))</script>
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-sm" onclick="show_contrast_chart(last_week_same_day)">
+                                        <script>document.write(last_week_same_day)</script>
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-sm" onclick="show_contrast_chart(last_month_same_day)">
+                                        <script>document.write(last_month_same_day)</script>
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-sm" onclick="show_contrast_chart(last_month_same_day)">
+                                        <script>document.write(last_year_same_day)</script>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade form-group contrast">
+                                <div class="col-sm-12 col-lg-10">
+                                    <input type="text" taginput-type="date" class="form-control" name="cdate" data-role="tagsinput" placeholder="document.write(_('Date'))">
+                                    <span class="error_text" name="date_error"></span>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade form-group contrast">
+                                <div class="col-sm-12">
+                                    <button type="button" class="btn btn-default" onclick="show_contrast_chart()">
+                                        <script>document.write(_("View"))</script>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12 col-lg-10" style="clear: both">
+        <div class="panel panel-default" style="display: none">
+            <div class="panel-body" id="log_chart">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% end %}
+{% block body_js %}
+<script src="{{ static_url('js/chart.js') }}"></script>
+<script>
+    $("input[name='logfile']").typeahead({
+        delay: 500,
+        autoSelect: false,
+        showHintOnFocus: true,
+        selectOnBlur: false,
+        changeInputOnSelect: true,
+        source: function (search, process) {
+            var param = {search: search, order: "asc", sort: "path", offset: 0, limit: 100};
+            $.get('/logfiles/', param, function (response_data) {
+                var data = jQuery.parseJSON(response_data).data
+                process(data);
+            });
+        },
+        matcher: function (items) {
+            return items;
+        },
+        updater: function (item) {
+            return item.name;
+        },
+        displayText: function (item) {
+            return item.name;
+        }
+    });
+
+    $(function () {
+        curr_logfile_map = {};
+        $("body").on("blur", "input[name='logfile']", function(){
+            if ($(this).val() == curr_logfile_map[$(this)]) {
+                return
+            } else {
+                curr_logfile_map[$(this)] = $("input[name='logfile']").val()
+            }
+
+            var form_group_obj = $(this).parent().parent()
+            var logfile = form_group_obj.find("input[name='logfile']").val()
+
+            form_group_obj.find("select[name='monitor_item']").html('')
+            form_group_obj.find("select[name='monitor_item']").selectpicker('refresh');
+            form_group_obj.find("select[name='monitor_item']").selectpicker('render');
+
+            form_group_obj.find("select[name='host']").html('')
+            form_group_obj.find("select[name='host']").selectpicker('refresh');
+            form_group_obj.find("select[name='host']").selectpicker('render');
+
+            if (logfile) {
+                $.ajax({
+                    url: "/logfiles/",
+                    type: "GET",
+                    data: {"name": logfile},
+                    success: function (result) {
+                        var response_data = jQuery.parseJSON(result)
+                        var data = response_data["data"]
+
+                        if (data.length > 0) {
+                            var host = data[0]["host"]
+                            var hosts = host.split(",")
+                            var select_option_html = ''
+                            for (var i = 0; i < hosts.length; i++) {
+                                select_option_html += ("<option value='" +
+                                        hosts[i] + "'>" + hosts[i] + "</option>")
+                            }
+
+                            form_group_obj.find("select[name='host']").html(select_option_html);
+                            form_group_obj.find("select[name='host']").selectpicker('refresh');
+                            form_group_obj.find("select[name='host']").selectpicker('render');
+                        }
+
+
+                        if (data.length > 0) {
+                            var logfile_id = data[0]["id"];
+                            $.ajax({
+                                url: "/monitor/items/",
+                                type: "GET",
+                                data: {"logfile_id": logfile_id},
+                                success: function (result) {
+                                    var response_data = jQuery.parseJSON(result)
+                                    var data = response_data["data"]
+                                    var select_option_html = ''
+                                    if (data.length > 0) {
+                                        for (var i = 0; i < data.length; i++) {
+                                            select_option_html += ("<option value='" +
+                                                    data[i]["name"] + "'>" + data[i]["name"] + "</option>")
+                                        }
+                                    }
+
+                                    form_group_obj.find("select[name='monitor_item']").html(select_option_html);
+                                    form_group_obj.find("select[name='monitor_item']").selectpicker('refresh');
+                                    form_group_obj.find("select[name='monitor_item']").selectpicker('render');
+                                },
+                                error: function (result) {
+                                }
+                            })
+                        }
+                    },
+                    error: function (result) {
+                        alert("GET logfiles error：" + result.responseText)
+                    }
+                })
+            }
+        })
+    })
+
+
+    $(".form_datetime").datetimepicker({
+        language: 'zh-CN',
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        forceParse: 0,
+    });
+    $(".form_date").datetimepicker({
+        language: 'zh-CN',
+        format: "yyyy-mm-dd",
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        forceParse: 0,
+        minView: 2,
+    });
+
+    $("input[name='logfile']").attr("placeholder", _("Logfile"))
+    $("select[name='host']").attr("title", _("Host"))
+    $("select[name='monitor_item']").attr("title", _("Monitor item"))
+    $("input[name='begin_time']").attr("placeholder", _("Begin time"))
+    $("input[name='end_time']").attr("placeholder", _("End time"))
+</script>
+{% end %}

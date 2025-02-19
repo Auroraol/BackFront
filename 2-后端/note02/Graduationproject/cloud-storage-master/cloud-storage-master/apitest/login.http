@@ -1,0 +1,14 @@
+### 登录
+POST http://{{host}}/login
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "UserName": "chenyu",
+  "Password": "123456"
+}
+
+###
+
+

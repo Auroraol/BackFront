@@ -1,0 +1,12 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: #yours
+        group: #yours
+        prefix: #yours
+        file-extension: yaml
+        namespace: #yours
+      discovery:
+        server-addr: #yours
+        namespace: #yours

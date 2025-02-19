@@ -1,0 +1,55 @@
+syntax = "v1"
+
+info(
+    title: "aso-app-api"
+    desc: "静态资源管理接口"
+    author: "thunur"
+    email: "thunur@qq.com"
+    version: "v1"
+)
+
+
+type ItemPageReq {
+    // 集成通用请求
+    PageData
+    ClassifyId      int64       `json:"classifyId,optional"`
+}
+
+type ItemPageData {
+    Id              int64       `json:"id"`
+    CreateTime      string      `json:"createTime"`
+    UpdateTime      string      `json:"updateTime"`
+    Url             string      `json:"url"`
+    Type            string      `json:"type"`
+    ClassifyId      int64       `json:"classifyId"`
+}
+
+type ItemAddReq {
+    ClassifyId      int64       `json:"classifyId,optional"`
+    Type            string      `json:"type"`
+    Url             string      `json:"url"`
+}
+
+type UploadReq {
+    File            string      `form:"file"`
+}
+
+@server(
+    jwt: Auth
+    middleware: Authority
+    group: app/item
+)
+service admin-api {
+    @doc(
+        summary: "相册列表"
+    )
+    @handler ItemPage
+    post /api/app/item/page(ItemPageReq) returns(PageResp)
+    @doc(
+        summary: "存入相册"
+    )
+    @handler ItemAdd
+    post /api/app/item/add(ItemAddReq) returns(Resp)
+    @handler Upload
+    post /api/app/item/upload(UploadReq) returns(Resp)
+}

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <conversionRule conversionWord="ip" converterClass="com.aixiya.framework.backend.log.starter.configure.IpLogConfig" />
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
+    <springProperty scope="context" name="logging.console.enable" source="aixiya.platform.log.console.enable" defaultValue="false" />
+    <springProperty scope="context" name="kServers.aixiya" source="aixiya.platform.log.kafka.bootstrap-servers"  />
+    <property name="log.path" value="log/foundation-center"/>
+    <property name="log.maxHistory" value="15"/>
+    <property name="log.colorPattern"
+              value="%magenta(%d{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %boldCyan(${springAppName:-}) %yellow(%thread) %green(%logger) %msg%n"/>
+    <property name="log.pattern" value="%ip %d{yyyy-MM-dd HH:mm:ss} %-5level ${springAppName:-} %X{X-B3-TraceId:-} %X{X-B3-SpanId:-} %thread %logger %msg%n"/>
+    <property name="mapper.package" value="aixiya.framework.backend.platform.foundation.mapper" />
+    <property name="log.file.size" value="5MB" />
+    <property name="log.console.enable" value="${logging.console.enable}" />
+    <property name="log.file.encoding" value="UTF-8" />
+    <property name="kafkaServers.aixiya" value="${kServers.aixiya}" />
+
+    <!--输出到控制台-->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log.colorPattern}</pattern>
+        </encoder>
+    </appender>
+
+
+    <!-- ROOT -->
+    <appender name="file_root" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/root/root.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <MaxHistory>${log.maxHistory}</MaxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${log.file.size}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+
+    <!--输出到文件-->
+    <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/info/info.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <MaxHistory>${log.maxHistory}</MaxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${log.file.size}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/error/error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <MaxHistory>${log.maxHistory}</MaxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${log.file.size}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!--sql-->
+    <appender name="sql" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/sql/sql.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <MaxHistory>${log.maxHistory}</MaxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${log.file.size}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!--输出到 logstash的 appender-->
+    <appender name="kafkaAppender" class="com.github.danielwegener.logback.kafka.KafkaAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers class="net.logstash.logback.composite.loggingevent.LoggingEventJsonProviders">
+                <pattern>
+                    <pattern>
+                        {
+                        "appName":"${springAppName:-}",
+                        "thread":"%thread %logger",
+                        "date":"%d{yyyy-MM-dd HH:mm:ss}",
+                        "level":"%level",
+                        "msg":"%msg",
+                        "aixiyaTraceId":"%X{X-B3-TraceId:-}",
+                        "aixiyaSpanId":"%X{X-B3-SpanId:-}",
+                        "stack_trace":"%exception",
+                        "ip":"%ip"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+            <!--  <charset>UTF-8</charset>-->
+        </encoder>
+        <topic>baelk-log</topic>
+        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy" />
+        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" />
+        <producerConfig>bootstrap.servers=${kafkaServers.aixiya}</producerConfig>
+        <producerConfig>acks=0</producerConfig>
+        <!-- this is the fallback appender if kafka is not available. -->
+        <appender-ref ref="console" />
+    </appender>
+
+
+    <logger name="org.apache.kafka.clients.producer.ProducerConfig" level="ERROR">
+        <appender-ref ref="file_error"/>
+    </logger>
+    <logger name="org.apache.kafka.common.utils.AppInfoParser" level="ERROR">
+        <appender-ref ref="file_error"/>
+    </logger>
+    <logger name="org.apache.kafka.clients.Metadata" level="ERROR">
+        <appender-ref ref="file_error"/>
+    </logger>
+    <logger name="org.springframework.kafka.listener.KafkaMessageListenerContainer" level="WARN">
+        <appender-ref ref="file_error"/>
+        <appender-ref ref="file_root"/>
+    </logger>
+
+
+
+    <root level="WARN">
+        <appender-ref ref="file_root" />
+    </root>
+
+    <root level="DEBUG">
+        <appender-ref ref="file_info"/>
+        <appender-ref ref="file_error"/>
+        <if condition='property("log.console.enable").contains("true")'>
+            <then>
+                <appender-ref ref="console"/>
+            </then>
+        </if>
+    </root>
+
+    <logger name="${mapper.package}" level="DEBUG">
+        <appender-ref ref="sql"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="kafkaAppender" />
+    </root>
+
+</configuration>

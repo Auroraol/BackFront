@@ -1,0 +1,66 @@
+syntax = "v1"
+
+info(
+    title: "aso-admin-api"
+    desc: "微信相关接口"
+    author: "thunur"
+    email: "thunur@qq.com"
+    version: "v1"
+)
+
+
+type ConfigInfoReq {
+    Type            int64               `form:"type"`
+}
+
+type ConfigUpdateData {
+    Appid           string              `json:"appId"`
+    AppSecret       string              `json:"appSecret"`
+    EncodingAESKey  string              `json:"EncodingAESKey,optional"`
+    Token           string              `json:"Token,optional"`
+}
+
+type ConfigUpdateReq {
+    Data            ConfigUpdateData        `json:"data"`
+    Type            int64                   `json:"type"`
+}
+
+// 自动回复
+type AutoReply struct {
+    active      string              `json:"active"`
+    media       []MaterialData      `json:"media,optional"`
+    mediaid     int64               `json:"media_id,optional"`
+    text        string              `json:"text,optional"`
+    url         string              `json:"url,optional"`
+}
+
+type Attention struct {
+    active      string              `json:"active"`
+    media       []MaterialData      `json:"media,optional"`
+    mediaid     int64               `json:"media_id,optional"`
+    text        string              `json:"text,optional"`
+    url         string              `json:"url,optional"`
+}
+
+type ConfigReplyUpdateData {
+    AutoReply   AutoReply           `json:"autoReply"`
+    Attention   Attention           `json:"attention"`
+}
+type ConfigReplyUpdateReq {
+    Type        int64                   `json:"type"`
+    Data        ConfigReplyUpdateData   `json:"data"`
+}
+
+@server(
+    jwt: Auth
+    group: wechat/config
+    middleware: Authority
+)
+service admin-api {
+    @handler ConfigInfo
+    get /api/wechat/config/info (ConfigInfoReq) returns (Resp)
+    @handler ConfigUpdate
+    put /api/wechat/config/update (ConfigUpdateReq) returns (Resp)
+    @handler ConfigUpdateReply
+    put /api/wechat/config/reply (ConfigReplyUpdateReq) returns(Resp)
+}

@@ -1,0 +1,6 @@
+*.pyc
+__pycache__
+*.DS_Store
+*.idea
+static/sb-admin-2/pages
+scripts/monitors.py

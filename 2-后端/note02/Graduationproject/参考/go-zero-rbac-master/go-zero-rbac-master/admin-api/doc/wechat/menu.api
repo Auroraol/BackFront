@@ -1,0 +1,44 @@
+syntax = "v1"
+
+info(
+    title: "aso-admin-api"
+    desc: "微信菜单管理接口"
+    author: "thunur"
+    email: "thunur@qq.com"
+    version: "v1"
+)
+
+type WechatMenuData {
+    Type       string               `json:"type"`
+    Name       string               `json:"name,optional"`
+    URL        string               `json:"url,optional"`
+    MediaID    int64                `json:"media_id,optional"`
+    MsgType    string               `json:"msgType"`
+    AppID      string               `json:"app_id,optional"`
+    PagePath   string               `json:"page_path,optional"`
+    Text       string               `json:"text,optional"`
+    Pic        string               `json:"pic,optional"`
+    SubButtons []*WechatMenuData    `json:"sub_button,optional"`
+}
+
+type WechatMenuAddReq {
+    Data        []WechatMenuData           `json:"data"`
+}
+
+@server(
+    jwt: Auth
+    group: wechat/menu
+    middleware: Authority
+)
+service admin-api {
+    @doc(
+        summary: "菜单添加"
+    )
+    @handler MenuAdd
+    post /api/wechat/menu/add (WechatMenuAddReq) returns (Resp)
+    @doc(
+        summary:"菜单信息"
+    )
+    @handler MenuList
+    get /api/wechat/menu/list () returns(Resp)
+}

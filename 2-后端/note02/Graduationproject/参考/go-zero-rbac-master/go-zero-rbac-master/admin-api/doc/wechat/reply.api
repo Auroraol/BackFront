@@ -1,0 +1,60 @@
+syntax = "v1"
+
+info(
+    title: "aso-admin-api"
+    desc: "微信菜单管理接口"
+    author: "thunur"
+    email: "thunur@qq.com"
+    version: "v1"
+)
+
+
+type AddReplyReq {
+    key string `json:"key"`
+    Match bool `json:"match"`
+    MediaId int64 `json:"mediaId,optional"`
+    Name string `json:"name"`
+    Text string `json:"text,optional"`
+    Type string `json:"type,optional"`
+    Url string `json:"url,optional"`
+}
+
+type ReplyInfoReq {
+    Id int64 `form:"id"`
+}
+
+//
+type ReplyInfoData {
+    Id         int64     `json:"id"`
+    Name       string    `json:"name"`
+    Key        string    `json:"key"`   // 关键词
+    Match      bool      `json:"match"` // 回复类型
+    Type       string    `json:"type"`
+    MediaId    int64     `json:"mediaId"` // 回复媒体内容id
+    Text       string    `json:"text"`    // 回复文本
+    Url        string    `json:"url"`
+    CreateTime string    `json:"createTime"`
+    UpdateTime string    `json:"updateTime"`
+}
+
+type ReplyDeleteReq {
+    Ids        []int64  `json:"ids"`
+}
+
+@server(
+    jwt: Auth
+    group: wechat/reply
+    middleware: Authority
+)
+service admin-api {
+    @handler ReplyKeyAdd
+    post /api/wechat/reply/add (AddReplyReq) returns (Resp)
+    @handler ReplyPage
+    post /api/wechat/reply/page (PageReq) returns (PageResp)
+    @handler ReplyInfo
+    get /api/wechat/reply/info (ReplyInfoReq) returns (Resp)
+    @handler ReplyDelete
+    delete /api/wechat/reply/delete (ReplyDeleteReq) returns(Resp)
+    @handler ReplyUpdate
+    put /api/wechat/reply/update(ReplyInfoData) returns(Resp)
+}

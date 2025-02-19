@@ -1,0 +1,19 @@
+[submodule "NeteaseCloudMusicApi"]
+	path = NeteaseCloudMusicApi
+	url = https://github.com/HyPlayer/NeteaseCloudMusicApi.git
+[submodule "Kawazu"]
+	path = Kawazu
+	url = https://github.com/HyPlayer/Kawazu.git
+[submodule "AudioEffectComponent"]
+	path = AudioEffectComponent
+	url = https://github.com/HyPlayer/AudioEffectComponent
+[submodule "LyricParser"]
+	path = LyricParser
+	url = https://github.com/HyPlayer/LyricParser
+	branch = UWP
+[submodule "Impressionist"]
+	path = Impressionist
+	url = https://github.com/Storyteller-Studios/Impressionist
+[submodule "HyPlayer.Frieren"]
+	path = HyPlayer.Frieren
+	url = https://github.com/HyPlayer/HyPlayer.Frieren

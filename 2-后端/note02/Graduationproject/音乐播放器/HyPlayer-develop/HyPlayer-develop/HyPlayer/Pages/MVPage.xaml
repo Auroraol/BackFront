@@ -1,0 +1,148 @@
+﻿<Page
+    x:Class="HyPlayer.Pages.MVPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:classes="using:HyPlayer.Classes"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:controls1="using:HyPlayer.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:frieren="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    NavigationCacheMode="Disabled"
+    mc:Ignorable="d">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer.Resources>
+            <DataTemplate x:Key="RelativeTemplate" x:DataType="classes:NCMlog">
+                <Grid Margin="0,12,0,12" Tag="{x:Bind id}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <frieren:ImageEx
+                        MaxHeight="100"
+                        IsCacheEnabled="False"
+                        Source="{x:Bind cover}"
+                        Stretch="UniformToFill" />
+
+                    <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                        <TextBlock
+                            Margin="0,0,0,6"
+                            HorizontalAlignment="Left"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Text="{x:Bind title}" />
+                        <TextBlock
+                            Width="350"
+                            FontWeight="Normal"
+                            MaxLines="1"
+                            Text="{x:Bind description}" />
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+        </ScrollViewer.Resources>
+        <StackPanel Orientation="Vertical">
+            <frieren:Loading x:Name="LoadingControl" IsLoading="True">
+                <StackPanel Padding="12" Orientation="Horizontal">
+                    <ProgressRing Margin="0,0,12,0" IsActive="True" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Foreground="White"
+                        Text="加载中" />
+                </StackPanel>
+                <frieren:Loading.Background>
+                    <AcrylicBrush
+                        BackgroundSource="Backdrop"
+                        TintColor="Black"
+                        TintOpacity="0.4" />
+                </frieren:Loading.Background>
+            </frieren:Loading>
+            <Grid
+                x:Name="MainGrid"
+                ColumnSpacing="10"
+                RowSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <MediaPlayerElement
+                    x:Name="MediaPlayerElement"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Margin="15"
+                    HorizontalAlignment="Left"
+                    AreTransportControlsEnabled="True" />
+                <StackPanel
+                    x:Name="SecondGrid"
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Margin="15"
+                    Orientation="Vertical"
+                    Spacing="15">
+                    <controls1:SelectableTextBox
+                        x:Name="TextBoxVideoName"
+                        FontSize="35"
+                        FontWeight="Bold"
+                        TextWrapping="Wrap" />
+                    <controls1:SelectableTextBox
+                        x:Name="TextBoxSinger"
+                        FontSize="18"
+                        Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
+                    <controls1:ExpandableTextBox
+                        x:Name="TextBoxDesc"
+                        FontSize="15"
+                        Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                        TextWrapping="Wrap" />
+                    <controls1:SelectableTextBox
+                        x:Name="TextBoxOtherInfo"
+                        FontSize="15"
+                        Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                        TextWrapping="Wrap" />
+                    <ComboBox
+                        x:Name="VideoQualityBox"
+                        Header="清晰度选择"
+                        SelectionChanged="VideoQualityBox_SelectionChanged" />
+                    <ListView
+                        x:Name="RelativeList"
+                        MaxHeight="400"
+                        ItemTemplate="{StaticResource RelativeTemplate}"
+                        SelectionChanged="RelativeList_OnSelectionChanged" />
+                </StackPanel>
+            </Grid>
+
+
+            <Frame x:Name="CommentFrame" />
+            <Grid Height="150" />
+        </StackPanel>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="MainGrid.RowDefinitions[1].Height" Value="*" />
+                        <Setter Target="MainGrid.ColumnDefinitions[1].Width" Value="auto" />
+                        <Setter Target="SecondGrid.(Grid.Column)" Value="0" />
+                        <Setter Target="SecondGrid.(Grid.Row)" Value="1" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="900" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="MainGrid.RowDefinitions[1].Height" Value="auto" />
+                        <Setter Target="MainGrid.ColumnDefinitions[1].Width" Value="*" />
+                        <Setter Target="SecondGrid.(Grid.Column)" Value="1" />
+                        <Setter Target="SecondGrid.(Grid.Row)" Value="0" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </ScrollViewer>
+</Page>

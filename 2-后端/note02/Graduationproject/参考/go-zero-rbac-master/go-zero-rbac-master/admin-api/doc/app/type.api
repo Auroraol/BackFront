@@ -1,0 +1,57 @@
+syntax = "v1"
+
+info(
+    title: "aso-app-api"
+    desc: "静态资源管理接口"
+    author: "thunur"
+    email: "thunur@qq.com"
+    version: "v1"
+)
+
+
+type (
+    TypeAddReq {
+        Name            string      `json:"name"`
+    }
+    TypeUpdateReq {
+        Id              int64       `json:"id"`
+        Name            string      `json:"name"`
+    }
+    TypeDeleteReq {
+        Ids             []int64     `json:"ids"`
+    }
+    TypeListData {
+        Id              int64       `json:"id"`
+        CreateTime      string      `json:"createTime"`
+        UpdateTime      string      `json:"updateTime"`
+        Name            string      `json:"name"`
+    }
+)
+
+@server(
+    jwt: Auth
+    middleware: Authority
+    group: app/type
+)
+service admin-api {
+    @doc(
+        summary: "类型添加"
+    )
+    @handler typeAdd
+    post /api/app/type/add (TypeAddReq) returns (Resp)
+    @doc(
+        summary: "类型更新"
+    )
+    @handler TypeUpdate
+    put /api/app/type/update(TypeUpdateReq) returns (Resp)
+    @doc(
+        summary: "类型删除"
+    )
+    @handler TypeDelete
+    delete /api/app/type/delete(TypeDeleteReq) returns (Resp)
+    @doc(
+        summary: "类型列表"
+    )
+    @handler TypeList
+    get /api/app/type/list () returns(Resp)
+}

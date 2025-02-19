@@ -1,0 +1,120 @@
+syntax = "v1"
+
+info(
+    title: "aso-admin-api-user"
+    desc: "后台菜单管理"
+    author: "thunur"
+    email: "thunur@qq.com"
+    version: "v1"
+)
+
+type UserListReq {
+    Page                int64     `json:"page"`
+    Size                int64     `json:"size"`
+    Sort                string    `json:"sort,optional"`
+    Oder                string    `json:"order,optional"`
+    KeyWord             string    `json:"keyWord,optional"`
+    DeptId              []int64   `json:"departmentIds,optional"`
+}
+type UserInfoData{
+     Id           int64   `json:"id"`
+     CreateTime   string  `json:"createTime"`
+     UpdateTime   string  `json:"updateTime"`
+     DepartmentId int64   `json:"departmentId"`
+     Name         string  `json:"name"`
+     NickName     string  `json:"nickName"`
+     HeadImg      string  `json:"headImg,optional"`
+     Phone        string  `json:"phone,optional"`
+     Email        string  `json:"email,optional"`
+     Status       bool    `json:"status,optional"`
+     Remark       string  `json:"remark,optional"`
+     RoleIdList   []int64 `json:"roleIdList"`
+}
+type UserListData {
+    Id                   int64    `json:"id"`
+    CreateTime           string   `json:"createTime"`
+    UpdateTime           string   `json:"updateTime"`
+    DepartmentId         int64    `json:"departmentId"`
+    Name                 string   `json:"name"`
+    Username             string   `json:"username"`
+    NickName             string   `json:"nickName"`
+    HeadImg              string   `json:"headImg"`
+    Phone                string   `json:"phone"`
+    Email                string   `json:"email"`
+    Status               bool     `json:"status"`
+    Remark               string   `json:"remark"`
+    RoleName             string   `json:"roleName"`
+    DepartmentName       string   `json:"departmentName"`
+}
+
+type UserAddReq {
+    DepartmentId         int64    `json:"departmentId"`
+    Name                 string   `json:"name"`
+    Username             string   `json:"username"`
+    NickName             string   `json:"nickName"`
+    HeadImg              string   `json:"headImg,optional"`
+    Phone                string   `json:"phone,optional"`
+    Email                string   `json:"email,optional"`
+    Status               bool     `json:"status"`
+    Remark               string   `json:"remark,optional"`
+    RoleIdList           []int64  `json:"roleIdList"`
+}
+
+type UserInfoReq {
+    Id                  int64     `form:"id"`
+}
+
+type UserUpdateReq {
+    Id                   int64    `json:"id"`
+    CreateTime           string   `json:"createTime"`
+    UpdateTime           string   `json:"updateTime"`
+    DepartmentId         int64    `json:"departmentId"`
+    Name                 string   `json:"name"`
+    NickName             string   `json:"nickName"`
+    HeadImg              string   `json:"headImg,optional"`
+    Phone                string   `json:"phone,optional"`
+    Email                string   `json:"email,optional"`
+    Status               bool     `json:"status,optional"`
+    Remark               string   `json:"remark,optional"`
+    RoleIdList           []int64  `json:"roleIdList"`
+}
+
+type UserMoveReq {
+    DepartmentId        int64     `json:"departmentId"`
+    UserIds             []int64   `json:"userIds"`
+}
+
+@server(
+    jwt: Auth
+    group: sys/user
+    middleware: Authority
+)
+
+service admin-api {
+    @doc(
+        summary:"用户列表"
+    )
+    @handler UserPage
+    post /api/sys/user/page (UserListReq) returns (PageResp)
+    @doc(
+        summary:"用户添加"
+    )
+    @handler UserAdd
+    post /api/sys/user/add (UserAddReq) returns (Resp)
+    @doc(
+        summary:"用户信息"
+    )
+    @handler UserInfo
+    get /api/sys/user/info (UserInfoReq) returns (Resp)
+    @doc(
+        summary:"编辑用户"
+    )
+    @handler UserUpdate
+    put /api/sys/user/update (UserUpdateReq) returns (Resp)
+    @doc(
+        summary:"部门转移"
+    )
+    @handler UserMove
+    put /api/sys/user/move (UserMoveReq) returns (Resp)
+// todo 删除用户
+}

@@ -1,0 +1,68 @@
+syntax = "v1"
+
+info(
+    title: "aso-admin-api"
+    desc: "后台相关api接口"
+    author: "thunur"
+    email: "thunur@qq.com"
+    version: "v1"
+)
+
+
+type DeptData {
+    Id         int64     `json:"id"`         // ID
+    CreateTime string    `json:"createTime"` // 创建时间
+    UpdateTime string    `json:"updateTime"` // 更新时间
+    Name       string    `json:"name"`       // 部门名称
+    ParentId   int64     `json:"parentId"`   // 上级部门ID
+    OrderNum   int64     `json:"orderNum"`   // 排序
+    ParentName string    `json:"parentName"` // 上级部门名称
+}
+
+type DeptAddReq {
+    Name       string    `json:"name"`       // 部门名称
+    ParentId   int64     `json:"parentId"`   // 上级部门ID
+    OrderNum   int64     `json:"orderNum"`   // 排序
+}
+
+type DeptDeleteReq {
+    DeleteUser bool      `json:"deleteUser"` // 是否删除会员
+    Ids        []int64   `json:"ids"` // 删除数组
+}
+
+type DeptOrderData {
+    Id         int64     `json:"id"`
+    OrderNum   int64     `json:"orderNum"`
+    ParentId   int64     `json:"parentId"`
+}
+type DeptOrderReq {
+    Data []DeptOrderData  `json:"data"`
+}
+
+@server(
+    jwt: Auth
+    group: sys/dept
+    middleware: Authority
+)
+service admin-api {
+    @doc(
+        summary: "部门列表"
+    )
+    @handler deptList
+    get /api/sys/dept/list () returns (Resp)
+    @doc(
+        summary: "部门添加"
+    )
+    @handler deptAdd
+    post /api/sys/dept/add (DeptAddReq) returns (Resp)
+    @doc(
+        summary: "部门删除"
+    )
+    @handler deptDelete
+    delete /api/sys/dept/delete (DeptDeleteReq) returns (Resp)
+    @doc(
+        summary: "部门排序"
+    )
+    @handler deptOrder
+    put /api/sys/dept/order (DeptOrderReq) returns (Resp)
+}

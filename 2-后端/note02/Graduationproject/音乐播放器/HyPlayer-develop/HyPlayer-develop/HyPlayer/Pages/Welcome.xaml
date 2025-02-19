@@ -1,0 +1,41 @@
+﻿<Page
+    x:Class="HyPlayer.Pages.Welcome"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    NavigationCacheMode="Disabled"
+    mc:Ignorable="d">
+    <Grid>
+        <StackPanel
+            Margin="0,0,0,64"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="18">
+            <controls:ImageEx
+                x:Name="ImageE"
+                Width="128"
+                Height="128"
+                Source="Assets/icon.png" />
+            <StackPanel VerticalAlignment="Center" Spacing="8">
+                <TextBlock
+                    x:Name="TBHINT"
+                    Style="{StaticResource TitleTextBlockStyle}"
+                    Text="欢迎使用 HyPlayer!" />
+                <TextBlock
+                    FontSize="18"
+                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                    Text="推荐您在登录后进入设置进行个性化" />
+                <Button x:Name="LoginBtn" Click="LoginBtn_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon FontSize="14" Glyph="&#xE0AD;" />
+                        <TextBlock Text="登录" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+
+    </Grid>
+</Page>

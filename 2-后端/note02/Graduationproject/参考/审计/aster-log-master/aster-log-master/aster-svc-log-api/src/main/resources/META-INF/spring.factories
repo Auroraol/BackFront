@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    com.aster.cloud.svc.log.api.LogAutoConfiguration

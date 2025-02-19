@@ -1,0 +1,22 @@
+$button-bgc-primary : #3766ff;
+
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    'primary': (
+      'base': $button-bgc-primary,
+    ),
+  )
+);
+
+.el-button:focus-visible{
+  outline: none;
+  outline-offset: 0;
+}
+
+.el-button--primary:focus{
+  background-color: var(--el-color-primary);
+}
+.el-button--primary:hover{
+  background-color: darken($button-bgc-primary, 6%);
+  border-color: darken($button-bgc-primary, 6%);
+}

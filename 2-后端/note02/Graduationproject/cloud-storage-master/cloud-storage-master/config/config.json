@@ -1,0 +1,24 @@
+{
+  "数据库配置":"",
+  "DbHost": "127.0.0.1",
+  "DbPort": 3306,
+  "DbUser": "root",
+  "DbPassword": "123456",
+  "DbDatabase": "fileserver",
+  "DbTablePrefix": "tbl_",
+
+  "Http配置": "",
+  "HttpPort":":8123",
+  "HttpReadTimeout": 30,
+  "HttpWriteTimeout": 30,
+
+  "redis配置":"",
+  "RedisHost": "127.0.0.1",
+  "RedisPassword": "123456",
+  "RedisMaxIdle": 30,
+  "RedisMaxActive": 30,
+  "RedisIdleTimeout": 3600,
+
+  "ChunkSize": 5,
+  "MergeAllShell": "./merge.sh"
+}
