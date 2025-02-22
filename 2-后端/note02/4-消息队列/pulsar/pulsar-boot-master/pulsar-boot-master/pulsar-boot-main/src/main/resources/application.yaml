@@ -1,0 +1,101 @@
+#============================#
+# 项目总相关配置
+#============================#
+javadog:
+  info:
+    # 名称
+    name: JavaDog
+    # 版本
+    version: 1.0.0
+    # 版权年份
+    copyrightYear: 2024
+    # 开发者
+    developer: hdx
+    # 邮箱
+    email: 862422627@qq.com
+  swagger:
+    # 标题
+    title: JavaDog开发平台
+    # 描述
+    description: 极简Java脚手架
+    # 版本
+    version: ${javadog.info.version}
+    # 作者
+    author: 胡东旭
+    # 路径
+    url:
+    # 邮箱
+    email: 862722627@qq.com
+    # 协议
+    license: MIT
+    # 协议地址
+    license-url: https://gitee.com
+
+#============================#
+# server 配置
+#============================#
+server:
+  # 端口号
+  port: 82
+  max-http-header-size: 10240
+  servlet:
+    context-path: /v1
+
+#============================#
+# spring 配置
+#============================#
+spring:
+  application:
+    # 应用名
+    name: javadog
+  profiles:
+    active: local
+  servlet:
+    multipart:
+      max-request-size: 100MB
+      max-file-size: 100MB
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss.SSS
+    locale: zh_CN
+    serialization:
+      # 格式化输出
+      indent_output: false
+
+
+#============================#
+# 接口文档配置
+#============================#
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui
+  # 参见 https://doc.xiaominfo.com/docs/faq/v4/knife4j-parameterobject-flat-param 文档
+  default-flat-param-object: true
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+
+pulsar:
+  #支付topic
+  pay-topic: persistent://public/default/pay-topic
+  #支付subscription
+  pay-subscription: pay-subscription
+  #订单topic
+  order-topic: persistent://public/default/order-topic
+  #订单subscription
+  order-subscription: order-subscription
+  #库存topic
+  stock-topic: persistent://public/default/stock-topic
+  #库存subscription
+  stock-subscription: stock-subscription
+  #物流topic
+  logistics-topic: persistent://public/default/logistics-topic
+  #物流subscription
+  logistics-subscription: logistics-subscription
+

@@ -1,0 +1,3 @@
+# Pulsar配置
+pulsar:
+  url: pulsar://192.168.31.27:6650
