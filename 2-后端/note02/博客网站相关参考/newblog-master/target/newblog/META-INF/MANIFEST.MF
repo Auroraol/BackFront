@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Created-By: IntelliJ IDEA
-Built-By: 16658
-Build-Jdk: Amazon Corretto version 17.0.7
-Implementation-Title: myblog
-Implementation-Version: 1.0
-Implementation-Vendor-Id: newblog
-Main-Class: ${start-class}
-
