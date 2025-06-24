@@ -813,6 +813,29 @@ console.log(fullName); // 输出: John，因为我们将 person 对象的 name �
 
 需要注意的是，解构赋值语法只能提取已经声明的变量。如果尝试提取一个未声明的变量，会导致错误。
 
+补充
+
+```ts
+function example({ prop1, prop2 }) {
+    console.log(prop1, prop2);
+}
+
+const obj = { prop1: 'value1', prop2: 'value2' };
+example(obj); // 
+```
+
+```ts
+function modifyObject(obj) {
+    obj.newProp = 'newValue';
+}
+
+const myObj = { existingProp: 'value' };
+modifyObject(myObj);
+console.log(myObj); // 输出: { existingProp: 'value', newProp: 'newValue' }
+```
+
+
+
 # 字符串拼接
 
 ## 1. 模板字符串（Template Strings）
