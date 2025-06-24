@@ -1,6 +1,0 @@
-<component name="CopyrightManager">
-  <copyright>
-    <option name="notice" value="# 文件：&amp;#36;file.fileName  项目：&amp;#36;project.name&#10;# 作用：&#10;# 当前修改时间：&amp;#36;today.format(&quot;yyyy年MM月dd日 HH:mm:ss&quot;)&#10;# 上次修改时间：&amp;#36;file.lastModified.format(&quot;yyyy年MM月dd日 HH:mm:ss&quot;)&#10;# 作者：&amp;#36;username&#10;# 这不是一个自由软件！您只能在不用于商业目的的前提下对程序代码进行修改和使用。&#10;# 任何企业和个人不允许对程序代码以任何形式任何目的再发布。&#10;# 如果您还没获得授权请联系我们 thunur@qq.com&#10;# Copyright (c) &amp;#36;today.year aso.design" />
-    <option name="myName" value="aso" />
-  </copyright>
-</component>
